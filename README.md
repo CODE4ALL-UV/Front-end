@@ -39,4 +39,3 @@ Verificar instalación:
 
 ```bash
 flutter doctor
-

@@ -1,0 +1,1 @@
+// este es un ejemplo de curso dart que sirve para mostrar como se pueden crear modelos de datos en Dart

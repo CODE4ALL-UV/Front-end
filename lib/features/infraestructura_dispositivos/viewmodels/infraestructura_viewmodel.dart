@@ -1,0 +1,1 @@
+// Este es un ejemplo de infraestructura viewmodel dart que sirve para mostrar como se pueden crear viewmodels en Dart

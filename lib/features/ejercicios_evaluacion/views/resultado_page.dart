@@ -1,0 +1,1 @@
+// este ees un jemplo de resultado page dart que sirve para mostrar como se pueden crear vistas en Dart

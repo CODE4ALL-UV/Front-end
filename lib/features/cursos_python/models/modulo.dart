@@ -1,0 +1,1 @@
+// este es un ejempl ode modulo dart que sirve para mostrar como se pueden crear modelos de datos en Dart

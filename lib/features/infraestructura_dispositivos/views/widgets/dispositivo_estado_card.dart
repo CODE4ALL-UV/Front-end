@@ -1,0 +1,1 @@
+// este es un ejemplo de dispositivo estado card dart que sirve para mostrar como se pueden crear widgets en Dart

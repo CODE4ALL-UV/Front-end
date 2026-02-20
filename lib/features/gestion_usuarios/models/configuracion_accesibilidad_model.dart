@@ -1,0 +1,1 @@
+// Este es un ejemplo de un modelo de configuración de accesibilidad que representa las opciones de accesibilidad para un usuario en la aplicación.

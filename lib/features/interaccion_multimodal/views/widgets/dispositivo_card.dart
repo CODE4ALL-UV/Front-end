@@ -1,0 +1,1 @@
+// este es un ejemplo de dispositivo card widget que representa una tarjeta de dispositivo en la interfaz de usuario de la aplicación para la interacción multimodal, mostrando información relevante sobre el dispositivo y permitiendo al usuario interactuar con él.

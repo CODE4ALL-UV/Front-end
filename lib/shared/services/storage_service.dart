@@ -1,0 +1,1 @@
+//este es unb ejemplo de storage service que sirve para guardar datos en el dispositivo del usuario, utilizando el paquete shared_preferences de dart

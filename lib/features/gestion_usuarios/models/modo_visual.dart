@@ -1,0 +1,1 @@
+// este es un ejemplo de modo visual model que representa los diferentes modos visuales que un usuario puede seleccionar en la aplicación, como modo claro, modo oscuro, etc. --- IGNORE ---

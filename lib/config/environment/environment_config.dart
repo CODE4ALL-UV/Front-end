@@ -1,0 +1,1 @@
+// Este es un ejemplo de environment_config.dart que se puede usar para configurar diferentes entornos (desarrollo, producción, etc.) en una aplicación Flutter.

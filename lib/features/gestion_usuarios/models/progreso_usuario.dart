@@ -1,0 +1,1 @@
+// Este es un ejemplo de un modelo de progreso de usuario que representa el progreso de un usuario en la aplicación, como el nivel alcanzado, puntos acumulados, etc. --- IGNORE ---

@@ -1,0 +1,1 @@
+// Este es un ejemplo de adaptacion viewmodel que representa la lógica de negocio y el estado de la vista de adaptación en la aplicación.

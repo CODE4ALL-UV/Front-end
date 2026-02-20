@@ -1,0 +1,1 @@
+// este es un jemplo de login page que representa la interfaz de usuario para que los usuarios puedan iniciar sesión en la aplicación, interactuando con el sesion viewmodel para manejar la autenticación y la gestión de sesiones de los usuarios.

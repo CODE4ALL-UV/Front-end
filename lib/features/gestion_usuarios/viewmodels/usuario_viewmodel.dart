@@ -1,0 +1,1 @@
+// este es un ejemplo de usuario viewmodel que representa la lógica de presentación y el estado de la vista de gestión de usuarios en la aplicación, interactuando con el usuario service para obtener y manipular los datos de los usuarios.

@@ -1,0 +1,1 @@
+// Este es un ejemplo de usuario model que representa la estructura de un usuario en la aplicación.

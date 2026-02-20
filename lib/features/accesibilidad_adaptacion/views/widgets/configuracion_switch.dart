@@ -1,0 +1,1 @@
+// este es un ejemplo de configuracion switch widget que representa un interruptor de configuración para una opción de accesibilidad en la aplicación.

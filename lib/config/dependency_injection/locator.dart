@@ -1,0 +1,1 @@
+// Este es un ejemplo de locator.dart que se puede usar para configurar la inyección de dependencias en una aplicación Flutter utilizando el paquete get_it.

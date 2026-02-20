@@ -1,0 +1,1 @@
+// Este es un ejemplo de motor adaptación que representa la lógica de adaptación en la aplicación, como la selección de contenido adaptativo, la personalización de la interfaz, etc.

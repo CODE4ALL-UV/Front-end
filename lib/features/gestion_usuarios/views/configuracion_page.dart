@@ -1,0 +1,1 @@
+// este es un ejempl ode configuracion page que representa la interfaz de usuario para que los usuarios puedan configurar sus preferencias de accesibilidad en la aplicación, interactuando con el configuracion viewmodel para manejar la lógica de presentación y el estado de la vista de configuración en la aplicación.

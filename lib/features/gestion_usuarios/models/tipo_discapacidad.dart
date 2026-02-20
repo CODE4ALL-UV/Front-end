@@ -1,0 +1,1 @@
+// este es un ejemplo de tipo de discapacidad model que representa los diferentes tipos de discapacidades que un usuario puede tener en la aplicación.

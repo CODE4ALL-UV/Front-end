@@ -1,0 +1,1 @@
+// este es un ejemplo de perfil page que representa la interfaz de usuario para que los usuarios puedan ver y editar su perfil en la aplicación, interactuando con el usuario viewmodel para manejar la lógica de presentación y el estado de la vista de perfil en la aplicación.

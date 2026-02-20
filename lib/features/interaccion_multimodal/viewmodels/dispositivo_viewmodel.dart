@@ -1,0 +1,1 @@
+// Este es un ejemplo de dispositivo viewmodel que representa la lógica de presentación y gestión de datos para los dispositivos utilizados en la aplicación para la interacción multimodal, incluyendo la obtención de la lista de dispositivos, la selección de un dispositivo, etc.

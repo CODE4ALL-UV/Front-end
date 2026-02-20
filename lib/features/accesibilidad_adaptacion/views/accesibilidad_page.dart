@@ -1,0 +1,1 @@
+// este ees un ejemplo de accesibilidad page que representa la interfaz de usuario para configurar las opciones de accesibilidad en la aplicación.

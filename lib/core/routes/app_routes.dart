@@ -1,0 +1,1 @@
+// Este es un ejemplo de app_routes.dart que define las rutas de la aplicación utilizando GetX.

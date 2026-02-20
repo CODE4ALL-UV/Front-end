@@ -1,0 +1,1 @@
+// este es un ejemplo de progreso viewmodel que representa la lógica de presentación y el estado de la vista de progreso en la aplicación, interactuando con el usuario service para manejar la visualización del progreso de los usuarios en la aplicación.

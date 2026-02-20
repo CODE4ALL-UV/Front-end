@@ -1,0 +1,1 @@
+// este es un ejemplo de progreso card que representa una tarjeta de progreso que muestra el progreso de un usuario en la aplicación, como el nivel alcanzado, puntos acumulados, etc., interactuando con el progreso viewmodel para manejar la lógica de presentación y el estado de la tarjeta de progreso en la aplicación.

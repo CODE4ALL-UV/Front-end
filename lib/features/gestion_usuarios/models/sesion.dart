@@ -1,0 +1,1 @@
+// Este es un ejemplo de un modelo de sesión que representa la información de una sesión de usuario en la aplicación.

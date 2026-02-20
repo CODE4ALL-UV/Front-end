@@ -1,0 +1,1 @@
+// este es un ejemplo de app_assets.dart, puedes personalizarlo según tus necesidades.

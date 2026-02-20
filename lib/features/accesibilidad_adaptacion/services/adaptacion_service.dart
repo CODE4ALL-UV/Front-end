@@ -1,0 +1,1 @@
+// este es un ejemplo de adaptacion service que representa la lógica de negocio para manejar las adaptaciones de accesibilidad en la aplicación.

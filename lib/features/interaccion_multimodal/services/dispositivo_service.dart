@@ -1,0 +1,1 @@
+// este ejemplo de dispositivo service representa un servicio que maneja la lógica relacionada con los dispositivos utilizados en la aplicación para la interacción multimodal, como obtener la lista de dispositivos disponibles, agregar nuevos dispositivos, etc.

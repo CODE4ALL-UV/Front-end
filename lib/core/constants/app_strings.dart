@@ -1,0 +1,1 @@
+// este es un ejemplo de app_strings.dart, puedes personalizarlo según tus necesidades.

@@ -1,0 +1,1 @@
+// este ejemplo de dispositivo model representa la estructura de un dispositivo utilizado en la aplicación para la interacción multimodal, incluyendo su tipo, nombre y características específicas.

@@ -1,0 +1,1 @@
+// Este es un ejemplo de api response que sirve para manejar las respuestas de las peticiones HTTP de manera estructurada.

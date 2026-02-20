@@ -1,0 +1,1 @@
+// este es un ejemplo de sesion viewmodel que representa la lógica de presentación y el estado de la vista de sesión en la aplicación, interactuando con el usuario service para manejar la autenticación y la gestión de sesiones de los usuarios.

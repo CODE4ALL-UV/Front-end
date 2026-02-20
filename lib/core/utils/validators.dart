@@ -1,0 +1,1 @@
+// este es un ejemplo de  validators.dart que contiene funciones para validar correos electrónicos, contraseñas y números de teléfono.

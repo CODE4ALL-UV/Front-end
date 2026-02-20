@@ -1,0 +1,1 @@
+// Este es un ejemplo loading widget que muestra un indicador de carga circular.

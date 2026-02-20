@@ -1,0 +1,1 @@
+// este es un ejemplo de registro page que representa la interfaz de usuario para que los usuarios puedan registrarse en la aplicación, interactuando con el usuario viewmodel para manejar la lógica de presentación y el estado de la vista de registro en la aplicación.

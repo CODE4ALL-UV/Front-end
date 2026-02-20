@@ -1,0 +1,1 @@
+// este es un ejemplo de  tipo de dispositivo model que representa los diferentes tipos de dispositivos que se pueden utilizar en la aplicación para la interacción multimodal, como pantallas táctiles, dispositivos de voz, etc.

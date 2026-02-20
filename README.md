@@ -1,17 +1,42 @@
-# flutter_code4all
+# Flutter Code4All
 
-A new Flutter project.
+Aplicación desarrollada en **Flutter** siguiendo la arquitectura **MVVM (Model - View - ViewModel)**, organizada por módulos para garantizar escalabilidad, mantenimiento y buenas prácticas de desarrollo.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## Autores
 
-A few resources to get you started if this is your first Flutter project:
+- **Joan Sebastian Saavedra**
+- **Daniel Melendez Ramirez**
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Arquitectura del Proyecto
+
+El proyecto implementa el patrón **MVVM**, separando claramente responsabilidades:
+
+- **Model** → Representa las entidades y acceso a datos.
+- **View** → Contiene la interfaz gráfica (UI).
+- **ViewModel** → Maneja la lógica de presentación y conecta la View con el Model.
+
+Esta estructura facilita:
+
+✔ Escalabilidad  
+✔ Reutilización de código  
+✔ Separación de responsabilidades  
+✔ Trabajo en equipo  
+
+---
+
+## ⚙️ Requisitos
+
+- Flutter SDK (última versión estable)
+- Dart SDK
+- Android Studio o VS Code
+- Emulador o dispositivo físico
+
+Verificar instalación:
+
+```bash
+flutter doctor
+

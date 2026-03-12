@@ -8,7 +8,7 @@ class App extends StatefulWidget {
   @override
   State<App> createState() => _AppState();
 }
-s
+
 class _AppState extends State<App> {
   bool isDark = false;
 

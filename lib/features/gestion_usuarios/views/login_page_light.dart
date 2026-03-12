@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class LoginPageLight extends StatelessWidget {
+  const LoginPageLight({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +13,7 @@ class LoginPage extends StatelessWidget {
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(6.0),
-          child: Image.asset('assets/images/logo-uv.png'),
+          child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
         ),
         title: const Text(
           'CODE4ALL',
@@ -39,12 +40,13 @@ class LoginPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo Code4All más grande
+                  // Logo Code4All
                   Image.asset(
                     'assets/images/logo-flutter.png',
-                    height: 160,
+                    height: 460,
+                    width: 460,
                   ),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 5),
 
                   // Botones sociales
                   Row(
@@ -53,55 +55,86 @@ class LoginPage extends StatelessWidget {
                       // Google
                       _SocialButton(
                         onTap: () {},
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // G de Google con colores
-                            RichText(
-                              text: const TextSpan(
-                                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                                children: [
-                                  TextSpan(text: 'G', style: TextStyle(color: Color(0xFF4285F4))),
-                                ],
-                              ),
+            
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: SvgPicture.network(
+                              'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
+                              width: 28,
+                              height: 28,
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 28),
+                      const SizedBox(width: 10),
                       // Facebook
                       _SocialButton(
                         onTap: () {},
-                        child: const Icon(
-                          Icons.facebook,
-                          color: Color(0xFF1877F2),
-                          size: 30,
+                      
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Image.network(
+                              'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/2023_Facebook_icon.svg/800px-2023_Facebook_icon.svg.png',
+                              width: 28,
+                              height: 28,
+                              errorBuilder: (context, error, stackTrace) => const Icon(
+                                Icons.facebook,
+                                color: Color(0xFF1877F2),
+                                size: 28,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 20),
 
                   // Botón Registrarse
                   SizedBox(
                     width: double.infinity,
                     height: 52,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1565C0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
                         ),
-                        elevation: 0,
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                      child: const Text(
-                        'REGISTRARSE',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'REGISTRARSE',
+                          style: TextStyle(
+                            color: Color(0xFFFFD600),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
                         ),
                       ),
                     ),
@@ -117,13 +150,13 @@ class LoginPage extends StatelessWidget {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Container(
-                width: 36,
-                height: 36,
+                width: 48,
+                height: 48,
                 decoration: const BoxDecoration(
                   color: Color(0xFF5C6BC0),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.accessibility_new, color: Colors.white, size: 22),
+                child: const Icon(Icons.accessibility_new, color: Colors.white, size: 30),
               ),
             ),
           ),
@@ -132,7 +165,7 @@ class LoginPage extends StatelessWidget {
 
       // Barra inferior
       bottomNavigationBar: Container(
-        color: const Color(0xFF212121),
+        color: const Color(0xFFE53935),
         height: 56,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -151,10 +184,12 @@ class LoginPage extends StatelessWidget {
 class _SocialButton extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
+  final Color backgroundColor;
 
   const _SocialButton({
     required this.child,
     required this.onTap,
+    this.backgroundColor = Colors.white,
   });
 
   @override
@@ -165,7 +200,7 @@ class _SocialButton extends StatelessWidget {
         width: 64,
         height: 64,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: backgroundColor,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(

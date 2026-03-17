@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-class LoginPageDark extends StatelessWidget {
-  final VoidCallback? onRegister;
-  const LoginPageDark({super.key, this.onRegister});
+class WelcomePageDark extends StatefulWidget {
+  final VoidCallback? onStart;
+  const WelcomePageDark({super.key, this.onStart});
+
+  @override
+  State<WelcomePageDark> createState() => _WelcomePageDarkState();
+}
+
+class _WelcomePageDarkState extends State<WelcomePageDark> {
+  int _selectedLevel = 0; // 0 = Básico, 1 = Avanzado
 
   @override
   Widget build(BuildContext context) {
@@ -41,60 +47,20 @@ class LoginPageDark extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo Code4All
+                  // Logo (versión blanca para dark mode)
                   Image.asset(
                     'assets/images/logoblancoTg.png',
-                    height: 460,
-                    width: 460,
+                    height: 200,
+                    width: 280,
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 48),
 
-                  // Botones sociales
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Google
-                      _SocialButtonDark(
-                        onTap: () {},
-                        backgroundColor: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(6.0),
-                          child: SvgPicture.network(
-                            'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-                            width: 28,
-                            height: 28,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      // Facebook
-                      _SocialButtonDark(
-                        onTap: () {},
-                        backgroundColor: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Image.network(
-                            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/2023_Facebook_icon.svg/800px-2023_Facebook_icon.svg.png',
-                            width: 28,
-                            height: 28,
-                            errorBuilder: (context, error, stackTrace) => const Icon(
-                              Icons.facebook,
-                              color: Color(0xFF1877F2),
-                              size: 28,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Botón Registrarse
+                  // Botón EMPEZAR
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: onRegister ?? () {},
+                      onPressed: widget.onStart ?? () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFFD600),
                         shape: RoundedRectangleBorder(
@@ -103,7 +69,7 @@ class LoginPageDark extends StatelessWidget {
                         elevation: 0,
                       ),
                       child: const Text(
-                        'REGISTRARSE',
+                        'EMPEZAR',
                         style: TextStyle(
                           color: Color(0xFF1A1A1A),
                           fontSize: 16,
@@ -111,6 +77,42 @@ class LoginPageDark extends StatelessWidget {
                           letterSpacing: 2,
                         ),
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Selector de nivel
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2C2C2C),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Básico
+                        GestureDetector(
+                          onTap: () => setState(() => _selectedLevel = 0),
+                          child: _LevelOptionDark(
+                            label: 'Básico',
+                            stars: 1,
+                            selected: _selectedLevel == 0,
+                            selectedColor: const Color(0xFFFFD600),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Avanzado
+                        GestureDetector(
+                          onTap: () => setState(() => _selectedLevel = 1),
+                          child: _LevelOptionDark(
+                            label: 'Avanzado',
+                            stars: 2,
+                            selected: _selectedLevel == 1,
+                            selectedColor: const Color(0xFFFFD600),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -155,37 +157,45 @@ class LoginPageDark extends StatelessWidget {
   }
 }
 
-class _SocialButtonDark extends StatelessWidget {
-  final Widget child;
-  final VoidCallback onTap;
-  final Color backgroundColor;
+class _LevelOptionDark extends StatelessWidget {
+  final String label;
+  final int stars;
+  final bool selected;
+  final Color selectedColor;
 
-  const _SocialButtonDark({
-    required this.child,
-    required this.onTap,
-    this.backgroundColor = Colors.white,
+  const _LevelOptionDark({
+    required this.label,
+    required this.stars,
+    required this.selected,
+    required this.selectedColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(
+            stars,
+            (i) => Icon(
+              selected ? Icons.star : Icons.star_border,
+              color: selected ? selectedColor : const Color(0xFF757575),
+              size: 20,
             ),
-          ],
+          ),
         ),
-        child: Center(child: child),
-      ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: selected ? selectedColor : const Color(0xFF757575),
+            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-class LoginPageLight extends StatelessWidget {
-  final VoidCallback? onRegister;
-  const LoginPageLight({super.key, this.onRegister});
+class WelcomePageLight extends StatefulWidget {
+  final VoidCallback? onStart;
+  const WelcomePageLight({super.key, this.onStart});
+
+  @override
+  State<WelcomePageLight> createState() => _WelcomePageLightState();
+}
+
+class _WelcomePageLightState extends State<WelcomePageLight> {
+  int _selectedLevel = 0; // 0 = Básico, 1 = Avanzado
 
   @override
   Widget build(BuildContext context) {
@@ -41,69 +47,15 @@ class LoginPageLight extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo Code4All
+                  // Logo
                   Image.asset(
                     'assets/images/logo-flutter.png',
-                    height: 460,
-                    width: 460,
+                    height: 200,
+                    width: 280,
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 48),
 
-                  // Botones sociales
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Google
-                      _SocialButtonLight(
-                        onTap: () {},
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(6.0),
-                            child: SvgPicture.network(
-                              'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-                              width: 28,
-                              height: 28,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      // Facebook
-                      _SocialButtonLight(
-                        onTap: () {},
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Image.network(
-                              'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/2023_Facebook_icon.svg/800px-2023_Facebook_icon.svg.png',
-                              width: 28,
-                              height: 28,
-                              errorBuilder: (context, error, stackTrace) => const Icon(
-                                Icons.facebook,
-                                color: Color(0xFF1877F2),
-                                size: 28,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Botón Registrarse
+                  // Botón EMPEZAR
                   SizedBox(
                     width: double.infinity,
                     height: 52,
@@ -117,7 +69,7 @@ class LoginPageLight extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: ElevatedButton(
-                        onPressed: onRegister ?? () {},
+                        onPressed: widget.onStart ?? () {},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           shadowColor: Colors.transparent,
@@ -127,7 +79,7 @@ class LoginPageLight extends StatelessWidget {
                           elevation: 0,
                         ),
                         child: const Text(
-                          'REGISTRARSE',
+                          'EMPEZAR',
                           style: TextStyle(
                             color: Color(0xFFFFD600),
                             fontSize: 16,
@@ -136,6 +88,42 @@ class LoginPageLight extends StatelessWidget {
                           ),
                         ),
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Selector de nivel
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Básico
+                        GestureDetector(
+                          onTap: () => setState(() => _selectedLevel = 0),
+                          child: _LevelOption(
+                            label: 'Básico',
+                            stars: 1,
+                            selected: _selectedLevel == 0,
+                            selectedColor: const Color(0xFF1E88E5),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Avanzado
+                        GestureDetector(
+                          onTap: () => setState(() => _selectedLevel = 1),
+                          child: _LevelOption(
+                            label: 'Avanzado',
+                            stars: 2,
+                            selected: _selectedLevel == 1,
+                            selectedColor: const Color(0xFF1E88E5),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -180,37 +168,45 @@ class LoginPageLight extends StatelessWidget {
   }
 }
 
-class _SocialButtonLight extends StatelessWidget {
-  final Widget child;
-  final VoidCallback onTap;
-  final Color backgroundColor;
+class _LevelOption extends StatelessWidget {
+  final String label;
+  final int stars;
+  final bool selected;
+  final Color selectedColor;
 
-  const _SocialButtonLight({
-    required this.child,
-    required this.onTap,
-    this.backgroundColor = Colors.white,
+  const _LevelOption({
+    required this.label,
+    required this.stars,
+    required this.selected,
+    required this.selectedColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(
+            stars,
+            (i) => Icon(
+              selected ? Icons.star : Icons.star_border,
+              color: selected ? selectedColor : const Color(0xFF9E9E9E),
+              size: 20,
             ),
-          ],
+          ),
         ),
-        child: Center(child: child),
-      ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: selected ? selectedColor : const Color(0xFF9E9E9E),
+            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -29,7 +29,11 @@ class LoginPageLight extends StatelessWidget {
         actions: const [
           Padding(
             padding: EdgeInsets.all(10.0),
-            child: Icon(Icons.account_circle_outlined, color: Colors.white, size: 28),
+            child: Icon(
+              Icons.account_circle_outlined,
+              color: Colors.white,
+              size: 28,
+            ),
           ),
         ],
       ),
@@ -90,11 +94,12 @@ class LoginPageLight extends StatelessWidget {
                               'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/2023_Facebook_icon.svg/800px-2023_Facebook_icon.svg.png',
                               width: 28,
                               height: 28,
-                              errorBuilder: (context, error, stackTrace) => const Icon(
-                                Icons.facebook,
-                                color: Color(0xFF1877F2),
-                                size: 28,
-                              ),
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                    Icons.facebook,
+                                    color: Color(0xFF1877F2),
+                                    size: 28,
+                                  ),
                             ),
                           ),
                         ),
@@ -155,7 +160,11 @@ class LoginPageLight extends StatelessWidget {
                   color: Color(0xFF5C6BC0),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.accessibility_new, color: Colors.white, size: 30),
+                child: const Icon(
+                  Icons.accessibility_new,
+                  color: Colors.white,
+                  size: 30,
+                ),
               ),
             ),
           ),
@@ -183,12 +192,12 @@ class LoginPageLight extends StatelessWidget {
 class _SocialButtonLight extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   const _SocialButtonLight({
     required this.child,
     required this.onTap,
-    this.backgroundColor = Colors.white,
+    this.backgroundColor,
   });
 
   @override
@@ -199,7 +208,7 @@ class _SocialButtonLight extends StatelessWidget {
         width: 64,
         height: 64,
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: backgroundColor ?? Colors.white,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(

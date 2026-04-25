@@ -3,11 +3,10 @@ import 'features/gestion_usuarios/views/login_page_light.dart';
 import 'features/gestion_usuarios/views/login_page_dark.dart';
 import 'features/gestion_usuarios/views/form_page_light.dart';
 import 'features/gestion_usuarios/views/form_page_dark.dart';
-import 'features/gestion_usuarios/views/welcome_page_light.dart';
-import 'features/gestion_usuarios/views/welcome_page_dark.dart';
+import 'features/gestion_usuarios/views/modulo_aprendizaje_light.dart';
+import 'features/gestion_usuarios/views/modulo_aprendizaje_dark.dart';
 
-// Pantallas posibles
-enum AppScreen { login, register, welcome }
+enum AppScreen { login, register, modulo }
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -22,7 +21,7 @@ class _AppState extends State<App> {
 
   void _goToRegister() => setState(() => _currentScreen = AppScreen.register);
   void _goToLogin()    => setState(() => _currentScreen = AppScreen.login);
-  void _goToWelcome()  => setState(() => _currentScreen = AppScreen.welcome);
+  void _goToModulo()   => setState(() => _currentScreen = AppScreen.modulo);
 
   @override
   Widget build(BuildContext context) {
@@ -31,24 +30,16 @@ class _AppState extends State<App> {
     switch (_currentScreen) {
       case AppScreen.register:
         currentPage = isDark
-            ? FormPageDark(
-                onBack: _goToLogin,
-                onSuccess: _goToWelcome,
-              )
-            : FormPageLight(
-                onBack: _goToLogin,
-                onSuccess: _goToWelcome,
-              );
+            ? FormPageDark(onBack: _goToLogin, onSuccess: _goToModulo)
+            : FormPageLight(onBack: _goToLogin, onSuccess: _goToModulo);
         break;
-      case AppScreen.welcome:
+
+      case AppScreen.modulo:
         currentPage = isDark
-            ? WelcomePageDark(onStart: () {
-                // TODO: navegar a pantalla de contenido
-              })
-            : WelcomePageLight(onStart: () {
-                // TODO: navegar a pantalla de contenido
-              });
+            ? const ModuloAprendizajeDark()
+            : const ModuloAprendizaje();
         break;
+
       case AppScreen.login:
       default:
         currentPage = isDark

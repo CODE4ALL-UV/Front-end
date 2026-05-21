@@ -24,6 +24,7 @@ class AppTheme {
   );
 
   // 1. CONFIGURACIÓN DEL TEMA CLARO COMPLETO
+  // (Sigue igual, pero ahora puedes llamar a tus mapas desde aquí)
   static ThemeData get lightTheme {
     return ThemeData(
       // 1.1. SISTEMA TIPOGRÁFICO GLOBAL (TextTheme - Modifica los textos)
@@ -237,6 +238,30 @@ class AppTheme {
     );
   }
 
+  // PALETAS EXCLUSIVAS PARA EL RESALTADO DE SINTAXIS PYTHON
+  // Estilos del Editor Python para el Modo Claro (Inspirado en GitHub Light accesible)
+  static Map<String, TextStyle> get pythonLightSyntax {
+    return {
+      'keyword': const TextStyle(
+        color: Color(0xFFD73A49),
+        fontWeight: FontWeight.bold,
+      ), // def, if, return
+      'string': const TextStyle(
+        color: Color(0xFF032F62),
+        fontStyle: FontStyle.normal,
+      ),
+      'comment': const TextStyle(
+        color: Color(0xFF6A737D),
+        fontStyle: FontStyle.italic,
+      ), // # Mi comentario
+      'number': const TextStyle(color: Color(0xFF005CC5)), // 10, 3.14
+      'title': const TextStyle(
+        color: Color(0xFF6F42C1),
+        fontWeight: FontWeight.bold,
+      ), // Nombre de funciones
+    };
+  }
+
   // 2. TEMA OSCURO STANDARD
   static ThemeData get darkTheme {
     return ThemeData(
@@ -336,4 +361,38 @@ class AppTheme {
       textTheme: const TextTheme(bodyMedium: _footerTextStyle),
     );
   }
+
+  // PALETAS EXCLUSIVAS PARA EL RESALTADO DE SINTAXIS PYTHON
+  // Estilos de Python para el Modo Acromatopsia (Contraste radical en escala de grises)
+  static Map<String, TextStyle> get pythonAchromatopsiaSyntax {
+    return {
+      'keyword': const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        decoration: TextDecoration.underline,
+      ),
+      'string': const TextStyle(
+        color: Color(0xFFE0E0E0),
+        fontStyle: FontStyle.italic,
+      ),
+      'comment': const TextStyle(
+        color: Color(0xFF757575),
+        fontStyle: FontStyle.normal,
+      ),
+      'number': const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w900,
+      ),
+      'title': const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+      ),
+    };
+  }
+}
+
+// CONSERVAR SI TIENE USO, DE LO CONTRARIO ELIMINAR
+// Extensión utilitaria para convertir Color a TextStyle fácilmente
+extension on Color {
+  TextStyle toTextStyle() => TextStyle(color: this);
 }

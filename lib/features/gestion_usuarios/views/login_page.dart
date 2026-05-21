@@ -1,42 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_code4all/ui/core/ui/header_widget.dart';
 
-class LoginPageLight extends StatelessWidget {
+class LoginPage extends StatelessWidget {
   final VoidCallback? onRegister;
-  const LoginPageLight({super.key, this.onRegister});
+  const LoginPage({super.key, this.onRegister});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFE53935),
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
-        ),
-        title: const Text(
-          'CODE4ALL',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 2,
-          ),
-        ),
-        centerTitle: true,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Icon(
-              Icons.account_circle_outlined,
-              color: Colors.white,
-              size: 28,
-            ),
-          ),
-        ],
-      ),
+      // 1. Insertamos el header unificado. Leerá automáticamente el tema activo.
+      appBar: HeaderWidget(title: 'CODE4ALL v1.1.'),
       body: Column(
         children: [
           Expanded(

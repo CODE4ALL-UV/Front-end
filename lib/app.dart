@@ -5,12 +5,12 @@ import 'ui/feature_home/widgets/feature_home_screen.dart';
 import 'ui/feature_home/widgets/feature_home_screen.dart';
 import 'ui/feature_home/widgets/feature_home_screen.dart';
 import 'ui/feature_home/widgets/feature_home_screen.dart';
-import 'ui/feature_users_management/widgets/login_page.dart';
-import 'ui/feature_users_management/widgets/login_page_dark.dart';
-import 'ui/feature_users_management/widgets/form_page_light.dart';
-import 'ui/feature_users_management/widgets/form_page_dark.dart';
-import 'ui/feature_users_management/widgets/modulo_aprendizaje_light.dart';
-import 'ui/feature_users_management/widgets/modulo_aprendizaje_dark.dart';
+import 'ui/feature_users_management/widgets/login_light_screen.dart';
+import 'ui/feature_users_management/widgets/login_dark_screen.dart';
+import 'ui/feature_users_management/widgets/form_light_screen.dart';
+import 'ui/feature_users_management/widgets/form_dark_screen.dart';
+import 'ui/feature_users_management/widgets/learning_module_light_screen.dart';
+import 'ui/feature_users_management/widgets/learning_module_dark_screen.dart';
 
 // Definimos los 6 estados de tema posibles de tu TG
 enum AppThemeMode {

@@ -1,1 +1,0 @@
-// Este es un ejemplo de app_colors.dart, puedes personalizarlo según tus necesidades.

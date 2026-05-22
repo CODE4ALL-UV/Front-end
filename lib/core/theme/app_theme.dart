@@ -1,1 +1,0 @@
-// Este es un ejemplo de app_theme.dart que define el tema de la aplicación utilizando GetX.

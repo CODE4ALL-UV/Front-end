@@ -3,37 +3,34 @@ import 'package:flutter/material.dart';
 class AppTheme {
   AppTheme._(); // Constructor privado para evitar instancias accidentales
 
-  // 0.1. ESTILOS DE TEXTO BASE (Centralizados para reutilizarse en los bloques)
-  // Estilo de texto base para los Headers
-  static const TextStyle _headerTextStyle = TextStyle(
-    fontSize: 22.0,
-    fontWeight: FontWeight.bold,
-    letterSpacing: 1.5,
-  );
-
-  // Estilo de texto base para el Body***
-  static const TextStyle _bodyTextStyle = TextStyle(
-    fontSize: 16.0,
-    fontWeight: FontWeight.normal,
-  );
-
-  // Estilo de texto base para los Footers
-  static const TextStyle _footerTextStyle = TextStyle(
-    fontSize: 14.0,
-    fontWeight: FontWeight.normal,
-  );
-
   // 1. CONFIGURACIÓN DEL TEMA CLARO COMPLETO
   // (Sigue igual, pero ahora puedes llamar a tus mapas desde aquí)
   static ThemeData get lightTheme {
+    // Tomamos la base tipográfica oficial de Material 3 para el modo claro
+    final baseTextTheme = ThemeData.light(useMaterial3: true).textTheme;
+
     return ThemeData(
-      // 1.1. SISTEMA TIPOGRÁFICO GLOBAL (TextTheme - Modifica los textos)
-      // ver: TextTheme class (https://api.flutter.dev/flutter/material/TextTheme-class.html)
-      textTheme: const TextTheme(),
-      fontFamily: 'Roboto',
-      // 1.2. PALETA DE COLORES GLOBAL (Sistema Semántico Basado en Material Design 3)
+      useMaterial3: true,
       brightness: Brightness.light, // Contrastes claros u oscuros
       scaffoldBackgroundColor: const Color(0xFFF5F5F5), //Fondo de pantalla
+      // 1.1. SISTEMA TIPOGRÁFICO GLOBAL (TextTheme - Modifica los textos)
+      // ver: TextTheme class (https://api.flutter.dev/flutter/material/TextTheme-class.html)
+      textTheme: TextTheme(
+        titleLarge: baseTextTheme.titleLarge?.copyWith(
+          color: const Color(0xFF212121),
+          fontWeight: FontWeight.bold,
+        ),
+        bodyLarge: baseTextTheme.bodyLarge?.copyWith(
+          color: const Color(0xFF212121),
+          fontStyle: FontStyle.normal,
+        ),
+        bodyMedium: baseTextTheme.bodyMedium?.copyWith(
+          color: const Color(0xFF757575),
+          fontStyle: FontStyle.italic,
+        ),
+      ),
+      fontFamily: 'Roboto',
+      // 1.2. PALETA DE COLORES GLOBAL (Sistema Semántico Basado en Material Design 3)
       colorScheme: const ColorScheme.light(
         primary: Color(
           0xFFE53935,
@@ -68,7 +65,7 @@ class AppTheme {
         foregroundColor: Color(0xFFFFFFFF), // Color de iconos y texto
         elevation: 0, // Altura de la sombra
         centerTitle: true, // Fuerza que el título siempre esté centrado
-        titleTextStyle: _headerTextStyle, // Aplica estilo de texto del header
+        //titleTextStyle: _headerTextStyle, // Aplica estilo de texto del header
         // Tamaño del icono por defecto
         actionsIconTheme: IconThemeData(size: 28.0),
       ),
@@ -79,8 +76,8 @@ class AppTheme {
         selectedItemColor: Color(0xFFE53935),
         unselectedItemColor: Color(0xFF757575),
         elevation: 8,
-        selectedLabelStyle: _footerTextStyle,
-        unselectedLabelStyle: _footerTextStyle,
+        //selectedLabelStyle: _footerTextStyle,
+        //unselectedLabelStyle: _footerTextStyle,
         selectedIconTheme: IconThemeData(size: 28.0),
         unselectedIconTheme: IconThemeData(size: 24.0),
       ),
@@ -181,7 +178,7 @@ class AppTheme {
           foregroundColor: const Color(
             0xFF5C6BC0,
           ), // Color del texto interactivo (Azul/Morado)
-          textStyle: _footerTextStyle, // Hereda tus 14px centralizados
+          //textStyle: _footerTextStyle, // Hereda tus 14px centralizados
         ),
       ),
 
@@ -203,11 +200,13 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: const Color(0xFFFFFFFF),
         elevation: 6,
-        titleTextStyle: _headerTextStyle.copyWith(
-          color: const Color(0xFF212121),
-        ),
-        contentTextStyle: _bodyTextStyle.copyWith(
+        titleTextStyle: baseTextTheme.bodyMedium?.copyWith(
           color: const Color(0xFF757575),
+          fontWeight: FontWeight.bold,
+        ),
+        contentTextStyle: baseTextTheme.bodyMedium?.copyWith(
+          color: const Color(0xFF757575),
+          fontStyle: FontStyle.italic,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
@@ -275,9 +274,9 @@ class AppTheme {
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFF1E1E1E),
         foregroundColor: Color(0xFFFFFFFF),
-        titleTextStyle: _headerTextStyle,
+        //titleTextStyle: _headerTextStyle,
       ),
-      textTheme: const TextTheme(bodyMedium: _footerTextStyle),
+      //textTheme: const TextTheme(bodyMedium: _footerTextStyle),
     );
   }
 
@@ -294,9 +293,9 @@ class AppTheme {
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFF0055B7),
         foregroundColor: Color(0xFFFFFFFF),
-        titleTextStyle: _headerTextStyle,
+        //titleTextStyle: _headerTextStyle,
       ),
-      textTheme: const TextTheme(bodyMedium: _footerTextStyle),
+      //textTheme: const TextTheme(bodyMedium: _footerTextStyle),
     );
   }
 
@@ -313,9 +312,9 @@ class AppTheme {
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFF002F6C),
         foregroundColor: Color(0xFFFFFFFF),
-        titleTextStyle: _headerTextStyle,
+        //titleTextStyle: _headerTextStyle,
       ),
-      textTheme: const TextTheme(bodyMedium: _footerTextStyle),
+      //textTheme: const TextTheme(bodyMedium: _footerTextStyle),
     );
   }
 
@@ -332,9 +331,9 @@ class AppTheme {
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFFD32F2F),
         foregroundColor: Color(0xFFFFFFFF),
-        titleTextStyle: _headerTextStyle,
+        //titleTextStyle: _headerTextStyle,
       ),
-      textTheme: const TextTheme(bodyMedium: _footerTextStyle),
+      //textTheme: const TextTheme(bodyMedium: _footerTextStyle),
     );
   }
 
@@ -356,9 +355,9 @@ class AppTheme {
           width: 1.5,
         ),*/
         // Borde blanco accesible
-        titleTextStyle: _headerTextStyle,
+        //titleTextStyle: _headerTextStyle,
       ),
-      textTheme: const TextTheme(bodyMedium: _footerTextStyle),
+      //textTheme: const TextTheme(bodyMedium: _footerTextStyle),
     );
   }
 

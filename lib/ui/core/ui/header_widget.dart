@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+//import 'package:flutter_svg/flutter_svg.dart';
 
 class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -34,6 +34,7 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         title: Text(title, style: theme.appBarTheme.titleTextStyle),
+        /* OJO NO UTILIZA APP_THEME */
         centerTitle: true,
         // 2. Icono de perfil interactivo y accesible
         actions: showUserIcon
@@ -47,7 +48,7 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                       Icons.account_circle_outlined,
                       color: theme
                           .appBarTheme
-                          .foregroundColor, // 👈 Dinámico según el tema
+                          .foregroundColor, // Dinámico según el tema
                       size: 28,
                     ),
                   ),

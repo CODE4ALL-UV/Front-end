@@ -104,9 +104,8 @@ class _AppState extends State<App> {
         body: currentPage,
         floatingActionButton: Semantics(
           button: true,
-          label: 'Cambiar modo visual de la aplicación',
-          hint:
-              'Alterna entre modo claro, modo oscuro y contrastes de daltonismo.',
+          label: '',
+          hint: '',
           child: FloatingActionButton(
             backgroundColor: const Color(0xFF5C6BC0),
             onPressed: _toggleTheme,

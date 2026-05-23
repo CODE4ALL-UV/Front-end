@@ -6,6 +6,7 @@ class MultimodalNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /* OJO NO UTILIZA APP_THEME */
     // Leemos estrictamente tu contrato de diseño centralizado en app_theme
     final footerTheme = Theme.of(context).bottomNavigationBarTheme;
 
@@ -28,7 +29,7 @@ class MultimodalNavBar extends StatelessWidget {
                 child: Icon(
                   Icons.skip_previous,
                   color: footerTheme.unselectedItemColor,
-                  size: footerTheme.unselectedIconTheme?.size ?? 24,
+                  size: footerTheme.unselectedIconTheme?.size ?? 28,
                 ),
               ),
             ),
@@ -43,7 +44,7 @@ class MultimodalNavBar extends StatelessWidget {
                 child: Icon(
                   Icons.play_arrow,
                   color: footerTheme.selectedItemColor,
-                  size: footerTheme.selectedIconTheme?.size ?? 28,
+                  size: footerTheme.selectedIconTheme?.size ?? 32,
                 ),
               ),
             ),
@@ -58,7 +59,7 @@ class MultimodalNavBar extends StatelessWidget {
                 child: Icon(
                   Icons.skip_next,
                   color: footerTheme.unselectedItemColor,
-                  size: footerTheme.unselectedIconTheme?.size ?? 24,
+                  size: footerTheme.unselectedIconTheme?.size ?? 28,
                 ),
               ),
             ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'ui/core/themes/app_theme.dart';
-import 'ui/feature_home/widgets/feature_home_screen.dart';
-import 'ui/feature_home/widgets/feature_home_screen.dart';
-import 'ui/feature_home/widgets/feature_home_screen.dart';
-import 'ui/feature_home/widgets/feature_home_screen.dart';
-import 'ui/feature_home/widgets/feature_home_screen.dart';
+import 'ui/home/screens/feature_home_screen.dart';
+import 'ui/home/screens/feature_home_screen.dart';
+import 'ui/home/screens/feature_home_screen.dart';
+import 'ui/home/screens/feature_home_screen.dart';
+import 'ui/home/screens/feature_home_screen.dart';
 import 'ui/feature_users_management/widgets/login_light_screen.dart';
 import 'ui/feature_users_management/widgets/login_dark_screen.dart';
 import 'ui/feature_users_management/widgets/form_light_screen.dart';

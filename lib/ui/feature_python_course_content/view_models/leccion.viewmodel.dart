@@ -1,1 +1,0 @@
-// este es un ejemplo de leccion viewmodel dart que sirve para mostrar como se pueden crear viewmodels en Dart

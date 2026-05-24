@@ -13,32 +13,44 @@ class SocialAuthBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Extraemos un color dinámico del tema para el fondo de los botones (Accesibilidad adaptativa)
+    final buttonBackgroundColor = Theme.of(context).cardColor;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Botón de Google
         SocialAuthButton(
           onTap: onGoogleTap ?? () {},
-          backgroundColor: Colors.white,
-          icon: SvgPicture.asset(AssetsRoutes.googleIcon),
+          backgroundColor: buttonBackgroundColor, // Cambiado por el tema global
+          iconSize: 22.0, // 👈 Dejamos a 32px para que no resalte tanto
+          icon: SvgPicture.asset(
+            AssetsRoutes.googleIcon,
+            fit: BoxFit.contain,
+            // 💡 Así se manejan los fallos en SvgPicture para evitar pantallas rotas
+            placeholderBuilder: (BuildContext context) =>
+                const Icon(Icons.g_mobiledata, color: Colors.red, size: 28),
+          ),
           semanticLabel: StaticMessages.googleButtonLabel,
           semanticHint: StaticMessages.googleButtonHint,
         ),
 
-        const SizedBox(
-          width: 10,
-        ), // Un espacio ligeramente mayor para mejorar el área táctil (Acessibilidad)
+        // Un espacio ligeramente mayor para mejorar el área táctil (Acessibilidad)
+        // Espacio de 16px recomendado para ergonomía motriz
+        const SizedBox(width: 10),
         // Botón de Facebook
         SocialAuthButton(
+          onTap: onFacebookTap ?? () {},
+          backgroundColor: buttonBackgroundColor, // Cambiado por el tema global
+          iconSize: 50.0, // 👈 Subimos a 34px para que resalte igual al otro
           icon: Image.asset(
             AssetsRoutes.facebookIcon,
-            /* OJO ¿PORQUE ERROR BUILDER NO ESTÁ EN EL BOTÓN DE ARRIBA? */
+            fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) =>
                 const Icon(Icons.facebook, color: Color(0xFF1877F2), size: 28),
           ),
           semanticLabel: StaticMessages.facebookButtonLabel,
           semanticHint: StaticMessages.facebookButtonHint,
-          onTap: onFacebookTap ?? () {},
         ),
       ],
     );

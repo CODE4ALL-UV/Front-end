@@ -6,6 +6,7 @@ class SocialAuthButton extends StatelessWidget {
   final String semanticLabel;
   final String semanticHint;
   final Color backgroundColor;
+  final double iconSize; // 👈 NUEVO: Tamaño configurable con valor por defecto
 
   const SocialAuthButton({
     super.key,
@@ -14,6 +15,7 @@ class SocialAuthButton extends StatelessWidget {
     required this.semanticLabel,
     required this.semanticHint,
     this.backgroundColor = Colors.white,
+    this.iconSize = 32.0, // 👈 32px por defecto para mantener la consistencia
   });
 
   @override
@@ -26,12 +28,6 @@ class SocialAuthButton extends StatelessWidget {
         onTap: onTap,
         customBorder:
             const CircleBorder(), // Hace que el efecto visual de onda sea circular
-        /* OJO
-        child: Padding(
-        padding: const EdgeInsets.all(6.0),
-        ...
-        )
-        */
         child: Container(
           width: 64,
           height: 64,
@@ -46,7 +42,9 @@ class SocialAuthButton extends StatelessWidget {
               ),
             ],
           ),
-          child: Center(child: SizedBox(width: 64, height: 64, child: icon)),
+          child: Center(
+            child: SizedBox(width: iconSize, height: iconSize, child: icon),
+          ),
         ),
       ),
     );

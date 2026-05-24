@@ -6,7 +6,6 @@ class MultimodalNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /* OJO NO UTILIZA APP_THEME */
     // Leemos estrictamente tu contrato de diseño centralizado en app_theme
     final footerTheme = Theme.of(context).bottomNavigationBarTheme;
 

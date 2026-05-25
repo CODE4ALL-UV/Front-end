@@ -23,11 +23,13 @@ class SocialAuthBlock extends StatelessWidget {
         SocialAuthButton(
           onTap: onGoogleTap ?? () {},
           backgroundColor: buttonBackgroundColor, // Cambiado por el tema global
-          iconSize: 22.0, // 👈 Dejamos a 32px para que no resalte tanto
+          paddingSize: 32.0, // 👈 Dejamos a 16px para que no resalte tanto
           icon: SvgPicture.asset(
             AssetsRoutes.googleIcon,
             fit: BoxFit.contain,
-            // 💡 Así se manejan los fallos en SvgPicture para evitar pantallas rotas
+            height:
+                50, // Ajustamos el tamaño del ícono dentro del botón circular
+            // Así se manejan los fallos en SvgPicture para evitar pantallas rotas
             placeholderBuilder: (BuildContext context) =>
                 const Icon(Icons.g_mobiledata, color: Colors.red, size: 28),
           ),
@@ -37,15 +39,17 @@ class SocialAuthBlock extends StatelessWidget {
 
         // Un espacio ligeramente mayor para mejorar el área táctil (Acessibilidad)
         // Espacio de 16px recomendado para ergonomía motriz
-        const SizedBox(width: 10),
+        const SizedBox(width: 30),
         // Botón de Facebook
         SocialAuthButton(
           onTap: onFacebookTap ?? () {},
           backgroundColor: buttonBackgroundColor, // Cambiado por el tema global
-          iconSize: 50.0, // 👈 Subimos a 34px para que resalte igual al otro
+          paddingSize: 32.0, // 👈 Dejamos a 16px para que no resalte tanto
           icon: Image.asset(
             AssetsRoutes.facebookIcon,
-            fit: BoxFit.contain,
+            fit: BoxFit.fill,
+            height:
+                60, // Ajustamos el tamaño del ícono dentro del botón circular
             errorBuilder: (context, error, stackTrace) =>
                 const Icon(Icons.facebook, color: Color(0xFF1877F2), size: 28),
           ),

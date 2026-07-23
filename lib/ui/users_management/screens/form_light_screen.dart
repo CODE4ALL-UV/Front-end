@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/data/models/auth_models.dart';
+import 'package:flutter_code4all/data/services/api_service.dart';
 
 class FormPageLight extends StatefulWidget {
   final VoidCallback? onBack;
   final VoidCallback? onSuccess;
+
   const FormPageLight({super.key, this.onBack, this.onSuccess});
 
   @override
@@ -10,34 +13,75 @@ class FormPageLight extends StatefulWidget {
 }
 
 class _FormPageLightState extends State<FormPageLight> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _acceptTerms = false;
+  final _apiService = ApiService();
 
-  void _handleRegister() {
+  int? _tipoDiscapacidad;
+  bool _acceptTerms = false;
+  bool _isLoading = false;
+
+  Future<void> _handleRegister() async {
+    final nombre = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    // Validación básica
-    if (email.isEmpty || !email.contains('@')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa un correo electrónico válido')),
-      );
-      return;
-    }
-    if (password.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('La contraseña debe tener al menos 6 caracteres')),
-      );
+    if (nombre.isEmpty) {
+      _showMessage('Ingresa tu nombre');
       return;
     }
 
-    // Registro exitoso → navegar a Welcome
-    widget.onSuccess?.call();
+    if (email.isEmpty || !email.contains('@')) {
+      _showMessage('Ingresa un correo electrónico válido');
+      return;
+    }
+
+    if (password.length < 6) {
+      _showMessage('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    if (!_acceptTerms) {
+      _showMessage('Debes aceptar los términos y condiciones');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _apiService.register(
+        nombre: nombre,
+        correo: email,
+        password: password,
+        tipoDiscapacidad: _tipoDiscapacidad,
+      );
+
+      if (!mounted) return;
+      _showMessage('Registro exitoso: ${response.nombre}');
+      widget.onSuccess?.call();
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      _showMessage(e.message);
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage('Ocurrió un error inesperado');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -72,7 +116,11 @@ class _FormPageLightState extends State<FormPageLight> {
         actions: const [
           Padding(
             padding: EdgeInsets.all(10.0),
-            child: Icon(Icons.account_circle_outlined, color: Colors.white, size: 28),
+            child: Icon(
+              Icons.account_circle_outlined,
+              color: Colors.white,
+              size: 28,
+            ),
           ),
         ],
       ),
@@ -85,16 +133,12 @@ class _FormPageLightState extends State<FormPageLight> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 32),
-
-                  // Logo Code4All
                   Image.asset(
                     'assets/images/logo-flutter.png',
                     height: 120,
                     width: 200,
                   ),
                   const SizedBox(height: 24),
-
-                  // Card del formulario
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -112,7 +156,20 @@ class _FormPageLightState extends State<FormPageLight> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Campo Correo electrónico
+                        const Text(
+                          'Nombre',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF424242),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        TextField(
+                          controller: _nameController,
+                          decoration: _inputDecoration(),
+                        ),
+                        const SizedBox(height: 16),
                         const Text(
                           'Correo electrónico',
                           style: TextStyle(
@@ -125,33 +182,9 @@ class _FormPageLightState extends State<FormPageLight> {
                         TextField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
-                          decoration: InputDecoration(
-                            hintText: 'Valor',
-                            hintStyle: const TextStyle(
-                              color: Color(0xFFBDBDBD),
-                              fontSize: 14,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6),
-                              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6),
-                              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6),
-                              borderSide: const BorderSide(color: Color(0xFFE53935)),
-                            ),
-                          ),
+                          decoration: _inputDecoration(),
                         ),
                         const SizedBox(height: 16),
-
-                        // Campo Contraseña
                         const Text(
                           'Contraseña',
                           style: TextStyle(
@@ -164,33 +197,39 @@ class _FormPageLightState extends State<FormPageLight> {
                         TextField(
                           controller: _passwordController,
                           obscureText: true,
-                          decoration: InputDecoration(
-                            hintText: 'Valor',
-                            hintStyle: const TextStyle(
-                              color: Color(0xFFBDBDBD),
-                              fontSize: 14,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6),
-                              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6),
-                              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6),
-                              borderSide: const BorderSide(color: Color(0xFFE53935)),
-                            ),
+                          decoration: _inputDecoration(),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Tipo de discapacidad',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF424242),
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
+                        const SizedBox(height: 6),
+                        DropdownButtonFormField<int?>(
+                          value: _tipoDiscapacidad,
+                          decoration: _inputDecoration(),
+                          items: const [
+                            DropdownMenuItem<int?>(
+                              value: null,
+                              child: Text('No especificar'),
+                            ),
+                            DropdownMenuItem<int?>(
+                              value: 1,
+                              child: Text('Tipo 1'),
+                            ),
+                            DropdownMenuItem<int?>(
+                              value: 2,
+                              child: Text('Tipo 2'),
+                            ),
+                          ],
+                          onChanged: (value) =>
+                              setState(() => _tipoDiscapacidad = value),
+                        ),
                         const SizedBox(height: 12),
-
-                        // Checkbox Aviso / Términos
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -229,15 +268,11 @@ class _FormPageLightState extends State<FormPageLight> {
                           ],
                         ),
                         const SizedBox(height: 16),
-
-                        // Botón Registrarse
                         SizedBox(
                           width: double.infinity,
                           height: 44,
                           child: ElevatedButton(
-                            onPressed: _acceptTerms
-                                ? () => _handleRegister()
-                                : null,
+                            onPressed: _isLoading ? null : _handleRegister,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF212121),
                               disabledBackgroundColor: const Color(0xFF9E9E9E),
@@ -246,14 +281,23 @@ class _FormPageLightState extends State<FormPageLight> {
                               ),
                               elevation: 0,
                             ),
-                            child: const Text(
-                              'Registrarse',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Registrarse',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
@@ -264,8 +308,6 @@ class _FormPageLightState extends State<FormPageLight> {
               ),
             ),
           ),
-
-          // Ícono accesibilidad
           Padding(
             padding: const EdgeInsets.only(left: 16, bottom: 8),
             child: Align(
@@ -277,14 +319,16 @@ class _FormPageLightState extends State<FormPageLight> {
                   color: Color(0xFF5C6BC0),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.accessibility_new, color: Colors.white, size: 30),
+                child: const Icon(
+                  Icons.accessibility_new,
+                  color: Colors.white,
+                  size: 30,
+                ),
               ),
             ),
           ),
         ],
       ),
-
-      // Barra inferior
       bottomNavigationBar: Container(
         color: const Color(0xFFE53935),
         height: 56,
@@ -300,4 +344,22 @@ class _FormPageLightState extends State<FormPageLight> {
       ),
     );
   }
+
+  InputDecoration _inputDecoration() => InputDecoration(
+    hintText: 'Valor',
+    hintStyle: const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: const BorderSide(color: Color(0xFFE53935)),
+    ),
+  );
 }

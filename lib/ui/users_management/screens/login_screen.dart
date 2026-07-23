@@ -1,35 +1,141 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_code4all/data/models/auth_models.dart';
+import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/ui/core/ui/header_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_fab_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/social_auth_block.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   final VoidCallback? onRegister;
-  const LoginPage({super.key, this.onRegister});
+  final VoidCallback? onSuccess;
+
+  const LoginPage({super.key, this.onRegister, this.onSuccess});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _apiService = ApiService();
+  bool _isLoading = false;
+
+  Future<void> _handleLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || !email.contains('@')) {
+      _showMessage('Ingresa un correo electrónico válido');
+      return;
+    }
+
+    if (password.length < 6) {
+      _showMessage('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _apiService.login(
+        email: email,
+        password: password,
+      );
+
+      if (!mounted) return;
+
+      _showMessage('Bienvenido ${response.nombre}');
+      widget.onSuccess?.call();
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      _showMessage(e.message);
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage('Ocurrió un error inesperado');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 1. Insertamos el header unificado. Leerá automáticamente el tema activo.
       appBar: HeaderWidget(title: 'CODE4ALL v0.1.'),
-      // 2. Cuerpo de la vista protegido contra desbordamientos en pantallas pequeñas
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo Code4All optimizado
               Image.asset(
                 'assets/images/logo-flutter.png',
                 height: 460,
                 width: 460,
               ),
               const SizedBox(height: 5),
-
-              // 3. Bloque de Botones Sociales Componetizado con Semántica
+              TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Correo electrónico',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Contraseña',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _handleLogin,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E88E5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('INICIAR SESIÓN'),
+                ),
+              ),
+              const SizedBox(height: 20),
               SocialAuthBlock(
                 onGoogleTap: () {
                   // TODO: Conectar con authViewModel.signInWithGoogle()
@@ -39,8 +145,6 @@ class LoginPage extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 20),
-
-              // 4. Botón Registrarse
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -54,7 +158,7 @@ class LoginPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: ElevatedButton(
-                    onPressed: onRegister ?? () {},
+                    onPressed: widget.onRegister ?? () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,
@@ -79,12 +183,8 @@ class LoginPage extends StatelessWidget {
           ),
         ),
       ),
-
-      // 5. Botón Flotante de Accesibilidad con Semantics nativo para TalkBack/VoiceOver
       floatingActionButton: const AccessibilityFab(),
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-
-      // 6. Barra Multimodal Inferior acoplada a tu bottomNavigationBarTheme
       bottomNavigationBar: const MultimodalNavBar(),
     );
   }

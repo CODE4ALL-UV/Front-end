@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'ui/core/themes/app_theme.dart';
-import 'ui/home/screens/feature_home_screen.dart';
-import 'ui/home/screens/feature_home_screen.dart';
-import 'ui/home/screens/feature_home_screen.dart';
-import 'ui/home/screens/feature_home_screen.dart';
-import 'ui/home/screens/feature_home_screen.dart';
 import 'ui/users_management/screens/login_screen.dart';
 import 'ui/users_management/screens/login_dark_screen.dart';
 import 'ui/users_management/screens/form_light_screen.dart';
 import 'ui/users_management/screens/form_dark_screen.dart';
 import 'ui/users_management/screens/learning_module_light_screen.dart';
-import 'ui/users_management/screens/learning_module_dark_screen.dart';
 
 // Definimos los 6 estados de tema posibles de tu TG
 enum AppThemeMode {
@@ -74,20 +68,22 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Le asignamos una pantalla por defecto desde el inicio
-    // 2. Control de navegación unificado (Una sola pantalla por feature)
-    Widget currentPage = LoginPage(onRegister: _goToRegister);
+    Widget currentPage;
 
     switch (_currentScreen) {
       case AppScreen.register:
-        //currentPage = RegisterPage(onBack: _goToLogin, onSuccess: _goToModulo);
+        currentPage = _currentThemeMode == AppThemeMode.dark
+            ? FormPageDark(onBack: _goToLogin, onSuccess: _goToLogin)
+            : FormPageLight(onBack: _goToLogin, onSuccess: _goToLogin);
         break;
       case AppScreen.modulo:
-        //currentPage = const ModuloAprendizajePage();
+        currentPage = const ModuloAprendizaje();
         break;
       case AppScreen.login:
       default:
-        currentPage = LoginPage(onRegister: _goToRegister);
+        currentPage = _currentThemeMode == AppThemeMode.dark
+            ? LoginPageDark(onRegister: _goToRegister, onSuccess: _goToModulo)
+            : LoginPage(onRegister: _goToRegister, onSuccess: _goToModulo);
         break;
     }
 

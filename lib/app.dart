@@ -90,24 +90,32 @@ class _AppState extends State<App> {
     return MaterialApp(
       title: 'Code4All',
       debugShowCheckedModeBanner: false,
-
-      // 3. INYECTAMOS EL TEMA DINÁMICO AQUÍ
       theme: _getThemeData(),
-
-      // Eliminamos el Scaffold global de aquí. Cada página (Login, Registro) debe
-      // tener su propio Scaffold para poder usar el HeaderWidget de forma independiente.
-      home: Scaffold(
-        body: currentPage,
-        floatingActionButton: Semantics(
-          button: true,
-          label: '',
-          hint: '',
-          child: FloatingActionButton(
-            backgroundColor: const Color(0xFF5C6BC0),
-            onPressed: _toggleTheme,
-            child: const Icon(Icons.palette, color: Colors.white),
+      home: Stack(
+        children: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            child: KeyedSubtree(
+              key: ValueKey('${_currentScreen.name}_${_currentThemeMode.name}'),
+              child: currentPage,
+            ),
           ),
-        ),
+          Positioned(
+            left: 16,
+            bottom: 24,
+            child: Semantics(
+              button: true,
+              label: 'Cambiar tema',
+              hint: 'Cambia el tema de la aplicación',
+              child: FloatingActionButton(
+                heroTag: 'theme-toggle',
+                backgroundColor: const Color(0xFF5C6BC0),
+                onPressed: _toggleTheme,
+                child: const Icon(Icons.palette, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

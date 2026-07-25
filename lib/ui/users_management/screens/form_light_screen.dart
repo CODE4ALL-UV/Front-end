@@ -89,7 +89,12 @@ class _FormPageLightState extends State<FormPageLight> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final logoSize = screenWidth < 360 ? 140.0 : 180.0;
+    final horizontalPadding = screenWidth < 480 ? 20.0 : 32.0;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color(0xFFE53935),
@@ -124,21 +129,24 @@ class _FormPageLightState extends State<FormPageLight> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 620),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: 24.0,
+              ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(height: 32),
                   Image.asset(
                     'assets/images/logo-flutter.png',
-                    height: 120,
-                    width: 200,
+                    height: logoSize,
+                    width: logoSize * 1.5,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -308,26 +316,7 @@ class _FormPageLightState extends State<FormPageLight> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, bottom: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF5C6BC0),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.accessibility_new,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
       bottomNavigationBar: Container(
         color: const Color(0xFFE53935),

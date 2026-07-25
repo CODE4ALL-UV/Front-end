@@ -88,6 +88,31 @@ class ApiService {
     }
   }
 
+  Future<LoginResponse> signInWithGoogle({required String idToken}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/api/auth/google'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'id_token': idToken}),
+      );
+
+      if (response.statusCode == 200) {
+        return LoginResponse.fromJson(jsonDecode(response.body));
+      }
+
+      throw ApiException(
+        statusCode: response.statusCode,
+        message: _extractMessage(response.body),
+      );
+    } catch (error) {
+      if (error is ApiException) rethrow;
+      throw ApiException(statusCode: null, message: _connectionErrorMessage());
+    }
+  }
+
   String _connectionErrorMessage() {
     return 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en $_baseUrl y que la ruta /api/auth/login o /api/auth/register esté disponible.';
   }

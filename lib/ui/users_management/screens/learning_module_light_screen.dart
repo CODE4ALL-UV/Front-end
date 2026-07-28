@@ -2,9 +2,28 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
+import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
 
-class ModuloAprendizaje extends StatelessWidget {
+class ModuloAprendizaje extends StatefulWidget {
   const ModuloAprendizaje({super.key});
+
+  @override
+  State<ModuloAprendizaje> createState() => _ModuloAprendizajeState();
+}
+
+class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
+  bool _isNavigatingToModule2 = false;
+
+  void _goToModulo2() {
+    if (_isNavigatingToModule2) return;
+    _isNavigatingToModule2 = true;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const Modulo2AprendizajeLight()),
+    ).then((_) {
+      _isNavigatingToModule2 = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,167 +73,188 @@ class ModuloAprendizaje extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
+            child: NotificationListener<OverscrollNotification>(
+              onNotification: (notification) {
+                if (notification.overscroll > 10 &&
+                    notification.metrics.pixels >=
+                        notification.metrics.maxScrollExtent - 1) {
+                  _goToModulo2();
+                  return true;
+                }
+                return false;
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
                       ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Módulo 1',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Preparación',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
                         ),
-                        Container(
-                          width: 52,
-                          height: 52,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Módulo 1',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Preparación',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
-                          child: const Icon(
-                            Icons.menu_book_rounded,
-                            color: Colors.white,
-                            size: 32,
+                          Container(
+                            width: 52,
+                            height: 52,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.menu_book_rounded,
+                              color: Colors.white,
+                              size: 32,
+                            ),
                           ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _BigCircle(
+                          icon: Icons.account_tree,
+                          iconColor: const Color(0xFFE53935),
+                          bgColor: const Color(0xFFFFF3E0),
+                          size: bigSize,
+                          progress: 0.75,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const Capitulo3DetalleLight(),
+                              ),
+                            );
+                          },
+                        ),
+                        _LessonBox(
+                          number: 3,
+                          title: 'El factor inglés',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const Capitulo3DetalleLight(),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _BigCircle(
-                        icon: Icons.account_tree,
-                        iconColor: const Color(0xFFE53935),
-                        bgColor: const Color(0xFFFFF3E0),
-                        size: bigSize,
-                        progress: 0.75,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const Capitulo3DetalleLight(),
-                            ),
-                          );
-                        },
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _LessonBox(
+                          number: 2,
+                          title: 'El entorno',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const Capitulo2DetalleLight(),
+                              ),
+                            );
+                          },
+                        ),
+                        _BigCircle(
+                          icon: Icons.manage_search,
+                          iconColor: const Color(0xFF8E24AA),
+                          bgColor: const Color(0xFFF3E5F5),
+                          size: bigSize,
+                          progress: 0.6,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const Capitulo2DetalleLight(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _BigCircle(
+                          icon: Icons.code,
+                          iconColor: const Color(0xFF5C6BC0),
+                          bgColor: const Color(0xFFE8EAF6),
+                          size: bigSize,
+                          progress: 0.3,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const CapituloDetalleLight(),
+                              ),
+                            );
+                          },
+                        ),
+                        _LessonBox(
+                          number: 1,
+                          title: 'Conociendo\nPython',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const CapituloDetalleLight(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Desliza hacia arriba para abrir Módulo 2',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF607D8B),
+                        fontWeight: FontWeight.w600,
                       ),
-                      _LessonBox(
-                        number: 3,
-                        title: 'El factor inglés',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const Capitulo3DetalleLight(),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _LessonBox(
-                        number: 2,
-                        title: 'El entorno',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const Capitulo2DetalleLight(),
-                            ),
-                          );
-                        },
-                      ),
-                      _BigCircle(
-                        icon: Icons.manage_search,
-                        iconColor: const Color(0xFF8E24AA),
-                        bgColor: const Color(0xFFF3E5F5),
-                        size: bigSize,
-                        progress: 0.6,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const Capitulo2DetalleLight(),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _BigCircle(
-                        icon: Icons.code,
-                        iconColor: const Color(0xFF5C6BC0),
-                        bgColor: const Color(0xFFE8EAF6),
-                        size: bigSize,
-                        progress: 0.3,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const CapituloDetalleLight(),
-                            ),
-                          );
-                        },
-                      ),
-                      _LessonBox(
-                        number: 1,
-                        title: 'Conociendo\nPython',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const CapituloDetalleLight(),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -265,6 +305,7 @@ class CapituloDetalleLight extends StatefulWidget {
 class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
   bool _resumenExpanded = true;
   bool _rutaExpanded = true;
+  bool _isNavigatingToModule2 = false;
 
   static const _rutaItems = [
     _ActivityItem('Relevancia del lenguaje Python', '📦🖥️🎧'),
@@ -299,6 +340,17 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
         builder: (_) => VideoTemaLightScreen(actividad: actividad),
       ),
     );
+  }
+
+  void _goToModulo2() {
+    if (_isNavigatingToModule2) return;
+    _isNavigatingToModule2 = true;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const Modulo2AprendizajeLight()),
+    ).then((_) {
+      _isNavigatingToModule2 = false;
+    });
   }
 
   @override
@@ -361,48 +413,70 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                horizontalPadding,
-                12,
-                horizontalPadding,
-                16,
-              ),
-              child: Column(
-                children: [
-                  _DetailCard(
-                    title: 'Capítulo 1: Conociendo Python',
-                    expanded: _resumenExpanded,
-                    onToggle: () =>
-                        setState(() => _resumenExpanded = !_resumenExpanded),
-                    child: const _ResumenContenido(),
-                  ),
-                  const SizedBox(height: 12),
-                  _DetailCard(
-                    title: 'Ruta de actividades',
-                    expanded: _rutaExpanded,
-                    onToggle: () =>
-                        setState(() => _rutaExpanded = !_rutaExpanded),
-                    child: Column(
-                      children: _rutaItems
-                          .map(
-                            (item) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: _ActivityRow(
-                                item: item,
-                                onBookTap: item.emoji.contains('📦')
-                                    ? () => _openLectura(item.label)
-                                    : null,
-                                onVideoTap: item.emoji.contains('🖥️')
-                                    ? () => _openVideo(item.label)
-                                    : null,
-                              ),
-                            ),
-                          )
-                          .toList(),
+            child: NotificationListener<OverscrollNotification>(
+              onNotification: (notification) {
+                if (notification.overscroll > 14 &&
+                    notification.metrics.pixels >=
+                        notification.metrics.maxScrollExtent - 1) {
+                  _goToModulo2();
+                  return true;
+                }
+                return false;
+              },
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  12,
+                  horizontalPadding,
+                  16,
+                ),
+                child: Column(
+                  children: [
+                    _DetailCard(
+                      title: 'Capítulo 1: Conociendo Python',
+                      expanded: _resumenExpanded,
+                      onToggle: () =>
+                          setState(() => _resumenExpanded = !_resumenExpanded),
+                      child: const _ResumenContenido(),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    _DetailCard(
+                      title: 'Ruta de actividades',
+                      expanded: _rutaExpanded,
+                      onToggle: () =>
+                          setState(() => _rutaExpanded = !_rutaExpanded),
+                      child: Column(
+                        children: _rutaItems
+                            .map(
+                              (item) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                ),
+                                child: _ActivityRow(
+                                  item: item,
+                                  onBookTap: item.emoji.contains('📦')
+                                      ? () => _openLectura(item.label)
+                                      : null,
+                                  onVideoTap: item.emoji.contains('🖥️')
+                                      ? () => _openVideo(item.label)
+                                      : null,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Desliza hacia arriba para abrir Módulo 2',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF607D8B),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1455,17 +1529,11 @@ class _LessonBox extends StatelessWidget {
                 title,
                 style: const TextStyle(
                   fontSize: 13,
-                  color: Color(0xFF424242),
-                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            if (onTap != null)
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: Color(0xFF1E88E5),
-                size: 18,
-              ),
           ],
         ),
       ),

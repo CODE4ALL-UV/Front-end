@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/utils/external_url_opener.dart';
 
 class ModuloAprendizaje extends StatelessWidget {
   const ModuloAprendizaje({super.key});
@@ -279,6 +280,27 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
     _ActivityItem('Evaluación final', '📋'),
   ];
 
+  void _openLectura(String actividad) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LecturaTemaLightScreen(
+          actividad: actividad,
+          contenido: _textoLecturaPorActividad(actividad),
+        ),
+      ),
+    );
+  }
+
+  void _openVideo(String actividad) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => VideoTemaLightScreen(actividad: actividad),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
@@ -366,7 +388,15 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
                           .map(
                             (item) => Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: _ActivityRow(item: item),
+                              child: _ActivityRow(
+                                item: item,
+                                onBookTap: item.emoji.contains('📦')
+                                    ? () => _openLectura(item.label)
+                                    : null,
+                                onVideoTap: item.emoji.contains('🖥️')
+                                    ? () => _openVideo(item.label)
+                                    : null,
+                              ),
                             ),
                           )
                           .toList(),
@@ -437,6 +467,27 @@ class _Capitulo2DetalleLightState extends State<Capitulo2DetalleLight> {
     _ActivityItem('Laboratorio', '🧪'),
     _ActivityItem('Evaluación final', '📋'),
   ];
+
+  void _openLectura(String actividad) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LecturaTemaLightScreen(
+          actividad: actividad,
+          contenido: _textoLecturaPorActividad(actividad),
+        ),
+      ),
+    );
+  }
+
+  void _openVideo(String actividad) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => VideoTemaLightScreen(actividad: actividad),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -525,7 +576,15 @@ class _Capitulo2DetalleLightState extends State<Capitulo2DetalleLight> {
                           .map(
                             (item) => Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: _ActivityRow(item: item),
+                              child: _ActivityRow(
+                                item: item,
+                                onBookTap: item.emoji.contains('📦')
+                                    ? () => _openLectura(item.label)
+                                    : null,
+                                onVideoTap: item.emoji.contains('🖥️')
+                                    ? () => _openVideo(item.label)
+                                    : null,
+                              ),
                             ),
                           )
                           .toList(),
@@ -595,6 +654,27 @@ class _Capitulo3DetalleLightState extends State<Capitulo3DetalleLight> {
     _ActivityItem('Laboratorio', '🧪'),
     _ActivityItem('Evaluación final', '📋'),
   ];
+
+  void _openLectura(String actividad) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LecturaTemaLightScreen(
+          actividad: actividad,
+          contenido: _textoLecturaPorActividad(actividad),
+        ),
+      ),
+    );
+  }
+
+  void _openVideo(String actividad) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => VideoTemaLightScreen(actividad: actividad),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -683,7 +763,15 @@ class _Capitulo3DetalleLightState extends State<Capitulo3DetalleLight> {
                           .map(
                             (item) => Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: _ActivityRow(item: item),
+                              child: _ActivityRow(
+                                item: item,
+                                onBookTap: item.emoji.contains('📦')
+                                    ? () => _openLectura(item.label)
+                                    : null,
+                                onVideoTap: item.emoji.contains('🖥️')
+                                    ? () => _openVideo(item.label)
+                                    : null,
+                              ),
                             ),
                           )
                           .toList(),
@@ -831,8 +919,10 @@ class _ActivityItem {
 
 class _ActivityRow extends StatelessWidget {
   final _ActivityItem item;
+  final VoidCallback? onBookTap;
+  final VoidCallback? onVideoTap;
 
-  const _ActivityRow({required this.item});
+  const _ActivityRow({required this.item, this.onBookTap, this.onVideoTap});
 
   @override
   Widget build(BuildContext context) {
@@ -855,9 +945,409 @@ class _ActivityRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text(item.emoji, style: const TextStyle(fontSize: 22)),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: onBookTap,
+              child: Text(
+                item.emoji,
+                style: TextStyle(
+                  fontSize: 22,
+                  decoration: onBookTap != null
+                      ? TextDecoration.underline
+                      : null,
+                  decorationColor: const Color(0xFF1E88E5),
+                ),
+              ),
+            ),
+            if (onVideoTap != null) ...[
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: onVideoTap,
+                child: const Icon(
+                  Icons.ondemand_video,
+                  size: 20,
+                  color: Color(0xFF1E88E5),
+                ),
+              ),
+            ],
+          ],
+        ),
       ],
     );
+  }
+}
+
+class VideoTemaLightScreen extends StatelessWidget {
+  final String actividad;
+
+  const VideoTemaLightScreen({super.key, required this.actividad});
+
+  static const String _videoUrl =
+      'https://www.youtube.com/watch?v=nKPbfIU442g&t=89s';
+
+  Future<void> _abrirVideo(BuildContext context) async {
+    final opened = await openExternalUrl(_videoUrl);
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo abrir el video.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              color: const Color(0xFF45D1D6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      size: 36,
+                      color: Color(0xFF263238),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Video',
+                    style: TextStyle(fontSize: 44, color: Color(0xFF263238)),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Mira el video',
+                      style: TextStyle(
+                        fontSize: 54,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF4A4A4A),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'En este espacio podras ver un video relacionado con $actividad aplicado en Python:',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        height: 1.45,
+                        color: Color(0xFF2A67AB),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    GestureDetector(
+                      onTap: () => _abrirVideo(context),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: Container(
+                            color: const Color(0xFF3A404A),
+                            child: Stack(
+                              children: [
+                                const Center(
+                                  child: Icon(
+                                    Icons.play_circle_fill,
+                                    size: 96,
+                                    color: Color(0xFFE0E0E0),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 12,
+                                  right: 12,
+                                  bottom: 10,
+                                  child: Row(
+                                    children: [
+                                      const Text(
+                                        '▶ 2:30 / 5:00',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Container(
+                                          height: 4,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white24,
+                                            borderRadius: BorderRadius.circular(
+                                              99,
+                                            ),
+                                          ),
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Container(
+                                              width: 120,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white70,
+                                                borderRadius:
+                                                    BorderRadius.circular(99),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: () => _abrirVideo(context),
+                        icon: const Icon(Icons.open_in_new, size: 18),
+                        label: const Text('Abrir en YouTube'),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      width: double.infinity,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x22000000),
+                            blurRadius: 8,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'Traducción en tiempo real',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF212121),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: const _NavButton(label: 'Anterior'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFCD00D3),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.help_outline,
+                      color: Colors.black,
+                      size: 34,
+                    ),
+                  ),
+                  const SizedBox(width: 52),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LecturaTemaLightScreen extends StatelessWidget {
+  final String actividad;
+  final String contenido;
+
+  const LecturaTemaLightScreen({
+    super.key,
+    required this.actividad,
+    required this.contenido,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFE53935),
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
+        ),
+        title: const Text(
+          'CODE4ALL',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            letterSpacing: 1,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Row(
+              children: const [
+                CircleAvatar(
+                  radius: 14,
+                  backgroundColor: Color(0xFF90CAF9),
+                  child: Icon(Icons.person, color: Colors.white, size: 18),
+                ),
+                SizedBox(width: 6),
+                Text(
+                  'Sheher',
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            color: const Color(0xFF45D1D6),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Text(
+              'Lectura: $actividad',
+              style: const TextStyle(
+                fontSize: 20,
+                color: Color(0xFF0B4F6C),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Realiza la siguiente lectura',
+                    style: TextStyle(
+                      fontSize: 44,
+                      color: Color(0xFF4A4A4A),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    contenido,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      height: 1.45,
+                      color: Color(0xFF2A67AB),
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      _NavButton(label: 'Anterior'),
+                      const SizedBox(width: 10),
+                      _NavButton(label: 'Siguiente'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, bottom: 12),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: 52,
+                height: 52,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFCD00D3),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.help_outline,
+                  color: Colors.black,
+                  size: 34,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NavButton extends StatelessWidget {
+  final String label;
+
+  const _NavButton({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E88E5),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Text(
+        '▶ $label',
+        style: const TextStyle(color: Colors.white, fontSize: 18),
+      ),
+    );
+  }
+}
+
+String _textoLecturaPorActividad(String actividad) {
+  switch (actividad) {
+    case 'Relevancia del lenguaje Python':
+      return 'Python es un lenguaje de programación interpretado, legible y versátil que se utiliza en desarrollo web, ciencia de datos, automatización y educación. Su sintaxis clara reduce la curva de aprendizaje y facilita que una persona se concentre en la lógica del problema en lugar de pelear con la estructura del código.\n\nEn proyectos reales, Python destaca por su ecosistema de librerías, su comunidad activa y su capacidad de integrarse con otros servicios. Esto lo vuelve ideal para construir prototipos rápidos y también para sistemas de producción cuando se diseña una arquitectura adecuada.';
+    case '¿Qué es un IDE/Editor?':
+      return 'Un editor de código es una herramienta para escribir y organizar archivos de programación, mientras que un IDE integra además funcionalidades como depuración, autocompletado inteligente y administración del proyecto.\n\nPara aprender Python, usar un entorno como VS Code permite ejecutar scripts, revisar errores en tiempo real y mantener una estructura ordenada. Elegir bien tu entorno mejora la productividad y disminuye errores comunes de configuración.';
+    case 'Palabras clave':
+      return 'En Python, las palabras clave son términos reservados por el lenguaje como if, for, while, def o class. Estas palabras tienen un significado especial y no se deben usar como nombres de variables.\n\nComprender estas palabras es fundamental porque forman la base de la lectura de cualquier programa. Identificarlas rápido te ayuda a entender el flujo del código, las condiciones y la forma en que se definen funciones y estructuras de datos.';
+    default:
+      return 'Esta lectura explica el contexto de la actividad y su propósito dentro del módulo. Revisa los conceptos principales, identifica las ideas clave y relaciona el contenido con los ejercicios prácticos para reforzar tu aprendizaje de Python.';
   }
 }
 

@@ -5,6 +5,7 @@ import 'ui/users_management/screens/login_dark_screen.dart';
 import 'ui/users_management/screens/form_light_screen.dart';
 import 'ui/users_management/screens/form_dark_screen.dart';
 import 'ui/users_management/screens/learning_module_light_screen.dart';
+import 'ui/users_management/screens/learning_module_dark_screen.dart';
 
 // Definimos los 6 estados de tema posibles de tu TG
 enum AppThemeMode {
@@ -48,7 +49,6 @@ class _AppState extends State<App> {
       case AppThemeMode.achromatopsia:
         return AppTheme.achromatopsiaTheme;
       case AppThemeMode.light:
-      default:
         return AppTheme.lightTheme;
     }
   }
@@ -77,10 +77,11 @@ class _AppState extends State<App> {
             : FormPageLight(onBack: _goToLogin, onSuccess: _goToLogin);
         break;
       case AppScreen.modulo:
-        currentPage = const ModuloAprendizaje();
+        currentPage = _currentThemeMode == AppThemeMode.dark
+            ? const ModuloAprendizajeDark()
+            : const ModuloAprendizaje();
         break;
       case AppScreen.login:
-      default:
         currentPage = _currentThemeMode == AppThemeMode.dark
             ? LoginPageDark(onRegister: _goToRegister, onSuccess: _goToModulo)
             : LoginPage(onRegister: _goToRegister, onSuccess: _goToModulo);

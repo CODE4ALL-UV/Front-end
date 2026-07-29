@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
 
@@ -279,18 +280,7 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        color: const Color(0xFFE53935),
-        height: 56,
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Icon(Icons.skip_previous, color: Colors.white, size: 28),
-            Icon(Icons.play_arrow, color: Colors.white, size: 32),
-            Icon(Icons.skip_next, color: Colors.white, size: 28),
-          ],
-        ),
-      ),
+      bottomNavigationBar: const MultimodalNavBar(),
     );
   }
 }

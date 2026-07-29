@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/config/static_messages.dart';
+import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
 
 class MultimodalNavBar extends StatelessWidget {
-  const MultimodalNavBar({super.key});
+  const MultimodalNavBar({super.key, this.announcementText});
+
+  final String? announcementText;
+
+  Future<void> _announceCurrentScreen(BuildContext context) async {
+    final explicitText = announcementText?.trim();
+    final extractedText = ScreenContentExtractor.extractFromContext(context);
+    final text =
+        (explicitText?.isNotEmpty == true ? explicitText! : extractedText)
+            .trim();
+
+    if (text.isEmpty) return;
+
+    await accessibilityReadingState.read(text, context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +53,9 @@ class MultimodalNavBar extends StatelessWidget {
               button: true,
               label: StaticMessages.navPlayLabel,
               hint: StaticMessages.navPlayHint,
+              onTap: () async => _announceCurrentScreen(context),
               child: InkWell(
-                onTap: () {},
+                onTap: () async => _announceCurrentScreen(context),
                 child: Icon(
                   Icons.play_arrow,
                   color: footerTheme.selectedItemColor,

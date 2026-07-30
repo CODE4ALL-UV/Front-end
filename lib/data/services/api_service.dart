@@ -104,15 +104,26 @@ class ApiService {
     }
   }
 
-  Future<LoginResponse> signInWithGoogle({required String idToken}) async {
+  Future<LoginResponse> signInWithGoogle({
+    String? accessToken,
+    String? idToken,
+  }) async {
     try {
+      final body = <String, String>{};
+      if (accessToken != null && accessToken.isNotEmpty) {
+        body['access_token'] = accessToken;
+      }
+      if (idToken != null && idToken.isNotEmpty) {
+        body['id_token'] = idToken;
+      }
+
       final response = await http.post(
         Uri.parse('$_baseUrl/api/auth/google'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: jsonEncode({'id_token': idToken}),
+        body: jsonEncode(body),
       );
 
       if (response.statusCode == 200) {

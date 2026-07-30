@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_code4all/data/models/auth_models.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
+import 'package:flutter_code4all/data/services/google_auth_service.dart';
 
 class LoginPageDark extends StatefulWidget {
   final VoidCallback? onRegister;
@@ -19,6 +20,7 @@ class _LoginPageDarkState extends State<LoginPageDark> {
   final _passwordController = TextEditingController();
   final _apiService = ApiService();
   final _authStorage = AuthStorage();
+  final _googleAuthService = GoogleAuthService();
   bool _isLoading = false;
 
   Future<void> _handleLogin() async {
@@ -199,7 +201,7 @@ class _LoginPageDarkState extends State<LoginPageDark> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _SocialButtonDark(
-                        onTap: () {},
+                        onTap: _isLoading ? null : () => _handleGoogleSignIn(),
                         backgroundColor: Colors.white,
                         child: Padding(
                           padding: const EdgeInsets.all(6.0),
@@ -276,11 +278,47 @@ class _LoginPageDarkState extends State<LoginPageDark> {
       ),
     );
   }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _googleAuthService.signIn(context: context);
+
+      await _authStorage.saveToken(response.accessToken);
+      await _authStorage.saveRole(response.rol);
+      await _authStorage.saveName(response.nombre);
+      await _authStorage.saveEmail(response.email);
+      await _authStorage.saveUserId(response.userId);
+      final existingPhotoUrl = await _authStorage.getPhotoUrl();
+      final nextPhotoUrl = (response.photoUrl?.trim().isNotEmpty ?? false)
+          ? response.photoUrl!
+          : (existingPhotoUrl ?? '');
+      await _authStorage.savePhotoUrl(nextPhotoUrl);
+
+      _showMessage(_buildWelcomeMessage(response));
+      widget.onSuccess?.call(response.rol);
+    } on GoogleAuthCanceledException {
+      if (!mounted) return;
+      _showMessage('Inicio de sesión cancelado');
+    } on GoogleAuthException catch (e) {
+      if (!mounted) return;
+      _showMessage(e.message);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      _showMessage(e.message);
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage('Error en autenticación con Google: ${e.toString()}');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 }
 
 class _SocialButtonDark extends StatelessWidget {
   final Widget child;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Color backgroundColor;
 
   const _SocialButtonDark({

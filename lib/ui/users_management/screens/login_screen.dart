@@ -1,14 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/models/auth_models.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_code4all/ui/core/ui/header_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_fab_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/social_auth_block.dart';
+import 'package:flutter_code4all/data/services/google_auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? onRegister;
@@ -25,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   final _apiService = ApiService();
   final _authStorage = AuthStorage();
+  final _googleAuthService = GoogleAuthService();
   bool _isLoading = false;
 
   Future<void> _handleLogin() async {
@@ -239,45 +238,35 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      final googleServerClientId = dotenv.env['GOOGLE_SERVER_CLIENT_ID'];
-      final googleSignIn = GoogleSignIn(
-        clientId: kIsWeb && googleServerClientId?.isNotEmpty == true
-            ? googleServerClientId
-            : null,
-        serverClientId: !kIsWeb && googleServerClientId?.isNotEmpty == true
-            ? googleServerClientId
-            : null,
-        scopes: ['email'],
-      );
+      final response = await _googleAuthService.signIn(context: context);
 
-      final account = await googleSignIn.signIn();
-      if (account == null) {
-        _showMessage('Inicio de sesión cancelado');
-        return;
-      }
-
-      final auth = await account.authentication;
-      final idToken = auth.idToken;
-      if (idToken == null) {
-        _showMessage('No se obtuvo el idToken de Google');
-        return;
-      }
-
-      final response = await _apiService.signInWithGoogle(idToken: idToken);
-
-      // Guardar token y rol de forma segura
       await _authStorage.saveToken(response.accessToken);
       await _authStorage.saveRole(response.rol);
+      await _authStorage.saveName(response.nombre);
+      await _authStorage.saveEmail(response.email);
+      await _authStorage.saveUserId(response.userId);
+      final existingPhotoUrl = await _authStorage.getPhotoUrl();
+      final nextPhotoUrl = (response.photoUrl?.trim().isNotEmpty ?? false)
+          ? response.photoUrl!
+          : (existingPhotoUrl ?? '');
+      await _authStorage.savePhotoUrl(nextPhotoUrl);
 
       _showMessage(_buildWelcomeMessage(response));
       widget.onSuccess?.call(response.rol);
+    } on GoogleAuthCanceledException {
+      if (!mounted) return;
+      _showMessage('Inicio de sesión cancelado');
+    } on GoogleAuthException catch (e) {
+      if (!mounted) return;
+      _showMessage(e.message);
     } on ApiException catch (e) {
       debugPrint('Google SignIn ApiException: ${e.toString()}');
+      if (!mounted) return;
       _showMessage(e.message);
     } catch (e, st) {
-      // Mostrar error real para ayudar a depurar (se puede quitar en producción)
       debugPrint('Google SignIn exception: $e');
       debugPrint(st.toString());
+      if (!mounted) return;
       _showMessage('Error en autenticación con Google: ${e.toString()}');
     } finally {
       if (mounted) setState(() => _isLoading = false);

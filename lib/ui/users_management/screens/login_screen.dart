@@ -53,6 +53,14 @@ class _LoginPageState extends State<LoginPage> {
 
       await _authStorage.saveToken(response.accessToken);
       await _authStorage.saveRole(response.rol);
+      await _authStorage.saveName(response.nombre);
+      await _authStorage.saveEmail(response.email);
+      await _authStorage.saveUserId(response.userId);
+      final existingPhotoUrl = await _authStorage.getPhotoUrl();
+      final nextPhotoUrl = (response.photoUrl?.trim().isNotEmpty ?? false)
+          ? response.photoUrl!
+          : (existingPhotoUrl ?? '');
+      await _authStorage.savePhotoUrl(nextPhotoUrl);
 
       _showMessage(_buildWelcomeMessage(response));
       widget.onSuccess?.call(response.rol);
@@ -102,7 +110,12 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: HeaderWidget(title: 'CODE4ALL v0.1.'),
+      appBar: HeaderWidget(
+        title: 'CODE4ALL v0.1.',
+        showUserIcon: false,
+        userName: 'Usuario',
+        onLogout: () => widget.onSuccess?.call('logout'),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

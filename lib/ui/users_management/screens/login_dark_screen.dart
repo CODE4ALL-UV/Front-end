@@ -46,6 +46,14 @@ class _LoginPageDarkState extends State<LoginPageDark> {
       if (!mounted) return;
       await _authStorage.saveToken(response.accessToken);
       await _authStorage.saveRole(response.rol);
+      await _authStorage.saveName(response.nombre);
+      await _authStorage.saveEmail(response.email);
+      await _authStorage.saveUserId(response.userId);
+      final existingPhotoUrl = await _authStorage.getPhotoUrl();
+      final nextPhotoUrl = (response.photoUrl?.trim().isNotEmpty ?? false)
+          ? response.photoUrl!
+          : (existingPhotoUrl ?? '');
+      await _authStorage.savePhotoUrl(nextPhotoUrl);
       _showMessage(_buildWelcomeMessage(response));
       widget.onSuccess?.call(response.rol);
     } on ApiException catch (e) {
@@ -111,16 +119,6 @@ class _LoginPageDarkState extends State<LoginPageDark> {
           ),
         ),
         centerTitle: true,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Icon(
-              Icons.account_circle_outlined,
-              color: Colors.white,
-              size: 28,
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: Center(

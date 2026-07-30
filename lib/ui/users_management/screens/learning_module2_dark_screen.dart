@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module_dark_screen.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module3_dark_screen.dart';
 
@@ -64,20 +65,10 @@ class _Modulo2AprendizajeDarkState extends State<Modulo2AprendizajeDark> {
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFF6D6D6D),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-                SizedBox(width: 8),
-              ],
+            child: UserProfileMenu(
+              showName: true,
+              onLogout: () =>
+                  Navigator.of(context).popUntil((route) => route.isFirst),
             ),
           ),
         ],

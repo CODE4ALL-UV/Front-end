@@ -2,11 +2,19 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
+import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
 
 class ModuloAprendizaje extends StatefulWidget {
-  const ModuloAprendizaje({super.key});
+  final String userName;
+  final VoidCallback? onLogout;
+
+  const ModuloAprendizaje({
+    super.key,
+    this.userName = 'Usuario',
+    this.onLogout,
+  });
 
   @override
   State<ModuloAprendizaje> createState() => _ModuloAprendizajeState();
@@ -53,20 +61,10 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFFBDBDBD),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-                SizedBox(width: 8),
-              ],
+            child: UserProfileMenu(
+              userName: widget.userName,
+              onLogout: widget.onLogout,
+              showName: true,
             ),
           ),
         ],

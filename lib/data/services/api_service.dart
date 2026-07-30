@@ -1,19 +1,33 @@
 import 'dart:convert';
+import 'dart:io' as io;
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/auth_models.dart';
 
 class ApiService {
   ApiService({String? baseUrl})
-    : _baseUrl =
-          baseUrl ??
-          const String.fromEnvironment(
-            'API_BASE_URL',
-            defaultValue: 'http://127.0.0.1:8000',
-          );
+    : _baseUrl = (baseUrl ?? _defaultBaseUrl()).trim();
 
   final String _baseUrl;
+
+  static String _defaultBaseUrl() {
+    if (kIsWeb) {
+      return 'http://127.0.0.1:8000';
+    }
+
+    if (io.Platform.isAndroid) {
+      return 'http://10.0.2.2:8000';
+    }
+
+    return 'http://127.0.0.1:8000';
+  }
+
+  String buildUrl(String path) {
+    final normalizedPath = path.startsWith('/') ? path : '/$path';
+    return '$_baseUrl$normalizedPath';
+  }
 
   Future<RegisterResponse> register({
     required String nombre,
@@ -113,6 +127,23 @@ class ApiService {
       if (error is ApiException) rethrow;
       throw ApiException(statusCode: null, message: _connectionErrorMessage());
     }
+  }
+
+  String resolveMediaUrl(String? url) {
+    if (url == null || url.trim().isEmpty) {
+      return '';
+    }
+
+    final normalized = url.trim();
+    if (normalized.startsWith('http://') || normalized.startsWith('https://')) {
+      return normalized;
+    }
+
+    if (normalized.startsWith('/')) {
+      return buildUrl(normalized);
+    }
+
+    return buildUrl('/$normalized');
   }
 
   String _connectionErrorMessage() {

@@ -1,11 +1,19 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_dark_screen.dart';
 
 class ModuloAprendizajeDark extends StatefulWidget {
-  const ModuloAprendizajeDark({super.key});
+  final String userName;
+  final VoidCallback? onLogout;
+
+  const ModuloAprendizajeDark({
+    super.key,
+    this.userName = 'Usuario',
+    this.onLogout,
+  });
 
   @override
   State<ModuloAprendizajeDark> createState() => _ModuloAprendizajeDarkState();
@@ -52,20 +60,10 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFF6D6D6D),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-                SizedBox(width: 8),
-              ],
+            child: UserProfileMenu(
+              userName: widget.userName,
+              onLogout: widget.onLogout,
+              showName: true,
             ),
           ),
         ],

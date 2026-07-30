@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
+import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module5_light_screen.dart';
 
 class Modulo6AprendizajeLight extends StatefulWidget {
@@ -53,20 +54,10 @@ class _Modulo6AprendizajeLightState extends State<Modulo6AprendizajeLight> {
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFFBDBDBD),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-                SizedBox(width: 8),
-              ],
+            child: UserProfileMenu(
+              showName: true,
+              onLogout: () =>
+                  Navigator.of(context).popUntil((route) => route.isFirst),
             ),
           ),
         ],

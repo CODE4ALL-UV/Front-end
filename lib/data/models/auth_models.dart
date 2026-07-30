@@ -67,6 +67,7 @@ class LoginResponse {
   final String email;
   final String nombre;
   final String rol;
+  final String? photoUrl;
 
   const LoginResponse({
     required this.accessToken,
@@ -75,6 +76,7 @@ class LoginResponse {
     required this.email,
     required this.nombre,
     required this.rol,
+    this.photoUrl,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
@@ -85,6 +87,7 @@ class LoginResponse {
       email: json['email'] as String,
       nombre: json['nombre'] as String,
       rol: (json['rol'] ?? 'estudiante').toString(),
+      photoUrl: json['photo_url']?.toString(),
     );
   }
 }

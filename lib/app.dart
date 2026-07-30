@@ -30,6 +30,7 @@ class _AppState extends State<App> {
   // Inicializamos en tema claro y pantalla de login
   AppThemeMode _currentThemeMode = AppThemeMode.light;
   AppScreen _currentScreen = AppScreen.login;
+  String _userName = 'Usuario';
 
   void _goToRegister() => setState(() => _currentScreen = AppScreen.register);
   void _goToLogin() => setState(() => _currentScreen = AppScreen.login);
@@ -42,6 +43,12 @@ class _AppState extends State<App> {
     }
 
     _goToLogin();
+  }
+
+  void _handleUserNameChanged(String name) {
+    setState(() {
+      _userName = name.trim().isNotEmpty ? name : 'Usuario';
+    });
   }
 
   // Método auxiliar para obtener el ThemeData dinámicamente según la selección
@@ -87,18 +94,28 @@ class _AppState extends State<App> {
         break;
       case AppScreen.modulo:
         currentPage = _currentThemeMode == AppThemeMode.dark
-            ? const ModuloAprendizajeDark()
-            : const ModuloAprendizaje();
+            ? ModuloAprendizajeDark(userName: _userName)
+            : ModuloAprendizaje(userName: _userName, onLogout: _goToLogin);
         break;
       case AppScreen.login:
         currentPage = _currentThemeMode == AppThemeMode.dark
             ? LoginPageDark(
                 onRegister: _goToRegister,
-                onSuccess: _handleSuccessfulLogin,
+                onSuccess: (role) {
+                  _handleSuccessfulLogin(role);
+                  if (role.toLowerCase() != 'logout') {
+                    _handleUserNameChanged('Usuario');
+                  }
+                },
               )
             : LoginPage(
                 onRegister: _goToRegister,
-                onSuccess: _handleSuccessfulLogin,
+                onSuccess: (role) {
+                  _handleSuccessfulLogin(role);
+                  if (role.toLowerCase() != 'logout') {
+                    _handleUserNameChanged('Usuario');
+                  }
+                },
               );
         break;
     }

@@ -3,12 +3,14 @@ class RegisterRequest {
   final String correo;
   final String password;
   final int? tipoDiscapacidad;
+  final String rol;
 
   const RegisterRequest({
     required this.nombre,
     required this.correo,
     required this.password,
     this.tipoDiscapacidad,
+    required this.rol,
   });
 
   Map<String, dynamic> toJson() => {
@@ -16,6 +18,7 @@ class RegisterRequest {
     'correo': correo,
     'password': password,
     'tipo_discapacidad': tipoDiscapacidad,
+    'rol': rol,
   };
 }
 
@@ -25,6 +28,7 @@ class RegisterResponse {
   final String correo;
   final int? tipoDiscapacidad;
   final DateTime fechaRegistro;
+  final String rol;
 
   const RegisterResponse({
     required this.idUsuario,
@@ -32,6 +36,7 @@ class RegisterResponse {
     required this.correo,
     required this.tipoDiscapacidad,
     required this.fechaRegistro,
+    required this.rol,
   });
 
   factory RegisterResponse.fromJson(Map<String, dynamic> json) {
@@ -41,6 +46,7 @@ class RegisterResponse {
       correo: json['correo'] as String,
       tipoDiscapacidad: json['tipo_discapacidad'] as int?,
       fechaRegistro: DateTime.parse(json['fecha_registro'] as String),
+      rol: (json['rol'] ?? 'estudiante').toString(),
     );
   }
 }
@@ -60,6 +66,7 @@ class LoginResponse {
   final int userId;
   final String email;
   final String nombre;
+  final String rol;
 
   const LoginResponse({
     required this.accessToken,
@@ -67,6 +74,7 @@ class LoginResponse {
     required this.userId,
     required this.email,
     required this.nombre,
+    required this.rol,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
@@ -76,6 +84,7 @@ class LoginResponse {
       userId: json['user_id'] as int,
       email: json['email'] as String,
       nombre: json['nombre'] as String,
+      rol: (json['rol'] ?? 'estudiante').toString(),
     );
   }
 }

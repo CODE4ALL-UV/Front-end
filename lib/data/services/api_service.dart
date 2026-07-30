@@ -20,12 +20,14 @@ class ApiService {
     required String correo,
     required String password,
     int? tipoDiscapacidad,
+    required String rol,
   }) async {
     final request = RegisterRequest(
       nombre: nombre,
       correo: correo,
       password: password,
       tipoDiscapacidad: tipoDiscapacidad,
+      rol: rol,
     );
 
     try {

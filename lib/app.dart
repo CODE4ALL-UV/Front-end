@@ -35,6 +35,15 @@ class _AppState extends State<App> {
   void _goToLogin() => setState(() => _currentScreen = AppScreen.login);
   void _goToModulo() => setState(() => _currentScreen = AppScreen.modulo);
 
+  void _handleSuccessfulLogin(String role) {
+    if (role.toLowerCase() == 'estudiante') {
+      _goToModulo();
+      return;
+    }
+
+    _goToLogin();
+  }
+
   // Método auxiliar para obtener el ThemeData dinámicamente según la selección
   ThemeData _getThemeData() {
     switch (_currentThemeMode) {
@@ -83,8 +92,14 @@ class _AppState extends State<App> {
         break;
       case AppScreen.login:
         currentPage = _currentThemeMode == AppThemeMode.dark
-            ? LoginPageDark(onRegister: _goToRegister, onSuccess: _goToModulo)
-            : LoginPage(onRegister: _goToRegister, onSuccess: _goToModulo);
+            ? LoginPageDark(
+                onRegister: _goToRegister,
+                onSuccess: _handleSuccessfulLogin,
+              )
+            : LoginPage(
+                onRegister: _goToRegister,
+                onSuccess: _handleSuccessfulLogin,
+              );
         break;
     }
 

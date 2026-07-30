@@ -19,6 +19,7 @@ class _FormPageDarkState extends State<FormPageDark> {
   final _apiService = ApiService();
 
   int? _tipoDiscapacidad;
+  String _selectedRole = 'estudiante';
   bool _acceptTerms = false;
   bool _isLoading = false;
 
@@ -55,10 +56,13 @@ class _FormPageDarkState extends State<FormPageDark> {
         correo: correo,
         password: password,
         tipoDiscapacidad: _tipoDiscapacidad,
+        rol: _selectedRole,
       );
 
       if (!mounted) return;
-      _showMessage('Registro exitoso: ${response.nombre}');
+      _showMessage(
+        'Registro exitoso: ${response.nombre}. Rol asignado: ${response.rol}',
+      );
       widget.onSuccess?.call();
     } on ApiException catch (e) {
       if (!mounted) return;
@@ -241,6 +245,39 @@ class _FormPageDarkState extends State<FormPageDark> {
                           ],
                           onChanged: (value) =>
                               setState(() => _tipoDiscapacidad = value),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Rol de acceso',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFFE0E0E0),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        DropdownButtonFormField<String>(
+                          value: _selectedRole,
+                          decoration: _inputDecoration(),
+                          dropdownColor: const Color(0xFF3A3A3A),
+                          style: const TextStyle(color: Colors.white),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'estudiante',
+                              child: Text('Estudiante'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'docente',
+                              child: Text('Docente'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'director',
+                              child: Text('Director'),
+                            ),
+                          ],
+                          onChanged: (value) => setState(
+                            () => _selectedRole = value ?? 'estudiante',
+                          ),
                         ),
                         const SizedBox(height: 12),
                         Row(

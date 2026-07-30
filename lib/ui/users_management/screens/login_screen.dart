@@ -12,7 +12,7 @@ import 'package:flutter_code4all/ui/core/ui/social_auth_block.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? onRegister;
-  final VoidCallback? onSuccess;
+  final void Function(String role)? onSuccess;
 
   const LoginPage({super.key, this.onRegister, this.onSuccess});
 
@@ -51,8 +51,11 @@ class _LoginPageState extends State<LoginPage> {
 
       if (!mounted) return;
 
-      _showMessage('Bienvenido ${response.nombre}');
-      widget.onSuccess?.call();
+      await _authStorage.saveToken(response.accessToken);
+      await _authStorage.saveRole(response.rol);
+
+      _showMessage(_buildWelcomeMessage(response));
+      widget.onSuccess?.call(response.rol);
     } on ApiException catch (e) {
       if (!mounted) return;
       _showMessage(e.message);
@@ -64,6 +67,17 @@ class _LoginPageState extends State<LoginPage> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  String _buildWelcomeMessage(LoginResponse response) {
+    final roleLabel = response.rol.toLowerCase();
+    if (roleLabel == 'docente') {
+      return 'Bienvenido ${response.nombre}. Tu rol es docente. Estamos construyendo las vistas necesarias próximamente.';
+    }
+    if (roleLabel == 'director') {
+      return 'Bienvenido ${response.nombre}. Tu rol es director. Estamos construyendo las vistas necesarias próximamente.';
+    }
+    return 'Bienvenido ${response.nombre}. Tu rol es estudiante y puedes acceder a aprendizaje.';
   }
 
   void _showMessage(String message) {
@@ -238,11 +252,12 @@ class _LoginPageState extends State<LoginPage> {
 
       final response = await _apiService.signInWithGoogle(idToken: idToken);
 
-      // Guardar token de forma segura
+      // Guardar token y rol de forma segura
       await _authStorage.saveToken(response.accessToken);
+      await _authStorage.saveRole(response.rol);
 
-      _showMessage('Bienvenido ${response.nombre}');
-      widget.onSuccess?.call();
+      _showMessage(_buildWelcomeMessage(response));
+      widget.onSuccess?.call(response.rol);
     } on ApiException catch (e) {
       debugPrint('Google SignIn ApiException: ${e.toString()}');
       _showMessage(e.message);

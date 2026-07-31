@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module4_light_screen.dart';
@@ -289,19 +290,7 @@ class _Modulo5AprendizajeLightState extends State<Modulo5AprendizajeLight> {
             padding: const EdgeInsets.only(left: 16, bottom: 8),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFCD00D3),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.help_outline,
-                  color: Colors.black,
-                  size: 30,
-                ),
-              ),
+              child: const HelpActionButton(),
             ),
           ),
         ],
@@ -560,19 +549,7 @@ class _ChapterDetailLightState extends State<_ChapterDetailLight> {
               padding: const EdgeInsets.only(left: 16, bottom: 8),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFCD00D3),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.help_outline,
-                    color: Colors.black,
-                    size: 30,
-                  ),
-                ),
+                child: const HelpActionButton(),
               ),
             ),
           ],

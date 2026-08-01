@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'accessibility_settings_screen.dart';
 
 class HelpActionButton extends StatefulWidget {
   const HelpActionButton({super.key});
@@ -46,10 +47,6 @@ class _HelpActionButtonState extends State<HelpActionButton>
     final screenWidth = mediaQuery.size.width;
     final safeWidth = (screenWidth - 24).clamp(220.0, 380.0);
     final panelWidth = (safeWidth - 92).clamp(180.0, 220.0);
-    final panelLeft = (safeWidth > 300 ? 72.0 : 56.0).clamp(
-      0.0,
-      (safeWidth - panelWidth - 16).clamp(0.0, safeWidth),
-    );
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
@@ -65,6 +62,10 @@ class _HelpActionButtonState extends State<HelpActionButton>
             overlaySafeWidth,
           ),
         );
+        final panelHeight = 360.0;
+        final availableBottomSpace =
+            overlayHeight - 24 - overlayMediaQuery.padding.bottom;
+        final panelTop = (availableBottomSpace - panelHeight).clamp(0.0, 80.0);
 
         return Stack(
           children: [
@@ -79,12 +80,12 @@ class _HelpActionButtonState extends State<HelpActionButton>
             ),
             Positioned(
               left: 12,
-              bottom: 12 + overlayMediaQuery.padding.bottom,
+              top: panelTop,
               child: Material(
                 color: Colors.transparent,
                 child: SizedBox(
                   width: overlaySafeWidth,
-                  height: 420,
+                  height: panelHeight,
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -173,7 +174,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                       ? Icons.close
                                       : Icons.help_outline,
                                   color: Colors.white,
-                                  size: 28,
+                                  size: 24,
                                 ),
                               ),
                             ),
@@ -212,10 +213,27 @@ class _HelpActionButtonState extends State<HelpActionButton>
   }
 
   void _selectOption(String option) {
+    if (option == 'Configuración') {
+      _navigateToSettings();
+      return;
+    }
     setState(() {
       _selectedOption = option;
     });
     _refreshOverlay();
+  }
+
+  void _navigateToSettings() {
+    _hideOverlay();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(
+          builder: (context) => const AccessibilitySettingsScreen(),
+        ),
+      );
+    });
   }
 
   void _closePanel() {
@@ -227,34 +245,33 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
   @override
   Widget build(BuildContext context) {
-    return Offstage(
-      offstage: _overlayEntry != null,
-      child: SizedBox(
-        width: 52,
-        height: 52,
+    // Return a plain, non-positioned button so callers can place it
+    // consistently across screens (Align/Padding/Row). The overlay
+    // behavior is handled separately via OverlayEntry.
+    return SafeArea(
+      child: Offstage(
+        offstage: _overlayEntry != null,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: _toggleMenu,
           child: Container(
-            width: 52,
-            height: 52,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
-              color: _isExpanded
-                  ? const Color(0xFFAB47BC)
-                  : const Color(0xFFCD00D3),
+              color: const Color(0xFF7E57C2),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: const Color(0xFF7E57C2).withOpacity(0.25),
                   blurRadius: 8,
-                  offset: const Offset(0, 2),
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
             child: Icon(
               _isExpanded ? Icons.close : Icons.help_outline,
               color: Colors.white,
-              size: 28,
+              size: 24,
             ),
           ),
         ),
@@ -432,81 +449,74 @@ class _OptionPanelState extends State<_OptionPanel> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Ajustar el tamaño de texto.',
-              style: TextStyle(
-                fontSize: 13,
-                color: Color(0xFF6A5B7D),
-                fontWeight: FontWeight.w500,
-              ),
+            _buildInfoBanner(
+              icon: Icons.text_fields,
+              title: 'Tamaño de texto',
+              subtitle: 'Aumenta el tamaño para leer con más comodidad.',
             ),
-            const SizedBox(height: 16),
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 8,
-              children: [
-                SizedBox(
-                  width: 130,
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF9575CD),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text(
-                          '1',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Flexible(
-                        child: Text(
-                          'Tamaño de texto',
-                          overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2D8F7)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Texto grande activo',
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF424242),
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF2F1F56),
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          _textSizeEnabled
+                              ? 'El contenido aparecerá con letra más grande.'
+                              : 'La lectura seguirá en el tamaño normal.',
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: Color(0xFF6A5B7D),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Switch(
-                  value: _textSizeEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _textSizeEnabled = value;
-                    });
-                  },
-                  activeColor: const Color(0xFF9575CD),
-                  activeTrackColor: const Color(0xFFD8C8F5),
-                  inactiveThumbColor: const Color(0xFFBDBDBD),
-                  inactiveTrackColor: const Color(0xFFE0E0E0),
-                ),
-              ],
+                  Switch(
+                    value: _textSizeEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        _textSizeEnabled = value;
+                      });
+                      _showStatusMessage(
+                        context,
+                        _textSizeEnabled
+                            ? 'Texto grande activado'
+                            : 'Texto grande desactivado',
+                      );
+                    },
+                    activeColor: const Color(0xFF9575CD),
+                    activeTrackColor: const Color(0xFFD8C8F5),
+                    inactiveThumbColor: const Color(0xFFBDBDBD),
+                    inactiveTrackColor: const Color(0xFFE0E0E0),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const Text(
-                  'A',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF424242),
-                  ),
-                ),
+                _buildScaleMarker('A', 14),
                 Container(
-                  width: 40,
+                  width: 42,
                   height: 4,
                   decoration: BoxDecoration(
                     color: const Color(0xFF424242),
@@ -514,21 +524,14 @@ class _OptionPanelState extends State<_OptionPanel> {
                   ),
                 ),
                 Container(
-                  width: 40,
+                  width: 42,
                   height: 4,
                   decoration: BoxDecoration(
                     color: const Color(0xFF9E9E9E),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const Text(
-                  'A',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF424242),
-                  ),
-                ),
+                _buildScaleMarker('A', 20),
               ],
             ),
           ],
@@ -537,68 +540,68 @@ class _OptionPanelState extends State<_OptionPanel> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Ajustar el modo visual.',
-              style: TextStyle(
-                fontSize: 13,
-                color: Color(0xFF6A5B7D),
-                fontWeight: FontWeight.w500,
-              ),
+            _buildInfoBanner(
+              icon: Icons.visibility,
+              title: 'Modo visual',
+              subtitle: 'Cambia el contraste y la claridad de la pantalla.',
             ),
-            const SizedBox(height: 16),
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 8,
-              children: [
-                SizedBox(
-                  width: 130,
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF9575CD),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text(
-                          '1',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Flexible(
-                        child: Text(
-                          'Modo visual',
-                          overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2D8F7)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Contraste mejorado',
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF424242),
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF2F1F56),
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          _visualModeEnabled
+                              ? 'La interfaz usará un contraste más fuerte.'
+                              : 'La interfaz conservará el diseño estándar.',
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: Color(0xFF6A5B7D),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Switch(
-                  value: _visualModeEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _visualModeEnabled = value;
-                    });
-                  },
-                  activeColor: const Color(0xFF9575CD),
-                  activeTrackColor: const Color(0xFFD8C8F5),
-                  inactiveThumbColor: const Color(0xFFBDBDBD),
-                  inactiveTrackColor: const Color(0xFFE0E0E0),
-                ),
-              ],
+                  Switch(
+                    value: _visualModeEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        _visualModeEnabled = value;
+                      });
+                      _showStatusMessage(
+                        context,
+                        _visualModeEnabled
+                            ? 'Contraste mejorado activado'
+                            : 'Contraste mejorado desactivado',
+                      );
+                    },
+                    activeColor: const Color(0xFF9575CD),
+                    activeTrackColor: const Color(0xFFD8C8F5),
+                    inactiveThumbColor: const Color(0xFFBDBDBD),
+                    inactiveTrackColor: const Color(0xFFE0E0E0),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -626,44 +629,24 @@ class _OptionPanelState extends State<_OptionPanel> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Ajustar el acompañamiento del lenguaje de señas.',
-              style: TextStyle(
-                fontSize: 13,
-                color: Color(0xFF6A5B7D),
-                fontWeight: FontWeight.w500,
-              ),
+            _buildInfoBanner(
+              icon: Icons.sign_language,
+              title: 'Lengua de señas',
+              subtitle:
+                  'Activa ayudas visuales para comprender mejor el contenido.',
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF9575CD),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Text(
-                    '1',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Text(
-                    'Nivel Lenguaje Señas',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF424242),
-                    ),
-                  ),
-                ),
-              ],
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2D8F7)),
+              ),
+              child: const Text(
+                'Se mostrarán apoyos visuales y señales de contexto para facilitar la comprensión.',
+                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
+              ),
             ),
             const SizedBox(height: 12),
             Wrap(
@@ -680,90 +663,55 @@ class _OptionPanelState extends State<_OptionPanel> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Ajustar la velocidad de reproducción del asistente de voz.',
-              style: TextStyle(
-                fontSize: 13,
-                color: Color(0xFF6A5B7D),
-                fontWeight: FontWeight.w500,
+            _buildInfoBanner(
+              icon: Icons.hearing,
+              title: 'Asistencia auditiva',
+              subtitle: 'Ajusta la voz para que sea más clara y comprensible.',
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2D8F7)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.volume_up,
+                    color: Color(0xFF7E57C2),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'La voz del asistente será más clara y pausada.',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: Color(0xFF6A5B7D),
+                      ),
+                    ),
+                  ),
+                  Switch(
+                    value: true,
+                    onChanged: (value) {},
+                    activeColor: const Color(0xFF9575CD),
+                    activeTrackColor: const Color(0xFFD8C8F5),
+                    inactiveThumbColor: const Color(0xFFBDBDBD),
+                    inactiveTrackColor: const Color(0xFFE0E0E0),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 8,
-              children: [
-                SizedBox(
-                  width: 130,
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF9575CD),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text(
-                          '1',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Flexible(
-                        child: Text(
-                          'Velocidad Auditiva',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF424242),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Switch(
-                  value: true,
-                  onChanged: (value) {},
-                  activeColor: const Color(0xFF9575CD),
-                  activeTrackColor: const Color(0xFFD8C8F5),
-                  inactiveThumbColor: const Color(0xFFBDBDBD),
-                  inactiveTrackColor: const Color(0xFFE0E0E0),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
-                const Icon(Icons.speed, size: 20, color: Color(0xFF424242)),
-                Container(
-                  width: 34,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF424242),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                Container(
-                  width: 34,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF9E9E9E),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const Icon(
-                  Icons.fast_forward,
-                  size: 20,
-                  color: Color(0xFF424242),
-                ),
+                _buildSpeedPill('Lenta'),
+                _buildSpeedPill('Media'),
+                _buildSpeedPill('Rápida'),
               ],
             ),
           ],
@@ -772,18 +720,128 @@ class _OptionPanelState extends State<_OptionPanel> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Configuración de ${widget.option}',
-              style: const TextStyle(
-                fontSize: 13,
-                color: Color(0xFF6A5B7D),
-                fontWeight: FontWeight.w500,
-              ),
+            _buildInfoBanner(
+              icon: Icons.settings,
+              title: widget.option,
+              subtitle:
+                  'Ajustes rápidos y accesibles para una mejor experiencia.',
             ),
           ],
         );
     }
   }
+}
+
+Widget _buildInfoBanner({
+  required IconData icon,
+  required String title,
+  required String subtitle,
+}) {
+  return Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: const Color(0xFF7E57C2).withOpacity(0.1),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: const Color(0xFFD8C8F5)),
+    ),
+    child: Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF7E57C2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: Colors.white, size: 18),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF2F1F56),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 12.2,
+                  color: Color(0xFF6A5B7D),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildScaleMarker(String label, double fontSize) {
+  return Text(
+    label,
+    style: TextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.bold,
+      color: const Color(0xFF424242),
+    ),
+  );
+}
+
+Widget _buildSpeedPill(String label) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(999),
+      border: Border.all(color: const Color(0xFFD8C8F5)),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFF9575CD).withOpacity(0.1),
+          blurRadius: 6,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Text(
+      label,
+      style: const TextStyle(
+        fontSize: 12.5,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF5B3E8A),
+      ),
+    ),
+  );
+}
+
+void _showStatusMessage(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Row(
+        children: [
+          const Icon(Icons.check_circle, color: Colors.white, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: const Color(0xFF7E57C2),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    ),
+  );
 }
 
 class _ModeButton extends StatelessWidget {

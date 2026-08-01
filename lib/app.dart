@@ -133,21 +133,24 @@ class _AppState extends State<App> {
               child: currentPage,
             ),
           ),
-          Positioned(
-            left: 16,
-            bottom: 24,
-            child: Semantics(
-              button: true,
-              label: 'Cambiar tema',
-              hint: 'Cambia el tema de la aplicación',
-              child: FloatingActionButton(
-                heroTag: 'theme-toggle',
-                backgroundColor: const Color(0xFF5C6BC0),
-                onPressed: _toggleTheme,
-                child: const Icon(Icons.palette, color: Colors.white),
+          // Show theme toggle only outside module screens to avoid
+          // overlapping with accessibility actions inside modules.
+          if (_currentScreen != AppScreen.modulo)
+            Positioned(
+              left: 16,
+              bottom: 24,
+              child: Semantics(
+                button: true,
+                label: 'Cambiar tema',
+                hint: 'Cambia el tema de la aplicación',
+                child: FloatingActionButton(
+                  heroTag: 'theme-toggle',
+                  backgroundColor: const Color(0xFF5C6BC0),
+                  onPressed: _toggleTheme,
+                  child: const Icon(Icons.palette, color: Colors.white),
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

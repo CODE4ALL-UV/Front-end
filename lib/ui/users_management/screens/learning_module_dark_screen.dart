@@ -261,19 +261,7 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
             padding: const EdgeInsets.only(left: 16, bottom: 8),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF5C6BC0),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.accessibility_new,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
+              child: const HelpActionButton(),
             ),
           ),
         ],

@@ -573,31 +573,60 @@ class _BigCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: CustomPaint(
-          painter: _ArcPainter(progress: progress, strokeWidth: size * 0.07),
-          child: Center(
-            child: Container(
-              width: size * 0.70,
-              height: size * 0.70,
-              decoration: BoxDecoration(
-                color: bgColor,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.10),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
+    final percentage = (progress * 100).toInt();
+    return Semantics(
+      button: true,
+      label: 'Lección con $percentage% de progreso',
+      hint: 'Toca para abrir la lección',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              CustomPaint(
+                size: Size(size, size),
+                painter: _ArcPainter(
+                  progress: progress,
+                  strokeWidth: size * 0.08,
+                  isDark: false,
+                ),
               ),
-              child: Icon(icon, color: iconColor, size: size * 0.36),
-            ),
+              Container(
+                width: size * 0.68,
+                height: size * 0.68,
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icon, color: iconColor, size: size * 0.28),
+                    SizedBox(height: size * 0.04),
+                    Text(
+                      '$percentage%',
+                      style: TextStyle(
+                        fontSize: size * 0.12,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF424242),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -614,49 +643,72 @@ class _LessonBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 150,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: const Color(0xFFEAFBFF),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFBFE5F0)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF607D8B), width: 2),
-                color: Colors.white,
+    return Semantics(
+      button: true,
+      label: 'Lección $number: $title',
+      hint: 'Toca para abrir',
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 150,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFFE3F2FD), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF1E88E5).withValues(alpha: 0.08),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
               ),
-              child: Center(
-                child: Text(
-                  '$number',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF424242),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF1E88E5).withValues(alpha: 0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    '$number',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Color(0xFF263238),
-                  fontWeight: FontWeight.w600,
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF263238),
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -666,8 +718,13 @@ class _LessonBox extends StatelessWidget {
 class _ArcPainter extends CustomPainter {
   final double progress;
   final double strokeWidth;
+  final bool isDark;
 
-  const _ArcPainter({required this.progress, required this.strokeWidth});
+  const _ArcPainter({
+    required this.progress,
+    required this.strokeWidth,
+    this.isDark = false,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -680,27 +737,50 @@ class _ArcPainter extends CustomPainter {
       2 * math.pi,
       false,
       Paint()
-        ..color = const Color(0xFFD0E8FF)
+        ..color = isDark ? const Color(0xFF2E3A4A) : const Color(0xFFE3F2FD)
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round,
     );
 
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      2 * math.pi * progress,
-      false,
-      Paint()
-        ..color = const Color(0xFF2F7CC0)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.round,
-    );
+    final progressSweep = 2 * math.pi * progress;
+    if (progress > 0) {
+      final rect = Rect.fromCircle(center: center, radius: radius);
+      final gradient = SweepGradient(
+        startAngle: -math.pi / 2,
+        endAngle: -math.pi / 2 + progressSweep,
+        colors: isDark
+            ? [
+                const Color(0xFF42A5F5),
+                const Color(0xFF1E88E5),
+                const Color(0xFF1565C0),
+              ]
+            : [
+                const Color(0xFF64B5F6),
+                const Color(0xFF1E88E5),
+                const Color(0xFF0D47A1),
+              ],
+        transform: const GradientRotation(-math.pi / 2),
+      );
+
+      canvas.drawArc(
+        rect,
+        -math.pi / 2,
+        progressSweep,
+        false,
+        Paint()
+          ..shader = gradient.createShader(rect)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth
+          ..strokeCap = StrokeCap.round,
+      );
+    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(_ArcPainter oldDelegate) {
+    return oldDelegate.progress != progress || oldDelegate.isDark != isDark;
+  }
 }
 
 class _DetailCard extends StatelessWidget {

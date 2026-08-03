@@ -5,6 +5,7 @@ import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_dark_screen.dart';
+import 'quiz_screen.dart'; // Added import for QuizScreen
 
 class ModuloAprendizajeDark extends StatefulWidget {
   final String userName;
@@ -193,7 +194,7 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
                           },
                         ),
                         _BigCircle(
-                          icon: Icons.manage_search,
+                          icon: Icons.lightbulb,
                           iconColor: const Color(0xFF8E24AA),
                           bgColor: const Color(0xFF2E2635),
                           size: bigSize,
@@ -443,6 +444,13 @@ class _CapituloDetalleDarkState extends State<CapituloDetalleDark> {
                                   item: item,
                                   onBookTap: item.emoji.contains('📦')
                                       ? () => _openLectura(item.label)
+                                      : item.label == 'Quiz'
+                                      ? () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => const QuizScreen(),
+                                          ),
+                                        )
                                       : null,
                                   onVideoTap: item.emoji.contains('🖥️')
                                       ? () => _openVideo(item.label)
@@ -997,6 +1005,20 @@ class _ActivityRowDark extends StatelessWidget {
                 ),
               ),
             ),
+            if (item.label == 'Quiz') ...[
+              const SizedBox(width: 6),
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(
+                  Icons.quiz,
+                  size: 20,
+                  color: Color(0xFF64B5F6),
+                ),
+                onPressed: onBookTap,
+                tooltip: 'Abrir Quiz',
+              ),
+            ],
             if (onVideoTap != null) ...[
               const SizedBox(width: 6),
               GestureDetector(

@@ -4,6 +4,7 @@ import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 
 class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final Widget? leading;
   final List<Widget>? actions;
   final bool showUserIcon; // Propiedad para intercambiar sesion on/off
   final String? userName;
@@ -15,6 +16,7 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   const HeaderWidget({
     super.key,
     required this.title,
+    this.leading,
     this.actions,
     this.showUserIcon = true,
     this.userName,
@@ -38,13 +40,15 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
         backgroundColor: toolbarColor,
         foregroundColor: theme.foregroundColor,
         elevation: theme.elevation,
-        leading: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Semantics(
-            label: 'Logo Oficial de la Universidad del Valle',
-            child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
-          ),
-        ),
+        leading:
+            leading ??
+            Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: Semantics(
+                label: 'Logo Oficial de la Universidad del Valle',
+                child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
+              ),
+            ),
         title: Text(title, style: theme.titleTextStyle),
         centerTitle: true,
         actions: showUserIcon

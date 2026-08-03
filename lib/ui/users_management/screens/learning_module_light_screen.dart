@@ -6,6 +6,7 @@ import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
+import 'quiz_screen.dart';
 
 class ModuloAprendizaje extends StatefulWidget {
   final String userName;
@@ -433,6 +434,13 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
                                   item: item,
                                   onBookTap: item.emoji.contains('📦')
                                       ? () => _openLectura(item.label)
+                                      : item.label == 'Quiz'
+                                      ? () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => const QuizScreen(),
+                                          ),
+                                        )
                                       : null,
                                   onVideoTap: item.emoji.contains('🖥️')
                                       ? () => _openVideo(item.label)
@@ -975,6 +983,20 @@ class _ActivityRow extends StatelessWidget {
                 ),
               ),
             ),
+            if (item.label == 'Quiz') ...[
+              const SizedBox(width: 6),
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(
+                  Icons.quiz,
+                  size: 20,
+                  color: Color(0xFF1E88E5),
+                ),
+                onPressed: onBookTap,
+                tooltip: 'Abrir Quiz',
+              ),
+            ],
             if (onVideoTap != null) ...[
               const SizedBox(width: 6),
               GestureDetector(

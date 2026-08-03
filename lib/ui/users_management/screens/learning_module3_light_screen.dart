@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'quiz_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
@@ -503,7 +504,29 @@ class _ChapterDetailLightState extends State<_ChapterDetailLight> {
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 4,
                                 ),
-                                child: _ActivityRow(item: item),
+                                child: item.label == 'Quiz'
+                                    ? Row(
+                                        children: [
+                                          Expanded(
+                                            child: _ActivityRow(item: item),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(
+                                              Icons.quiz,
+                                              color: Color(0xFF1E88E5),
+                                            ),
+                                            onPressed: () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    const QuizScreen(),
+                                              ),
+                                            ),
+                                            tooltip: 'Abrir Quiz',
+                                          ),
+                                        ],
+                                      )
+                                    : _ActivityRow(item: item),
                               ),
                             )
                             .toList(),

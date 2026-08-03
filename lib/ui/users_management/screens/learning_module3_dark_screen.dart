@@ -733,13 +733,18 @@ class _LessonBox extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFFE8E8E8),
-                    fontWeight: FontWeight.w600,
-                    height: 1.3,
+                child: FittedBox(
+                  alignment: Alignment.centerLeft,
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    title,
+                    softWrap: false,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFFE8E8E8),
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
                   ),
                 ),
               ),

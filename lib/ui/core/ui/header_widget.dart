@@ -32,6 +32,10 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
     final theme = Theme.of(context).appBarTheme;
     final toolbarColor =
         theme.backgroundColor ?? Theme.of(context).colorScheme.primary;
+    final brightness = Theme.of(context).brightness;
+    final logoAsset = brightness == Brightness.light
+        ? 'assets/images/logoUV_Gris1.png'
+        : 'assets/images/logoUV_Oficial_Rojo.png';
 
     return Semantics(
       header: true, // Avisa al lector de pantalla que es un navbar
@@ -46,7 +50,7 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
               padding: const EdgeInsets.all(6.0),
               child: Semantics(
                 label: 'Logo Oficial de la Universidad del Valle',
-                child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
+                child: Image.asset(logoAsset),
               ),
             ),
         title: Text(title, style: theme.titleTextStyle),

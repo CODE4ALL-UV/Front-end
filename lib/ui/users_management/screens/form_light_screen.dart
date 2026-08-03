@@ -112,7 +112,7 @@ class _FormPageLightState extends State<FormPageLight> {
                 )
               : Padding(
                   padding: const EdgeInsets.all(6.0),
-                  child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
+                  child: Image.asset('assets/images/logoUV_Gris1.png'),
                 ),
           title: const Text(
             'CODE4ALL',

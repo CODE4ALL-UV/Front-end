@@ -54,7 +54,7 @@ class _Modulo2AprendizajeLightState extends State<Modulo2AprendizajeLight> {
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(6.0),
-          child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
+          child: Image.asset('assets/images/logoUV_Gris1.png'),
         ),
         title: const Text(
           'CODE4ALL',
@@ -720,13 +720,18 @@ class _LessonBox extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF263238),
-                    fontWeight: FontWeight.w600,
-                    height: 1.3,
+                child: FittedBox(
+                  alignment: Alignment.centerLeft,
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    title,
+                    softWrap: false,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF263238),
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
                   ),
                 ),
               ),

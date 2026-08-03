@@ -59,10 +59,7 @@ class AuthStorage {
   }
 
   Future<void> clear() async {
-    final photoUrl = await getPhotoUrl();
+    // Remove all stored auth data on logout, including photo URL
     await _storage.deleteAll();
-    if (photoUrl != null && photoUrl.trim().isNotEmpty) {
-      await _storage.write(key: _photoUrlKey, value: photoUrl);
-    }
   }
 }

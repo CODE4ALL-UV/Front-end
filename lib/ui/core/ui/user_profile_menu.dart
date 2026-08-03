@@ -245,7 +245,36 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
         : 'U';
     final resolvedPhotoUrl = _apiService.resolveMediaUrl(_userPhotoUrl);
 
-    if (resolvedPhotoUrl.isNotEmpty) {
+    // Treat some placeholder values ('null', 'default') and common placeholders as empty
+    final raw = (_userPhotoUrl ?? '').toString().trim().toLowerCase();
+    final blacklist = [
+      'null',
+      'none',
+      'default',
+      'placeholder',
+      'noimage',
+      'no_image',
+      'no-avatar',
+      'noavatar',
+      'avatar.png',
+      'user.png',
+      'avatar_default',
+      'placeholder.png',
+    ];
+
+    bool looksLikePlaceholder(String s) {
+      for (final token in blacklist) {
+        if (s.contains(token)) return true;
+      }
+      return false;
+    }
+
+    final hasValidPhoto =
+        resolvedPhotoUrl.isNotEmpty &&
+        !looksLikePlaceholder(raw) &&
+        !raw.endsWith('/');
+
+    if (hasValidPhoto) {
       return CircleAvatar(
         radius: radius,
         backgroundColor: theme.colorScheme.primaryContainer,

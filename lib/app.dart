@@ -6,6 +6,7 @@ import 'ui/users_management/screens/form_light_screen.dart';
 import 'ui/users_management/screens/form_dark_screen.dart';
 import 'ui/users_management/screens/learning_module_light_screen.dart';
 import 'ui/users_management/screens/learning_module_dark_screen.dart';
+import 'ui/director/director_performance_screen.dart';
 
 // Definimos los 6 estados de tema posibles de tu TG
 enum AppThemeMode {
@@ -17,7 +18,7 @@ enum AppThemeMode {
   achromatopsia,
 }
 
-enum AppScreen { login, register, modulo }
+enum AppScreen { login, register, modulo, director }
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -37,8 +38,13 @@ class _AppState extends State<App> {
   void _goToModulo() => setState(() => _currentScreen = AppScreen.modulo);
 
   void _handleSuccessfulLogin(String role) {
-    if (role.toLowerCase() == 'estudiante') {
+    final r = role.toLowerCase();
+    if (r == 'estudiante') {
       _goToModulo();
+      return;
+    }
+    if (r == 'director') {
+      setState(() => _currentScreen = AppScreen.director);
       return;
     }
 
@@ -96,6 +102,11 @@ class _AppState extends State<App> {
         currentPage = _currentThemeMode == AppThemeMode.dark
             ? ModuloAprendizajeDark(userName: _userName)
             : ModuloAprendizaje(userName: _userName, onLogout: _goToLogin);
+        break;
+      case AppScreen.director:
+        currentPage = _currentThemeMode == AppThemeMode.dark
+            ? DirectorPerformanceScreen(onLogout: _goToLogin)
+            : DirectorPerformanceScreen(onLogout: _goToLogin);
         break;
       case AppScreen.login:
         currentPage = _currentThemeMode == AppThemeMode.dark

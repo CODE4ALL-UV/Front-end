@@ -104,6 +104,86 @@ class ApiService {
     }
   }
 
+  Future<List<dynamic>> getStudents({required String bearerToken}) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/api/director/students'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $bearerToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return List<dynamic>.from(jsonDecode(response.body) as List);
+    }
+
+    throw ApiException(
+      statusCode: response.statusCode,
+      message: _extractMessage(response.body),
+    );
+  }
+
+  Future<List<dynamic>> getPerformances({required String bearerToken}) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/api/director/performances'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $bearerToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return List<dynamic>.from(jsonDecode(response.body) as List);
+    }
+
+    throw ApiException(
+      statusCode: response.statusCode,
+      message: _extractMessage(response.body),
+    );
+  }
+
+  Future<List<dynamic>> getPerformancesAggregate({
+    required String bearerToken,
+  }) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/api/director/performances/aggregate'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $bearerToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return List<dynamic>.from(jsonDecode(response.body) as List);
+    }
+
+    throw ApiException(
+      statusCode: response.statusCode,
+      message: _extractMessage(response.body),
+    );
+  }
+
+  Future<List<dynamic>> getPerformancesAverage({
+    required String bearerToken,
+  }) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/api/director/performances/average'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $bearerToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return List<dynamic>.from(jsonDecode(response.body) as List);
+    }
+
+    throw ApiException(
+      statusCode: response.statusCode,
+      message: _extractMessage(response.body),
+    );
+  }
+
   Future<LoginResponse> signInWithGoogle({
     String? accessToken,
     String? idToken,

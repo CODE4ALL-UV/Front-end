@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
@@ -45,9 +46,18 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF2A2A2A),
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
+        leading: Builder(
+          builder: (context) {
+            return Navigator.canPop(context)
+                ? IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
+                  );
+          },
         ),
         title: const Text(
           'CODE4ALL',
@@ -368,20 +378,7 @@ class _CapituloDetalleDarkState extends State<CapituloDetalleDark> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFF607D8B),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-              ],
-            ),
+            child: StoredUserAvatar(radius: 14, size: 28, showName: true),
           ),
         ],
       ),
@@ -573,20 +570,7 @@ class _Capitulo2DetalleDarkState extends State<Capitulo2DetalleDark> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFF607D8B),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-              ],
-            ),
+            child: StoredUserAvatar(radius: 14, size: 28, showName: true),
           ),
         ],
       ),
@@ -748,20 +732,7 @@ class _Capitulo3DetalleDarkState extends State<Capitulo3DetalleDark> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFF607D8B),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-              ],
-            ),
+            child: StoredUserAvatar(radius: 14, size: 28, showName: true),
           ),
         ],
       ),
@@ -1267,20 +1238,7 @@ class LecturaTemaDarkScreen extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFF607D8B),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-              ],
-            ),
+            child: StoredUserAvatar(radius: 14, size: 28, showName: true),
           ),
         ],
       ),

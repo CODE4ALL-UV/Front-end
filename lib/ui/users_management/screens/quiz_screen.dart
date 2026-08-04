@@ -30,7 +30,7 @@ class _QuizScreenState extends State<QuizScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         showUserIcon: true,
-        userName: 'Sheher',
+        userName: null,
       ),
       body: SafeArea(
         child: Padding(

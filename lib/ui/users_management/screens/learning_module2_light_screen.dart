@@ -52,9 +52,18 @@ class _Modulo2AprendizajeLightState extends State<Modulo2AprendizajeLight> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFE53935),
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Image.asset('assets/images/logoUV_Gris1.png'),
+        leading: Builder(
+          builder: (context) {
+            return Navigator.canPop(context)
+                ? IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Image.asset('assets/images/logoUV_Gris1.png'),
+                  );
+          },
         ),
         title: const Text(
           'CODE4ALL',

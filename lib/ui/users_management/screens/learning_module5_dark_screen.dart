@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
 import 'quiz_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
@@ -50,9 +51,18 @@ class _Modulo5AprendizajeDarkState extends State<Modulo5AprendizajeDark> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF2A2A2A),
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
+        leading: Builder(
+          builder: (context) {
+            return Navigator.canPop(context)
+                ? IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
+                  );
+          },
         ),
         title: const Text(
           'CODE4ALL',
@@ -66,22 +76,8 @@ class _Modulo5AprendizajeDarkState extends State<Modulo5AprendizajeDark> {
         centerTitle: true,
         actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFF6D6D6D),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-                SizedBox(width: 8),
-              ],
-            ),
+            padding: const EdgeInsets.only(right: 12),
+            child: StoredUserAvatar(radius: 14, size: 28, showName: true),
           ),
         ],
       ),
@@ -90,15 +86,15 @@ class _Modulo5AprendizajeDarkState extends State<Modulo5AprendizajeDark> {
           Expanded(
             child: NotificationListener<OverscrollNotification>(
               onNotification: (notification) {
-                if (notification.overscroll > 10 &&
+                if (notification.overscroll > 2 &&
                     notification.metrics.pixels >=
-                        notification.metrics.maxScrollExtent - 1) {
+                        notification.metrics.maxScrollExtent - 2) {
                   _goToModulo6();
                   return true;
                 }
-                if (notification.overscroll < -10 &&
+                if (notification.overscroll < -2 &&
                     notification.metrics.pixels <=
-                        notification.metrics.minScrollExtent + 1) {
+                        notification.metrics.minScrollExtent + 2) {
                   _goToModulo4();
                   return true;
                 }
@@ -479,22 +475,8 @@ class _ChapterDetailDarkState extends State<_ChapterDetailDark> {
         centerTitle: true,
         actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFF6D6D6D),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-                SizedBox(width: 8),
-              ],
-            ),
+            padding: const EdgeInsets.only(right: 12),
+            child: StoredUserAvatar(radius: 14, size: 28, showName: true),
           ),
         ],
       ),

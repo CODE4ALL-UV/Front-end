@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
 import 'quiz_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
@@ -52,9 +53,18 @@ class _Modulo4AprendizajeLightState extends State<Modulo4AprendizajeLight> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFE53935),
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Image.asset('assets/images/logoUV_Gris1.png'),
+        leading: Builder(
+          builder: (context) {
+            return Navigator.canPop(context)
+                ? IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Image.asset('assets/images/logoUV_Gris1.png'),
+                  );
+          },
         ),
         title: const Text(
           'CODE4ALL',
@@ -453,21 +463,7 @@ class _ChapterDetailLightState extends State<_ChapterDetailLight> {
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFFBDBDBD),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-                SizedBox(width: 8),
-              ],
-            ),
+            child: StoredUserAvatar(radius: 14, size: 28, showName: true),
           ),
         ],
       ),

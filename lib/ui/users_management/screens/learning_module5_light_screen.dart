@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'quiz_screen.dart';
+import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
-import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
+import 'quiz_screen.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module4_light_screen.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module6_light_screen.dart';
 
@@ -52,9 +52,18 @@ class _Modulo5AprendizajeLightState extends State<Modulo5AprendizajeLight> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFE53935),
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Image.asset('assets/images/logoUV_Gris1.png'),
+        leading: Builder(
+          builder: (context) {
+            return Navigator.canPop(context)
+                ? IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Image.asset('assets/images/logoUV_Gris1.png'),
+                  );
+          },
         ),
         title: const Text(
           'CODE4ALL',
@@ -68,12 +77,8 @@ class _Modulo5AprendizajeLightState extends State<Modulo5AprendizajeLight> {
         centerTitle: true,
         actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: UserProfileMenu(
-              showName: true,
-              onLogout: () =>
-                  Navigator.of(context).popUntil((route) => route.isFirst),
-            ),
+            padding: const EdgeInsets.only(right: 12),
+            child: StoredUserAvatar(radius: 14, size: 28, showName: true),
           ),
         ],
       ),
@@ -82,15 +87,15 @@ class _Modulo5AprendizajeLightState extends State<Modulo5AprendizajeLight> {
           Expanded(
             child: NotificationListener<OverscrollNotification>(
               onNotification: (notification) {
-                if (notification.overscroll > 10 &&
+                if (notification.overscroll > 2 &&
                     notification.metrics.pixels >=
-                        notification.metrics.maxScrollExtent - 1) {
+                        notification.metrics.maxScrollExtent - 2) {
                   _goToModulo6();
                   return true;
                 }
-                if (notification.overscroll < -10 &&
+                if (notification.overscroll < -2 &&
                     notification.metrics.pixels <=
-                        notification.metrics.minScrollExtent + 1) {
+                        notification.metrics.minScrollExtent + 2) {
                   _goToModulo4();
                   return true;
                 }
@@ -282,16 +287,17 @@ class _Modulo5AprendizajeLightState extends State<Modulo5AprendizajeLight> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, bottom: 8),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: const HelpActionButton(),
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, bottom: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: const HelpActionButton(),
             ),
           ),
         ],
@@ -301,6 +307,7 @@ class _Modulo5AprendizajeLightState extends State<Modulo5AprendizajeLight> {
   }
 }
 
+// Reuse the chapter/detail classes that exist elsewhere in the project
 class Capitulo1AlgoritmosLight extends StatelessWidget {
   const Capitulo1AlgoritmosLight({super.key});
 
@@ -463,21 +470,7 @@ class _ChapterDetailLightState extends State<_ChapterDetailLight> {
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFFBDBDBD),
-                  child: Icon(Icons.person, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Sheher',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-                SizedBox(width: 8),
-              ],
-            ),
+            child: StoredUserAvatar(radius: 14, size: 28, showName: true),
           ),
         ],
       ),

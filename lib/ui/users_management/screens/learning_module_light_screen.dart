@@ -8,6 +8,7 @@ import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
 import 'quiz_screen.dart';
+import 'quiz_with_video_screen.dart';
 
 class ModuloAprendizaje extends StatefulWidget {
   final String userName;
@@ -141,34 +142,36 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
                             width: 52,
                             height: 52,
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(
-                              Icons.menu_book_rounded,
-                              color: Colors.white,
-                              size: 32,
+                            child: Padding(
+                              padding: const EdgeInsets.all(6.0),
+                              child: Image.asset(
+                                'assets/images/logoUV_Gris1.png',
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         _BigCircle(
                           icon: Icons.account_tree,
-                          iconColor: const Color(0xFFE53935),
-                          bgColor: const Color(0xFFFFF3E0),
+                          iconColor: const Color(0xFF1976D2),
+                          bgColor: const Color(0xFFE3F2FD),
                           size: bigSize,
                           progress: 0.75,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const Capitulo3DetalleLight(),
+                                builder: (_) => const Capitulo2DetalleLight(),
                               ),
                             );
                           },
@@ -180,7 +183,7 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const Capitulo3DetalleLight(),
+                                builder: (_) => const Capitulo2DetalleLight(),
                               ),
                             );
                           },
@@ -441,6 +444,15 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
                                       : null,
                                   onVideoTap: item.emoji.contains('🖥️')
                                       ? () => _openVideo(item.label)
+                                      : item.label == 'Quiz'
+                                      ? () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => QuizWithVideoScreen(
+                                              actividad: item.label,
+                                            ),
+                                          ),
+                                        )
                                       : null,
                                 ),
                               ),

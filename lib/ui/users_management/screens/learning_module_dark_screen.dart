@@ -7,6 +7,7 @@ import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_dark_screen.dart';
 import 'quiz_screen.dart'; // Added import for QuizScreen
+import 'quiz_with_video_screen.dart';
 
 class ModuloAprendizajeDark extends StatefulWidget {
   final String userName;
@@ -445,7 +446,9 @@ class _CapituloDetalleDarkState extends State<CapituloDetalleDark> {
                                       ? () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => const QuizScreen(),
+                                            builder: (_) => QuizWithVideoScreen(
+                                              actividad: item.label,
+                                            ),
                                           ),
                                         )
                                       : null,

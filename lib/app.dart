@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'ui/users_management/screens/login_screen.dart';
 import 'ui/users_management/screens/login_dark_screen.dart';
 import 'ui/users_management/screens/form_light_screen.dart';
@@ -32,6 +33,7 @@ class _AppState extends State<App> {
   AppThemeMode _currentThemeMode = AppThemeMode.light;
   AppScreen _currentScreen = AppScreen.login;
   String _userName = 'Usuario';
+  List<String> _bottomLabels = ['Anterior', 'Reproducir', 'Siguiente'];
 
   void _goToRegister() => setState(() => _currentScreen = AppScreen.register);
   void _goToLogin() => setState(() => _currentScreen = AppScreen.login);
@@ -39,7 +41,7 @@ class _AppState extends State<App> {
 
   void _handleSuccessfulLogin(String role) {
     final r = role.toLowerCase();
-    if (r == 'estudiante') {
+    if (r == 'estudiante' || r == 'docente') {
       _goToModulo();
       return;
     }
@@ -55,6 +57,13 @@ class _AppState extends State<App> {
     setState(() {
       _userName = name.trim().isNotEmpty ? name : 'Usuario';
     });
+  }
+
+  Future<void> _updateUserNameFromStorage() async {
+    final storage = AuthStorage();
+    final name = await storage.getName();
+    if (!mounted) return;
+    _handleUserNameChanged(name ?? 'Usuario');
   }
 
   // Método auxiliar para obtener el ThemeData dinámicamente según la selección
@@ -75,15 +84,44 @@ class _AppState extends State<App> {
     }
   }
 
-  // Ciclo rotativo de prueba para el botón (Claro -> Oscuro -> Deuteranopía -> Claro...)
-  void _toggleTheme() {
+  // Mostrar selector con tres opciones y actualizar etiquetas
+  void _showThemeOptions(BuildContext context) async {
+    final choice = await showModalBottomSheet<AppThemeMode>(
+      context: context,
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Claro'),
+                onTap: () => Navigator.of(ctx).pop(AppThemeMode.light),
+              ),
+              ListTile(
+                title: const Text('Oscuro'),
+                onTap: () => Navigator.of(ctx).pop(AppThemeMode.dark),
+              ),
+              ListTile(
+                title: const Text('Accesibilidad'),
+                subtitle: const Text('Deuteranopía'),
+                onTap: () => Navigator.of(ctx).pop(AppThemeMode.deuteranopia),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (choice == null) return;
+
     setState(() {
-      if (_currentThemeMode == AppThemeMode.light) {
-        _currentThemeMode = AppThemeMode.dark;
-      } else if (_currentThemeMode == AppThemeMode.dark) {
-        _currentThemeMode = AppThemeMode.deuteranopia;
+      _currentThemeMode = choice;
+      if (choice == AppThemeMode.light) {
+        _bottomLabels = ['Anterior', 'Reproducir', 'Siguiente'];
+      } else if (choice == AppThemeMode.dark) {
+        _bottomLabels = ['Volver', 'Play', 'Adelantar'];
       } else {
-        _currentThemeMode = AppThemeMode.light;
+        _bottomLabels = ['Atrás', 'Iniciar', 'Siguiente'];
       }
     });
   }
@@ -100,8 +138,15 @@ class _AppState extends State<App> {
         break;
       case AppScreen.modulo:
         currentPage = _currentThemeMode == AppThemeMode.dark
-            ? ModuloAprendizajeDark(userName: _userName)
-            : ModuloAprendizaje(userName: _userName, onLogout: _goToLogin);
+            ? ModuloAprendizajeDark(
+                userName: _userName,
+                bottomLabels: _bottomLabels,
+              )
+            : ModuloAprendizaje(
+                userName: _userName,
+                onLogout: _goToLogin,
+                bottomLabels: _bottomLabels,
+              );
         break;
       case AppScreen.director:
         currentPage = _currentThemeMode == AppThemeMode.dark
@@ -115,7 +160,7 @@ class _AppState extends State<App> {
                 onSuccess: (role) {
                   _handleSuccessfulLogin(role);
                   if (role.toLowerCase() != 'logout') {
-                    _handleUserNameChanged('Usuario');
+                    _updateUserNameFromStorage();
                   }
                 },
               )
@@ -124,7 +169,7 @@ class _AppState extends State<App> {
                 onSuccess: (role) {
                   _handleSuccessfulLogin(role);
                   if (role.toLowerCase() != 'logout') {
-                    _handleUserNameChanged('Usuario');
+                    _updateUserNameFromStorage();
                   }
                 },
               );
@@ -157,7 +202,7 @@ class _AppState extends State<App> {
                 child: FloatingActionButton(
                   heroTag: 'theme-toggle',
                   backgroundColor: const Color(0xFF5C6BC0),
-                  onPressed: _toggleTheme,
+                  onPressed: () => _showThemeOptions(context),
                   child: const Icon(Icons.palette, color: Colors.white),
                 ),
               ),

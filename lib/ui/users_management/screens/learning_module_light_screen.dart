@@ -9,15 +9,23 @@ import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
 import 'quiz_screen.dart';
 import 'quiz_with_video_screen.dart';
+import '../widgets/live_translation_box.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_code4all/data/services/auth_storage.dart';
+import 'package:flutter_code4all/ui/users_management/screens/teacher_module_editor.dart';
 
 class ModuloAprendizaje extends StatefulWidget {
   final String userName;
   final VoidCallback? onLogout;
+  final List<String>? bottomLabels;
 
   const ModuloAprendizaje({
     super.key,
     this.userName = 'Usuario',
     this.onLogout,
+    this.bottomLabels,
   });
 
   @override
@@ -25,7 +33,61 @@ class ModuloAprendizaje extends StatefulWidget {
 }
 
 class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
+  static const String _defaultModuleId = 'default-module';
+
   bool _isNavigatingToModule2 = false;
+  bool _isTeacher = false;
+  String _moduleName = 'Módulo 1';
+  List<String> _topics = [];
+
+  final _authStorage = AuthStorage();
+
+  void _checkRole() async {
+    final role = await _authStorage.getRole();
+    if (!mounted) return;
+    setState(() {
+      _isTeacher = (role ?? '').toLowerCase() == 'docente';
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRole();
+    _fetchModuleAndApply(_defaultModuleId);
+  }
+
+  Future<void> _fetchModuleAndApply(String moduleId) async {
+    final backend = dotenv.env['BACKEND_URL'] ?? 'http://127.0.0.1:8000';
+    try {
+      final res = await http.get(Uri.parse('$backend/api/modules/$moduleId'));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        final name = data['name'] ?? 'Módulo 1';
+        final topics = (data['topics'] as List<dynamic>? ?? []).cast<String>();
+        if (!mounted) return;
+        setState(() {
+          _moduleName = name;
+          _topics = topics;
+        });
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo cargar el módulo')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
+
+  String _topicOrFallback(int idx, String fallback) {
+    if (idx < 0 || idx >= _topics.length) return fallback;
+    return _topics[idx];
+  }
 
   void _goToModulo2() {
     if (_isNavigatingToModule2) return;
@@ -117,41 +179,80 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Módulo 1',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _moduleName,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      const Text(
+                                        'Preparación',
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Preparación',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
+                                if (_isTeacher)
+                                  IconButton(
+                                    onPressed: () async {
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const TeacherModuleEditor(),
+                                        ),
+                                      );
+                                      if (result is String &&
+                                          result.isNotEmpty) {
+                                        await _fetchModuleAndApply(result);
+                                      } else {
+                                        await _fetchModuleAndApply(
+                                          _defaultModuleId,
+                                        );
+                                      }
+                                    },
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                width: 52,
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: Image.asset(
+                                    'assets/images/logoUV_Gris1.png',
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
                               ),
                             ],
-                          ),
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Image.asset(
-                                'assets/images/logoUV_Gris1.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -178,7 +279,7 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
                         ),
                         _LessonBox(
                           number: 3,
-                          title: 'El factor inglés',
+                          title: _topicOrFallback(2, 'Tema 3'),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -197,7 +298,7 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
                       children: [
                         _LessonBox(
                           number: 2,
-                          title: 'El entorno',
+                          title: _topicOrFallback(1, 'Tema 2'),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -246,7 +347,7 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
                         ),
                         _LessonBox(
                           number: 1,
-                          title: 'Conociendo\nPython',
+                          title: _topicOrFallback(0, 'Tema 1'),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -281,7 +382,20 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
           ),
         ],
       ),
-      bottomNavigationBar: const MultimodalNavBar(),
+      bottomNavigationBar: MultimodalNavBar(
+        previousLabel:
+            widget.bottomLabels != null && widget.bottomLabels!.length > 0
+            ? widget.bottomLabels![0]
+            : null,
+        playLabel:
+            widget.bottomLabels != null && widget.bottomLabels!.length > 1
+            ? widget.bottomLabels![1]
+            : null,
+        nextLabel:
+            widget.bottomLabels != null && widget.bottomLabels!.length > 2
+            ? widget.bottomLabels![2]
+            : null,
+      ),
     );
   }
 }
@@ -1140,31 +1254,10 @@ class VideoTemaLightScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    Container(
-                      width: double.infinity,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: const Color(0xFFE0E0E0)),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x22000000),
-                            blurRadius: 8,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Traducción en tiempo real',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF212121),
-                          ),
-                        ),
-                      ),
+                    // Live translation box: opens external video and shows live subtitles
+                    LiveTranslationBox(
+                      videoUrl: VideoTemaLightScreen._videoUrl,
+                      backendUrl: dotenv.env['BACKEND_URL'],
                     ),
                     const SizedBox(height: 20),
                     Row(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/header_widget.dart';
-import 'package:flutter_code4all/utils/external_url_opener.dart';
+import 'video_player_screen.dart';
 
 class QuizWithVideoScreen extends StatefulWidget {
   final String? actividad;
@@ -23,12 +23,10 @@ class _QuizWithVideoScreenState extends State<QuizWithVideoScreen> {
       : ColorScheme.fromSeed(seedColor: Colors.teal);
 
   Future<void> _abrirVideo() async {
-    final opened = await openExternalUrl(_videoUrl);
-    if (!opened && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo abrir el video.')),
-      );
-    }
+    if (!context.mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => VideoPlayerScreen(videoUrl: _videoUrl)),
+    );
   }
 
   @override

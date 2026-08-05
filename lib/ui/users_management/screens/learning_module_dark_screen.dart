@@ -1,22 +1,31 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
+import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_dark_screen.dart';
 import 'quiz_screen.dart'; // Added import for QuizScreen
 import 'quiz_with_video_screen.dart';
+import '../widgets/live_translation_box.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_code4all/data/services/auth_storage.dart';
+import 'package:flutter_code4all/ui/users_management/screens/teacher_module_editor.dart';
 
 class ModuloAprendizajeDark extends StatefulWidget {
   final String userName;
   final VoidCallback? onLogout;
+  final List<String>? bottomLabels;
 
   const ModuloAprendizajeDark({
     super.key,
     this.userName = 'Usuario',
     this.onLogout,
+    this.bottomLabels,
   });
 
   @override
@@ -24,7 +33,22 @@ class ModuloAprendizajeDark extends StatefulWidget {
 }
 
 class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
+  static const String _defaultModuleId = 'default-module';
+
   bool _isNavigatingToModule2 = false;
+  bool _isTeacher = false;
+  String _moduleName = 'Módulo 1';
+  List<String> _topics = [];
+
+  final _authStorage = AuthStorage();
+
+  void _checkRole() async {
+    final role = await _authStorage.getRole();
+    if (!mounted) return;
+    setState(() {
+      _isTeacher = (role ?? '').toLowerCase() == 'docente';
+    });
+  }
 
   void _goToModulo2() {
     if (_isNavigatingToModule2) return;
@@ -35,6 +59,45 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
     ).then((_) {
       _isNavigatingToModule2 = false;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRole();
+    _fetchModuleAndApply(_defaultModuleId);
+  }
+
+  Future<void> _fetchModuleAndApply(String moduleId) async {
+    final backend = dotenv.env['BACKEND_URL'] ?? 'http://127.0.0.1:8000';
+    try {
+      final res = await http.get(Uri.parse('$backend/api/modules/$moduleId'));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        final name = data['name'] ?? 'Módulo 1';
+        final topics = (data['topics'] as List<dynamic>? ?? []).cast<String>();
+        if (!mounted) return;
+        setState(() {
+          _moduleName = name;
+          _topics = topics;
+        });
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo cargar el módulo')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
+
+  String _topicOrFallback(int idx, String fallback) {
+    if (idx < 0 || idx >= _topics.length) return fallback;
+    return _topics[idx];
   }
 
   @override
@@ -116,76 +179,85 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Módulo 1',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _moduleName,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      const Text(
+                                        'Preparación',
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Preparación',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
+                                if (_isTeacher)
+                                  IconButton(
+                                    onPressed: () async {
+                                      final id = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const TeacherModuleEditor(),
+                                        ),
+                                      );
+                                      if (id is String && id.isNotEmpty) {
+                                        await _fetchModuleAndApply(id);
+                                      } else {
+                                        await _fetchModuleAndApply(
+                                          _defaultModuleId,
+                                        );
+                                      }
+                                    },
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                width: 52,
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(
+                                  Icons.menu_book_rounded,
+                                  color: Colors.white,
+                                  size: 32,
                                 ),
                               ),
                             ],
                           ),
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.menu_book_rounded,
-                              color: Colors.white,
-                              size: 32,
-                            ),
-                          ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _BigCircle(
-                          icon: Icons.account_tree,
-                          iconColor: const Color(0xFFE53935),
-                          bgColor: const Color(0xFF2E2B24),
-                          size: bigSize,
-                          progress: 0.75,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const Capitulo3DetalleDark(),
-                              ),
-                            );
-                          },
-                        ),
-                        _LessonBox(
-                          number: 3,
-                          title: 'El factor inglés',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const Capitulo3DetalleDark(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                    const SizedBox(height: 24),
+                    LiveTranslationBox(
+                      videoUrl: VideoTemaDarkScreen._videoUrl,
+                      backendUrl: dotenv.env['BACKEND_URL'],
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -194,7 +266,7 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
                       children: [
                         _LessonBox(
                           number: 2,
-                          title: 'El entorno',
+                          title: _topicOrFallback(1, 'Tema 2'),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -243,7 +315,7 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
                         ),
                         _LessonBox(
                           number: 1,
-                          title: 'Conociendo\nPython',
+                          title: _topicOrFallback(0, 'Tema 1'),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -278,17 +350,19 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        color: const Color(0xFF2A2A2A),
-        height: 56,
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Icon(Icons.skip_previous, color: Colors.white, size: 28),
-            Icon(Icons.play_arrow, color: Colors.white, size: 32),
-            Icon(Icons.skip_next, color: Colors.white, size: 28),
-          ],
-        ),
+      bottomNavigationBar: MultimodalNavBar(
+        previousLabel:
+            widget.bottomLabels != null && widget.bottomLabels!.length > 0
+            ? widget.bottomLabels![0]
+            : null,
+        playLabel:
+            widget.bottomLabels != null && widget.bottomLabels!.length > 1
+            ? widget.bottomLabels![1]
+            : null,
+        nextLabel:
+            widget.bottomLabels != null && widget.bottomLabels!.length > 2
+            ? widget.bottomLabels![2]
+            : null,
       ),
     );
   }

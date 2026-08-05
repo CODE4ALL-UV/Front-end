@@ -3,9 +3,18 @@ import 'package:flutter_code4all/config/static_messages.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
 
 class MultimodalNavBar extends StatelessWidget {
-  const MultimodalNavBar({super.key, this.announcementText});
+  const MultimodalNavBar({
+    super.key,
+    this.announcementText,
+    this.previousLabel,
+    this.playLabel,
+    this.nextLabel,
+  });
 
   final String? announcementText;
+  final String? previousLabel;
+  final String? playLabel;
+  final String? nextLabel;
 
   Future<void> _announceCurrentScreen(BuildContext context) async {
     final explicitText = announcementText?.trim();
@@ -35,10 +44,9 @@ class MultimodalNavBar extends StatelessWidget {
             // 1. BOTÓN ANTERIOR
             Semantics(
               button: true,
-              label: StaticMessages.navPreviousLabel,
+              label: previousLabel ?? StaticMessages.navPreviousLabel,
               hint: StaticMessages.navPreviousHint,
               child: InkWell(
-                // Cambiado a InkWell para que el lector detecte que es cliqueable
                 onTap: () {},
                 child: Icon(
                   Icons.skip_previous,
@@ -51,7 +59,7 @@ class MultimodalNavBar extends StatelessWidget {
             // 2. BOTÓN REPRODUCIR (Selected / Destacado)
             Semantics(
               button: true,
-              label: StaticMessages.navPlayLabel,
+              label: playLabel ?? StaticMessages.navPlayLabel,
               hint: StaticMessages.navPlayHint,
               onTap: () async => _announceCurrentScreen(context),
               child: InkWell(
@@ -67,7 +75,7 @@ class MultimodalNavBar extends StatelessWidget {
             // 3. BOTÓN SIGUIENTE
             Semantics(
               button: true,
-              label: StaticMessages.navNextLabel,
+              label: nextLabel ?? StaticMessages.navNextLabel,
               hint: StaticMessages.navNextHint,
               child: InkWell(
                 onTap: () {},

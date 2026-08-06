@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'accessibility_settings_screen.dart';
+import 'accessibility_text_scale.dart';
 
 class HelpActionButton extends StatefulWidget {
   const HelpActionButton({super.key});
@@ -15,6 +16,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
   OverlayEntry? _overlayEntry;
   late AnimationController _controller;
   late Animation<double> _animation;
+  late AccessibilityTextScaleController _textScaleController;
 
   @override
   void initState() {
@@ -24,12 +26,20 @@ class _HelpActionButtonState extends State<HelpActionButton>
       vsync: this,
     );
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    _textScaleController = AccessibilityTextScaleController.global;
+    _textScaleController.addListener(_handleTextScaleChanged);
   }
 
   @override
   void dispose() {
+    _textScaleController.removeListener(_handleTextScaleChanged);
     _controller.dispose();
     super.dispose();
+  }
+
+  void _handleTextScaleChanged() {
+    if (!mounted) return;
+    _refreshOverlay();
   }
 
   void _refreshOverlay() {
@@ -46,7 +56,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final safeWidth = (screenWidth - 24).clamp(220.0, 380.0);
-    final panelWidth = (safeWidth - 92).clamp(180.0, 220.0);
+    final panelWidth = (safeWidth - 92).clamp(180.0, 240.0);
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
@@ -62,7 +72,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
             overlaySafeWidth,
           ),
         );
-        final panelHeight = 360.0;
+        final panelHeight = (overlayHeight * 0.7).clamp(320.0, 430.0);
         final availableBottomSpace =
             overlayHeight - 24 - overlayMediaQuery.padding.bottom;
         final panelTop = (availableBottomSpace - panelHeight).clamp(0.0, 80.0);
@@ -144,8 +154,8 @@ class _HelpActionButtonState extends State<HelpActionButton>
                               behavior: HitTestBehavior.opaque,
                               onTap: _toggleMenu,
                               child: Container(
-                                width: 56,
-                                height: 56,
+                                width: 64,
+                                height: 64,
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: _isExpanded
@@ -197,18 +207,30 @@ class _HelpActionButtonState extends State<HelpActionButton>
       _selectedOption = null;
     });
     _refreshOverlay();
-    _controller.forward();
+    _runAnimation(forward: true);
   }
 
   void _hideOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;
-    _controller.reverse();
+    _runAnimation(forward: false);
     if (mounted) {
       setState(() {
         _isExpanded = false;
         _selectedOption = null;
       });
+    }
+  }
+
+  void _runAnimation({required bool forward}) {
+    if (!mounted) return;
+    if (_controller.isAnimating) {
+      _controller.stop();
+    }
+    if (forward) {
+      _controller.forward(from: _controller.value);
+    } else {
+      _controller.reverse(from: _controller.value);
     }
   }
 
@@ -328,8 +350,8 @@ class _AccessibilityIconButton extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        width: 56,
-        height: 56,
+        width: 64,
+        height: 64,
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
@@ -372,73 +394,104 @@ class _OptionPanelState extends State<_OptionPanel> {
   bool _textSizeEnabled = false;
   bool _visualModeEnabled = false;
   double _textSize = 1.0;
+  AccessibilityTextScaleController? _textScaleController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final controller = AccessibilityTextScaleScope.of(context);
+    if (_textScaleController != controller) {
+      _textScaleController?.removeListener(_handleTextScaleChanged);
+      _textScaleController = controller;
+      _textScaleController?.addListener(_handleTextScaleChanged);
+    }
+    _textSizeEnabled = controller.scale != 1.0;
+    _textSize = controller.scale;
+  }
+
+  @override
+  void dispose() {
+    _textScaleController?.removeListener(_handleTextScaleChanged);
+    super.dispose();
+  }
+
+  void _handleTextScaleChanged() {
+    if (!mounted) return;
+    setState(() {
+      _textSizeEnabled = (_textScaleController?.scale ?? 1.0) != 1.0;
+      _textSize = _textScaleController?.scale ?? 1.0;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: widget.width,
+    return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: widget.width),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFF4EDFF), Color(0xFFE8E4F3)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFD8C8F5), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
+      child: Container(
+        width: widget.width,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFF4EDFF), Color(0xFFE8E4F3)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 8,
-              children: [
-                SizedBox(
-                  width: 160,
-                  child: Text(
-                    widget.option,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF2F1F56),
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: widget.onClose,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    child: const Icon(
-                      Icons.close,
-                      color: Color(0xFF6B5D83),
-                      size: 22,
-                    ),
-                  ),
-                ),
-              ],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFD8C8F5), width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.12),
+              blurRadius: 24,
+              offset: const Offset(0, 10),
             ),
+          ],
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.option,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF2F1F56),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: widget.onClose,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        child: const Icon(
+                          Icons.close,
+                          color: Color(0xFF6B5D83),
+                          size: 22,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
+                child: _buildOptionContent(),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
-          // Contenido según la opción
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            child: _buildOptionContent(),
-          ),
-          const SizedBox(height: 16),
-        ],
+        ),
       ),
     );
   }
@@ -446,13 +499,16 @@ class _OptionPanelState extends State<_OptionPanel> {
   Widget _buildOptionContent() {
     switch (widget.option) {
       case 'Tamaño de texto':
+        final controller = AccessibilityTextScaleScope.of(context);
+        final activeScale = controller.scale;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildInfoBanner(
               icon: Icons.text_fields,
               title: 'Tamaño de texto',
-              subtitle: 'Aumenta el tamaño para leer con más comodidad.',
+              subtitle:
+                  'Aumenta o reduce el tamaño para leer con más comodidad.',
             ),
             const SizedBox(height: 14),
             Container(
@@ -462,50 +518,114 @@ class _OptionPanelState extends State<_OptionPanel> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2D8F7)),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Texto grande activo',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF2F1F56),
-                          ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Texto grande activo',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF2F1F56),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              activeScale != 1.0
+                                  ? 'El contenido aparecerá con letra más grande.'
+                                  : 'La lectura seguirá en el tamaño normal.',
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                color: Color(0xFF6A5B7D),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _textSizeEnabled
-                              ? 'El contenido aparecerá con letra más grande.'
-                              : 'La lectura seguirá en el tamaño normal.',
-                          style: const TextStyle(
-                            fontSize: 12.5,
-                            color: Color(0xFF6A5B7D),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                      Switch(
+                        value: activeScale != 1.0,
+                        onChanged: (value) {
+                          setState(() {
+                            _textSizeEnabled = value;
+                          });
+                          if (value) {
+                            controller.setScale(1.2);
+                          } else {
+                            controller.reset();
+                          }
+                          _showStatusMessage(
+                            context,
+                            value
+                                ? 'Texto grande activado'
+                                : 'Texto grande desactivado',
+                          );
+                        },
+                        activeColor: const Color(0xFF9575CD),
+                        activeTrackColor: const Color(0xFFD8C8F5),
+                        inactiveThumbColor: const Color(0xFFBDBDBD),
+                        inactiveTrackColor: const Color(0xFFE0E0E0),
+                      ),
+                    ],
                   ),
-                  Switch(
-                    value: _textSizeEnabled,
-                    onChanged: (value) {
-                      setState(() {
-                        _textSizeEnabled = value;
-                      });
-                      _showStatusMessage(
-                        context,
-                        _textSizeEnabled
-                            ? 'Texto grande activado'
-                            : 'Texto grande desactivado',
-                      );
-                    },
-                    activeColor: const Color(0xFF9575CD),
-                    activeTrackColor: const Color(0xFFD8C8F5),
-                    inactiveThumbColor: const Color(0xFFBDBDBD),
-                    inactiveTrackColor: const Color(0xFFE0E0E0),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      IconButton(
+                        padding: const EdgeInsets.all(10),
+                        constraints: const BoxConstraints(
+                          minWidth: 52,
+                          minHeight: 52,
+                        ),
+                        onPressed: () {
+                          controller.decrease();
+                          setState(() {
+                            _textSize = controller.scale;
+                            _textSizeEnabled = controller.scale != 1.0;
+                          });
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        },
+                        icon: const Icon(Icons.remove_circle_outline, size: 28),
+                        color: const Color(0xFF7E57C2),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            '${controller.scale.toStringAsFixed(2)}x',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF2F1F56),
+                            ),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        padding: const EdgeInsets.all(10),
+                        constraints: const BoxConstraints(
+                          minWidth: 52,
+                          minHeight: 52,
+                        ),
+                        onPressed: () {
+                          controller.increase();
+                          setState(() {
+                            _textSize = controller.scale;
+                            _textSizeEnabled = controller.scale != 1.0;
+                          });
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        },
+                        icon: const Icon(Icons.add_circle_outline, size: 28),
+                        color: const Color(0xFF7E57C2),
+                      ),
+                    ],
                   ),
                 ],
               ),

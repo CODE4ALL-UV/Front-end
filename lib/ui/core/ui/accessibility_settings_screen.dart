@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'accessibility_text_scale.dart';
 
 class AccessibilitySettingsScreen extends StatefulWidget {
   const AccessibilitySettingsScreen({super.key});
@@ -10,6 +11,7 @@ class AccessibilitySettingsScreen extends StatefulWidget {
 
 class _AccessibilitySettingsScreenState
     extends State<AccessibilitySettingsScreen> {
+  late final AccessibilityTextScaleController _textScaleController;
   bool _textSizeEnabled = false;
   bool _visualModeEnabled = false;
   bool _audioAssistEnabled = true;
@@ -17,6 +19,13 @@ class _AccessibilitySettingsScreenState
   String _selectedVisualMode = 'Auto';
   String _selectedAudioSpeed = 'Media';
   String _selectedSignLevel = 'Básico';
+
+  @override
+  void initState() {
+    super.initState();
+    _textScaleController = AccessibilityTextScaleScope.of(context);
+    _textSizeEnabled = _textScaleController.scale != 1.0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,6 +166,11 @@ class _AccessibilitySettingsScreenState
                   setState(() {
                     _textSizeEnabled = value;
                   });
+                  if (value) {
+                    _textScaleController.setScale(1.2);
+                  } else {
+                    _textScaleController.reset();
+                  }
                   _showStatusMessage(
                     _textSizeEnabled
                         ? 'Texto grande activado'

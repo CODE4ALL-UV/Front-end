@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'ui/core/themes/app_theme.dart';
+import 'ui/core/ui/accessibility_text_scale.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'ui/users_management/screens/login_screen.dart';
 import 'ui/users_management/screens/login_dark_screen.dart';
@@ -34,6 +35,26 @@ class _AppState extends State<App> {
   AppScreen _currentScreen = AppScreen.login;
   String _userName = 'Usuario';
   List<String> _bottomLabels = ['Anterior', 'Reproducir', 'Siguiente'];
+  final AccessibilityTextScaleController _textScaleController =
+      AccessibilityTextScaleController.global;
+
+  @override
+  void initState() {
+    super.initState();
+    _textScaleController.addListener(_handleTextScaleChanged);
+  }
+
+  @override
+  void dispose() {
+    _textScaleController.removeListener(_handleTextScaleChanged);
+    super.dispose();
+  }
+
+  void _handleTextScaleChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   void _goToRegister() => setState(() => _currentScreen = AppScreen.register);
   void _goToLogin() => setState(() => _currentScreen = AppScreen.login);
@@ -82,6 +103,24 @@ class _AppState extends State<App> {
       case AppThemeMode.light:
         return AppTheme.lightTheme;
     }
+  }
+
+  Widget _buildScaledModulePage(BuildContext context, Widget page) {
+    if (_currentScreen != AppScreen.modulo) {
+      return page;
+    }
+
+    final scale = _textScaleController.scale;
+    if (scale <= 1.0) {
+      return page;
+    }
+
+    final screenSize = MediaQuery.of(context).size;
+    return Transform.scale(
+      scale: scale,
+      alignment: Alignment.topCenter,
+      child: SizedBox(width: screenSize.width / scale, child: page),
+    );
   }
 
   // Mostrar selector con tres opciones y actualizar etiquetas
@@ -176,38 +215,50 @@ class _AppState extends State<App> {
         break;
     }
 
-    return MaterialApp(
-      title: 'Code4All',
-      debugShowCheckedModeBanner: false,
-      theme: _getThemeData(),
-      home: Stack(
-        children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            child: KeyedSubtree(
-              key: ValueKey('${_currentScreen.name}_${_currentThemeMode.name}'),
-              child: currentPage,
+    return AccessibilityTextScaleScope(
+      controller: _textScaleController,
+      child: MaterialApp(
+        title: 'Code4All',
+        debugShowCheckedModeBanner: false,
+        theme: _getThemeData(),
+        builder: (context, child) {
+          final mediaQuery = MediaQuery.of(context);
+          return MediaQuery(
+            data: mediaQuery.copyWith(
+              textScaler: TextScaler.linear(_textScaleController.scale),
             ),
-          ),
-          // Show theme toggle only outside module screens to avoid
-          // overlapping with accessibility actions inside modules.
-          if (_currentScreen != AppScreen.modulo)
-            Positioned(
-              left: 16,
-              bottom: 24,
-              child: Semantics(
-                button: true,
-                label: 'Cambiar tema',
-                hint: 'Cambia el tema de la aplicación',
-                child: FloatingActionButton(
-                  heroTag: 'theme-toggle',
-                  backgroundColor: const Color(0xFF5C6BC0),
-                  onPressed: () => _showThemeOptions(context),
-                  child: const Icon(Icons.palette, color: Colors.white),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
+        home: Stack(
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: KeyedSubtree(
+                key: ValueKey(
+                  '${_currentScreen.name}_${_currentThemeMode.name}_${_textScaleController.scale.toStringAsFixed(2)}',
                 ),
+                child: currentPage,
               ),
             ),
-        ],
+            if (_currentScreen != AppScreen.modulo)
+              Positioned(
+                left: 16,
+                bottom: 24,
+                child: Semantics(
+                  button: true,
+                  label: 'Cambiar tema',
+                  hint: 'Cambia el tema de la aplicación',
+                  child: FloatingActionButton(
+                    heroTag: 'theme-toggle',
+                    backgroundColor: const Color(0xFF5C6BC0),
+                    onPressed: () => _showThemeOptions(context),
+                    child: const Icon(Icons.palette, color: Colors.white),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

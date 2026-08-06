@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'ui/core/themes/app_theme.dart';
 import 'ui/core/ui/accessibility_text_scale.dart';
+import 'ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'ui/users_management/screens/login_screen.dart';
 import 'ui/users_management/screens/login_dark_screen.dart';
@@ -41,11 +42,19 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
+    VisualThemeController.globalThemeNotifier.value =
+        _currentThemeMode == AppThemeMode.dark;
+    VisualThemeController.globalThemeNotifier.addListener(
+      _handleGlobalVisualThemeChanged,
+    );
     _textScaleController.addListener(_handleTextScaleChanged);
   }
 
   @override
   void dispose() {
+    VisualThemeController.globalThemeNotifier.removeListener(
+      _handleGlobalVisualThemeChanged,
+    );
     _textScaleController.removeListener(_handleTextScaleChanged);
     super.dispose();
   }
@@ -56,9 +65,42 @@ class _AppState extends State<App> {
     }
   }
 
+  void _handleGlobalVisualThemeChanged() {
+    if (!mounted) return;
+    _applyThemeMode(
+      VisualThemeController.globalThemeNotifier.value
+          ? AppThemeMode.dark
+          : AppThemeMode.light,
+    );
+  }
+
   void _goToRegister() => setState(() => _currentScreen = AppScreen.register);
   void _goToLogin() => setState(() => _currentScreen = AppScreen.login);
   void _goToModulo() => setState(() => _currentScreen = AppScreen.modulo);
+
+  void _applyThemeMode(AppThemeMode mode) {
+    final isDarkTheme = mode == AppThemeMode.dark;
+    if (_currentThemeMode == mode &&
+        VisualThemeController.globalThemeNotifier.value == isDarkTheme) {
+      return;
+    }
+
+    setState(() {
+      _currentThemeMode = mode;
+      VisualThemeController.globalThemeNotifier.value = isDarkTheme;
+      if (mode == AppThemeMode.light) {
+        _bottomLabels = ['Anterior', 'Reproducir', 'Siguiente'];
+      } else if (mode == AppThemeMode.dark) {
+        _bottomLabels = ['Volver', 'Play', 'Adelantar'];
+      } else {
+        _bottomLabels = ['Atrás', 'Iniciar', 'Siguiente'];
+      }
+    });
+  }
+
+  void _handleVisualThemeChanged(bool isDark) {
+    _applyThemeMode(isDark ? AppThemeMode.dark : AppThemeMode.light);
+  }
 
   void _handleSuccessfulLogin(String role) {
     final r = role.toLowerCase();
@@ -88,8 +130,8 @@ class _AppState extends State<App> {
   }
 
   // Método auxiliar para obtener el ThemeData dinámicamente según la selección
-  ThemeData _getThemeData() {
-    switch (_currentThemeMode) {
+  ThemeData _getThemeData(AppThemeMode mode) {
+    switch (mode) {
       case AppThemeMode.dark:
         return AppTheme.darkTheme;
       case AppThemeMode.protanopia:
@@ -153,30 +195,30 @@ class _AppState extends State<App> {
 
     if (choice == null) return;
 
-    setState(() {
-      _currentThemeMode = choice;
-      if (choice == AppThemeMode.light) {
-        _bottomLabels = ['Anterior', 'Reproducir', 'Siguiente'];
-      } else if (choice == AppThemeMode.dark) {
-        _bottomLabels = ['Volver', 'Play', 'Adelantar'];
-      } else {
-        _bottomLabels = ['Atrás', 'Iniciar', 'Siguiente'];
-      }
-    });
+    _applyThemeMode(choice);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = VisualThemeController.globalThemeNotifier.value;
+    final resolvedThemeMode = isDarkTheme
+        ? AppThemeMode.dark
+        : AppThemeMode.light;
+
+    if (_currentThemeMode != resolvedThemeMode) {
+      _currentThemeMode = resolvedThemeMode;
+    }
+
     Widget currentPage;
 
     switch (_currentScreen) {
       case AppScreen.register:
-        currentPage = _currentThemeMode == AppThemeMode.dark
+        currentPage = isDarkTheme
             ? FormPageDark(onBack: _goToLogin, onSuccess: _goToLogin)
             : FormPageLight(onBack: _goToLogin, onSuccess: _goToLogin);
         break;
       case AppScreen.modulo:
-        currentPage = _currentThemeMode == AppThemeMode.dark
+        currentPage = isDarkTheme
             ? ModuloAprendizajeDark(
                 userName: _userName,
                 bottomLabels: _bottomLabels,
@@ -188,12 +230,10 @@ class _AppState extends State<App> {
               );
         break;
       case AppScreen.director:
-        currentPage = _currentThemeMode == AppThemeMode.dark
-            ? DirectorPerformanceScreen(onLogout: _goToLogin)
-            : DirectorPerformanceScreen(onLogout: _goToLogin);
+        currentPage = DirectorPerformanceScreen(onLogout: _goToLogin);
         break;
       case AppScreen.login:
-        currentPage = _currentThemeMode == AppThemeMode.dark
+        currentPage = isDarkTheme
             ? LoginPageDark(
                 onRegister: _goToRegister,
                 onSuccess: (role) {
@@ -217,47 +257,51 @@ class _AppState extends State<App> {
 
     return AccessibilityTextScaleScope(
       controller: _textScaleController,
-      child: MaterialApp(
-        title: 'Code4All',
-        debugShowCheckedModeBanner: false,
-        theme: _getThemeData(),
-        builder: (context, child) {
-          final mediaQuery = MediaQuery.of(context);
-          return MediaQuery(
-            data: mediaQuery.copyWith(
-              textScaler: TextScaler.linear(_textScaleController.scale),
-            ),
-            child: child ?? const SizedBox.shrink(),
-          );
-        },
-        home: Stack(
-          children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              child: KeyedSubtree(
-                key: ValueKey(
-                  '${_currentScreen.name}_${_currentThemeMode.name}_${_textScaleController.scale.toStringAsFixed(2)}',
-                ),
-                child: currentPage,
+      child: VisualThemeController(
+        isDarkTheme: isDarkTheme,
+        onThemeChanged: _handleVisualThemeChanged,
+        child: MaterialApp(
+          title: 'Code4All',
+          debugShowCheckedModeBanner: false,
+          theme: _getThemeData(resolvedThemeMode),
+          builder: (context, child) {
+            final mediaQuery = MediaQuery.of(context);
+            return MediaQuery(
+              data: mediaQuery.copyWith(
+                textScaler: TextScaler.linear(_textScaleController.scale),
               ),
-            ),
-            if (_currentScreen != AppScreen.modulo)
-              Positioned(
-                left: 16,
-                bottom: 24,
-                child: Semantics(
-                  button: true,
-                  label: 'Cambiar tema',
-                  hint: 'Cambia el tema de la aplicación',
-                  child: FloatingActionButton(
-                    heroTag: 'theme-toggle',
-                    backgroundColor: const Color(0xFF5C6BC0),
-                    onPressed: () => _showThemeOptions(context),
-                    child: const Icon(Icons.palette, color: Colors.white),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
+          home: Stack(
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: KeyedSubtree(
+                  key: ValueKey(
+                    '${_currentScreen.name}_${_currentThemeMode.name}_${_textScaleController.scale.toStringAsFixed(2)}',
+                  ),
+                  child: currentPage,
+                ),
+              ),
+              if (_currentScreen != AppScreen.modulo)
+                Positioned(
+                  left: 16,
+                  bottom: 24,
+                  child: Semantics(
+                    button: true,
+                    label: 'Cambiar tema',
+                    hint: 'Cambia el tema de la aplicación',
+                    child: FloatingActionButton(
+                      heroTag: 'theme-toggle',
+                      backgroundColor: const Color(0xFF5C6BC0),
+                      onPressed: () => _showThemeOptions(context),
+                      child: const Icon(Icons.palette, color: Colors.white),
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

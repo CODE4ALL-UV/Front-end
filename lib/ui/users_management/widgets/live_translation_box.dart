@@ -38,6 +38,19 @@ class _LiveTranslationBoxState extends State<LiveTranslationBox> {
     super.dispose();
   }
 
+  String _resolvedBackendUrl() {
+    final explicitBackend = widget.backendUrl;
+    if (explicitBackend != null && explicitBackend.isNotEmpty) {
+      return explicitBackend;
+    }
+
+    try {
+      return dotenv.env['BACKEND_URL'] ?? 'http://127.0.0.1:8000';
+    } catch (_) {
+      return 'http://127.0.0.1:8000';
+    }
+  }
+
   Future<void> _loadCaptions() async {
     final videoId = _extractVideoId(widget.videoUrl);
     if (videoId == null) {
@@ -48,11 +61,7 @@ class _LiveTranslationBoxState extends State<LiveTranslationBox> {
       return;
     }
 
-    // Allow a sensible default when dotenv not configured during development.
-    final backend =
-        widget.backendUrl ??
-        dotenv.env['BACKEND_URL'] ??
-        'http://127.0.0.1:8000';
+    final backend = _resolvedBackendUrl();
 
     try {
       final uri = Uri.parse(
@@ -163,14 +172,18 @@ class _LiveTranslationBoxState extends State<LiveTranslationBox> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final secondaryTextColor = colorScheme.onSurfaceVariant;
+    final backendLabel = _resolvedBackendUrl();
+
     return Container(
       width: double.infinity,
-      height: 160,
+      constraints: const BoxConstraints(minHeight: 160),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
+        border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: const [
           BoxShadow(
             color: Color(0x22000000),
@@ -180,51 +193,54 @@ class _LiveTranslationBoxState extends State<LiveTranslationBox> {
         ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           if (_error != null)
-            Text(_error!, style: const TextStyle(color: Colors.red)),
+            Text(_error!, style: TextStyle(color: colorScheme.error)),
           if (_startedAt == null)
-            const Text(
+            Text(
               'Traducción en tiempo real',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface,
+              ),
             ),
           const SizedBox(height: 6),
           Align(
             alignment: Alignment.center,
             child: Text(
-              'Backend: ${dotenv.env['BACKEND_URL'] ?? widget.backendUrl ?? 'http://127.0.0.1:8000'}',
-              style: const TextStyle(fontSize: 11, color: Colors.grey),
+              'Backend: $backendLabel',
+              style: TextStyle(fontSize: 11, color: secondaryTextColor),
             ),
           ),
-          if (_startedAt != null)
-            Expanded(
-              child: Center(
-                child: Text(
-                  _currentIndex == null
-                      ? ''
-                      : (_cues[_currentIndex!]['translated'] ??
-                            _cues[_currentIndex!]['text'] ??
-                            ''),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16, color: Colors.white),
-                ),
+          if (_startedAt != null) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                _currentIndex == null
+                    ? ''
+                    : (_cues[_currentIndex!]['translated'] ??
+                          _cues[_currentIndex!]['text'] ??
+                          ''),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: colorScheme.onSurface),
               ),
             ),
+          ],
           const SizedBox(height: 8),
-          // show quick debug/count info about loaded cues
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6.0),
             child: Align(
               alignment: Alignment.center,
               child: Text(
                 'Subtítulos: ${_cues.length}',
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(fontSize: 12, color: secondaryTextColor),
               ),
             ),
           ),
           const SizedBox(height: 6),
-          // Use Wrap so buttons flow on small widths instead of overflowing
           Wrap(
             alignment: WrapAlignment.center,
             spacing: 8,

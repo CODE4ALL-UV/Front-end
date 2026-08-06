@@ -81,17 +81,19 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
           _moduleName = name;
           _topics = topics;
         });
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se pudo cargar el módulo')),
-        );
+      } else if (mounted) {
+        setState(() {
+          _moduleName = 'Módulo 1';
+          _topics = [];
+        });
       }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _moduleName = 'Módulo 1';
+          _topics = [];
+        });
+      }
     }
   }
 
@@ -105,10 +107,14 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
     final screenW = MediaQuery.of(context).size.width;
     final bigSize = screenW * 0.40;
 
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: isDarkTheme ? const Color(0xFF121212) : Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2A2A2A),
+        backgroundColor: isDarkTheme
+            ? const Color(0xFF2A2A2A)
+            : const Color(0xFFE53935),
         elevation: 0,
         leading: Builder(
           builder: (context) {
@@ -254,10 +260,39 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    LiveTranslationBox(
-                      videoUrl: VideoTemaDarkScreen._videoUrl,
-                      backendUrl: dotenv.env['BACKEND_URL'],
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _BigCircle(
+                          icon: Icons.account_tree,
+                          iconColor: const Color(0xFF1976D2),
+                          bgColor: const Color(0xFF2A3A4A),
+                          size: bigSize,
+                          progress: 0.75,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const Capitulo2DetalleDark(),
+                              ),
+                            );
+                          },
+                        ),
+                        _LessonBox(
+                          number: 3,
+                          title: _topicOrFallback(2, 'Tema 3'),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const Capitulo2DetalleDark(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -277,7 +312,7 @@ class _ModuloAprendizajeDarkState extends State<ModuloAprendizajeDark> {
                           },
                         ),
                         _BigCircle(
-                          icon: Icons.lightbulb,
+                          icon: Icons.manage_search,
                           iconColor: const Color(0xFF8E24AA),
                           bgColor: const Color(0xFF2E2635),
                           size: bigSize,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'accessibility_settings_screen.dart';
 import 'accessibility_text_scale.dart';
+import 'visual_theme_controller.dart';
 
 class HelpActionButton extends StatefulWidget {
   const HelpActionButton({super.key});
@@ -43,6 +44,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
   }
 
   void _refreshOverlay() {
+    if (!mounted) return;
     _overlayEntry?.markNeedsBuild();
   }
 
@@ -56,7 +58,6 @@ class _HelpActionButtonState extends State<HelpActionButton>
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final safeWidth = (screenWidth - 24).clamp(220.0, 380.0);
-    final panelWidth = (safeWidth - 92).clamp(180.0, 240.0);
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
@@ -64,7 +65,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
         final overlayHeight = overlayMediaQuery.size.height;
         final overlayWidth = overlayMediaQuery.size.width;
         final overlaySafeWidth = (overlayWidth - 24).clamp(220.0, 380.0);
-        final overlayPanelWidth = (overlaySafeWidth - 92).clamp(180.0, 220.0);
+        final overlayPanelWidth = (overlaySafeWidth - 92).clamp(200.0, 260.0);
         final overlayPanelLeft = (overlaySafeWidth > 300 ? 72.0 : 56.0).clamp(
           0.0,
           (overlaySafeWidth - overlayPanelWidth - 16).clamp(
@@ -72,10 +73,10 @@ class _HelpActionButtonState extends State<HelpActionButton>
             overlaySafeWidth,
           ),
         );
-        final panelHeight = (overlayHeight * 0.7).clamp(320.0, 430.0);
+        final panelHeight = (overlayHeight * 0.65).clamp(280.0, 380.0);
         final availableBottomSpace =
             overlayHeight - 24 - overlayMediaQuery.padding.bottom;
-        final panelTop = (availableBottomSpace - panelHeight).clamp(0.0, 80.0);
+        final panelTop = (availableBottomSpace - panelHeight).clamp(0.0, 48.0);
 
         return Stack(
           children: [
@@ -103,10 +104,13 @@ class _HelpActionButtonState extends State<HelpActionButton>
                         Positioned(
                           left: overlayPanelLeft,
                           top: 8,
-                          child: _OptionPanel(
-                            option: _selectedOption!,
-                            onClose: _closePanel,
+                          child: SizedBox(
                             width: overlayPanelWidth,
+                            child: _OptionPanel(
+                              option: _selectedOption!,
+                              onClose: _closePanel,
+                              width: overlayPanelWidth,
+                            ),
                           ),
                         ),
                       Positioned(
@@ -201,7 +205,10 @@ class _HelpActionButtonState extends State<HelpActionButton>
       },
     );
 
+    if (!mounted) return;
+
     overlay.insert(_overlayEntry!);
+    if (!mounted) return;
     setState(() {
       _isExpanded = true;
       _selectedOption = null;
@@ -211,8 +218,11 @@ class _HelpActionButtonState extends State<HelpActionButton>
   }
 
   void _hideOverlay() {
-    _overlayEntry?.remove();
+    final entry = _overlayEntry;
     _overlayEntry = null;
+    if (entry != null) {
+      entry.remove();
+    }
     _runAnimation(forward: false);
     if (mounted) {
       setState(() {
@@ -235,6 +245,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
   }
 
   void _selectOption(String option) {
+    if (!mounted) return;
     if (option == 'Configuración') {
       _navigateToSettings();
       return;
@@ -259,6 +270,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
   }
 
   void _closePanel() {
+    if (!mounted) return;
     setState(() {
       _selectedOption = null;
     });
@@ -423,6 +435,15 @@ class _OptionPanelState extends State<_OptionPanel> {
     });
   }
 
+  void _applyVisualMode(bool isDarkTheme) {
+    VisualThemeController.updateTheme(isDarkTheme);
+
+    final controller = VisualThemeController.of(context);
+    if (controller != null) {
+      controller.onThemeChanged(isDarkTheme);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
@@ -445,52 +466,47 @@ class _OptionPanelState extends State<_OptionPanel> {
             ),
           ],
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        widget.option,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF2F1F56),
-                        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.option,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF2F1F56),
                       ),
                     ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: widget.onClose,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        child: const Icon(
-                          Icons.close,
-                          color: Color(0xFF6B5D83),
-                          size: 22,
-                        ),
+                  ),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: widget.onClose,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      child: const Icon(
+                        Icons.close,
+                        color: Color(0xFF6B5D83),
+                        size: 22,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
-                child: _buildOptionContent(),
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: _buildOptionContent(),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );
@@ -507,151 +523,96 @@ class _OptionPanelState extends State<_OptionPanel> {
             _buildInfoBanner(
               icon: Icons.text_fields,
               title: 'Tamaño de texto',
-              subtitle:
-                  'Aumenta o reduce el tamaño para leer con más comodidad.',
+              subtitle: 'Ajusta la lectura sin perder la vista del contenido.',
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2D8F7)),
               ),
-              child: Column(
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Texto grande activo',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF2F1F56),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              activeScale != 1.0
-                                  ? 'El contenido aparecerá con letra más grande.'
-                                  : 'La lectura seguirá en el tamaño normal.',
-                              style: const TextStyle(
-                                fontSize: 12.5,
-                                color: Color(0xFF6A5B7D),
-                              ),
-                            ),
-                          ],
-                        ),
+                  Expanded(
+                    child: Text(
+                      'Texto grande ${activeScale != 1.0 ? 'activado' : 'desactivado'}',
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        color: Color(0xFF6A5B7D),
                       ),
-                      Switch(
-                        value: activeScale != 1.0,
-                        onChanged: (value) {
-                          setState(() {
-                            _textSizeEnabled = value;
-                          });
-                          if (value) {
-                            controller.setScale(1.2);
-                          } else {
-                            controller.reset();
-                          }
-                          _showStatusMessage(
-                            context,
-                            value
-                                ? 'Texto grande activado'
-                                : 'Texto grande desactivado',
-                          );
-                        },
-                        activeColor: const Color(0xFF9575CD),
-                        activeTrackColor: const Color(0xFFD8C8F5),
-                        inactiveThumbColor: const Color(0xFFBDBDBD),
-                        inactiveTrackColor: const Color(0xFFE0E0E0),
-                      ),
-                    ],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      IconButton(
-                        padding: const EdgeInsets.all(10),
-                        constraints: const BoxConstraints(
-                          minWidth: 52,
-                          minHeight: 52,
-                        ),
-                        onPressed: () {
-                          controller.decrease();
-                          setState(() {
-                            _textSize = controller.scale;
-                            _textSizeEnabled = controller.scale != 1.0;
-                          });
-                          if (mounted) {
-                            setState(() {});
-                          }
-                        },
-                        icon: const Icon(Icons.remove_circle_outline, size: 28),
-                        color: const Color(0xFF7E57C2),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            '${controller.scale.toStringAsFixed(2)}x',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF2F1F56),
-                            ),
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        padding: const EdgeInsets.all(10),
-                        constraints: const BoxConstraints(
-                          minWidth: 52,
-                          minHeight: 52,
-                        ),
-                        onPressed: () {
-                          controller.increase();
-                          setState(() {
-                            _textSize = controller.scale;
-                            _textSizeEnabled = controller.scale != 1.0;
-                          });
-                          if (mounted) {
-                            setState(() {});
-                          }
-                        },
-                        icon: const Icon(Icons.add_circle_outline, size: 28),
-                        color: const Color(0xFF7E57C2),
-                      ),
-                    ],
+                  Switch(
+                    value: activeScale != 1.0,
+                    onChanged: (value) {
+                      setState(() {
+                        _textSizeEnabled = value;
+                      });
+                      if (value) {
+                        controller.setScale(1.2);
+                      } else {
+                        controller.reset();
+                      }
+                    },
+                    activeColor: const Color(0xFF9575CD),
+                    activeTrackColor: const Color(0xFFD8C8F5),
+                    inactiveThumbColor: const Color(0xFFBDBDBD),
+                    inactiveTrackColor: const Color(0xFFE0E0E0),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildScaleMarker('A', 14),
-                Container(
-                  width: 42,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF424242),
-                    borderRadius: BorderRadius.circular(2),
+                IconButton(
+                  padding: const EdgeInsets.all(6),
+                  constraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
+                  onPressed: () {
+                    controller.decrease();
+                    setState(() {
+                      _textSize = controller.scale;
+                      _textSizeEnabled = controller.scale != 1.0;
+                    });
+                  },
+                  icon: const Icon(Icons.remove_circle_outline, size: 22),
+                  color: const Color(0xFF7E57C2),
+                ),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      '${controller.scale.toStringAsFixed(2)}x',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF2F1F56),
+                      ),
+                    ),
                   ),
                 ),
-                Container(
-                  width: 42,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF9E9E9E),
-                    borderRadius: BorderRadius.circular(2),
+                IconButton(
+                  padding: const EdgeInsets.all(6),
+                  constraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
                   ),
+                  onPressed: () {
+                    controller.increase();
+                    setState(() {
+                      _textSize = controller.scale;
+                      _textSizeEnabled = controller.scale != 1.0;
+                    });
+                  },
+                  icon: const Icon(Icons.add_circle_outline, size: 22),
+                  color: const Color(0xFF7E57C2),
                 ),
-                _buildScaleMarker('A', 20),
               ],
             ),
           ],
@@ -663,65 +624,9 @@ class _OptionPanelState extends State<_OptionPanel> {
             _buildInfoBanner(
               icon: Icons.visibility,
               title: 'Modo visual',
-              subtitle: 'Cambia el contraste y la claridad de la pantalla.',
+              subtitle: 'Elige el contraste que prefieras para la interfaz.',
             ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2D8F7)),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Contraste mejorado',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF2F1F56),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _visualModeEnabled
-                              ? 'La interfaz usará un contraste más fuerte.'
-                              : 'La interfaz conservará el diseño estándar.',
-                          style: const TextStyle(
-                            fontSize: 12.5,
-                            color: Color(0xFF6A5B7D),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Switch(
-                    value: _visualModeEnabled,
-                    onChanged: (value) {
-                      setState(() {
-                        _visualModeEnabled = value;
-                      });
-                      _showStatusMessage(
-                        context,
-                        _visualModeEnabled
-                            ? 'Contraste mejorado activado'
-                            : 'Contraste mejorado desactivado',
-                      );
-                    },
-                    activeColor: const Color(0xFF9575CD),
-                    activeTrackColor: const Color(0xFFD8C8F5),
-                    inactiveThumbColor: const Color(0xFFBDBDBD),
-                    inactiveTrackColor: const Color(0xFFE0E0E0),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -729,17 +634,19 @@ class _OptionPanelState extends State<_OptionPanel> {
                 _ModeButton(
                   icon: Icons.brightness_2,
                   label: 'Oscuro',
-                  onTap: () {},
+                  onTap: () => _applyVisualMode(true),
                 ),
                 _ModeButton(
                   icon: Icons.brightness_5,
                   label: 'Claro',
-                  onTap: () {},
+                  onTap: () => _applyVisualMode(false),
                 ),
                 _ModeButton(
                   icon: Icons.brightness_auto,
                   label: 'Auto',
-                  onTap: () {},
+                  onTap: () => _applyVisualMode(
+                    Theme.of(context).brightness == Brightness.dark,
+                  ),
                 ),
               ],
             ),
@@ -936,30 +843,6 @@ Widget _buildSpeedPill(String label) {
         fontWeight: FontWeight.w600,
         color: Color(0xFF5B3E8A),
       ),
-    ),
-  );
-}
-
-void _showStatusMessage(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Row(
-        children: [
-          const Icon(Icons.check_circle, color: Colors.white, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-      backgroundColor: const Color(0xFF7E57C2),
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      duration: const Duration(seconds: 2),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     ),
   );
 }

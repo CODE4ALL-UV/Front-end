@@ -70,17 +70,19 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
           _moduleName = name;
           _topics = topics;
         });
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se pudo cargar el módulo')),
-        );
+      } else if (mounted) {
+        setState(() {
+          _moduleName = 'Módulo 1';
+          _topics = [];
+        });
       }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _moduleName = 'Módulo 1';
+          _topics = [];
+        });
+      }
     }
   }
 
@@ -104,11 +106,14 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
     final bigSize = screenW * 0.40;
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkTheme ? const Color(0xFF121212) : Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFE53935),
+        backgroundColor: isDarkTheme
+            ? const Color(0xFF2A2A2A)
+            : const Color(0xFFE53935),
         elevation: 0,
         leading: Builder(
           builder: (context) {
@@ -1254,11 +1259,6 @@ class VideoTemaLightScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Live translation box: opens external video and shows live subtitles
-                    LiveTranslationBox(
-                      videoUrl: VideoTemaLightScreen._videoUrl,
-                      backendUrl: dotenv.env['BACKEND_URL'],
-                    ),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,

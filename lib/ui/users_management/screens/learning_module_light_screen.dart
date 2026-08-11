@@ -9,6 +9,7 @@ import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
 import 'quiz_screen.dart';
 import 'quiz_with_video_screen.dart';
+import 'laboratory_console_screen.dart';
 import '../widgets/live_translation_box.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
@@ -558,6 +559,14 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => const QuizScreen(),
+                                          ),
+                                        )
+                                      : item.label == 'Laboratorio'
+                                      ? () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                const LaboratoryConsoleScreen(),
                                           ),
                                         )
                                       : null,

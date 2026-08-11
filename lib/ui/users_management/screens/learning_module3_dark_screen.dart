@@ -44,11 +44,14 @@ class _Modulo3AprendizajeDarkState extends State<Modulo3AprendizajeDark> {
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
     final bigSize = screenW * 0.40;
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: isDarkTheme ? const Color(0xFF121212) : Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2A2A2A),
+        backgroundColor: isDarkTheme
+            ? const Color(0xFF2A2A2A)
+            : const Color(0xFFE53935),
         elevation: 0,
         leading: Builder(
           builder: (context) {

@@ -2,11 +2,15 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'quiz_screen.dart';
+import 'quiz_screen_dark.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
+import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
+import 'package:flutter_code4all/ui/users_management/screens/learning_module2_dark_screen.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module4_light_screen.dart';
+import 'package:flutter_code4all/ui/users_management/screens/learning_module4_dark_screen.dart';
 
 class Modulo3AprendizajeLight extends StatefulWidget {
   const Modulo3AprendizajeLight({super.key});
@@ -23,9 +27,16 @@ class _Modulo3AprendizajeLightState extends State<Modulo3AprendizajeLight> {
   void _goToModulo2() {
     if (_isNavigatingToModule2) return;
     _isNavigatingToModule2 = true;
+    final isDarkTheme =
+        VisualThemeController.of(context)?.isDarkTheme ??
+        VisualThemeController.globalThemeNotifier.value;
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const Modulo2AprendizajeLight()),
+      MaterialPageRoute(
+        builder: (_) => isDarkTheme
+            ? const Modulo2AprendizajeDark()
+            : const Modulo2AprendizajeLight(),
+      ),
     ).then((_) {
       _isNavigatingToModule2 = false;
     });
@@ -34,9 +45,16 @@ class _Modulo3AprendizajeLightState extends State<Modulo3AprendizajeLight> {
   void _goToModulo4() {
     if (_isNavigatingToModule4) return;
     _isNavigatingToModule4 = true;
+    final isDarkTheme =
+        VisualThemeController.of(context)?.isDarkTheme ??
+        VisualThemeController.globalThemeNotifier.value;
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const Modulo4AprendizajeLight()),
+      MaterialPageRoute(
+        builder: (_) => isDarkTheme
+            ? const Modulo4AprendizajeDark()
+            : const Modulo4AprendizajeLight(),
+      ),
     ).then((_) {
       _isNavigatingToModule4 = false;
     });
@@ -46,7 +64,9 @@ class _Modulo3AprendizajeLightState extends State<Modulo3AprendizajeLight> {
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
     final bigSize = screenW * 0.40;
-    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+    final isDarkTheme =
+        VisualThemeController.of(context)?.isDarkTheme ??
+        VisualThemeController.globalThemeNotifier.value;
 
     return Scaffold(
       backgroundColor: isDarkTheme ? const Color(0xFF121212) : Colors.white,
@@ -156,7 +176,7 @@ class _Modulo3AprendizajeLightState extends State<Modulo3AprendizajeLight> {
                             width: 52,
                             height: 52,
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.25),
+                              color: Colors.white.withOpacity(0.25),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
@@ -438,6 +458,7 @@ class _ChapterDetailLightState extends State<_ChapterDetailLight> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = VisualThemeController.resolveIsDark(context);
     final width = MediaQuery.sizeOf(context).width;
     final horizontalPadding = width < 360 ? 10.0 : 16.0;
 
@@ -530,8 +551,9 @@ class _ChapterDetailLightState extends State<_ChapterDetailLight> {
                                             onPressed: () => Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (_) =>
-                                                    const QuizScreen(),
+                                                builder: (_) => isDarkTheme
+                                                    ? const QuizScreenDark()
+                                                    : const QuizScreen(),
                                               ),
                                             ),
                                             tooltip: 'Abrir Quiz',
@@ -846,8 +868,15 @@ class _DetailCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFD9DEE3)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -923,29 +952,84 @@ class _ActivityRow extends StatelessWidget {
 
   const _ActivityRow({required this.item});
 
+  String _badgeText() {
+    if (item.label == 'Quiz') return 'Comenzar';
+    if (item.label == 'Laboratorio') return 'Explorar';
+    if (item.label == 'Ejercicio') return 'Resolver';
+    if (item.label == 'Ejemplo') return 'Ver';
+    if (item.label == 'Descarga y puesta en marcha') return 'Abrir';
+    if (item.label == 'Preparando la versión instalada') return 'Ver';
+    return 'Abrir';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 6),
-          child: Icon(Icons.circle, size: 5, color: Color(0xFF607D8B)),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            item.label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF263238),
-              height: 1.35,
+    final badgeText = _badgeText();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FBFF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE3ECF7)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F1FF),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            alignment: Alignment.center,
+            child: Text(item.emoji, style: const TextStyle(fontSize: 20)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF263238),
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Actividad educativa',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: const Color(0xFF607D8B),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Text(item.emoji, style: const TextStyle(fontSize: 22)),
-      ],
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE3F2FD),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0xFF90CAF9)),
+            ),
+            child: Text(
+              badgeText,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Color(0xFF1565C0),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

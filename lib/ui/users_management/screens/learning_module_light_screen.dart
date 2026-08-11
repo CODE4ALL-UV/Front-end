@@ -3,13 +3,18 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
+import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
+import 'package:flutter_code4all/ui/users_management/screens/learning_module2_dark_screen.dart';
 import 'quiz_screen.dart';
 import 'quiz_with_video_screen.dart';
 import 'laboratory_console_screen.dart';
+import 'quiz_screen_dark.dart';
+import 'quiz_with_video_screen_dark.dart';
+import 'laboratory_console_screen_dark.dart';
 import '../widgets/live_translation_box.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
@@ -107,7 +112,9 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
     final bigSize = screenW * 0.40;
-    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+    final isDarkTheme =
+        VisualThemeController.of(context)?.isDarkTheme ??
+        VisualThemeController.globalThemeNotifier.value;
 
     return Scaffold(
       backgroundColor: isDarkTheme ? const Color(0xFF121212) : Colors.white,
@@ -466,6 +473,7 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = VisualThemeController.resolveIsDark(context);
     final width = MediaQuery.sizeOf(context).width;
     final horizontalPadding = width < 360 ? 10.0 : 16.0;
 
@@ -558,15 +566,18 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
                                       ? () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => const QuizScreen(),
+                                            builder: (_) => isDarkTheme
+                                                ? const QuizScreenDark()
+                                                : const QuizScreen(),
                                           ),
                                         )
                                       : item.label == 'Laboratorio'
                                       ? () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) =>
-                                                const LaboratoryConsoleScreen(),
+                                            builder: (_) => isDarkTheme
+                                                ? const LaboratoryConsoleScreenDark()
+                                                : const LaboratoryConsoleScreen(),
                                           ),
                                         )
                                       : null,
@@ -576,9 +587,13 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
                                       ? () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => QuizWithVideoScreen(
-                                              actividad: item.label,
-                                            ),
+                                            builder: (_) => isDarkTheme
+                                                ? QuizWithVideoScreenDark(
+                                                    actividad: item.label,
+                                                  )
+                                                : QuizWithVideoScreen(
+                                                    actividad: item.label,
+                                                  ),
                                           ),
                                         )
                                       : null,
@@ -1058,70 +1073,98 @@ class _ActivityRow extends StatelessWidget {
 
   const _ActivityRow({required this.item, this.onBookTap, this.onVideoTap});
 
+  String _badgeText() {
+    if (item.label == 'Quiz') return 'Comenzar';
+    if (item.label == 'Laboratorio') return 'Explorar';
+    if (item.label == 'Ejercicio') return 'Resolver';
+    if (item.label == 'Ejemplo') return 'Ver';
+    if (item.label == 'Descarga y puesta en marcha') return 'Abrir';
+    if (item.label == 'Preparando la versión instalada') return 'Ver';
+    if (item.label == 'Relevancia del lenguaje Python') return 'Explorar';
+    return 'Abrir';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 6),
-          child: Icon(Icons.circle, size: 5, color: Color(0xFF424242)),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            item.label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF263238),
-              height: 1.35,
+    final hasAction = onBookTap != null || onVideoTap != null;
+    final badgeText = _badgeText();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FBFF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE3ECF7)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F1FF),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            alignment: Alignment.center,
+            child: Text(item.emoji, style: const TextStyle(fontSize: 20)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF263238),
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Actividad educativa',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: const Color(0xFF607D8B),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Row(
-          children: [
-            GestureDetector(
-              onTap: onBookTap,
-              child: Text(
-                item.emoji,
-                style: TextStyle(
-                  fontSize: 22,
-                  decoration: onBookTap != null
-                      ? TextDecoration.underline
-                      : null,
-                  decorationColor: const Color(0xFF1E88E5),
+          const SizedBox(width: 8),
+          if (hasAction)
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onBookTap ?? onVideoTap,
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE3F2FD),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: const Color(0xFF90CAF9)),
+                  ),
+                  child: Text(
+                    badgeText,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF1565C0),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ),
             ),
-            if (item.label == 'Quiz') ...[
-              const SizedBox(width: 6),
-              IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: const Icon(
-                  Icons.quiz,
-                  size: 20,
-                  color: Color(0xFF1E88E5),
-                ),
-                onPressed: onBookTap,
-                tooltip: 'Abrir Quiz',
-              ),
-            ],
-            if (onVideoTap != null) ...[
-              const SizedBox(width: 6),
-              GestureDetector(
-                onTap: onVideoTap,
-                child: const Icon(
-                  Icons.ondemand_video,
-                  size: 20,
-                  color: Color(0xFF1E88E5),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

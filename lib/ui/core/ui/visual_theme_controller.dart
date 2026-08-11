@@ -19,6 +19,10 @@ class VisualThemeController extends InheritedWidget {
     return context.dependOnInheritedWidgetOfExactType<VisualThemeController>();
   }
 
+  static bool resolveIsDark(BuildContext context) {
+    return of(context)?.isDarkTheme ?? globalThemeNotifier.value;
+  }
+
   static void updateTheme(bool isDarkTheme) {
     globalThemeNotifier.value = isDarkTheme;
   }
@@ -26,5 +30,21 @@ class VisualThemeController extends InheritedWidget {
   @override
   bool updateShouldNotify(covariant VisualThemeController oldWidget) {
     return isDarkTheme != oldWidget.isDarkTheme;
+  }
+}
+
+class VisualThemeBuilder extends StatelessWidget {
+  const VisualThemeBuilder({super.key, required this.builder});
+
+  final Widget Function(BuildContext context, bool isDarkTheme) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: VisualThemeController.globalThemeNotifier,
+      builder: (context, isDarkTheme, _) {
+        return builder(context, isDarkTheme);
+      },
+    );
   }
 }

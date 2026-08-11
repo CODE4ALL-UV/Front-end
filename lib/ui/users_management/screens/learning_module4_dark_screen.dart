@@ -3,10 +3,18 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
 import 'quiz_screen.dart';
+import 'quiz_screen_dark.dart';
+import 'quiz_with_video_screen.dart';
+import 'quiz_with_video_screen_dark.dart';
+import 'laboratory_console_screen.dart';
+import 'laboratory_console_screen_dark.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
+import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module3_dark_screen.dart';
+import 'package:flutter_code4all/ui/users_management/screens/learning_module3_light_screen.dart';
 import 'package:flutter_code4all/ui/users_management/screens/learning_module5_dark_screen.dart';
+import 'package:flutter_code4all/ui/users_management/screens/learning_module5_light_screen.dart';
 
 class Modulo4AprendizajeDark extends StatefulWidget {
   const Modulo4AprendizajeDark({super.key});
@@ -22,9 +30,16 @@ class _Modulo4AprendizajeDarkState extends State<Modulo4AprendizajeDark> {
   void _goToModulo3() {
     if (_isNavigatingToModule3) return;
     _isNavigatingToModule3 = true;
+    final isDarkTheme =
+        VisualThemeController.of(context)?.isDarkTheme ??
+        VisualThemeController.globalThemeNotifier.value;
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const Modulo3AprendizajeDark()),
+      MaterialPageRoute(
+        builder: (_) => isDarkTheme
+            ? const Modulo3AprendizajeDark()
+            : const Modulo3AprendizajeLight(),
+      ),
     ).then((_) {
       _isNavigatingToModule3 = false;
     });
@@ -33,9 +48,16 @@ class _Modulo4AprendizajeDarkState extends State<Modulo4AprendizajeDark> {
   void _goToModulo5() {
     if (_isNavigatingToModule5) return;
     _isNavigatingToModule5 = true;
+    final isDarkTheme =
+        VisualThemeController.of(context)?.isDarkTheme ??
+        VisualThemeController.globalThemeNotifier.value;
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const Modulo5AprendizajeDark()),
+      MaterialPageRoute(
+        builder: (_) => isDarkTheme
+            ? const Modulo5AprendizajeDark()
+            : const Modulo5AprendizajeLight(),
+      ),
     ).then((_) {
       _isNavigatingToModule5 = false;
     });
@@ -45,7 +67,9 @@ class _Modulo4AprendizajeDarkState extends State<Modulo4AprendizajeDark> {
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
     final bigSize = screenW * 0.40;
-    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+    final isDarkTheme =
+        VisualThemeController.of(context)?.isDarkTheme ??
+        VisualThemeController.globalThemeNotifier.value;
 
     return Scaffold(
       backgroundColor: isDarkTheme ? const Color(0xFF121212) : Colors.white,
@@ -446,6 +470,7 @@ class _ChapterDetailDarkState extends State<_ChapterDetailDark> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = VisualThemeController.resolveIsDark(context);
     final width = MediaQuery.sizeOf(context).width;
     final horizontalPadding = width < 360 ? 10.0 : 16.0;
 
@@ -544,8 +569,9 @@ class _ChapterDetailDarkState extends State<_ChapterDetailDark> {
                                             onPressed: () => Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (_) =>
-                                                    const QuizScreen(),
+                                                builder: (_) => isDarkTheme
+                                                    ? const QuizScreenDark()
+                                                    : const QuizScreen(),
                                               ),
                                             ),
                                             tooltip: 'Abrir Quiz',
@@ -952,29 +978,84 @@ class _ActivityRowDark extends StatelessWidget {
 
   const _ActivityRowDark({required this.item});
 
+  String _badgeText() {
+    if (item.label == 'Quiz') return 'Comenzar';
+    if (item.label == 'Laboratorio') return 'Explorar';
+    if (item.label == 'Ejercicio') return 'Resolver';
+    if (item.label == 'Ejemplo') return 'Ver';
+    if (item.label == 'Descarga y puesta en marcha') return 'Abrir';
+    if (item.label == 'Preparando la versión instalada') return 'Ver';
+    return 'Abrir';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 6),
-          child: Icon(Icons.circle, size: 5, color: Color(0xFFBDBDBD)),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            item.label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFFE0E0E0),
-              height: 1.35,
+    final badgeText = _badgeText();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F2937),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF334155)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color(0xFF263548),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            alignment: Alignment.center,
+            child: Text(item.emoji, style: const TextStyle(fontSize: 20)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFF8FAFC),
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Actividad educativa',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: const Color(0xFF94A3B8),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Text(item.emoji, style: const TextStyle(fontSize: 22)),
-      ],
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1D4ED8),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0xFF60A5FA)),
+            ),
+            child: Text(
+              badgeText,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

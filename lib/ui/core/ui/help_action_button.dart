@@ -442,6 +442,10 @@ class _OptionPanelState extends State<_OptionPanel> {
     if (controller != null) {
       controller.onThemeChanged(isDarkTheme);
     }
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override

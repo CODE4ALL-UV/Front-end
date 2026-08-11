@@ -31,8 +31,6 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  // Inicializamos en tema claro y pantalla de login
-  AppThemeMode _currentThemeMode = AppThemeMode.light;
   AppScreen _currentScreen = AppScreen.login;
   String _userName = 'Usuario';
   List<String> _bottomLabels = ['Anterior', 'Reproducir', 'Siguiente'];
@@ -42,12 +40,16 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    VisualThemeController.globalThemeNotifier.value =
-        _currentThemeMode == AppThemeMode.dark;
+    VisualThemeController.globalThemeNotifier.value = false;
     VisualThemeController.globalThemeNotifier.addListener(
       _handleGlobalVisualThemeChanged,
     );
     _textScaleController.addListener(_handleTextScaleChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _refreshTheme();
+      }
+    });
   }
 
   @override
@@ -67,11 +69,7 @@ class _AppState extends State<App> {
 
   void _handleGlobalVisualThemeChanged() {
     if (!mounted) return;
-    _applyThemeMode(
-      VisualThemeController.globalThemeNotifier.value
-          ? AppThemeMode.dark
-          : AppThemeMode.light,
-    );
+    setState(() {});
   }
 
   void _goToRegister() => setState(() => _currentScreen = AppScreen.register);
@@ -80,13 +78,16 @@ class _AppState extends State<App> {
 
   void _applyThemeMode(AppThemeMode mode) {
     final isDarkTheme = mode == AppThemeMode.dark;
-    if (_currentThemeMode == mode &&
-        VisualThemeController.globalThemeNotifier.value == isDarkTheme) {
+    final currentIsDark = VisualThemeController.globalThemeNotifier.value;
+    final shouldUpdate =
+        currentIsDark != isDarkTheme ||
+        mode != AppThemeMode.light && mode != AppThemeMode.dark;
+
+    if (!shouldUpdate) {
       return;
     }
 
     setState(() {
-      _currentThemeMode = mode;
       VisualThemeController.globalThemeNotifier.value = isDarkTheme;
       if (mode == AppThemeMode.light) {
         _bottomLabels = ['Anterior', 'Reproducir', 'Siguiente'];
@@ -100,6 +101,11 @@ class _AppState extends State<App> {
 
   void _handleVisualThemeChanged(bool isDark) {
     _applyThemeMode(isDark ? AppThemeMode.dark : AppThemeMode.light);
+  }
+
+  void _refreshTheme() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   void _handleSuccessfulLogin(String role) {
@@ -198,27 +204,14 @@ class _AppState extends State<App> {
     _applyThemeMode(choice);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isDarkTheme = VisualThemeController.globalThemeNotifier.value;
-    final resolvedThemeMode = isDarkTheme
-        ? AppThemeMode.dark
-        : AppThemeMode.light;
-
-    if (_currentThemeMode != resolvedThemeMode) {
-      _currentThemeMode = resolvedThemeMode;
-    }
-
-    Widget currentPage;
-
+  Widget _buildCurrentPage(bool isDarkTheme) {
     switch (_currentScreen) {
       case AppScreen.register:
-        currentPage = isDarkTheme
+        return isDarkTheme
             ? FormPageDark(onBack: _goToLogin, onSuccess: _goToLogin)
             : FormPageLight(onBack: _goToLogin, onSuccess: _goToLogin);
-        break;
       case AppScreen.modulo:
-        currentPage = isDarkTheme
+        return isDarkTheme
             ? ModuloAprendizajeDark(
                 userName: _userName,
                 bottomLabels: _bottomLabels,
@@ -228,12 +221,10 @@ class _AppState extends State<App> {
                 onLogout: _goToLogin,
                 bottomLabels: _bottomLabels,
               );
-        break;
       case AppScreen.director:
-        currentPage = DirectorPerformanceScreen(onLogout: _goToLogin);
-        break;
+        return DirectorPerformanceScreen(onLogout: _goToLogin);
       case AppScreen.login:
-        currentPage = isDarkTheme
+        return isDarkTheme
             ? LoginPageDark(
                 onRegister: _goToRegister,
                 onSuccess: (role) {
@@ -252,56 +243,70 @@ class _AppState extends State<App> {
                   }
                 },
               );
-        break;
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkTheme = VisualThemeController.globalThemeNotifier.value;
 
     return AccessibilityTextScaleScope(
       controller: _textScaleController,
       child: VisualThemeController(
         isDarkTheme: isDarkTheme,
         onThemeChanged: _handleVisualThemeChanged,
-        child: MaterialApp(
-          title: 'Code4All',
-          debugShowCheckedModeBanner: false,
-          theme: _getThemeData(resolvedThemeMode),
-          builder: (context, child) {
-            final mediaQuery = MediaQuery.of(context);
-            return MediaQuery(
-              data: mediaQuery.copyWith(
-                textScaler: TextScaler.linear(_textScaleController.scale),
-              ),
-              child: child ?? const SizedBox.shrink(),
-            );
-          },
-          home: Stack(
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                child: KeyedSubtree(
-                  key: ValueKey(
-                    '${_currentScreen.name}_${_currentThemeMode.name}_${_textScaleController.scale.toStringAsFixed(2)}',
+        child: ValueListenableBuilder<bool>(
+          valueListenable: VisualThemeController.globalThemeNotifier,
+          builder: (context, themeValue, _) {
+            final effectiveIsDark = themeValue;
+            final currentPage = _buildCurrentPage(effectiveIsDark);
+
+            return MaterialApp(
+              title: 'Code4All',
+              debugShowCheckedModeBanner: false,
+              themeMode: effectiveIsDark ? ThemeMode.dark : ThemeMode.light,
+              theme: _getThemeData(AppThemeMode.light),
+              darkTheme: _getThemeData(AppThemeMode.dark),
+              builder: (context, child) {
+                final mediaQuery = MediaQuery.of(context);
+                return MediaQuery(
+                  data: mediaQuery.copyWith(
+                    textScaler: TextScaler.linear(_textScaleController.scale),
                   ),
-                  child: currentPage,
-                ),
-              ),
-              if (_currentScreen != AppScreen.modulo)
-                Positioned(
-                  left: 16,
-                  bottom: 24,
-                  child: Semantics(
-                    button: true,
-                    label: 'Cambiar tema',
-                    hint: 'Cambia el tema de la aplicación',
-                    child: FloatingActionButton(
-                      heroTag: 'theme-toggle',
-                      backgroundColor: const Color(0xFF5C6BC0),
-                      onPressed: () => _showThemeOptions(context),
-                      child: const Icon(Icons.palette, color: Colors.white),
+                  child: child ?? const SizedBox.shrink(),
+                );
+              },
+              home: Stack(
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: KeyedSubtree(
+                      key: ValueKey(
+                        '${_currentScreen.name}_${(effectiveIsDark ? 'dark' : 'light')}_${_textScaleController.scale.toStringAsFixed(2)}',
+                      ),
+                      child: currentPage,
                     ),
                   ),
-                ),
-            ],
-          ),
+                  if (_currentScreen != AppScreen.modulo)
+                    Positioned(
+                      left: 16,
+                      bottom: 24,
+                      child: Semantics(
+                        button: true,
+                        label: 'Cambiar tema',
+                        hint: 'Cambia el tema de la aplicación',
+                        child: FloatingActionButton(
+                          heroTag: 'theme-toggle',
+                          backgroundColor: const Color(0xFF5C6BC0),
+                          onPressed: () => _showThemeOptions(context),
+                          child: const Icon(Icons.palette, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

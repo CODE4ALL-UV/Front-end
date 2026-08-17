@@ -20,6 +20,9 @@ class _HelpActionButtonState extends State<HelpActionButton>
       late Animation<double> _animation;
       late AccessibilityTextScaleController _textScaleController;
 
+      // Add this near your other variables (like _activeCategory, etc.)
+      final GlobalKey _buttonKey = GlobalKey();
+
       // NEW: Track which category is currently open
       String? _activeCategory;
 
@@ -28,9 +31,9 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
       // NEW: 2. Map each category to its specific vertical options
       final Map<String, List<Map<String, dynamic>>> categoryOptions = {
-        'Accesibilidad': [{'icon': Icons.zoom_in, 'label': 'Pistas'}, {'icon': Icons.support, 'label': 'Manual interactivo'}],
-        'Apoyo': [ {'icon': Icons.filter_list_alt, 'label': 'Preferencias'}, {'icon': Icons.psychology, 'label': 'Dificultad'} ],
         'Ayuda': [{'icon': Icons.settings, 'label': 'Configuracion'}, {'icon': Icons.text_fields, 'label': 'Tamaño de texto'}, {'icon': Icons.brightness_4, 'label': 'Modo visual'}, {'icon': Icons.hearing, 'label': 'Asistencia auditiva'}, {'icon': Icons.language, 'label': 'Lengua de señas'}], // Add Help's vertical buttons here
+        'Accesibilidad': [{'icon': Icons.zoom_in, 'label': 'Pistas'}, {'icon': Icons.support, 'label': 'Manual interactivo'}],
+        'Apoyo': [{'icon': Icons.filter_list_alt, 'label': 'Preferencias'}, {'icon': Icons.psychology, 'label': 'Dificultad'}],
       };
 
       // NEW: 3. Logic to reorder the horizontal buttons
@@ -93,10 +96,24 @@ class _HelpActionButtonState extends State<HelpActionButton>
       return;
     }
 
+    // --- NEW: Find the exact position of the closed button ---
+    final RenderBox? renderBox = _buttonKey.currentContext?.findRenderObject() as RenderBox?;
+    Offset buttonPosition = Offset.zero;
+    
+    if (renderBox != null) {
+      buttonPosition = renderBox.localToGlobal(Offset.zero);
+    }
+
     final overlay = Overlay.of(context);
     final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
     final safeWidth = (screenWidth - 24).clamp(220.0, 380.0);
+
+    // Calculate the exact bottom and left coordinates based on the real button
+    // We subtract 56 (the button height) to get the distance from the bottom edge
+    final double exactBottom = screenHeight - buttonPosition.dy - 56;
+    final double exactLeft = buttonPosition.dx;
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
@@ -112,10 +129,10 @@ class _HelpActionButtonState extends State<HelpActionButton>
             overlaySafeWidth,
           ),
         );
-        final panelHeight = (overlayHeight * 0.65).clamp(280.0, 380.0);
+        //DELETE final panelHeight = (overlayHeight * 0.65).clamp(280.0, 380.0);
+        final panelHeight = (screenHeight * 0.65).clamp(280.0, 380.0);
         final availableBottomSpace =
             overlayHeight - 24 - overlayMediaQuery.padding.bottom;
-        final panelTop = (availableBottomSpace - panelHeight).clamp(0.0, 48.0);
 
         // --- NEW TOP ALIGNMENT CALCULATION ADDED HERE ---
         // Calculate vertical alignment so the modal's TOP aligns with the vertical button's TOP
@@ -162,8 +179,8 @@ class _HelpActionButtonState extends State<HelpActionButton>
               ),
             ),
             Positioned(
-              left: 12,
-              top: panelTop,
+              left: exactLeft,
+              bottom: exactBottom, // Matches the bottom padding of your closed button
               child: Material(
                 color: Colors.transparent,
                 child: SizedBox(
@@ -271,8 +288,8 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                   onTap: _toggleMenu,
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 300),
-                                    width: 64,
-                                    height: 64,
+                                    width: 56,
+                                    height: 56,
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: _isExpanded
@@ -385,36 +402,35 @@ class _HelpActionButtonState extends State<HelpActionButton>
     _refreshOverlay();
   }
 
+  /*MAIN WIDGET IMO*/
   @override
   Widget build(BuildContext context) {
     // Return a plain, non-positioned button so callers can place it
-    // consistently across screens (Align/Padding/Row). The overlay
-    // behavior is handled separately via OverlayEntry.
-    return SafeArea(
-      child: Offstage(
-        offstage: _overlayEntry != null,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: _toggleMenu,
-          child: Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: const Color(0xFF7E57C2),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF7E57C2).withOpacity(0.25),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Icon(
-              _isExpanded ? Icons.close : Icons.help_outline,
-              color: Colors.white,
-              size: 24,
-            ),
+    // consistently across screens. No SafeArea to avoid the white row.
+    return Offstage(
+      offstage: _overlayEntry != null,
+      child: GestureDetector(
+        key: _buttonKey, // <-- Attach the key here
+        behavior: HitTestBehavior.opaque,
+        onTap: _toggleMenu,
+        child: Container(
+          width: 56, // NEW Updated to match your code
+          height: 56,
+          decoration: BoxDecoration(
+            color: const Color(0xFF7E57C2),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF7E57C2).withOpacity(0.25),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Icon(
+            _isExpanded ? Icons.close : Icons.help_outline,
+            color: Colors.white,
+            size: 24,
           ),
         ),
       ),

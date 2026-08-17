@@ -3,21 +3,59 @@ import 'accessibility_settings_screen.dart';
 import 'accessibility_text_scale.dart';
 import 'visual_theme_controller.dart';
 
-class HelpActionButton extends StatefulWidget {
+class HelpActionButton extends StatefulWidget { //AccessibilityMenu == HelpActionButton
   const HelpActionButton({super.key});
 
   @override
   State<HelpActionButton> createState() => _HelpActionButtonState();
 }
 
+// IMPORTANT: MAIN CODE
 class _HelpActionButtonState extends State<HelpActionButton>
     with SingleTickerProviderStateMixin {
-  bool _isExpanded = false;
-  String? _selectedOption;
-  OverlayEntry? _overlayEntry;
-  late AnimationController _controller;
-  late Animation<double> _animation;
-  late AccessibilityTextScaleController _textScaleController;
+      bool _isExpanded = false;
+      String? _selectedOption;
+      OverlayEntry? _overlayEntry;
+      late AnimationController _controller;
+      late Animation<double> _animation;
+      late AccessibilityTextScaleController _textScaleController;
+
+      // NEW: Track which category is currently open
+      String? _activeCategory;
+
+      // NEW: 1. Maintain the order of horizontal categories
+      List<String> horizontalCategories = ['Accesibilidad', 'Apoyo', 'Ayuda'];
+
+      // NEW: 2. Map each category to its specific vertical options
+      final Map<String, List<Map<String, dynamic>>> categoryOptions = {
+        'Accesibilidad': [{'icon': Icons.zoom_in, 'label': 'Pistas'}, {'icon': Icons.support, 'label': 'Manual interactivo'}],
+        'Apoyo': [ {'icon': Icons.filter_list_alt, 'label': 'Preferencias'}, {'icon': Icons.psychology, 'label': 'Dificultad'} ],
+        'Ayuda': [{'icon': Icons.settings, 'label': 'Configuracion'}, {'icon': Icons.text_fields, 'label': 'Tamaño de texto'}, {'icon': Icons.brightness_4, 'label': 'Modo visual'}, {'icon': Icons.hearing, 'label': 'Asistencia auditiva'}, {'icon': Icons.language, 'label': 'Lengua de señas'}], // Add Help's vertical buttons here
+      };
+
+      // NEW: 3. Logic to reorder the horizontal buttons
+      void _onHorizontalButtonTapped(String category) {
+        setState(() {
+          // THIS CLOSES THE DIALOG WHENEVER A HORIZONTAL TABS IS CLICKED
+          _selectedOption = null;
+
+          if (_activeCategory == category) {
+            _activeCategory = null; // Close the vertical menu if clicked again
+          } else {
+            _activeCategory = category; // Open the respective vertical menu
+            
+            // Reordering logic: if it's not already the first item
+            if (horizontalCategories.first != category) {
+              String oldFirst = horizontalCategories.first;
+              horizontalCategories.remove(category); // Remove the clicked item
+              horizontalCategories.remove(oldFirst); // Remove the previous first item
+              horizontalCategories.insert(0, category); // Place clicked item at the start
+              horizontalCategories.add(oldFirst); // Move previous first item to the end
+            }
+          }
+        });
+        _refreshOverlay();
+      }
 
   @override
   void initState() {
@@ -48,6 +86,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
     _overlayEntry?.markNeedsBuild();
   }
 
+  /* Toggles the visibility of the help menu. */
   void _toggleMenu() {
     if (_overlayEntry != null) {
       _hideOverlay();
@@ -78,6 +117,39 @@ class _HelpActionButtonState extends State<HelpActionButton>
             overlayHeight - 24 - overlayMediaQuery.padding.bottom;
         final panelTop = (availableBottomSpace - panelHeight).clamp(0.0, 48.0);
 
+        // --- NEW TOP ALIGNMENT CALCULATION ADDED HERE ---
+        // Calculate vertical alignment so the modal's TOP aligns with the vertical button's TOP
+        // DELETE: double panelBottom = 76.0; // Base bottom offset (64px for horizontal button + 12px spacing)
+        double? panelTopPosition;
+
+        if (_selectedOption != null && _activeCategory != null) {
+          final options = categoryOptions[_activeCategory!] ?? [];
+          final index = options.indexWhere((opt) => opt['label'] == _selectedOption);
+          
+          if (index != -1) {
+            // NOTE: Tweak '56.0' to match the exact height + padding of your _buildAnimatedOption widget
+            //A Quick Tip on Sizing:
+            //If the dialog's top edge doesn't line up perfectly with the button,
+            //adjust the final double optionHeight = 56.0; variable.
+            //Make sure that number includes the height of the button plus any padding or SizedBox heights
+            //that separate the vertical buttons from one another.
+            final double optionHeight = 56.0; 
+            
+            // Reversing the index because the options map renders top-to-bottom, 
+            // but we calculate position from bottom-to-top
+            final int reversedIndex = options.length - 1 - index;
+
+            // Calculate distance from the bottom of the Stack to the TOP of the selected button
+            // 76.0 = 64px horizontal button + 12px spacing
+            final double buttonTopFromBottom = 76.0 + (reversedIndex * optionHeight) + optionHeight;
+            
+            // Offset by -20 so the center of the dialog visually aligns with the button
+            //DELETE panelBottom = 76.0 + (reversedIndex * optionHeight) - 20.0;
+            // Subtract that distance from the total panel height to get the exact 'top' position
+            panelTopPosition = panelHeight - buttonTopFromBottom;
+          }
+        }
+
         return Stack(
           children: [
             GestureDetector(
@@ -103,7 +175,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
                       if (_selectedOption != null)
                         Positioned(
                           left: overlayPanelLeft,
-                          top: 8,
+                          top: panelTopPosition ?? 8.0, // Use the calculated top position, or default to 8.0 if something fails
                           child: SizedBox(
                             width: overlayPanelWidth,
                             child: _OptionPanel(
@@ -116,81 +188,116 @@ class _HelpActionButtonState extends State<HelpActionButton>
                       Positioned(
                         left: 0,
                         bottom: 0,
-                        child: Column(
+                        // ROW OF COLUMNS: This keeps everything horizontally aligned 
+                        // while allowing vertical buttons to shoot up from their specific parent.
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.end, //PSDT: START BEFORE WHY??
                           children: [
-                            if (_isExpanded) ...[
-                              _buildAnimatedOption(
-                                icon: Icons.settings,
-                                label: 'Configuración',
-                                color: const Color(0xFF7E57C2),
-                                onTap: () => _selectOption('Configuración'),
-                              ),
-                              _buildAnimatedOption(
-                                icon: Icons.zoom_in,
-                                label: 'Tamaño de texto',
-                                color: const Color(0xFF7E57C2),
-                                onTap: () => _selectOption('Tamaño de texto'),
-                              ),
-                              _buildAnimatedOption(
-                                icon: Icons.wb_sunny,
-                                label: 'Modo visual',
-                                color: const Color(0xFF7E57C2),
-                                onTap: () => _selectOption('Modo visual'),
-                              ),
-                              _buildAnimatedOption(
-                                icon: Icons.record_voice_over,
-                                label: 'Asistencia auditiva',
-                                color: const Color(0xFF7E57C2),
-                                onTap: () =>
-                                    _selectOption('Asistencia auditiva'),
-                              ),
-                              _buildAnimatedOption(
-                                icon: Icons.translate,
-                                label: 'Lengua de señas',
-                                color: const Color(0xFF7E57C2),
-                                onTap: () => _selectOption('Lengua de señas'),
-                              ),
-                            ],
-                            const SizedBox(height: 12),
-                            GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: _toggleMenu,
-                              child: Container(
-                                width: 64,
-                                height: 64,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: _isExpanded
-                                        ? const [
-                                            Color(0xFFAB47BC),
-                                            Color(0xFF8E24AA),
-                                          ]
-                                        : const [
-                                            Color(0xFFCD00D3),
-                                            Color(0xFFB000D1),
-                                          ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
+                            // 2. The 3 Dynamic Category Buttons
+                            if (_isExpanded)
+                              ...horizontalCategories.map((category) {
+                                bool isActive = _activeCategory == category;
+
+                                IconData displayIcon;
+                                if (category == 'Accesibilidad') {
+                                  displayIcon = Icons.accessibility_new;
+                                } else if (category == 'Apoyo') {
+                                  displayIcon = Icons.support;
+                                } else {
+                                  displayIcon = Icons.help;
+                                }
+
+                                return Padding(
+                                  // Changed padding to LEFT so it pushes away from the previous button
+                                  padding: const EdgeInsets.only(left: 12.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (isActive) ...[
+                                        ...categoryOptions[category]!.map((optionData) {
+                                          return _buildAnimatedOption(
+                                            icon: optionData['icon'] as IconData,
+                                            label: optionData['label'] as String,
+                                            color: const Color(0xFF7E57C2),
+                                            onTap: () => _selectOption(optionData['label'] as String),
+                                          );
+                                        }).toList(),
+                                        const SizedBox(height: 12),
+                                      ],
+                                      
+                                      GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () => _onHorizontalButtonTapped(category),
+                                        child: AnimatedContainer(
+                                          duration: const Duration(milliseconds: 300),
+                                          width: 64,
+                                          height: 64,
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: isActive
+                                                  ? const [Color(0xFFAB47BC), Color(0xFF8E24AA)]
+                                                  : const [Color(0xFFD8C8F5), Color(0xFFC0A8F0)],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.18),
+                                                blurRadius: 10,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Icon(
+                                            displayIcon,
+                                            color: isActive ? Colors.white : const Color(0xFF7E57C2),
+                                            size: 24,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.18),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
+                                );
+                              }).toList(),
+
+                              // 1. The 4th Main Toggle Button (Now at the START / Left)
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: _toggleMenu,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 300),
+                                    width: 64,
+                                    height: 64,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: _isExpanded
+                                            ? const [Color(0xFFAB47BC), Color(0xFF8E24AA)]
+                                            : const [Color(0xFFCD00D3), Color(0xFFB000D1)],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.18),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                    child: Icon(
+                                      _isExpanded ? Icons.close : Icons.help_outline,
+                                      color: Colors.white,
+                                      size: 24,
+                                    ),
+                                  ),
                                 ),
-                                child: Icon(
-                                  _isExpanded
-                                      ? Icons.close
-                                      : Icons.help_outline,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                              ),
+                              ],
                             ),
                           ],
                         ),
@@ -212,6 +319,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
     setState(() {
       _isExpanded = true;
       _selectedOption = null;
+      _activeCategory = null;
     });
     _refreshOverlay();
     _runAnimation(forward: true);
@@ -344,6 +452,11 @@ class _HelpActionButtonState extends State<HelpActionButton>
 }
 
 class _AccessibilityIconButton extends StatelessWidget {
+  /*
+  This is purely the visual template for the circular buttons.
+  It handles the gradients, shadows, and touch detection to match your
+  Figma aesthetic perfectly.
+  */
   final IconData icon;
   final String label;
   final Color color;
@@ -387,6 +500,10 @@ class _AccessibilityIconButton extends StatelessWidget {
 }
 
 class _OptionPanel extends StatefulWidget {
+  /*
+  This is the skeleton for the rounded white modal card that appears
+  on the right (the one holding the toggles and sliders).
+  */
   final String option;
   final VoidCallback onClose;
   final double width;
@@ -403,6 +520,13 @@ class _OptionPanel extends StatefulWidget {
 }
 
 class _OptionPanelState extends State<_OptionPanel> {
+  /*
+  This _OptionPanelState is the core brain of the white modal card. Your classmate used a very clean switch(widget.option) statement to dynamically render different UI layouts (the font size slider, the visual mode toggles, the sign language buttons) depending on which vertical button was tapped. It also properly connects to the AccessibilityTextScaleScope and VisualThemeController to actually apply the changes to the app.
+
+Handling the UI states for these accessibility toggles this way is a very solid approach for this stage of your TG.
+
+I assume the final parts of the file contain the small helper widgets mentioned here (like _buildInfoBanner, _ModeButton, _LevelButton, and _buildSpeedPill).
+  */
   bool _textSizeEnabled = false;
   bool _visualModeEnabled = false;
   double _textSize = 1.0;

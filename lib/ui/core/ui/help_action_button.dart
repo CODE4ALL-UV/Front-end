@@ -26,17 +26,17 @@ class _HelpActionButtonState extends State<HelpActionButton>
       // NEW: Track which category is currently open
       String? _activeCategory;
 
-      // NEW: 1. Maintain the order of horizontal categories
-      List<String> horizontalCategories = ['Accesibilidad', 'Apoyo', 'Ayuda'];
+      // NEW: Maintain the order of horizontal categories
+      List<String> horizontalCategories = ['Ayuda', 'Accesibilidad', 'Apoyo'];
 
-      // NEW: 2. Map each category to its specific vertical options
+      // NEW: Map each category to its specific vertical options
       final Map<String, List<Map<String, dynamic>>> categoryOptions = {
         'Ayuda': [{'icon': Icons.settings, 'label': 'Configuracion'}, {'icon': Icons.text_fields, 'label': 'Tamaño de texto'}, {'icon': Icons.brightness_4, 'label': 'Modo visual'}, {'icon': Icons.hearing, 'label': 'Asistencia auditiva'}, {'icon': Icons.language, 'label': 'Lengua de señas'}], // Add Help's vertical buttons here
         'Accesibilidad': [{'icon': Icons.zoom_in, 'label': 'Pistas'}, {'icon': Icons.support, 'label': 'Manual interactivo'}],
         'Apoyo': [{'icon': Icons.filter_list_alt, 'label': 'Preferencias'}, {'icon': Icons.psychology, 'label': 'Dificultad'}],
       };
 
-      // NEW: 3. Logic to reorder the horizontal buttons
+      // Logic to reorder the horizontal buttons
       void _onHorizontalButtonTapped(String category) {
         setState(() {
           // THIS CLOSES THE DIALOG WHENEVER A HORIZONTAL TABS IS CLICKED
@@ -112,7 +112,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
     // Calculate the exact bottom and left coordinates based on the real button
     // We subtract 56 (the button height) to get the distance from the bottom edge
-    final double exactBottom = screenHeight - buttonPosition.dy - 56;
+    final double exactBottom = screenHeight - buttonPosition.dy - 44; // Same as Vertical and Horizontal Buttons
     final double exactLeft = buttonPosition.dx;
 
     _overlayEntry = OverlayEntry(
@@ -129,41 +129,36 @@ class _HelpActionButtonState extends State<HelpActionButton>
             overlaySafeWidth,
           ),
         );
-        //DELETE final panelHeight = (overlayHeight * 0.65).clamp(280.0, 380.0);
         final panelHeight = (screenHeight * 0.65).clamp(280.0, 380.0);
         final availableBottomSpace =
             overlayHeight - 24 - overlayMediaQuery.padding.bottom;
 
-        // --- NEW TOP ALIGNMENT CALCULATION ADDED HERE ---
+        // --- NEW BOTTOM-TO-BOTTOM ALIGNMENT ---
         // Calculate vertical alignment so the modal's TOP aligns with the vertical button's TOP
-        // DELETE: double panelBottom = 76.0; // Base bottom offset (64px for horizontal button + 12px spacing)
-        double? panelTopPosition;
+        double? panelBottomPosition;
 
         if (_selectedOption != null && _activeCategory != null) {
           final options = categoryOptions[_activeCategory!] ?? [];
           final index = options.indexWhere((opt) => opt['label'] == _selectedOption);
           
-          if (index != -1) {
-            // NOTE: Tweak '56.0' to match the exact height + padding of your _buildAnimatedOption widget
-            //A Quick Tip on Sizing:
-            //If the dialog's top edge doesn't line up perfectly with the button,
-            //adjust the final double optionHeight = 56.0; variable.
-            //Make sure that number includes the height of the button plus any padding or SizedBox heights
-            //that separate the vertical buttons from one another.
-            final double optionHeight = 56.0; 
-            
+          if (index != -1) {            
             // Reversing the index because the options map renders top-to-bottom, 
             // but we calculate position from bottom-to-top
             final int reversedIndex = options.length - 1 - index;
-
-            // Calculate distance from the bottom of the Stack to the TOP of the selected button
-            // 76.0 = 64px horizontal button + 12px spacing
-            final double buttonTopFromBottom = 76.0 + (reversedIndex * optionHeight) + optionHeight;
             
-            // Offset by -20 so the center of the dialog visually aligns with the button
-            //DELETE panelBottom = 76.0 + (reversedIndex * optionHeight) - 20.0;
-            // Subtract that distance from the total panel height to get the exact 'top' position
-            panelTopPosition = panelHeight - buttonTopFromBottom;
+            // Distance from the bottom of the Stack to the bottom of the LOWEST vertical button.
+            // 6px (bottom padding) + 44px (horizontal button) + 12px (SizedBox) = 62.0
+            final double optionHeight = 62.0;
+
+            // FIX 3: STEP HEIGHT
+            // This is the exact distance from the bottom of one vertical button to the bottom of the next.
+            // If your _buildAnimatedOption is 44px tall and has 12px of spacing between them, this is 56.0.
+            // If the modal is still falling below the UPPER buttons, INCREASE this number (e.g. 60.0 or 64.0)
+            final double stepHeight = 56.0;
+
+            // 50.0 is the horizontal button height (44) + bottom padding (6)
+            // This perfectly calculates where the BOTTOM of the clicked button is.
+            panelBottomPosition = optionHeight + (reversedIndex * stepHeight);
           }
         }
 
@@ -192,7 +187,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
                       if (_selectedOption != null)
                         Positioned(
                           left: overlayPanelLeft,
-                          top: panelTopPosition ?? 8.0, // Use the calculated top position, or default to 8.0 if something fails
+                          bottom: panelBottomPosition ?? 62.0, // Use the calculated bottom position, defaulting to 62.0 (the base height) just in case
                           child: SizedBox(
                             width: overlayPanelWidth,
                             child: _OptionPanel(
@@ -209,7 +204,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
                         // while allowing vertical buttons to shoot up from their specific parent.
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.end, //PSDT: START BEFORE WHY??
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             // 2. The 3 Dynamic Category Buttons
                             if (_isExpanded)
@@ -226,8 +221,8 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                 }
 
                                 return Padding(
-                                  // Changed padding to LEFT so it pushes away from the previous button
-                                  padding: const EdgeInsets.only(left: 12.0),
+                                  // This ensures an equal gap between all buttons AND the main closed button.
+                                  padding: const EdgeInsets.only(right: 12.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -243,34 +238,39 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                         const SizedBox(height: 12),
                                       ],
                                       
-                                      GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: () => _onHorizontalButtonTapped(category),
-                                        child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
-                                          width: 64,
-                                          height: 64,
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: isActive
-                                                  ? const [Color(0xFFAB47BC), Color(0xFF8E24AA)]
-                                                  : const [Color(0xFFD8C8F5), Color(0xFFC0A8F0)],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            ),
-                                            shape: BoxShape.circle,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(0.18),
-                                                blurRadius: 10,
-                                                offset: const Offset(0, 4),
+                                      // Horizontal Buttons
+                                      // (44 - 44) = 12 / 2 = 0. No adding 0px of bottom padding perfectly centers it!
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 0.0), 
+                                        child: GestureDetector(
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () => _onHorizontalButtonTapped(category),
+                                          child: AnimatedContainer(
+                                            duration: const Duration(milliseconds: 300),
+                                            width: 44, // Same as Vertical Buttons
+                                            height: 44, // Same as Vertical Buttons
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: isActive
+                                                    ? const [Color(0xFFAB47BC), Color(0xFF8E24AA)]
+                                                    : const [Color(0xFFD8C8F5), Color(0xFFC0A8F0)],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
                                               ),
-                                            ],
-                                          ),
-                                          child: Icon(
-                                            displayIcon,
-                                            color: isActive ? Colors.white : const Color(0xFF7E57C2),
-                                            size: 24,
+                                              shape: BoxShape.circle,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(0.18),
+                                                  blurRadius: 10,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Icon(
+                                              displayIcon,
+                                              color: isActive ? Colors.white : const Color(0xFF7E57C2),
+                                              size: 33, //Same as Vertical Buttons
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -279,7 +279,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                 );
                               }).toList(),
 
-                              // 1. The 4th Main Toggle Button (Now at the START / Left)
+                            // Main and Close Button, Same circle and icons Sizes as Horizontal Buttons
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -288,8 +288,8 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                   onTap: _toggleMenu,
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 300),
-                                    width: 56,
-                                    height: 56,
+                                    width: 44, // Same as Vertical and Horizontal Buttons
+                                    height: 44, // Same as Vertical and Horizontal Buttons
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: _isExpanded
@@ -308,9 +308,9 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                       ],
                                     ),
                                     child: Icon(
-                                      _isExpanded ? Icons.close : Icons.help_outline,
+                                      Icons.close,
                                       color: Colors.white,
-                                      size: 24,
+                                      size: 33.0, // Same as Vertical and Horizontal Buttons
                                     ),
                                   ),
                                 ),
@@ -402,7 +402,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
     _refreshOverlay();
   }
 
-  /*MAIN WIDGET IMO*/
+  /*Closed button displayed*/
   @override
   Widget build(BuildContext context) {
     // Return a plain, non-positioned button so callers can place it
@@ -414,8 +414,8 @@ class _HelpActionButtonState extends State<HelpActionButton>
         behavior: HitTestBehavior.opaque,
         onTap: _toggleMenu,
         child: Container(
-          width: 56, // NEW Updated to match your code
-          height: 56,
+          width: 44, // Same as Vertical and Horizontal Buttons
+          height: 44, // Same as Vertical and Horizontal Buttons
           decoration: BoxDecoration(
             color: const Color(0xFF7E57C2),
             shape: BoxShape.circle,
@@ -428,9 +428,9 @@ class _HelpActionButtonState extends State<HelpActionButton>
             ],
           ),
           child: Icon(
-            _isExpanded ? Icons.close : Icons.help_outline,
+            Icons.question_mark,
             color: Colors.white,
-            size: 24,
+            size: 33, // Same as Vertical and Horizontal Buttons
           ),
         ),
       ),
@@ -469,9 +469,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
 class _AccessibilityIconButton extends StatelessWidget {
   /*
-  This is purely the visual template for the circular buttons.
-  It handles the gradients, shadows, and touch detection to match your
-  Figma aesthetic perfectly.
+  Vertical Buttons, Figma aesthetic perfectly.
   */
   final IconData icon;
   final String label;
@@ -491,8 +489,8 @@ class _AccessibilityIconButton extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        width: 64,
-        height: 64,
+        width: 44, // Same as Horizontal Buttons
+        height: 44, // Same as Horizontal Buttons
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
@@ -509,7 +507,7 @@ class _AccessibilityIconButton extends StatelessWidget {
             ),
           ],
         ),
-        child: Icon(icon, color: Colors.white, size: 26),
+        child: Icon(icon, color: Colors.white, size: 33), // Same as Horizontal Buttons
       ),
     );
   }

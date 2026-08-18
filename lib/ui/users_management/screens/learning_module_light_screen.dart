@@ -157,10 +157,10 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: NotificationListener<OverscrollNotification>(
+          //DELETE Expanded(
+            NotificationListener<OverscrollNotification>(
               onNotification: (notification) {
                 if (notification.overscroll > 10 &&
                     notification.metrics.pixels >=
@@ -172,7 +172,7 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 80), //NEW OLD EdgeInsets.fromLTRB(16, 20, 16, 12),
                 child: Column(
                   children: [
                     Container(
@@ -385,13 +385,11 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, bottom: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: const HelpActionButton(),
-            ),
+          // DELETE EXPANDED),
+          Positioned( //NEW OLD Padding
+            left: 16,
+            bottom: 8,
+            child: const HelpActionButton(),
           ),
         ],
       ),

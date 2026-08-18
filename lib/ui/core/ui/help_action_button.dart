@@ -27,13 +27,14 @@ class _HelpActionButtonState extends State<HelpActionButton>
       String? _activeCategory;
 
       // NEW: Maintain the order of horizontal categories
-      List<String> horizontalCategories = ['Ayuda', 'Accesibilidad', 'Apoyo'];
+      List<String> horizontalCategories = ['Ayuda', 'Ajustes de aprendizaje', 'Apoyo'];
 
       // NEW: Map each category to its specific vertical options
+      // Labels need to match exactly with the ones used in _selectOption and _buildOptionContent
       final Map<String, List<Map<String, dynamic>>> categoryOptions = {
-        'Ayuda': [{'icon': Icons.settings, 'label': 'Configuracion'}, {'icon': Icons.text_fields, 'label': 'Tamaño de texto'}, {'icon': Icons.brightness_4, 'label': 'Modo visual'}, {'icon': Icons.hearing, 'label': 'Asistencia auditiva'}, {'icon': Icons.language, 'label': 'Lengua de señas'}], // Add Help's vertical buttons here
-        'Accesibilidad': [{'icon': Icons.zoom_in, 'label': 'Pistas'}, {'icon': Icons.support, 'label': 'Manual interactivo'}],
-        'Apoyo': [{'icon': Icons.filter_list_alt, 'label': 'Preferencias'}, {'icon': Icons.psychology, 'label': 'Dificultad'}],
+        'Ayuda': [{'icon': Icons.settings, 'label': 'Configuración'}, {'icon': Icons.text_fields, 'label': 'Tamaño de texto'}, {'icon': Icons.brightness_4, 'label': 'Modo visual'}, {'icon': Icons.hearing, 'label': 'Asistencia auditiva'}, {'icon': Icons.language, 'label': 'Lengua de señas'}], // Add Help's vertical buttons here
+        'Ajustes de aprendizaje': [{'icon': Icons.settings, 'label': 'Configuración'}, {'icon': Icons.build_circle, 'label': 'Preferencias de aprendizaje'}, {'icon': Icons.stars, 'label': 'Nivel de aprendizaje'}],
+        'Apoyo': [{'icon': Icons.settings, 'label': 'Configuración'}, {'icon': Icons.saved_search, 'label': 'Pistas'}, {'icon': Icons.menu_book, 'label': 'Manual interactivo'}],
       };
 
       // Logic to reorder the horizontal buttons
@@ -212,10 +213,10 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                 bool isActive = _activeCategory == category;
 
                                 IconData displayIcon;
-                                if (category == 'Accesibilidad') {
-                                  displayIcon = Icons.accessibility_new;
+                                if (category == 'Ajustes de aprendizaje') {
+                                  displayIcon = Icons.psychology;
                                 } else if (category == 'Apoyo') {
-                                  displayIcon = Icons.support;
+                                  displayIcon = Icons.volunteer_activism;
                                 } else {
                                   displayIcon = Icons.help;
                                 }
@@ -656,6 +657,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
 
   Widget _buildOptionContent() {
     switch (widget.option) {
+      //Dialogs or modals for help horizontal button
       case 'Tamaño de texto':
         final controller = AccessibilityTextScaleScope.of(context);
         final activeScale = controller.scale;
@@ -794,40 +796,6 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             ),
           ],
         );
-      case 'Lengua de señas':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoBanner(
-              icon: Icons.sign_language,
-              title: 'Lengua de señas',
-              subtitle:
-                  'Activa ayudas visuales para comprender mejor el contenido.',
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2D8F7)),
-              ),
-              child: const Text(
-                'Se mostrarán apoyos visuales y señales de contexto para facilitar la comprensión.',
-                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _LevelButton(label: 'Básico', onTap: () {}),
-                _LevelButton(label: 'Avanzado', onTap: () {}),
-              ],
-            ),
-          ],
-        );
       case 'Asistencia auditiva':
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -881,6 +849,178 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                 _buildSpeedPill('Lenta'),
                 _buildSpeedPill('Media'),
                 _buildSpeedPill('Rápida'),
+              ],
+            ),
+          ],
+        );
+      case 'Lengua de señas':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildInfoBanner(
+              icon: Icons.sign_language,
+              title: 'Lengua de señas',
+              subtitle:
+                  'Activa ayudas visuales para comprender mejor el contenido.',
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2D8F7)),
+              ),
+              child: const Text(
+                'Se mostrarán apoyos visuales y señales de contexto para facilitar la comprensión.',
+                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _LevelButton(label: 'Básico', onTap: () {}),
+                _LevelButton(label: 'Avanzado', onTap: () {}),
+              ],
+            ),
+          ],
+        );
+      //Dialogs or modals for accesibility horizontal button
+      case 'Preferencias de aprendizaje':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildInfoBanner(
+              icon: Icons.sign_language,
+              title: 'Preferencias de aprendizaje',
+              subtitle:
+                  'Que tipo de contenido predomina para el proceso de aprendizaje.',
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2D8F7)),
+              ),
+              child: const Text(
+                'Estas preferencias te ayudarán a personalizar tu experiencia de aprendizaje.',
+                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _LevelButton(label: 'Lecturas', onTap: () {}),
+                _LevelButton(label: 'Videos', onTap: () {}),
+                _LevelButton(label: 'Audios', onTap: () {}),
+              ],
+            ),
+          ],
+        );
+      case 'Nivel de aprendizaje':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildInfoBanner(
+              icon: Icons.sign_language,
+              title: 'Nivel de aprendizaje',
+              subtitle:
+                  'Cual es el nivel de dificultad para el proceso de aprendizaje.',
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2D8F7)),
+              ),
+              child: const Text(
+                'Estas preferencias te ayudarán a personalizar tu experiencia de aprendizaje.',
+                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _LevelButton(label: 'Básico', onTap: () {}),
+                _LevelButton(label: 'Medio', onTap: () {}),
+                _LevelButton(label: 'Avanzado', onTap: () {}),
+              ],
+            ),
+          ],
+        );
+      //Dialogs or modals for support horizontal button
+      case 'Pistas':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildInfoBanner(
+              icon: Icons.sign_language,
+              title: 'Pistas',
+              subtitle:
+                  'Sirven para guiar al usuario en su proceso de aprendizaje.',
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2D8F7)),
+              ),
+              child: const Text(
+                'Estas pistas te ayudarán para avanzar en tu proceso de aprendizaje.',
+                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _LevelButton(label: 'Activar pista', onTap: () {}),
+              ],
+            ),
+          ],
+        );
+      case 'Manual interactivo':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildInfoBanner(
+              icon: Icons.sign_language,
+              title: 'Manual interactivo',
+              subtitle:
+                  'Guía interactiva para facilitar el proceso de aprendizaje.',
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2D8F7)),
+              ),
+              child: const Text(
+                'Esta guía interactiva te ayudará a personalizar tu experiencia de aprendizaje.',
+                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _LevelButton(label: 'Activar manual interactivo', onTap: () {}),
               ],
             ),
           ],

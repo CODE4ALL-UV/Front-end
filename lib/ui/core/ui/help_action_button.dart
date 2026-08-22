@@ -3,7 +3,14 @@ import 'accessibility_settings_screen.dart';
 import 'accessibility_text_scale.dart';
 import 'visual_theme_controller.dart';
 
-class HelpActionButton extends StatefulWidget { //AccessibilityMenu == HelpActionButton
+//TAREAS
+// BUG DE PANTALLAZO ROJO AL PRESIONAR EL BOTÓN DE CONFIGURACIÓN ATTE MI PAPACHO
+// BUG DEL CAMBIO DE FONDO Y BLOQUEO DE COMPONENTE QUE NO DEJA INTERACTUAR SOLO CERRAR ATTE MI PAPACHO
+// BUG DE AUMENTAR EL TAMAÑO DE TEXTO PARA QUE APLIQUE A LOS BOTONES DE ESTE COMPONENTE ATTE MI PAPACHO
+// BUG DEL BUG
+
+class HelpActionButton extends StatefulWidget {
+  //AccessibilityMenu == HelpActionButton
   const HelpActionButton({super.key});
 
   @override
@@ -13,53 +20,78 @@ class HelpActionButton extends StatefulWidget { //AccessibilityMenu == HelpActio
 // IMPORTANT: MAIN CODE
 class _HelpActionButtonState extends State<HelpActionButton>
     with SingleTickerProviderStateMixin {
-      bool _isExpanded = false;
-      String? _selectedOption;
-      OverlayEntry? _overlayEntry;
-      late AnimationController _controller;
-      late Animation<double> _animation;
-      late AccessibilityTextScaleController _textScaleController;
+  bool _isExpanded = false;
+  String? _selectedOption;
+  OverlayEntry? _overlayEntry;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  late AccessibilityTextScaleController _textScaleController;
 
-      // Add this near your other variables (like _activeCategory, etc.)
-      final GlobalKey _buttonKey = GlobalKey();
+  // Add this near your other variables (like _activeCategory, etc.)
+  final GlobalKey _buttonKey = GlobalKey();
 
-      // NEW: Track which category is currently open
-      String? _activeCategory;
+  // NEW: Track which category is currently open
+  String? _activeCategory;
 
-      // NEW: Maintain the order of horizontal categories
-      List<String> horizontalCategories = ['Ayuda', 'Ajustes de aprendizaje', 'Apoyo'];
+  // NEW: Maintain the order of horizontal categories
+  List<String> horizontalCategories = [
+    'Ayuda',
+    'Ajustes de aprendizaje',
+    'Apoyo',
+  ];
 
-      // NEW: Map each category to its specific vertical options
-      // Labels need to match exactly with the ones used in _selectOption and _buildOptionContent
-      final Map<String, List<Map<String, dynamic>>> categoryOptions = {
-        'Ayuda': [{'icon': Icons.settings, 'label': 'Configuración'}, {'icon': Icons.text_fields, 'label': 'Tamaño de texto'}, {'icon': Icons.brightness_4, 'label': 'Modo visual'}, {'icon': Icons.hearing, 'label': 'Asistencia auditiva'}, {'icon': Icons.language, 'label': 'Lengua de señas'}], // Add Help's vertical buttons here
-        'Ajustes de aprendizaje': [{'icon': Icons.settings, 'label': 'Configuración'}, {'icon': Icons.build_circle, 'label': 'Preferencias de aprendizaje'}, {'icon': Icons.stars, 'label': 'Nivel de aprendizaje'}],
-        'Apoyo': [{'icon': Icons.settings, 'label': 'Configuración'}, {'icon': Icons.saved_search, 'label': 'Pistas'}, {'icon': Icons.menu_book, 'label': 'Manual interactivo'}],
-      };
+  // NEW: Map each category to its specific vertical options
+  // Labels need to match exactly with the ones used in _selectOption and _buildOptionContent
+  final Map<String, List<Map<String, dynamic>>> categoryOptions = {
+    'Ayuda': [
+      {'icon': Icons.settings, 'label': 'Configuración'},
+      {'icon': Icons.text_fields, 'label': 'Tamaño de texto'},
+      {'icon': Icons.brightness_4, 'label': 'Modo visual'},
+      {'icon': Icons.hearing, 'label': 'Asistencia auditiva'},
+      {'icon': Icons.language, 'label': 'Lengua de señas'},
+    ], // Add Help's vertical buttons here
+    'Ajustes de aprendizaje': [
+      {'icon': Icons.settings, 'label': 'Configuración'},
+      {'icon': Icons.build_circle, 'label': 'Preferencias de aprendizaje'},
+      {'icon': Icons.stars, 'label': 'Nivel de aprendizaje'},
+    ],
+    'Apoyo': [
+      {'icon': Icons.settings, 'label': 'Configuración'},
+      {'icon': Icons.saved_search, 'label': 'Pistas'},
+      {'icon': Icons.menu_book, 'label': 'Manual interactivo'},
+    ],
+  };
 
-      // Logic to reorder the horizontal buttons
-      void _onHorizontalButtonTapped(String category) {
-        setState(() {
-          // THIS CLOSES THE DIALOG WHENEVER A HORIZONTAL TABS IS CLICKED
-          _selectedOption = null;
+  // Logic to reorder the horizontal buttons
+  void _onHorizontalButtonTapped(String category) {
+    setState(() {
+      // THIS CLOSES THE DIALOG WHENEVER A HORIZONTAL TABS IS CLICKED
+      _selectedOption = null;
 
-          if (_activeCategory == category) {
-            _activeCategory = null; // Close the vertical menu if clicked again
-          } else {
-            _activeCategory = category; // Open the respective vertical menu
-            
-            // Reordering logic: if it's not already the first item
-            if (horizontalCategories.first != category) {
-              String oldFirst = horizontalCategories.first;
-              horizontalCategories.remove(category); // Remove the clicked item
-              horizontalCategories.remove(oldFirst); // Remove the previous first item
-              horizontalCategories.insert(0, category); // Place clicked item at the start
-              horizontalCategories.add(oldFirst); // Move previous first item to the end
-            }
-          }
-        });
-        _refreshOverlay();
+      if (_activeCategory == category) {
+        _activeCategory = null; // Close the vertical menu if clicked again
+      } else {
+        _activeCategory = category; // Open the respective vertical menu
+
+        // Reordering logic: if it's not already the first item
+        if (horizontalCategories.first != category) {
+          String oldFirst = horizontalCategories.first;
+          horizontalCategories.remove(category); // Remove the clicked item
+          horizontalCategories.remove(
+            oldFirst,
+          ); // Remove the previous first item
+          horizontalCategories.insert(
+            0,
+            category,
+          ); // Place clicked item at the start
+          horizontalCategories.add(
+            oldFirst,
+          ); // Move previous first item to the end
+        }
       }
+    });
+    _refreshOverlay();
+  }
 
   @override
   void initState() {
@@ -98,9 +130,10 @@ class _HelpActionButtonState extends State<HelpActionButton>
     }
 
     // --- NEW: Find the exact position of the closed button ---
-    final RenderBox? renderBox = _buttonKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox =
+        _buttonKey.currentContext?.findRenderObject() as RenderBox?;
     Offset buttonPosition = Offset.zero;
-    
+
     if (renderBox != null) {
       buttonPosition = renderBox.localToGlobal(Offset.zero);
     }
@@ -113,11 +146,15 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
     // Calculate the exact bottom and left coordinates based on the real button
     // We subtract 56 (the button height) to get the distance from the bottom edge
-    final double exactBottom = screenHeight - buttonPosition.dy - 44; // Same as Vertical and Horizontal Buttons
+    final double exactBottom =
+        screenHeight -
+        buttonPosition.dy -
+        44; // Same as Vertical and Horizontal Buttons
     final double exactLeft = buttonPosition.dx;
 
     _overlayEntry = OverlayEntry(
-      builder: (context) {
+      builder: (overlayContext) {
+        final double scale = AccessibilityTextScaleScope.of(overlayContext).scale;
         final overlayMediaQuery = MediaQuery.of(context);
         final overlayHeight = overlayMediaQuery.size.height;
         final overlayWidth = overlayMediaQuery.size.width;
@@ -140,13 +177,15 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
         if (_selectedOption != null && _activeCategory != null) {
           final options = categoryOptions[_activeCategory!] ?? [];
-          final index = options.indexWhere((opt) => opt['label'] == _selectedOption);
-          
-          if (index != -1) {            
-            // Reversing the index because the options map renders top-to-bottom, 
+          final index = options.indexWhere(
+            (opt) => opt['label'] == _selectedOption,
+          );
+
+          if (index != -1) {
+            // Reversing the index because the options map renders top-to-bottom,
             // but we calculate position from bottom-to-top
             final int reversedIndex = options.length - 1 - index;
-            
+
             // Distance from the bottom of the Stack to the bottom of the LOWEST vertical button.
             // 6px (bottom padding) + 44px (horizontal button) + 12px (SizedBox) = 62.0
             final double optionHeight = 62.0;
@@ -176,7 +215,8 @@ class _HelpActionButtonState extends State<HelpActionButton>
             ),
             Positioned(
               left: exactLeft,
-              bottom: exactBottom, // Matches the bottom padding of your closed button
+              bottom:
+                  exactBottom, // Matches the bottom padding of your closed button
               child: Material(
                 color: Colors.transparent,
                 child: SizedBox(
@@ -188,20 +228,23 @@ class _HelpActionButtonState extends State<HelpActionButton>
                       if (_selectedOption != null)
                         Positioned(
                           left: overlayPanelLeft,
-                          bottom: panelBottomPosition ?? 62.0, // Use the calculated bottom position, defaulting to 62.0 (the base height) just in case
+                          bottom:
+                              panelBottomPosition ??
+                              62.0, // Use the calculated bottom position, defaulting to 62.0 (the base height) just in case
                           child: SizedBox(
                             width: overlayPanelWidth,
                             child: _OptionPanel(
                               option: _selectedOption!,
                               onClose: _closePanel,
                               width: overlayPanelWidth,
+                              onRefresh: _refreshOverlay,
                             ),
                           ),
                         ),
                       Positioned(
                         left: 0,
                         bottom: 0,
-                        // ROW OF COLUMNS: This keeps everything horizontally aligned 
+                        // ROW OF COLUMNS: This keeps everything horizontally aligned
                         // while allowing vertical buttons to shoot up from their specific parent.
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -221,6 +264,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                   displayIcon = Icons.help;
                                 }
 
+                                /* Horizontal Buttons */
                                 return Padding(
                                   // This ensures an equal gap between all buttons AND the main closed button.
                                   padding: const EdgeInsets.only(right: 12.0),
@@ -228,40 +272,64 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       if (isActive) ...[
-                                        ...categoryOptions[category]!.map((optionData) {
+                                        ...categoryOptions[category]!.map((
+                                          optionData,
+                                        ) {
                                           return _buildAnimatedOption(
-                                            icon: optionData['icon'] as IconData,
-                                            label: optionData['label'] as String,
+                                            icon:
+                                                optionData['icon'] as IconData,
+                                            label:
+                                                optionData['label'] as String,
                                             color: const Color(0xFF7E57C2),
-                                            onTap: () => _selectOption(optionData['label'] as String),
+                                            onTap: () => _selectOption(
+                                              optionData['label'] as String,
+                                            ),
                                           );
                                         }).toList(),
                                         const SizedBox(height: 12),
                                       ],
-                                      
-                                      // Horizontal Buttons
+
+                                      // Vertical Buttons
                                       // (44 - 44) = 12 / 2 = 0. No adding 0px of bottom padding perfectly centers it!
                                       Padding(
-                                        padding: const EdgeInsets.only(bottom: 0.0), 
+                                        padding: const EdgeInsets.only(
+                                          bottom: 0.0,
+                                        ),
                                         child: GestureDetector(
                                           behavior: HitTestBehavior.opaque,
-                                          onTap: () => _onHorizontalButtonTapped(category),
+                                          onTap: () =>
+                                              _onHorizontalButtonTapped(
+                                                category,
+                                              ),
                                           child: AnimatedContainer(
-                                            duration: const Duration(milliseconds: 300),
-                                            width: 44, // Same as Vertical Buttons
-                                            height: 44, // Same as Vertical Buttons
+                                            duration: const Duration(
+                                              milliseconds: 300,
+                                            ),
+                                            width:
+                                                44 *
+                                                scale, // Same as Vertical Buttons
+                                            height:
+                                                44 *
+                                                scale, // Same as Vertical Buttons
                                             decoration: BoxDecoration(
                                               gradient: LinearGradient(
                                                 colors: isActive
-                                                    ? const [Color(0xFFAB47BC), Color(0xFF8E24AA)]
-                                                    : const [Color(0xFFD8C8F5), Color(0xFFC0A8F0)],
+                                                    ? const [
+                                                        Color(0xFFAB47BC),
+                                                        Color(0xFF8E24AA),
+                                                      ]
+                                                    : const [
+                                                        Color(0xFFD8C8F5),
+                                                        Color(0xFFC0A8F0),
+                                                      ],
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
                                               ),
                                               shape: BoxShape.circle,
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.black.withOpacity(0.18),
+                                                  color: Colors.black
+                                                      .withOpacity(0.18),
                                                   blurRadius: 10,
                                                   offset: const Offset(0, 4),
                                                 ),
@@ -269,8 +337,12 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                             ),
                                             child: Icon(
                                               displayIcon,
-                                              color: isActive ? Colors.white : const Color(0xFF7E57C2),
-                                              size: 33, //Same as Vertical Buttons
+                                              color: isActive
+                                                  ? Colors.white
+                                                  : const Color(0xFF7E57C2),
+                                              size:
+                                                  33 *
+                                                  scale, //Same as Vertical Buttons
                                             ),
                                           ),
                                         ),
@@ -289,13 +361,23 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                   onTap: _toggleMenu,
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 300),
-                                    width: 44, // Same as Vertical and Horizontal Buttons
-                                    height: 44, // Same as Vertical and Horizontal Buttons
+                                    width:
+                                        44 *
+                                        scale, // Same as Vertical and Horizontal Buttons
+                                    height:
+                                        44 *
+                                        scale, // Same as Vertical and Horizontal Buttons
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: _isExpanded
-                                            ? const [Color(0xFFAB47BC), Color(0xFF8E24AA)]
-                                            : const [Color(0xFFCD00D3), Color(0xFFB000D1)],
+                                            ? const [
+                                                Color(0xFFAB47BC),
+                                                Color(0xFF8E24AA),
+                                              ]
+                                            : const [
+                                                Color(0xFFCD00D3),
+                                                Color(0xFFB000D1),
+                                              ],
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                       ),
@@ -311,7 +393,9 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                     child: Icon(
                                       Icons.close,
                                       color: Colors.white,
-                                      size: 33.0, // Same as Vertical and Horizontal Buttons
+                                      size:
+                                          33.0 *
+                                          scale, // Same as Vertical and Horizontal Buttons
                                     ),
                                   ),
                                 ),
@@ -406,6 +490,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
   /*Closed button displayed*/
   @override
   Widget build(BuildContext context) {
+    final double scale = AccessibilityTextScaleScope.of(context).scale;
     // Return a plain, non-positioned button so callers can place it
     // consistently across screens. No SafeArea to avoid the white row.
     return Offstage(
@@ -415,8 +500,8 @@ class _HelpActionButtonState extends State<HelpActionButton>
         behavior: HitTestBehavior.opaque,
         onTap: _toggleMenu,
         child: Container(
-          width: 44, // Same as Vertical and Horizontal Buttons
-          height: 44, // Same as Vertical and Horizontal Buttons
+          width: 44 * scale, // Same as Vertical and Horizontal Buttons
+          height: 44 * scale, // Same as Vertical and Horizontal Buttons
           decoration: BoxDecoration(
             color: const Color(0xFF7E57C2),
             shape: BoxShape.circle,
@@ -431,7 +516,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
           child: Icon(
             Icons.question_mark,
             color: Colors.white,
-            size: 33, // Same as Vertical and Horizontal Buttons
+            size: 33 * scale, // Same as Vertical and Horizontal Buttons
           ),
         ),
       ),
@@ -486,12 +571,13 @@ class _AccessibilityIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double scale = AccessibilityTextScaleScope.of(context).scale;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        width: 44, // Same as Horizontal Buttons
-        height: 44, // Same as Horizontal Buttons
+        width: 44 * scale, // Same as Horizontal Buttons
+        height: 44 * scale, // Same as Horizontal Buttons
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
@@ -508,7 +594,11 @@ class _AccessibilityIconButton extends StatelessWidget {
             ),
           ],
         ),
-        child: Icon(icon, color: Colors.white, size: 33), // Same as Horizontal Buttons
+        child: Icon(
+          icon,
+          color: Colors.white,
+          size: 33 * scale,
+        ), // Same as Horizontal Buttons
       ),
     );
   }
@@ -522,12 +612,14 @@ class _OptionPanel extends StatefulWidget {
   final String option;
   final VoidCallback onClose;
   final double width;
+  final VoidCallback onRefresh;
 
   const _OptionPanel({
     super.key,
     required this.option,
     required this.onClose,
     required this.width,
+    required this.onRefresh,
   });
 
   @override
@@ -693,9 +785,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                   Switch(
                     value: activeScale != 1.0,
                     onChanged: (value) {
-                      setState(() {
-                        _textSizeEnabled = value;
-                      });
+                      if (!mounted) return;
                       if (value) {
                         controller.setScale(1.2);
                       } else {
@@ -720,11 +810,8 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                     minHeight: 36,
                   ),
                   onPressed: () {
+                    if (!mounted) return;
                     controller.decrease();
-                    setState(() {
-                      _textSize = controller.scale;
-                      _textSizeEnabled = controller.scale != 1.0;
-                    });
                   },
                   icon: const Icon(Icons.remove_circle_outline, size: 22),
                   color: const Color(0xFF7E57C2),
@@ -748,11 +835,8 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                     minHeight: 36,
                   ),
                   onPressed: () {
+                    if (!mounted) return;
                     controller.increase();
-                    setState(() {
-                      _textSize = controller.scale;
-                      _textSizeEnabled = controller.scale != 1.0;
-                    });
                   },
                   icon: const Icon(Icons.add_circle_outline, size: 22),
                   color: const Color(0xFF7E57C2),
@@ -986,9 +1070,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: [
-                _LevelButton(label: 'Activar pista', onTap: () {}),
-              ],
+              children: [_LevelButton(label: 'Activar pista', onTap: () {})],
             ),
           ],
         );

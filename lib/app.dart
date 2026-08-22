@@ -269,7 +269,7 @@ class _AppState extends State<App> {
               darkTheme: _getThemeData(AppThemeMode.dark),
               builder: (context, child) {
                 final mediaQuery = MediaQuery.of(context);
-                return MediaQuery(
+                return MediaQuery( //HERE IS THE ERROR The relevant error-causing widget failed
                   data: mediaQuery.copyWith(
                     textScaler: TextScaler.linear(_textScaleController.scale),
                   ),
@@ -282,7 +282,7 @@ class _AppState extends State<App> {
                     duration: const Duration(milliseconds: 250),
                     child: KeyedSubtree(
                       key: ValueKey(
-                        '${_currentScreen.name}_${(effectiveIsDark ? 'dark' : 'light')}_${_textScaleController.scale.toStringAsFixed(2)}',
+                        '${_currentScreen.name}_${(effectiveIsDark ? 'dark' : 'light')}',
                       ),
                       child: currentPage,
                     ),

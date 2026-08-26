@@ -11,7 +11,7 @@ class AccessibilitySettingsScreen extends StatefulWidget {
 
 class _AccessibilitySettingsScreenState
     extends State<AccessibilitySettingsScreen> {
-  late final AccessibilityTextScaleController _textScaleController;
+  late final AccessibilityTextScaleController? _textScaleController;
   bool _textSizeEnabled = false;
   bool _visualModeEnabled = false;
   bool _audioAssistEnabled = true;
@@ -23,9 +23,14 @@ class _AccessibilitySettingsScreenState
   @override
   void initState() {
     super.initState();
-    _textScaleController = AccessibilityTextScaleScope.of(context);
-    _textSizeEnabled = _textScaleController.scale != 1.0;
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _textScaleController = AccessibilityTextScaleScope.of(context);
+    _textSizeEnabled = _textScaleController?.scale != 1.0;
+}
 
   @override
   Widget build(BuildContext context) {
@@ -167,9 +172,9 @@ class _AccessibilitySettingsScreenState
                     _textSizeEnabled = value;
                   });
                   if (value) {
-                    _textScaleController.setScale(1.2);
+                    _textScaleController?.setScale(1.2);
                   } else {
-                    _textScaleController.reset();
+                    _textScaleController?.reset();
                   }
                   _showStatusMessage(
                     _textSizeEnabled

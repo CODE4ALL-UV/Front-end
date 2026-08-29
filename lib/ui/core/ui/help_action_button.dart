@@ -329,7 +329,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.black
-                                                      .withOpacity(0.18),
+                                                      .withValues(alpha: 0.18),
                                                   blurRadius: 10,
                                                   offset: const Offset(0, 4),
                                                 ),
@@ -384,7 +384,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.18),
+                                          color: Colors.black.withValues(alpha: 0.18),
                                           blurRadius: 10,
                                           offset: const Offset(0, 4),
                                         ),
@@ -507,7 +507,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF7E57C2).withOpacity(0.25),
+                color: const Color(0xFF7E57C2).withValues(alpha: 0.25),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -582,13 +582,13 @@ class _AccessibilityIconButton extends StatelessWidget {
           color: color,
           shape: BoxShape.circle,
           gradient: LinearGradient(
-            colors: [color.withOpacity(0.95), color.withOpacity(0.8)],
+            colors: [color.withValues(alpha: 0.95), color.withValues(alpha: 0.8)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.35),
+              color: color.withValues(alpha: 0.35),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -695,7 +695,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
           border: Border.all(color: const Color(0xFFD8C8F5), width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
+              color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 24,
               offset: const Offset(0, 10),
             ),
@@ -765,7 +765,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2D8F7)),
               ),
@@ -792,7 +792,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                         controller.reset();
                       }
                     },
-                    activeColor: const Color(0xFF9575CD),
+                    activeThumbColor: const Color(0xFF9575CD),
                     activeTrackColor: const Color(0xFFD8C8F5),
                     inactiveThumbColor: const Color(0xFFBDBDBD),
                     inactiveTrackColor: const Color(0xFFE0E0E0),
@@ -893,7 +893,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2D8F7)),
               ),
@@ -917,7 +917,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                   Switch(
                     value: true,
                     onChanged: (value) {},
-                    activeColor: const Color(0xFF9575CD),
+                    activeThumbColor: const Color(0xFF9575CD),
                     activeTrackColor: const Color(0xFFD8C8F5),
                     inactiveThumbColor: const Color(0xFFBDBDBD),
                     inactiveTrackColor: const Color(0xFFE0E0E0),
@@ -951,7 +951,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2D8F7)),
               ),
@@ -986,7 +986,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2D8F7)),
               ),
@@ -1021,7 +1021,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2D8F7)),
               ),
@@ -1057,7 +1057,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2D8F7)),
               ),
@@ -1088,7 +1088,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2D8F7)),
               ),
@@ -1131,7 +1131,7 @@ Widget _buildInfoBanner({
   return Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-      color: const Color(0xFF7E57C2).withOpacity(0.1),
+      color: const Color(0xFF7E57C2).withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(12),
       border: Border.all(color: const Color(0xFFD8C8F5)),
     ),
@@ -1194,7 +1194,7 @@ Widget _buildSpeedPill(String label) {
       border: Border.all(color: const Color(0xFFD8C8F5)),
       boxShadow: [
         BoxShadow(
-          color: const Color(0xFF9575CD).withOpacity(0.1),
+          color: const Color(0xFF9575CD).withValues(alpha: 0.1),
           blurRadius: 6,
           offset: const Offset(0, 2),
         ),
@@ -1237,7 +1237,7 @@ class _ModeButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF7E57C2).withOpacity(0.25),
+              color: const Color(0xFF7E57C2).withValues(alpha: 0.25),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -1267,7 +1267,7 @@ class _LevelButton extends StatelessWidget {
           border: Border.all(color: const Color(0xFFD4C4F2), width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF9575CD).withOpacity(0.12),
+              color: const Color(0xFF9575CD).withValues(alpha: 0.12),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),

@@ -1,5 +1,5 @@
 // Web implementation that embeds a simple browser-like frame inside the app.
-import 'dart:html' as html;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 
 Widget youtubeIframe(String id) {
@@ -19,11 +19,16 @@ Widget youtubeIframe(String id) {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                html.window.open(
-                  'https://www.youtube.com/watch?v=$id',
-                  '_blank',
-                );
+              onPressed: () async {
+                final Uri url = Uri.parse('https://www.youtube.com/watch?v=$id');
+                
+                // Abre el enlace en una nueva pestaña (Web) o en la app de YouTube/Navegador (Móvil)
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(
+                    url,
+                    mode: LaunchMode.externalApplication,
+                  );
+                }
               },
               child: const Text('Abrir video en YouTube'),
             ),

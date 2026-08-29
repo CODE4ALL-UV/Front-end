@@ -150,7 +150,7 @@ class _Modulo6AprendizajeLightState extends State<Modulo6AprendizajeLight> {
                             width: 52,
                             height: 52,
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.30),
+                              color: Colors.white.withValues(alpha: 0.30),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(

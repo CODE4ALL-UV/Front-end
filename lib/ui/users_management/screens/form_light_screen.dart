@@ -161,7 +161,7 @@ class _FormPageLightState extends State<FormPageLight> {
                         border: Border.all(color: const Color(0xFFE0E0E0)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
+                            color: Colors.black.withValues(alpha: 0.06),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -224,7 +224,7 @@ class _FormPageLightState extends State<FormPageLight> {
                           ),
                           const SizedBox(height: 6),
                           DropdownButtonFormField<int?>(
-                            value: _tipoDiscapacidad,
+                            initialValue: _tipoDiscapacidad,
                             decoration: _inputDecoration(),
                             items: const [
                               DropdownMenuItem<int?>(
@@ -254,7 +254,7 @@ class _FormPageLightState extends State<FormPageLight> {
                           ),
                           const SizedBox(height: 6),
                           DropdownButtonFormField<String>(
-                            value: _selectedRole,
+                            initialValue: _selectedRole,
                             decoration: _inputDecoration(),
                             items: const [
                               DropdownMenuItem(

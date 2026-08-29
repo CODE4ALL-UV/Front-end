@@ -36,7 +36,7 @@ class _QuizScreenState extends State<QuizScreen> {
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaleFactor: textScale),
+            data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScale)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

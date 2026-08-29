@@ -159,7 +159,7 @@ class _FormPageDarkState extends State<FormPageDark> {
                       border: Border.all(color: const Color(0xFF3E3E3E)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha: 0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -225,7 +225,7 @@ class _FormPageDarkState extends State<FormPageDark> {
                         ),
                         const SizedBox(height: 6),
                         DropdownButtonFormField<int?>(
-                          value: _tipoDiscapacidad,
+                          initialValue: _tipoDiscapacidad,
                           decoration: _inputDecoration(),
                           dropdownColor: const Color(0xFF3A3A3A),
                           style: const TextStyle(color: Colors.white),
@@ -257,7 +257,7 @@ class _FormPageDarkState extends State<FormPageDark> {
                         ),
                         const SizedBox(height: 6),
                         DropdownButtonFormField<String>(
-                          value: _selectedRole,
+                          initialValue: _selectedRole,
                           decoration: _inputDecoration(),
                           dropdownColor: const Color(0xFF3A3A3A),
                           style: const TextStyle(color: Colors.white),

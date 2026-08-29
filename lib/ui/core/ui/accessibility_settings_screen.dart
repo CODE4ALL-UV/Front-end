@@ -85,7 +85,7 @@ class _AccessibilitySettingsScreenState
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF7E57C2).withOpacity(0.3),
+            color: const Color(0xFF7E57C2).withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -96,7 +96,7 @@ class _AccessibilitySettingsScreenState
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -182,7 +182,7 @@ class _AccessibilitySettingsScreenState
                         : 'Texto grande desactivado',
                   );
                 },
-                activeColor: const Color(0xFF9575CD),
+                activeThumbColor: const Color(0xFF9575CD),
                 activeTrackColor: const Color(0xFFD8C8F5),
                 inactiveThumbColor: const Color(0xFFBDBDBD),
                 inactiveTrackColor: const Color(0xFFE0E0E0),
@@ -264,7 +264,7 @@ class _AccessibilitySettingsScreenState
                         : 'Contraste mejorado desactivado',
                   );
                 },
-                activeColor: const Color(0xFF9575CD),
+                activeThumbColor: const Color(0xFF9575CD),
                 activeTrackColor: const Color(0xFFD8C8F5),
                 inactiveThumbColor: const Color(0xFFBDBDBD),
                 inactiveTrackColor: const Color(0xFFE0E0E0),
@@ -333,7 +333,7 @@ class _AccessibilitySettingsScreenState
                         : 'Asistencia auditiva desactivada',
                   );
                 },
-                activeColor: const Color(0xFF9575CD),
+                activeThumbColor: const Color(0xFF9575CD),
                 activeTrackColor: const Color(0xFFD8C8F5),
                 inactiveThumbColor: const Color(0xFFBDBDBD),
                 inactiveTrackColor: const Color(0xFFE0E0E0),
@@ -400,7 +400,7 @@ class _AccessibilitySettingsScreenState
                         : 'Lengua de señas desactivada',
                   );
                 },
-                activeColor: const Color(0xFF9575CD),
+                activeThumbColor: const Color(0xFF9575CD),
                 activeTrackColor: const Color(0xFFD8C8F5),
                 inactiveThumbColor: const Color(0xFFBDBDBD),
                 inactiveTrackColor: const Color(0xFFE0E0E0),
@@ -434,7 +434,7 @@ class _AccessibilitySettingsScreenState
         border: Border.all(color: const Color(0xFFE8E4F3)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -448,7 +448,7 @@ class _AccessibilitySettingsScreenState
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF7E57C2).withOpacity(0.1),
+                  color: const Color(0xFF7E57C2).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: const Color(0xFF7E57C2), size: 22),
@@ -528,7 +528,7 @@ class _AccessibilitySettingsScreenState
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF7E57C2).withOpacity(0.25),
+                      color: const Color(0xFF7E57C2).withValues(alpha: 0.25),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -570,7 +570,7 @@ class _AccessibilitySettingsScreenState
               BoxShadow(
                 color: const Color(
                   0xFF9575CD,
-                ).withOpacity(isSelected ? 0.2 : 0.1),
+                ).withValues(alpha: isSelected ? 0.2 : 0.1),
                 blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
@@ -616,7 +616,7 @@ class _AccessibilitySettingsScreenState
               BoxShadow(
                 color: const Color(
                   0xFF9575CD,
-                ).withOpacity(isSelected ? 0.18 : 0.12),
+                ).withValues(alpha: isSelected ? 0.18 : 0.12),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),

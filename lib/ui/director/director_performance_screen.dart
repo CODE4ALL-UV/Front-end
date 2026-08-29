@@ -482,7 +482,7 @@ class _DirectorPerformanceScreenState extends State<DirectorPerformanceScreen> {
             ),
             pw.Text('Generado: ${now.toLocal()}'),
             pw.SizedBox(height: 12),
-            pw.Table.fromTextArray(
+            pw.TableHelper.fromTextArray(
               headers: [
                 'Lección',
                 'Puntaje',

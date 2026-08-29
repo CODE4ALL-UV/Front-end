@@ -4,7 +4,7 @@ import 'accessibility_text_scale.dart';
 import 'visual_theme_controller.dart';
 
 //TAREAS
-// BUG DE PANTALLAZO ROJO AL PRESIONAR EL BOTÓN DE CONFIGURACIÓN ATTE MI PAPACHO
+// SOLVED BUG DE PANTALLAZO ROJO AL PRESIONAR EL BOTÓN DE CONFIGURACIÓN ATTE MI PAPACHO
 // BUG DEL CAMBIO DE FONDO Y BLOQUEO DE COMPONENTE QUE NO DEJA INTERACTUAR SOLO CERRAR ATTE MI PAPACHO
 // SOLVED BUG DE AUMENTAR EL TAMAÑO DE TEXTO PARA QUE APLIQUE A LOS BOTONES DE ESTE COMPONENTE ATTE MI PAPACHO
 // BUG DEL BUG
@@ -155,7 +155,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
     _overlayEntry = OverlayEntry(
       builder: (overlayContext) {
         final double scale = AccessibilityTextScaleScope.of(overlayContext).scale;
-        final overlayMediaQuery = MediaQuery.of(context);
+        final overlayMediaQuery = MediaQuery.of(overlayContext);
         final overlayHeight = overlayMediaQuery.size.height;
         final overlayWidth = overlayMediaQuery.size.width;
         final overlaySafeWidth = (overlayWidth - 24).clamp(220.0, 380.0);

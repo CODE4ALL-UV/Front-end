@@ -65,6 +65,18 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
     });
   }
 
+  void _finishLaboratory() {
+    if (_feedback?.contains('✅') != true) {
+      setState(() {
+        _feedback =
+            '⚠️ Completa el laboratorio con una salida correcta para terminar.';
+      });
+      return;
+    }
+
+    Navigator.pop(context, true);
+  }
+
   String _evaluateSource(String source) {
     final variables = <String, dynamic>{};
     final outputs = <String>[];
@@ -126,7 +138,13 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
         title: 'CODE4ALL',
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            if (_feedback?.contains('✅') == true) {
+              Navigator.of(context).pop(true);
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
         ),
         showUserIcon: true,
         userName: null,
@@ -341,6 +359,21 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
                             ),
                           ),
                         ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _finishLaboratory,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF2E7D32),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: const Text('Terminar'),
+                        ),
+                      ),
                     ],
                   ),
                 ),

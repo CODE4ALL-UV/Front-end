@@ -9,13 +9,80 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  String? _selected;
+  late final PageController _pageController;
+  final List<String?> _selecciones = List.filled(2, null);
+  final List<String?> _feedbacks = List.filled(2, null);
+  final List<String> _correctas = const [
+    'B) Porque tiene una sintaxis clara y elegante que democratiza la programación, permitiendo que tanto principiantes como expertos creen soluciones poderosas',
+    'B) Para gestionar e instalar librerías externas',
+  ];
+  int _currentPage = 0;
   bool _largeText = false;
   bool _highContrast = false;
 
   ColorScheme get _colors => _highContrast
       ? const ColorScheme.highContrastLight()
       : ColorScheme.fromSeed(seedColor: Colors.teal);
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _handleSelection(int index, String opcion) {
+    setState(() {
+      _selecciones[index] = opcion;
+      _feedbacks[index] = opcion == _correctas[index]
+          ? null
+          : 'Respuesta equivocada';
+    });
+  }
+
+  void _goToNextOrFinish() {
+    final seleccionActual = _selecciones[_currentPage];
+
+    if (seleccionActual == null) {
+      setState(() {
+        _feedbacks[_currentPage] =
+            'Selecciona una respuesta antes de continuar.';
+      });
+      return;
+    }
+
+    if (seleccionActual != _correctas[_currentPage]) {
+      setState(() {
+        _feedbacks[_currentPage] = 'Respuesta equivocada';
+      });
+      return;
+    }
+
+    if (_currentPage < 1) {
+      setState(() {
+        _currentPage += 1;
+      });
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('¡Éxito! Has completado el quiz satisfactoriamente.'),
+          backgroundColor: Color(0xFF2E7D32),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      Navigator.pop(context, true);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +103,13 @@ class _QuizScreenState extends State<QuizScreen> {
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScale)),
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(textScale)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 4),
-
-                // Tarjeta principal con ardilla y pregunta
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -55,7 +122,6 @@ class _QuizScreenState extends State<QuizScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Imagen de la ardilla
                       SizedBox(
                         width: 120,
                         height: 140,
@@ -85,9 +151,14 @@ class _QuizScreenState extends State<QuizScreen> {
                                   color: const Color(0xFFE0E0E0),
                                 ),
                               ),
-                              child: const Text(
-                                '¿Cuál es la sintaxis correcta para imprimir texto en Python?',
-                                style: TextStyle(fontSize: 18, height: 1.25),
+                              child: Text(
+                                _currentPage == 0
+                                    ? '¿Cuál es la razón principal por la cual Python se ha convertido en el lenguaje de programación más relevante del siglo XXI?'
+                                    : '¿Para qué se utiliza pip en Python?',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  height: 1.25,
+                                ),
                               ),
                             ),
                           ],
@@ -96,42 +167,70 @@ class _QuizScreenState extends State<QuizScreen> {
                       const SizedBox(width: 8),
                       CircleAvatar(
                         backgroundColor: Colors.orangeAccent,
-                        child: const Text(
-                          '5',
-                          style: TextStyle(color: Colors.white),
+                        child: Text(
+                          '${_currentPage + 1}',
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 18),
-
-                // Opciones
-                _optionButton('print("Hola")'),
-                const SizedBox(height: 10),
-                _optionButton('echo("Hola")'),
-                const SizedBox(height: 10),
-                _optionButton('printf("Hola")'),
-
-                const Spacer(),
-
-                // Botón validar
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: List.generate(2, (index) {
+                          final isActive = index == _currentPage;
+                          return Expanded(
+                            child: Container(
+                              height: 5,
+                              margin: const EdgeInsets.symmetric(horizontal: 3),
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? const Color(0xFFE53935)
+                                    : const Color(0xFFBBDEFB),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: 2,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return _buildQuestionPage(index);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: _selected == null ? null : () {},
+                        onPressed: _goToNextOrFinish,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _selected == null
-                              ? Colors.grey
-                              : _colors.primary,
+                          backgroundColor: _colors.primary,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text('Validar'),
+                        child: Text(
+                          _currentPage < 1 ? 'Siguiente' : 'Terminar',
+                        ),
                       ),
                     ),
                   ],
@@ -144,18 +243,67 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  Widget _optionButton(String text) {
-    final selected = _selected == text;
+  Widget _buildQuestionPage(int index) {
+    final opciones = index == 0
+        ? const [
+            'A) Porque fue el primer lenguaje de programación creado',
+            'B) Porque tiene una sintaxis clara y elegante que democratiza la programación, permitiendo que tanto principiantes como expertos creen soluciones poderosas',
+            'C) Porque es el único lenguaje compatible con Windows',
+            'D) Porque no requiere descargar ni instalar nada',
+          ]
+        : const [
+            'A) Para escribir código más rápido',
+            'B) Para gestionar e instalar librerías externas',
+            'C) Para cambiar el color de la terminal',
+            'D) Para ejecutar juegos',
+          ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ...opciones.map(
+          (opcion) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: _optionButton(index, opcion),
+          ),
+        ),
+        if (_feedbacks[index] != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              _feedbacks[index]!,
+              style: const TextStyle(
+                color: Color(0xFFE53935),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _optionButton(int index, String text) {
+    final selected = _selecciones[index] == text;
+    final isCorrect = text == _correctas[index];
+    final isWrongSelected = selected && !isCorrect;
+    final showCorrect = isCorrect && _selecciones[index] != null;
+
     return Semantics(
       button: true,
       label: 'Opción $text',
       child: GestureDetector(
-        onTap: () => setState(() => _selected = text),
+        onTap: () => _handleSelection(index, text),
         child: Container(
-          height: 54,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          constraints: const BoxConstraints(minHeight: 46),
           decoration: BoxDecoration(
-            color: selected ? Colors.teal : Colors.white,
+            color: isWrongSelected
+                ? const Color(0xFFE53935)
+                : showCorrect
+                ? const Color(0xFF2E7D32)
+                : selected
+                ? Colors.teal
+                : Colors.white,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: const Color(0xFFE0E0E0)),
             boxShadow: const [
@@ -170,9 +318,12 @@ class _QuizScreenState extends State<QuizScreen> {
             alignment: Alignment.centerLeft,
             child: Text(
               text,
+              softWrap: true,
               style: TextStyle(
-                fontSize: 16,
-                color: selected ? Colors.white : Colors.black,
+                fontSize: 13,
+                color: isWrongSelected || selected || showCorrect
+                    ? Colors.white
+                    : Colors.black,
               ),
             ),
           ),

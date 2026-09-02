@@ -29,6 +29,21 @@ class _QuizWithVideoScreenState extends State<QuizWithVideoScreen> {
     );
   }
 
+  void _validateAnswer() {
+    if (_selected == 'print("Hola")') {
+      Navigator.pop(context, true);
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Respuesta incorrecta. Intenta de nuevo.'),
+        backgroundColor: Color(0xFFE53935),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final textScale = _largeText ? 1.3 : 1.0;
@@ -48,7 +63,9 @@ class _QuizWithVideoScreenState extends State<QuizWithVideoScreen> {
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScale)),
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(textScale)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -183,7 +200,7 @@ class _QuizWithVideoScreenState extends State<QuizWithVideoScreen> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: _selected == null ? null : () {},
+                        onPressed: _selected == null ? null : _validateAnswer,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _selected == null
                               ? Colors.grey

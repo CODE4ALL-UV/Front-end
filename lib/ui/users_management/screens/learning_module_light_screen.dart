@@ -15,6 +15,7 @@ import 'laboratory_console_screen.dart';
 import 'quiz_screen_dark.dart';
 import 'quiz_with_video_screen_dark.dart';
 import 'laboratory_console_screen_dark.dart';
+import 'final_evaluation_screen.dart';
 import '../widgets/live_translation_box.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
@@ -160,233 +161,237 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
       body: Stack(
         children: [
           //DELETE Expanded(
-            NotificationListener<OverscrollNotification>(
-              onNotification: (notification) {
-                if (notification.overscroll > 10 &&
-                    notification.metrics.pixels >=
-                        notification.metrics.maxScrollExtent - 1) {
-                  _goToModulo2();
-                  return true;
-                }
-                return false;
-              },
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 80), //NEW OLD EdgeInsets.fromLTRB(16, 20, 16, 12),
-                child: Column(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
+          NotificationListener<OverscrollNotification>(
+            onNotification: (notification) {
+              if (notification.overscroll > 10 &&
+                  notification.metrics.pixels >=
+                      notification.metrics.maxScrollExtent - 1) {
+                _goToModulo2();
+                return true;
+              }
+              return false;
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                20,
+                16,
+                80,
+              ), //NEW OLD EdgeInsets.fromLTRB(16, 20, 16, 12),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
                       ),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        _moduleName,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      const Text(
-                                        'Preparación',
-                                        style: TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (_isTeacher)
-                                  IconButton(
-                                    onPressed: () async {
-                                      final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              const TeacherModuleEditor(),
-                                        ),
-                                      );
-                                      if (result is String &&
-                                          result.isNotEmpty) {
-                                        await _fetchModuleAndApply(result);
-                                      } else {
-                                        await _fetchModuleAndApply(
-                                          _defaultModuleId,
-                                        );
-                                      }
-                                    },
-                                    icon: const Icon(
-                                      Icons.edit,
-                                      color: Colors.white,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          Row(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
                             children: [
-                              Container(
-                                width: 52,
-                                height: 52,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(6.0),
-                                  child: Image.asset(
-                                    'assets/images/logoUV_Gris1.png',
-                                    fit: BoxFit.contain,
-                                  ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _moduleName,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      'Preparación',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                              if (_isTeacher)
+                                IconButton(
+                                  onPressed: () async {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const TeacherModuleEditor(),
+                                      ),
+                                    );
+                                    if (result is String && result.isNotEmpty) {
+                                      await _fetchModuleAndApply(result);
+                                    } else {
+                                      await _fetchModuleAndApply(
+                                        _defaultModuleId,
+                                      );
+                                    }
+                                  },
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
                             ],
                           ),
-                        ],
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 52,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(6.0),
+                                child: Image.asset(
+                                  'assets/images/logoUV_Gris1.png',
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _BigCircle(
+                        icon: Icons.account_tree,
+                        iconColor: const Color(0xFF1976D2),
+                        bgColor: const Color(0xFFE3F2FD),
+                        size: bigSize,
+                        progress: 0.75,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const Capitulo2DetalleLight(),
+                            ),
+                          );
+                        },
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _BigCircle(
-                          icon: Icons.account_tree,
-                          iconColor: const Color(0xFF1976D2),
-                          bgColor: const Color(0xFFE3F2FD),
-                          size: bigSize,
-                          progress: 0.75,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const Capitulo2DetalleLight(),
-                              ),
-                            );
-                          },
-                        ),
-                        _LessonBox(
-                          number: 3,
-                          title: _topicOrFallback(2, 'Tema 3'),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const Capitulo2DetalleLight(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _LessonBox(
-                          number: 2,
-                          title: _topicOrFallback(1, 'Tema 2'),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const Capitulo2DetalleLight(),
-                              ),
-                            );
-                          },
-                        ),
-                        _BigCircle(
-                          icon: Icons.manage_search,
-                          iconColor: const Color(0xFF8E24AA),
-                          bgColor: const Color(0xFFF3E5F5),
-                          size: bigSize,
-                          progress: 0.6,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const Capitulo2DetalleLight(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _BigCircle(
-                          icon: Icons.code,
-                          iconColor: const Color(0xFF5C6BC0),
-                          bgColor: const Color(0xFFE8EAF6),
-                          size: bigSize,
-                          progress: 0.3,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const CapituloDetalleLight(),
-                              ),
-                            );
-                          },
-                        ),
-                        _LessonBox(
-                          number: 1,
-                          title: _topicOrFallback(0, 'Tema 1'),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const CapituloDetalleLight(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Desliza hacia arriba para abrir Módulo 2',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF607D8B),
-                        fontWeight: FontWeight.w600,
+                      _LessonBox(
+                        number: 3,
+                        title: _topicOrFallback(2, 'Tema 3'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const Capitulo2DetalleLight(),
+                            ),
+                          );
+                        },
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _LessonBox(
+                        number: 2,
+                        title: _topicOrFallback(1, 'Tema 2'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const Capitulo2DetalleLight(),
+                            ),
+                          );
+                        },
+                      ),
+                      _BigCircle(
+                        icon: Icons.manage_search,
+                        iconColor: const Color(0xFF8E24AA),
+                        bgColor: const Color(0xFFF3E5F5),
+                        size: bigSize,
+                        progress: 0.6,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const Capitulo2DetalleLight(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _BigCircle(
+                        icon: Icons.code,
+                        iconColor: const Color(0xFF5C6BC0),
+                        bgColor: const Color(0xFFE8EAF6),
+                        size: bigSize,
+                        progress: 0.3,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CapituloDetalleLight(),
+                            ),
+                          );
+                        },
+                      ),
+                      _LessonBox(
+                        number: 1,
+                        title: _topicOrFallback(0, 'Tema 1'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CapituloDetalleLight(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Desliza hacia arriba para abrir Módulo 2',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF607D8B),
+                      fontWeight: FontWeight.w600,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
+          ),
           // DELETE EXPANDED),
-          Positioned( //NEW OLD Padding
+          Positioned(
+            //NEW OLD Padding
             left: 16,
             bottom: 8,
             child: const HelpActionButton(),
@@ -422,23 +427,20 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
   bool _resumenExpanded = true;
   bool _rutaExpanded = true;
   bool _isNavigatingToModule2 = false;
+  final Set<String> _completedActivities = <String>{};
 
   static const _rutaItems = [
     _ActivityItem('Relevancia del lenguaje Python', '📦🖥️🎧'),
     _ActivityItem('Nombre del Tip/Cápsula de conocimiento', '🎁'),
     _ActivityItem('Ejemplo', '⚙️'),
-    _ActivityItem('Descarga y puesta en marcha', '📦🖥️🎧'),
-    _ActivityItem('Nombre del Tip/Cápsula de conocimiento', '🎁'),
     _ActivityItem('Ejercicio', '🎮'),
-    _ActivityItem('Preparando la versión instalada', '📦🖥️🎧'),
-    _ActivityItem('Nombre de la buena práctica', '🏅'),
     _ActivityItem('Quiz', '❓'),
     _ActivityItem('Laboratorio', '🧪'),
     _ActivityItem('Evaluación final', '📋'),
   ];
 
-  void _openLectura(String actividad) {
-    Navigator.push(
+  Future<void> _openLectura(String actividad) async {
+    final completed = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => LecturaTemaLightScreen(
@@ -447,6 +449,153 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
         ),
       ),
     );
+
+    if (completed == true && mounted) {
+      setState(() {
+        _completedActivities.add(actividad);
+      });
+    }
+  }
+
+  Future<void> _openCapsulaConocimiento(String actividad) async {
+    final completed = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CapsulaConocimientoLightScreen(actividad: actividad),
+      ),
+    );
+
+    if (completed == true && mounted) {
+      setState(() {
+        _completedActivities.add(actividad);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('¡Éxito! Has completado el tip satisfactoriamente.'),
+          backgroundColor: Color(0xFF2E7D32),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _openEjemplo(String actividad) async {
+    final completed = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EjemploPythonLightScreen(actividad: actividad),
+      ),
+    );
+
+    if (completed == true && mounted) {
+      setState(() {
+        _completedActivities.add(actividad);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            '¡Éxito! Has completado este ejemplo satisfactoriamente.',
+          ),
+          backgroundColor: Color(0xFF2E7D32),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _openEjercicio(String actividad) async {
+    final completed = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EjercicioInteractivoLightScreen(actividad: actividad),
+      ),
+    );
+
+    if (completed == true && mounted) {
+      setState(() {
+        _completedActivities.add(actividad);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            '¡Éxito! Has completado este ejercicio satisfactoriamente.',
+          ),
+          backgroundColor: Color(0xFF2E7D32),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _openEvaluacionFinal(String actividad) async {
+    final completed = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const FinalEvaluationScreen()),
+    );
+
+    if (completed == true && mounted) {
+      setState(() {
+        _completedActivities.add(actividad);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('¡Éxito! Has completado la evaluación final.'),
+          backgroundColor: Color(0xFF2E7D32),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _openQuiz(String actividad) async {
+    final isDarkTheme = VisualThemeController.resolveIsDark(context);
+    final completed = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            isDarkTheme ? const QuizScreenDark() : const QuizScreen(),
+      ),
+    );
+
+    if (completed == true && mounted) {
+      setState(() {
+        _completedActivities.add(actividad);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('¡Éxito! Has completado el quiz satisfactoriamente.'),
+          backgroundColor: Color(0xFF2E7D32),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _openLaboratorio(String actividad) async {
+    final isDarkTheme = VisualThemeController.resolveIsDark(context);
+    final completed = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => isDarkTheme
+            ? const LaboratoryConsoleScreenDark()
+            : const LaboratoryConsoleScreen(),
+      ),
+    );
+
+    if (completed == true && mounted) {
+      setState(() {
+        _completedActivities.add(actividad);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            '¡Éxito! Has completado el laboratorio satisfactoriamente.',
+          ),
+          backgroundColor: Color(0xFF2E7D32),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   void _openVideo(String actividad) {
@@ -558,26 +707,26 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
                                 ),
                                 child: _ActivityRow(
                                   item: item,
-                                  onBookTap: item.emoji.contains('📦')
+                                  isCompleted: _completedActivities.contains(
+                                    item.label,
+                                  ),
+                                  onBookTap:
+                                      item.label ==
+                                          'Nombre del Tip/Cápsula de conocimiento'
+                                      ? () =>
+                                            _openCapsulaConocimiento(item.label)
+                                      : item.label == 'Ejemplo'
+                                      ? () => _openEjemplo(item.label)
+                                      : item.label == 'Ejercicio'
+                                      ? () => _openEjercicio(item.label)
+                                      : item.emoji.contains('📦')
                                       ? () => _openLectura(item.label)
                                       : item.label == 'Quiz'
-                                      ? () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => isDarkTheme
-                                                ? const QuizScreenDark()
-                                                : const QuizScreen(),
-                                          ),
-                                        )
+                                      ? () => _openQuiz(item.label)
+                                      : item.label == 'Evaluación final'
+                                      ? () => _openEvaluacionFinal(item.label)
                                       : item.label == 'Laboratorio'
-                                      ? () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => isDarkTheme
-                                                ? const LaboratoryConsoleScreenDark()
-                                                : const LaboratoryConsoleScreen(),
-                                          ),
-                                        )
+                                      ? () => _openLaboratorio(item.label)
                                       : null,
                                   onVideoTap: item.emoji.contains('🖥️')
                                       ? () => _openVideo(item.label)
@@ -1068,14 +1217,21 @@ class _ActivityRow extends StatelessWidget {
   final _ActivityItem item;
   final VoidCallback? onBookTap;
   final VoidCallback? onVideoTap;
+  final bool isCompleted;
 
-  const _ActivityRow({required this.item, this.onBookTap, this.onVideoTap});
+  const _ActivityRow({
+    required this.item,
+    this.onBookTap,
+    this.onVideoTap,
+    this.isCompleted = false,
+  });
 
   String _badgeText() {
     if (item.label == 'Quiz') return 'Comenzar';
     if (item.label == 'Laboratorio') return 'Explorar';
-    if (item.label == 'Ejercicio') return 'Resolver';
-    if (item.label == 'Ejemplo') return 'Ver';
+    if (item.label == 'Ejercicio') return 'Abrir';
+    if (item.label == 'Ejemplo') return 'Abrir';
+    if (item.label == 'Evaluación final') return 'Abrir';
     if (item.label == 'Descarga y puesta en marcha') return 'Abrir';
     if (item.label == 'Preparando la versión instalada') return 'Ver';
     if (item.label == 'Relevancia del lenguaje Python') return 'Explorar';
@@ -1134,7 +1290,31 @@ class _ActivityRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          if (hasAction)
+          if (isCompleted)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5E9),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: const Color(0xFF66BB6A)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.check_circle, size: 16, color: Color(0xFF2E7D32)),
+                  SizedBox(width: 6),
+                  Text(
+                    'Completado',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF2E7D32),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else if (hasAction)
             Material(
               color: Colors.transparent,
               child: InkWell(
@@ -1158,6 +1338,718 @@ class _ActivityRow extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class CapsulaConocimientoLightScreen extends StatelessWidget {
+  final String actividad;
+
+  const CapsulaConocimientoLightScreen({super.key, required this.actividad});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFE53935),
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
+        title: const Text(
+          'CODE4ALL',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            letterSpacing: 1,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAF7FF),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: const Color(0xFF0B4F6C).withOpacity(0.18),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '💡 Cápsula de conocimiento',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0B4F6C),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Python',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF0B4F6C).withOpacity(0.95),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Escribe código claro, legible y fácil de mantener.',
+                      style: TextStyle(
+                        fontSize: 15,
+                        height: 1.45,
+                        color: Color(0xFF2A67AB),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              _LecturaCard(
+                title: 'El poder de los nombres descriptivos',
+                body:
+                    'Cuando escribes código en Python, toma un momento extra para elegir nombres claros y descriptivos para tus variables y funciones. Python premia la claridad, y un buen nombre reduce el esfuerzo de entender el programa.',
+                color: const Color(0xFF0B4F6C),
+                backgroundColor: const Color(0xFFEAF7FF),
+              ),
+              const SizedBox(height: 12),
+              _LecturaCard(
+                title: 'Ejemplo',
+                body:
+                    'Malo: x = 25\n\ny = "Juan"\n\ndef f(a, b):\n    return a + b\n\nBueno: edad_usuario = 25\n\nnombre_cliente = "Juan"\n\ndef sumar_numeros(numero1, numero2):\n    return numero1 + numero2',
+                color: const Color(0xFF1565C0),
+                backgroundColor: const Color(0xFFF4F8FC),
+              ),
+              const SizedBox(height: 12),
+              _LecturaCard(
+                title: '¿Por qué importa?',
+                body:
+                    '• Tu código será más fácil de mantener\n• Otros desarrolladores lo entenderán rápido\n• Los errores serán más fáciles de encontrar\n• Python prioriza la legibilidad',
+                color: const Color(0xFF1E88E5),
+                backgroundColor: const Color(0xFFF8FBFF),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9F5E7),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFFB8860B).withOpacity(0.25),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Bonus: La regla del Zen de Python',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF8D6E63),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Escribe import this en tu intérprete y descubrirás los principios que guían a Python. El primero dice: “Beautiful is better than ugly”.',
+                      style: TextStyle(
+                        fontSize: 15,
+                        height: 1.5,
+                        color: const Color(0xFF6D4C41).withOpacity(0.95),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.pop(context, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2E7D32),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                  ),
+                  icon: const Icon(Icons.check_circle_outline),
+                  label: const Text('Terminar'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class EjemploPythonLightScreen extends StatelessWidget {
+  final String actividad;
+
+  const EjemploPythonLightScreen({super.key, required this.actividad});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFE53935),
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
+        title: const Text(
+          'CODE4ALL',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            letterSpacing: 1,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAF7FF),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: const Color(0xFF0B4F6C).withOpacity(0.18),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '🧪 Ejemplo',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0B4F6C),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Mi primer programa en Python',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0B4F6C),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              _LecturaCard(
+                title: 'Ejemplo: Mi primer programa en Python',
+                body:
+                    '## Ejemplo: Mi primer programa en Python\n\n```python\n# Mi primer programa en Python\n\nprint("¡Bienvenido a Python!")\n\nprint("Este es mi primer código")\n\nnumero = 10\n\nmensaje = "Python es genial"\n\nprint(f"Número: {numero}")\n\nprint(f"Mensaje: {mensaje}")\n```\n\nResultado en la terminal:\n\n¡Bienvenido a Python!\n\nEste es mi primer código\n\nNúmero: 10\n\nMensaje: Python es genial\n\n### Explicación línea por línea:\n\n1. print("¡Bienvenido a Python!") — Imprime un texto en la pantalla\n2. print("Este es mi primer código") — Imprime otra línea de texto\n3. numero = 10 — Crea una variable llamada numero y le asigna el valor 10\n4. mensaje = "Python es genial" — Crea una variable llamada mensaje con un texto\n5. print(f"Número: {numero}") — Imprime el valor de la variable numero dentro del texto\n6. print(f"Mensaje: {mensaje}") — Imprime el valor de la variable mensaje dentro del texto',
+                color: const Color(0xFF1565C0),
+                backgroundColor: const Color(0xFFF4F8FC),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9F5E7),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFFB8860B).withOpacity(0.25),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Resultado en la terminal',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF8D6E63),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      '¡Bienvenido a Python!\n\nEste es mi primer código\n\nNúmero: 10\n\nMensaje: Python es genial',
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                        color: Color(0xFF6D4C41),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FBFF),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFF1E88E5).withOpacity(0.2),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Explicación línea por línea',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1565C0),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildStep(
+                      'print("¡Bienvenido a Python!")',
+                      'Imprime un texto en la pantalla.',
+                    ),
+                    _buildStep(
+                      'print("Este es mi primer código")',
+                      'Imprime otra línea de texto.',
+                    ),
+                    _buildStep(
+                      'numero = 10',
+                      'Crea una variable llamada numero y le asigna el valor 10.',
+                    ),
+                    _buildStep(
+                      'mensaje = "Python es genial"',
+                      'Crea una variable llamada mensaje con un texto.',
+                    ),
+                    _buildStep(
+                      'print(f"Número: {numero}")',
+                      'Imprime el valor de la variable numero dentro del texto.',
+                    ),
+                    _buildStep(
+                      'print(f"Mensaje: {mensaje}")',
+                      'Imprime el valor de la variable mensaje dentro del texto.',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.pop(context, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2E7D32),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                  ),
+                  icon: const Icon(Icons.check_circle_outline),
+                  label: const Text('Terminar'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStep(String code, String explanation) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '$code\n',
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 13,
+                color: Color(0xFF0B4F6C),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            TextSpan(
+              text: explanation,
+              style: const TextStyle(
+                fontSize: 13,
+                color: Color(0xFF2A67AB),
+                height: 1.45,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EjercicioInteractivoLightScreen extends StatefulWidget {
+  final String actividad;
+
+  const EjercicioInteractivoLightScreen({super.key, required this.actividad});
+
+  @override
+  State<EjercicioInteractivoLightScreen> createState() =>
+      _EjercicioInteractivoLightScreenState();
+}
+
+class _EjercicioInteractivoLightScreenState
+    extends State<EjercicioInteractivoLightScreen> {
+  late final PageController _pageController;
+  final List<String?> _selecciones = List.filled(2, null);
+  final List<String?> _feedbacks = List.filled(2, null);
+  final List<String> _correctas = const [
+    'B) Porque tiene una sintaxis clara y elegante que democratiza la programación, permitiendo que tanto principiantes como expertos creen soluciones poderosas',
+    'B) Para gestionar e instalar librerías externas',
+  ];
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _handleSelection(int index, String opcion) {
+    setState(() {
+      _selecciones[index] = opcion;
+      _feedbacks[index] = opcion == _correctas[index]
+          ? null
+          : 'Respuesta equivocada';
+    });
+  }
+
+  void _goToNextOrFinish() {
+    final seleccionActual = _selecciones[_currentPage];
+
+    if (seleccionActual == null) {
+      setState(() {
+        _feedbacks[_currentPage] =
+            'Selecciona una respuesta antes de continuar.';
+      });
+      return;
+    }
+
+    if (seleccionActual != _correctas[_currentPage]) {
+      setState(() {
+        _feedbacks[_currentPage] = 'Respuesta equivocada';
+      });
+      return;
+    }
+
+    if (_currentPage < 1) {
+      setState(() {
+        _currentPage += 1;
+      });
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      Navigator.pop(context, true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFE53935),
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
+        title: const Text(
+          'CODE4ALL',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            letterSpacing: 1,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAF7FF),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: const Color(0xFF0B4F6C).withOpacity(0.18),
+                  ),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '🎯 Ejercicio interactivo',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0B4F6C),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Responde correctamente para poder avanzar a la siguiente pregunta.',
+                      style: TextStyle(
+                        fontSize: 15,
+                        height: 1.45,
+                        color: Color(0xFF2A67AB),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Text(
+                    'Pregunta ${_currentPage + 1} de 2',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1565C0),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Row(
+                      children: List.generate(2, (index) {
+                        final isActive = index == _currentPage;
+                        return Expanded(
+                          child: Container(
+                            height: 5,
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? const Color(0xFFE53935)
+                                  : const Color(0xFFBBDEFB),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 2,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                    child: _buildPregunta(
+                      index: index,
+                      pregunta: index == 0
+                          ? '¿Cuál es la razón principal por la cual Python se ha convertido en el lenguaje de programación más relevante del siglo XXI?'
+                          : '¿Para qué se utiliza pip en Python?',
+                      opciones: index == 0
+                          ? const [
+                              'A) Porque fue el primer lenguaje de programación creado',
+                              'B) Porque tiene una sintaxis clara y elegante que democratiza la programación, permitiendo que tanto principiantes como expertos creen soluciones poderosas',
+                              'C) Porque es el único lenguaje compatible con Windows',
+                              'D) Porque no requiere descargar ni instalar nada',
+                            ]
+                          : const [
+                              'A) Para escribir código más rápido',
+                              'B) Para gestionar e instalar librerías externas',
+                              'C) Para cambiar el color de la terminal',
+                              'D) Para ejecutar juegos',
+                            ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _goToNextOrFinish,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2E7D32),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                      icon: Icon(
+                        _currentPage < 1
+                            ? Icons.arrow_forward
+                            : Icons.check_circle_outline,
+                      ),
+                      label: Text(_currentPage < 1 ? 'Siguiente' : 'Terminar'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPregunta({
+    required int index,
+    required String pregunta,
+    required List<String> opciones,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FBFF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF90CAF9).withOpacity(0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            pregunta,
+            style: const TextStyle(
+              fontSize: 15,
+              height: 1.4,
+              color: Color(0xFF263238),
+            ),
+          ),
+          const SizedBox(height: 10),
+          ...opciones.map(
+            (opcion) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: GestureDetector(
+                onTap: () => _handleSelection(index, opcion),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        _selecciones[index] == opcion &&
+                            opcion == _correctas[index]
+                        ? const Color(0xFF2E7D32)
+                        : _selecciones[index] == opcion &&
+                              opcion != _correctas[index]
+                        ? const Color(0xFFE53935)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color:
+                          _selecciones[index] == opcion &&
+                              opcion == _correctas[index]
+                          ? const Color(0xFF2E7D32)
+                          : _selecciones[index] == opcion &&
+                                opcion != _correctas[index]
+                          ? const Color(0xFFE53935)
+                          : const Color(0xFFB0BEC5),
+                    ),
+                  ),
+                  child: Text(
+                    opcion,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color:
+                          _selecciones[index] == opcion &&
+                              opcion == _correctas[index]
+                          ? Colors.white
+                          : _selecciones[index] == opcion &&
+                                opcion != _correctas[index]
+                          ? Colors.white
+                          : const Color(0xFF263238),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_feedbacks[index] != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                _feedbacks[index]!,
+                style: const TextStyle(
+                  color: Color(0xFFE53935),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
                 ),
               ),
             ),
@@ -1337,7 +2229,7 @@ class VideoTemaLightScreen extends StatelessWidget {
   }
 }
 
-class LecturaTemaLightScreen extends StatelessWidget {
+class LecturaTemaLightScreen extends StatefulWidget {
   final String actividad;
   final String contenido;
 
@@ -1348,7 +2240,59 @@ class LecturaTemaLightScreen extends StatelessWidget {
   });
 
   @override
+  State<LecturaTemaLightScreen> createState() => _LecturaTemaLightScreenState();
+}
+
+class _LecturaTemaLightScreenState extends State<LecturaTemaLightScreen> {
+  static const List<String> _lecturasDisponibles = [
+    'Relevancia del lenguaje Python',
+    '¿Qué es un IDE/Editor?',
+    'Palabras clave',
+  ];
+
+  late int _indiceActual;
+  bool _lecturaCompletada = false;
+  bool _isFinishing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _indiceActual = _lecturasDisponibles.indexOf(widget.actividad);
+    if (_indiceActual == -1) {
+      _indiceActual = 0;
+    }
+  }
+
+  void _cambiarLectura(int delta) {
+    if (_isFinishing) return;
+
+    if (_indiceActual == _lecturasDisponibles.length - 1 && delta > 0) {
+      setState(() {
+        _lecturaCompletada = true;
+        _isFinishing = true;
+      });
+
+      Future.delayed(const Duration(milliseconds: 900), () {
+        if (mounted) {
+          Navigator.pop(context, true);
+        }
+      });
+      return;
+    }
+
+    setState(() {
+      _indiceActual =
+          (_indiceActual + delta + _lecturasDisponibles.length) %
+          _lecturasDisponibles.length;
+      _lecturaCompletada = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final actividadActual = _lecturasDisponibles[_indiceActual];
+    final contenidoActual = _textoLecturaPorActividad(actividadActual);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -1382,7 +2326,7 @@ class LecturaTemaLightScreen extends StatelessWidget {
             color: const Color(0xFF45D1D6),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Text(
-              'Lectura: $actividad',
+              'Lectura: $actividadActual',
               style: const TextStyle(
                 fontSize: 20,
                 color: Color(0xFF0B4F6C),
@@ -1405,24 +2349,174 @@ class LecturaTemaLightScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Text(
-                    contenido,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      height: 1.45,
-                      color: Color(0xFF2A67AB),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 320),
+                    reverseDuration: const Duration(milliseconds: 240),
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position:
+                              Tween<Offset>(
+                                begin: const Offset(0.04, 0),
+                                end: Offset.zero,
+                              ).animate(
+                                CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.easeOutCubic,
+                                ),
+                              ),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: KeyedSubtree(
+                      key: ValueKey<String>(actividadActual),
+                      child: actividadActual == 'Relevancia del lenguaje Python'
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _LecturaCard(
+                                  title: 'Por qué importa',
+                                  body:
+                                      'Python se ha vuelto clave porque combina una sintaxis clara con una gran capacidad para resolver problemas reales en ciencia de datos, desarrollo web, automatización e inteligencia artificial.',
+                                  color: const Color(0xFF0B4F6C),
+                                  backgroundColor: const Color(0xFFEAF7FF),
+                                ),
+                                const SizedBox(height: 12),
+                                _LecturaCard(
+                                  title: '¿Dónde se usa?',
+                                  body:
+                                      'Empresas y equipos tecnológicos lo utilizan para crear prototipos rápidos, servicios digitales y herramientas que conectan distintos sistemas.',
+                                  color: const Color(0xFF0B4F6C),
+                                  backgroundColor: const Color(0xFFEAF7FF),
+                                ),
+                                const SizedBox(height: 12),
+                                _LecturaCard(
+                                  title: 'Ventajas para aprender',
+                                  body:
+                                      'Su lectura sencilla y su comunidad activa hacen que aprender Python sea más accesible, más entretenido y más fácil de mantener a lo largo del tiempo.',
+                                  color: const Color(0xFF0B4F6C),
+                                  backgroundColor: const Color(0xFFEAF7FF),
+                                ),
+                              ],
+                            )
+                          : Text(
+                              contenidoActual,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                height: 1.45,
+                                color: Color(0xFF2A67AB),
+                              ),
+                              textAlign: TextAlign.justify,
+                            ),
                     ),
-                    textAlign: TextAlign.justify,
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF4F8FC),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: const Color(0xFF0B4F6C).withOpacity(0.14),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(999),
+                            child: LinearProgressIndicator(
+                              value:
+                                  (_indiceActual + 1) /
+                                  _lecturasDisponibles.length,
+                              minHeight: 8,
+                              backgroundColor: const Color(
+                                0xFF0B4F6C,
+                              ).withOpacity(0.12),
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Color(0xFF1E88E5),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          '${_indiceActual + 1}/${_lecturasDisponibles.length}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF0B4F6C),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      _NavButton(label: 'Anterior'),
-                      const SizedBox(width: 10),
-                      _NavButton(label: 'Siguiente'),
-                    ],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      _lecturasDisponibles.length,
+                      (index) => AnimatedContainer(
+                        duration: const Duration(milliseconds: 240),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: index == _indiceActual ? 18 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: index == _indiceActual
+                              ? const Color(0xFF1E88E5)
+                              : const Color(0xFF0B4F6C).withOpacity(0.24),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                    ),
                   ),
+                  const SizedBox(height: 20),
+                  if (_lecturaCompletada)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F5E9),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFF2E7D32).withOpacity(0.25),
+                        ),
+                      ),
+                      child: const Text(
+                        '¡Felicitaciones! Has completado la lectura satisfactoriamente.',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF2E7D32),
+                        ),
+                      ),
+                    )
+                  else
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: () => _cambiarLectura(-1),
+                          child: const _NavButton(label: 'Anterior'),
+                        ),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () => _cambiarLectura(1),
+                          child: _NavButton(
+                            label:
+                                _indiceActual == _lecturasDisponibles.length - 1
+                                ? 'Finalizar'
+                                : 'Siguiente',
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -1456,6 +2550,55 @@ class _NavButton extends StatelessWidget {
       child: Text(
         '▶ $label',
         style: const TextStyle(color: Colors.white, fontSize: 18),
+      ),
+    );
+  }
+}
+
+class _LecturaCard extends StatelessWidget {
+  final String title;
+  final String body;
+  final Color color;
+  final Color backgroundColor;
+
+  const _LecturaCard({
+    required this.title,
+    required this.body,
+    required this.color,
+    required this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            body,
+            style: TextStyle(
+              fontSize: 15,
+              height: 1.5,
+              color: color.withValues(alpha: 0.9),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/web_player_html.dart'; //Daniel Pruebas
+import 'package:flutter_code4all/web_player_html_2.dart'; //Daniel Pruebas
 import 'accessibility_settings_screen.dart';
 import 'accessibility_text_scale.dart';
 import 'visual_theme_controller.dart';
@@ -47,6 +48,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
     'Ayuda': [
       {'icon': Icons.settings, 'label': 'Configuración'},
       {'icon': Icons.assignment_late, 'label': 'Video prueba Daniel'},
+      {'icon': Icons.notifications_paused, 'label': 'Audio prueba Daniel'},
       {'icon': Icons.text_fields, 'label': 'Tamaño de texto'},
       {'icon': Icons.brightness_4, 'label': 'Modo visual'},
       {'icon': Icons.hearing, 'label': 'Asistencia auditiva'},
@@ -156,7 +158,9 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
     _overlayEntry = OverlayEntry(
       builder: (overlayContext) {
-        final double scale = AccessibilityTextScaleScope.of(overlayContext).scale;
+        final double scale = AccessibilityTextScaleScope.of(
+          overlayContext,
+        ).scale;
         final overlayMediaQuery = MediaQuery.of(overlayContext);
         final overlayHeight = overlayMediaQuery.size.height;
         final overlayWidth = overlayMediaQuery.size.width;
@@ -386,7 +390,9 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.18),
+                                          color: Colors.black.withValues(
+                                            alpha: 0.18,
+                                          ),
                                           blurRadius: 10,
                                           offset: const Offset(0, 4),
                                         ),
@@ -466,6 +472,10 @@ class _HelpActionButtonState extends State<HelpActionButton>
       _navigateToVideoDaniel();
       return;
     }
+    if (option == 'Audio prueba Daniel') {
+      _navigateToAudioDaniel();
+      return;
+    }
     setState(() {
       _selectedOption = option;
     });
@@ -484,6 +494,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
       );
     });
   }
+
   void _navigateToVideoDaniel() {
     _hideOverlay();
 
@@ -491,7 +502,21 @@ class _HelpActionButtonState extends State<HelpActionButton>
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute(
-          builder: (context) => const YoutubeIframeTestScreen(videoId: 'dQw4w9WgXcQ'),
+          builder: (context) =>
+              const YoutubeIframeTestScreen(videoId: 'dQw4w9WgXcQ'),
+        ),
+      );
+    });
+  }
+
+  void _navigateToAudioDaniel() {
+    _hideOverlay();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(
+          builder: (context) => const CustomAudioPlayerScreen(),
         ),
       );
     });
@@ -600,7 +625,10 @@ class _AccessibilityIconButton extends StatelessWidget {
           color: color,
           shape: BoxShape.circle,
           gradient: LinearGradient(
-            colors: [color.withValues(alpha: 0.95), color.withValues(alpha: 0.8)],
+            colors: [
+              color.withValues(alpha: 0.95),
+              color.withValues(alpha: 0.8),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

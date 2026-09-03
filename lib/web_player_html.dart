@@ -4,13 +4,11 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 class YoutubeIframeTestScreen extends StatefulWidget {
   final String videoId;
 
-  const YoutubeIframeTestScreen({
-    super.key,
-    required this.videoId,
-  });
+  const YoutubeIframeTestScreen({super.key, required this.videoId});
 
   @override
-  State<YoutubeIframeTestScreen> createState() => _YoutubeIframeTestScreenState();
+  State<YoutubeIframeTestScreen> createState() =>
+      _YoutubeIframeTestScreenState();
 }
 
 class _YoutubeIframeTestScreenState extends State<YoutubeIframeTestScreen> {
@@ -23,7 +21,8 @@ class _YoutubeIframeTestScreenState extends State<YoutubeIframeTestScreen> {
       videoId: widget.videoId,
       autoPlay: false,
       params: const YoutubePlayerParams(
-        showControls: true, // Mantenemos ocultos los controles nativos de YouTube cuando IgnorePointer está activo, de lo contrario es true
+        showControls:
+            true, // Mantenemos ocultos los controles nativos de YouTube cuando IgnorePointer está activo, de lo contrario es true
         showFullscreenButton: false,
         mute: false,
         strictRelatedVideos: true,
@@ -54,18 +53,18 @@ class _YoutubeIframeTestScreenState extends State<YoutubeIframeTestScreen> {
                 constraints: const BoxConstraints(maxWidth: 800),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  // Envolvemos el video en un IgnorePointer para que los clics 
+                  // Envolvemos el video en un IgnorePointer para que los clics
                   // vayan a nuestros botones y no al iframe
                   //child: IgnorePointer(
-                    child: YoutubePlayer(
-                      controller: _controller,
-                      aspectRatio: 16 / 9,
-                    ),
+                  child: YoutubePlayer(
+                    controller: _controller,
+                    aspectRatio: 16 / 9,
+                  ),
                   //),
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // ✨ AQUÍ ESTÁN TUS CONTROLES PERSONALIZADOS EN FLUTTER
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

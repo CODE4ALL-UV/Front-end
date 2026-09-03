@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_code4all/youtube_translator_player.dart';
+import 'package:flutter_code4all/youtube_translator_player_new.dart'; // LE FALTO EL _new MI PAPACHO, VEA ESO jaja
 
 void main() {
   group('extractVideoId', () {

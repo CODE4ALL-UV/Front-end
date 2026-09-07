@@ -424,10 +424,17 @@ class CapituloDetalleLight extends StatefulWidget {
 }
 
 class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
+  static const String _defaultModuleId = 'default-module';
+  String _chapterName = 'Capítulo 1';
+  List<String> _topics = [];
+
   bool _resumenExpanded = true;
   bool _rutaExpanded = true;
   bool _isNavigatingToModule2 = false;
+  bool _isTeacher = false;
   final Set<String> _completedActivities = <String>{};
+
+  final _authStorage = AuthStorage();
 
   static const _rutaItems = [
     _ActivityItem('Relevancia del lenguaje Python', '📦🖥️🎧'),
@@ -438,6 +445,51 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
     _ActivityItem('Laboratorio', '🧪'),
     _ActivityItem('Evaluación final', '📋'),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRole();
+    _fetchModuleAndApply(_defaultModuleId);
+  }
+
+  Future<void> _fetchModuleAndApply(String moduleId) async {
+    final backend = dotenv.env['BACKEND_URL'] ?? 'http://127.0.0.1:8000';
+    try {
+      final res = await http.get(Uri.parse('$backend/api/modules/$moduleId'));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        final name = data['name'] ?? 'Módulo 1';
+        final topics = (data['topics'] as List<dynamic>? ?? []).cast<String>();
+        if (!mounted) return;
+        setState(() {
+          _chapterName = name;
+          _topics = topics;
+        });
+      } else if (mounted) {
+        setState(() {
+          _chapterName = 'Capítulo 1';
+          _topics = [];
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _chapterName = 'Capítulo 1';
+          _topics = [];
+        });
+      }
+    }
+  }
+
+  Future<void> _checkRole() async {
+    final role = await _authStorage.getRole();
+    if (!mounted) return;
+
+    setState(() {
+      _isTeacher = (role ?? '').toLowerCase() == 'docente';
+    });
+  }
 
   Future<void> _openLectura(String actividad) async {
     final completed = await Navigator.push(
@@ -687,6 +739,26 @@ class _CapituloDetalleLightState extends State<CapituloDetalleLight> {
                   children: [
                     _DetailCard(
                       title: 'Capítulo 1: Conociendo Python',
+                      actionIcon: _isTeacher
+                          ? IconButton(
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const TeacherModuleEditor(),
+                                  ),
+                                );
+                                if (result is String && result.isNotEmpty) {
+                                  await _fetchModuleAndApply(result);
+                                } else {
+                                  await _fetchModuleAndApply(_defaultModuleId);
+                                }
+                              },
+                              icon: const Icon(Icons.edit, color: Colors.black),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            )
+                          : null,
                       expanded: _resumenExpanded,
                       onToggle: () =>
                           setState(() => _resumenExpanded = !_resumenExpanded),
@@ -1148,12 +1220,14 @@ class _DetailCard extends StatelessWidget {
   final bool expanded;
   final VoidCallback onToggle;
   final Widget child;
+  final Widget? actionIcon; // <-- 1. Lo declaras aquí, lapíz docente
 
   const _DetailCard({
     required this.title,
     required this.expanded,
     required this.onToggle,
     required this.child,
+    this.actionIcon, // <-- 2. Lo pides en el constructor
   });
 
   @override
@@ -1190,6 +1264,10 @@ class _DetailCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8), // Espacio entre el texto y el icono
+                actionIcon ??
+                    const SizedBox.shrink(), //PILAS PUES if (actionIcon != null) actionIcon!, // <-- 3. Lo muestras si no es nulo
+                const Spacer(), // Empuja la flecha de expandir a la derecha
                 Icon(
                   expanded
                       ? Icons.keyboard_arrow_up

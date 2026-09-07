@@ -3,7 +3,7 @@ import 'ui/core/themes/app_theme.dart';
 import 'ui/core/ui/accessibility_text_scale.dart';
 import 'ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
-import 'ui/users_management/screens/login_screen.dart';
+import 'ui/users_management/widgets/login_screen.dart';
 import 'ui/users_management/screens/login_dark_screen.dart';
 import 'ui/users_management/screens/form_light_screen.dart';
 import 'ui/users_management/screens/form_dark_screen.dart';
@@ -269,7 +269,8 @@ class _AppState extends State<App> {
               darkTheme: _getThemeData(AppThemeMode.dark),
               builder: (context, child) {
                 final mediaQuery = MediaQuery.of(context);
-                return MediaQuery( //HERE IS THE ERROR The relevant error-causing widget failed
+                return MediaQuery(
+                  //HERE IS THE ERROR The relevant error-causing widget failed
                   data: mediaQuery.copyWith(
                     textScaler: TextScaler.linear(_textScaleController.scale),
                   ),

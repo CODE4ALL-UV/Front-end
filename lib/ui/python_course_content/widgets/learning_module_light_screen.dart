@@ -7,8 +7,8 @@ import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
-import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
-import 'package:flutter_code4all/ui/users_management/screens/learning_module2_dark_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_light_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_dark_screen.dart';
 import 'quiz_screen.dart';
 import 'quiz_with_video_screen.dart';
 import 'laboratory_console_screen.dart';
@@ -16,7 +16,7 @@ import 'quiz_screen_dark.dart';
 import 'quiz_with_video_screen_dark.dart';
 import 'laboratory_console_screen_dark.dart';
 import 'final_evaluation_screen.dart';
-import '../widgets/live_translation_box.dart';
+import '../../users_management/widgets/live_translation_box.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -1465,7 +1465,7 @@ class CapsulaConocimientoLightScreen extends StatelessWidget {
                   color: const Color(0xFFEAF7FF),
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: const Color(0xFF0B4F6C).withOpacity(0.18),
+                    color: const Color(0xFF0B4F6C).withValues(alpha: 0.18),
                   ),
                 ),
                 child: Column(
@@ -1485,7 +1485,7 @@ class CapsulaConocimientoLightScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0B4F6C).withOpacity(0.95),
+                        color: const Color(0xFF0B4F6C).withValues(alpha: 0.95),
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -1532,7 +1532,7 @@ class CapsulaConocimientoLightScreen extends StatelessWidget {
                   color: const Color(0xFFF9F5E7),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFFB8860B).withOpacity(0.25),
+                    color: const Color(0xFFB8860B).withValues(alpha: 0.25),
                   ),
                 ),
                 child: Column(
@@ -1552,7 +1552,7 @@ class CapsulaConocimientoLightScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         height: 1.5,
-                        color: const Color(0xFF6D4C41).withOpacity(0.95),
+                        color: const Color(0xFF6D4C41).withValues(alpha: 0.95),
                       ),
                     ),
                   ],
@@ -1626,7 +1626,7 @@ class EjemploPythonLightScreen extends StatelessWidget {
                   color: const Color(0xFFEAF7FF),
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: const Color(0xFF0B4F6C).withOpacity(0.18),
+                    color: const Color(0xFF0B4F6C).withValues(alpha: 0.18),
                   ),
                 ),
                 child: Column(
@@ -1668,7 +1668,7 @@ class EjemploPythonLightScreen extends StatelessWidget {
                   color: const Color(0xFFF9F5E7),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFFB8860B).withOpacity(0.25),
+                    color: const Color(0xFFB8860B).withValues(alpha: 0.25),
                   ),
                 ),
                 child: Column(
@@ -1702,7 +1702,7 @@ class EjemploPythonLightScreen extends StatelessWidget {
                   color: const Color(0xFFF8FBFF),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFF1E88E5).withOpacity(0.2),
+                    color: const Color(0xFF1E88E5).withValues(alpha: 0.2),
                   ),
                 ),
                 child: Column(
@@ -1909,7 +1909,7 @@ class _EjercicioInteractivoLightScreenState
                   color: const Color(0xFFEAF7FF),
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: const Color(0xFF0B4F6C).withOpacity(0.18),
+                    color: const Color(0xFF0B4F6C).withValues(alpha: 0.18),
                   ),
                 ),
                 child: const Column(
@@ -2054,7 +2054,9 @@ class _EjercicioInteractivoLightScreenState
       decoration: BoxDecoration(
         color: const Color(0xFFF8FBFF),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF90CAF9).withOpacity(0.25)),
+        border: Border.all(
+          color: const Color(0xFF90CAF9).withValues(alpha: 0.25),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2501,7 +2503,7 @@ class _LecturaTemaLightScreenState extends State<LecturaTemaLightScreen> {
                       color: const Color(0xFFF4F8FC),
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(
-                        color: const Color(0xFF0B4F6C).withOpacity(0.14),
+                        color: const Color(0xFF0B4F6C).withValues(alpha: 0.14),
                       ),
                     ),
                     child: Row(
@@ -2516,7 +2518,7 @@ class _LecturaTemaLightScreenState extends State<LecturaTemaLightScreen> {
                               minHeight: 8,
                               backgroundColor: const Color(
                                 0xFF0B4F6C,
-                              ).withOpacity(0.12),
+                              ).withValues(alpha: 0.12),
                               valueColor: const AlwaysStoppedAnimation<Color>(
                                 Color(0xFF1E88E5),
                               ),
@@ -2548,7 +2550,7 @@ class _LecturaTemaLightScreenState extends State<LecturaTemaLightScreen> {
                         decoration: BoxDecoration(
                           color: index == _indiceActual
                               ? const Color(0xFF1E88E5)
-                              : const Color(0xFF0B4F6C).withOpacity(0.24),
+                              : const Color(0xFF0B4F6C).withValues(alpha: 0.24),
                           borderRadius: BorderRadius.circular(999),
                         ),
                       ),
@@ -2563,7 +2565,9 @@ class _LecturaTemaLightScreenState extends State<LecturaTemaLightScreen> {
                         color: const Color(0xFFE8F5E9),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFF2E7D32).withOpacity(0.25),
+                          color: const Color(
+                            0xFF2E7D32,
+                          ).withValues(alpha: 0.25),
                         ),
                       ),
                       child: const Text(

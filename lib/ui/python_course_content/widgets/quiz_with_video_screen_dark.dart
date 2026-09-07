@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/header_widget.dart';
-import 'video_player_screen.dart';
+import '../../users_management/screens/video_player_screen.dart';
 
 class QuizWithVideoScreenDark extends StatefulWidget {
   final String? actividad;

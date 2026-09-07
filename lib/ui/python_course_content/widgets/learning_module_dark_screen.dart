@@ -9,7 +9,7 @@ import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_code4all/ui/users_management/screens/learning_module2_dark_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_dark_screen.dart';
 import 'quiz_screen.dart';
 import 'quiz_screen_dark.dart';
 import 'quiz_with_video_screen.dart';
@@ -17,7 +17,7 @@ import 'quiz_with_video_screen_dark.dart';
 import 'laboratory_console_screen.dart';
 import 'laboratory_console_screen_dark.dart';
 import 'final_evaluation_screen.dart';
-import '../widgets/live_translation_box.dart';
+import '../../users_management/widgets/live_translation_box.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'package:flutter_code4all/ui/users_management/screens/teacher_module_editor.dart';
@@ -1343,7 +1343,7 @@ class CapsulaConocimientoDarkScreen extends StatelessWidget {
                   color: const Color(0xFF263238),
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: const Color(0xFF4DD0E1).withOpacity(0.25),
+                    color: const Color(0xFF4DD0E1).withValues(alpha: 0.25),
                   ),
                 ),
                 child: Column(
@@ -1410,7 +1410,7 @@ class CapsulaConocimientoDarkScreen extends StatelessWidget {
                   color: const Color(0xFF2D2A20),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFFE0C97D).withOpacity(0.25),
+                    color: const Color(0xFFE0C97D).withValues(alpha: 0.25),
                   ),
                 ),
                 child: Column(
@@ -1504,7 +1504,7 @@ class EjemploPythonDarkScreen extends StatelessWidget {
                   color: const Color(0xFF263238),
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: const Color(0xFF4DD0E1).withOpacity(0.25),
+                    color: const Color(0xFF4DD0E1).withValues(alpha: 0.25),
                   ),
                 ),
                 child: Column(
@@ -1546,7 +1546,7 @@ class EjemploPythonDarkScreen extends StatelessWidget {
                   color: const Color(0xFF2D2A20),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFFE0C97D).withOpacity(0.25),
+                    color: const Color(0xFFE0C97D).withValues(alpha: 0.25),
                   ),
                 ),
                 child: Column(
@@ -1580,7 +1580,7 @@ class EjemploPythonDarkScreen extends StatelessWidget {
                   color: const Color(0xFF1F2D31),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFF4DD0E1).withOpacity(0.2),
+                    color: const Color(0xFF4DD0E1).withValues(alpha: 0.2),
                   ),
                 ),
                 child: Column(
@@ -1787,7 +1787,7 @@ class _EjercicioInteractivoDarkScreenState
                   color: const Color(0xFF263238),
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: const Color(0xFF4DD0E1).withOpacity(0.25),
+                    color: const Color(0xFF4DD0E1).withValues(alpha: 0.25),
                   ),
                 ),
                 child: const Column(
@@ -1932,7 +1932,9 @@ class _EjercicioInteractivoDarkScreenState
       decoration: BoxDecoration(
         color: const Color(0xFF1F2D31),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF4DD0E1).withOpacity(0.2)),
+        border: Border.all(
+          color: const Color(0xFF4DD0E1).withValues(alpha: 0.2),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2405,7 +2407,7 @@ class _LecturaTemaDarkScreenState extends State<LecturaTemaDarkScreen> {
                       color: const Color(0xFF23343D),
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(
-                        color: const Color(0xFF90CAF9).withOpacity(0.18),
+                        color: const Color(0xFF90CAF9).withValues(alpha: 0.18),
                       ),
                     ),
                     child: Row(
@@ -2420,7 +2422,7 @@ class _LecturaTemaDarkScreenState extends State<LecturaTemaDarkScreen> {
                               minHeight: 8,
                               backgroundColor: const Color(
                                 0xFF90CAF9,
-                              ).withOpacity(0.12),
+                              ).withValues(alpha: 0.12),
                               valueColor: const AlwaysStoppedAnimation<Color>(
                                 Color(0xFF29B6F6),
                               ),
@@ -2452,7 +2454,7 @@ class _LecturaTemaDarkScreenState extends State<LecturaTemaDarkScreen> {
                         decoration: BoxDecoration(
                           color: index == _indiceActual
                               ? const Color(0xFF29B6F6)
-                              : const Color(0xFFE0F7FA).withOpacity(0.24),
+                              : const Color(0xFFE0F7FA).withValues(alpha: 0.24),
                           borderRadius: BorderRadius.circular(999),
                         ),
                       ),
@@ -2467,7 +2469,9 @@ class _LecturaTemaDarkScreenState extends State<LecturaTemaDarkScreen> {
                         color: const Color(0xFF1B3A4B),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFF80CBC4).withOpacity(0.25),
+                          color: const Color(
+                            0xFF80CBC4,
+                          ).withValues(alpha: 0.25),
                         ),
                       ),
                       child: const Text(

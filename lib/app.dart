@@ -7,8 +7,8 @@ import 'ui/users_management/widgets/login_screen.dart';
 import 'ui/users_management/screens/login_dark_screen.dart';
 import 'ui/users_management/screens/form_light_screen.dart';
 import 'ui/users_management/screens/form_dark_screen.dart';
-import 'ui/users_management/screens/learning_module_light_screen.dart';
-import 'ui/users_management/screens/learning_module_dark_screen.dart';
+import 'ui/python_course_content/widgets/learning_module_light_screen.dart';
+import 'ui/python_course_content/widgets/learning_module_dark_screen.dart';
 import 'ui/director/director_performance_screen.dart';
 
 // Definimos los 6 estados de tema posibles de tu TG

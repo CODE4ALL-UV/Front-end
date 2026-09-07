@@ -8,8 +8,8 @@ import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
-import 'package:flutter_code4all/ui/users_management/screens/learning_module5_light_screen.dart';
-import 'package:flutter_code4all/ui/users_management/screens/learning_module5_dark_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module5_light_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module5_dark_screen.dart';
 
 class Modulo6AprendizajeLight extends StatefulWidget {
   const Modulo6AprendizajeLight({super.key});

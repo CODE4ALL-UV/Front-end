@@ -10,10 +10,10 @@ import 'laboratory_console_screen_dark.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
-import 'package:flutter_code4all/ui/users_management/screens/learning_module2_dark_screen.dart';
-import 'package:flutter_code4all/ui/users_management/screens/learning_module2_light_screen.dart';
-import 'package:flutter_code4all/ui/users_management/screens/learning_module4_dark_screen.dart';
-import 'package:flutter_code4all/ui/users_management/screens/learning_module4_light_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_dark_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_light_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module4_dark_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module4_light_screen.dart';
 
 class Modulo3AprendizajeDark extends StatefulWidget {
   const Modulo3AprendizajeDark({super.key});

@@ -295,7 +295,7 @@ class _FinalEvaluationScreenState extends State<FinalEvaluationScreen> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: isSelected
-                                        ? accent.withOpacity(0.15)
+                                        ? accent.withValues(alpha: 0.15)
                                         : isDark
                                         ? const Color(0xFF1F2937)
                                         : Colors.white,

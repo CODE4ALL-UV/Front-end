@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/ui/header_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
 class FinalEvaluationScreen extends StatefulWidget {
   const FinalEvaluationScreen({super.key});
@@ -106,7 +106,7 @@ class _FinalEvaluationScreenState extends State<FinalEvaluationScreen> {
       backgroundColor: isDark
           ? const Color(0xFF0F172A)
           : const Color(0xFFF8FAFC),
-      appBar: HeaderWidget(
+      appBar: GlobalAppBarWidget(
         title: 'CODE4ALL',
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

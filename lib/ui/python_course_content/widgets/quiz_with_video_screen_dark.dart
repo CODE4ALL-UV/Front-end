@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/ui/header_widget.dart';
-import '../../users_management/screens/video_player_screen.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import '../../users_management/widgets/video_player_screen.dart';
 
 class QuizWithVideoScreenDark extends StatefulWidget {
   final String? actividad;
@@ -51,7 +51,7 @@ class _QuizWithVideoScreenDarkState extends State<QuizWithVideoScreenDark> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
-      appBar: HeaderWidget(
+      appBar: GlobalAppBarWidget(
         title: 'CODE4ALL',
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),

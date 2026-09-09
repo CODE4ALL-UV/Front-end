@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/models/auth_models.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
-import 'package:flutter_code4all/ui/core/ui/header_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/social_auth_block.dart';
 import 'package:flutter_code4all/data/services/google_auth_service.dart';
@@ -108,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: HeaderWidget(
+      appBar: GlobalAppBarWidget(
         title: 'CODE4ALL v0.1.',
         showUserIcon: false,
         userName: 'Usuario',

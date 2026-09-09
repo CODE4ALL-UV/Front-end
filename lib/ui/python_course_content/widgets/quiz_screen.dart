@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/ui/header_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key});
@@ -90,7 +90,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
     return Scaffold(
       backgroundColor: _highContrast ? Colors.black : const Color(0xFFFDFDFD),
-      appBar: HeaderWidget(
+      appBar: GlobalAppBarWidget(
         title: 'CODE4ALL',
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

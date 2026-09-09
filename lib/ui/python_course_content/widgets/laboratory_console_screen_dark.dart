@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/ui/header_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
 class LaboratoryConsoleScreenDark extends StatefulWidget {
   const LaboratoryConsoleScreenDark({super.key});
@@ -133,7 +133,7 @@ class _LaboratoryConsoleScreenDarkState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
-      appBar: HeaderWidget(
+      appBar: GlobalAppBarWidget(
         title: 'CODE4ALL',
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),

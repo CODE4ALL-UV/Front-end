@@ -20,7 +20,7 @@ import 'final_evaluation_screen.dart';
 import '../../users_management/widgets/live_translation_box.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
-import 'package:flutter_code4all/ui/users_management/screens/teacher_module_editor.dart';
+import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor.dart';
 
 class ModuloAprendizajeDark extends StatefulWidget {
   final String userName;

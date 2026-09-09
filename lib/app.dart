@@ -4,11 +4,10 @@ import 'ui/core/ui/accessibility_text_scale.dart';
 import 'ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'ui/users_management/widgets/login_screen.dart';
-import 'ui/users_management/screens/login_dark_screen.dart';
-import 'ui/users_management/screens/form_light_screen.dart';
-import 'ui/users_management/screens/form_dark_screen.dart';
+import 'ui/users_management/widgets/login_dark_screen.dart';
+import 'ui/users_management/widgets/form_light_screen.dart';
+import 'ui/users_management/widgets/form_dark_screen.dart';
 import 'ui/python_course_content/widgets/learning_module_light_screen.dart';
-import 'ui/python_course_content/widgets/learning_module_dark_screen.dart';
 import 'ui/director/director_performance_screen.dart';
 
 // Definimos los 6 estados de tema posibles de tu TG
@@ -31,6 +30,8 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  AppThemeMode _themeMode = AppThemeMode.light;
+
   AppScreen _currentScreen = AppScreen.login;
   String _userName = 'Usuario';
   List<String> _bottomLabels = ['Anterior', 'Reproducir', 'Siguiente'];
@@ -77,25 +78,20 @@ class _AppState extends State<App> {
   void _goToModulo() => setState(() => _currentScreen = AppScreen.modulo);
 
   void _applyThemeMode(AppThemeMode mode) {
-    final isDarkTheme = mode == AppThemeMode.dark;
-    final currentIsDark = VisualThemeController.globalThemeNotifier.value;
-    final shouldUpdate =
-        currentIsDark != isDarkTheme ||
-        mode != AppThemeMode.light && mode != AppThemeMode.dark;
-
-    if (!shouldUpdate) {
-      return;
-    }
+    if (_themeMode == mode) return;
 
     setState(() {
-      VisualThemeController.globalThemeNotifier.value = isDarkTheme;
-      if (mode == AppThemeMode.light) {
-        _bottomLabels = ['Anterior', 'Reproducir', 'Siguiente'];
-      } else if (mode == AppThemeMode.dark) {
-        _bottomLabels = ['Volver', 'Play', 'Adelantar'];
-      } else {
-        _bottomLabels = ['Atrás', 'Iniciar', 'Siguiente'];
-      }
+      _themeMode = mode;
+
+      // Solo compatibilidad temporal con widgets viejos que aún consultan
+      // VisualThemeController.
+      VisualThemeController.globalThemeNotifier.value =
+          mode == AppThemeMode.dark || mode == AppThemeMode.achromatopsia;
+
+      _bottomLabels = switch (mode) {
+        AppThemeMode.dark => ['Volver', 'Play', 'Adelantar'],
+        _ => ['Anterior', 'Reproducir', 'Siguiente'],
+      };
     });
   }
 
@@ -171,7 +167,7 @@ class _AppState extends State<App> {
     );
   }
 
-  // Mostrar selector con tres opciones y actualizar etiquetas
+  // Muestra las seis paletas configuradas en AppTheme.
   void _showThemeOptions(BuildContext context) async {
     final choice = await showModalBottomSheet<AppThemeMode>(
       context: context,
@@ -190,8 +186,20 @@ class _AppState extends State<App> {
               ),
               ListTile(
                 title: const Text('Accesibilidad'),
-                subtitle: const Text('Deuteranopía'),
                 onTap: () => Navigator.of(ctx).pop(AppThemeMode.deuteranopia),
+              ),
+              ListTile(
+                title: const Text('Protanopía'),
+                onTap: () => Navigator.of(ctx).pop(AppThemeMode.protanopia),
+              ),
+              ListTile(
+                title: const Text('Tritanopía'),
+                onTap: () => Navigator.of(ctx).pop(AppThemeMode.tritanopia),
+              ),
+              ListTile(
+                title: const Text('Acromatopsia'),
+                onTap: () =>
+                    Navigator.of(ctx).pop(AppThemeMode.achromatopsia),
               ),
             ],
           ),
@@ -211,16 +219,12 @@ class _AppState extends State<App> {
             ? FormPageDark(onBack: _goToLogin, onSuccess: _goToLogin)
             : FormPageLight(onBack: _goToLogin, onSuccess: _goToLogin);
       case AppScreen.modulo:
-        return isDarkTheme
-            ? ModuloAprendizajeDark(
-                userName: _userName,
-                bottomLabels: _bottomLabels,
-              )
-            : ModuloAprendizaje(
-                userName: _userName,
-                onLogout: _goToLogin,
-                bottomLabels: _bottomLabels,
-              );
+        return ModuloAprendizaje(
+          //LearningModuleScreen
+          userName: _userName,
+          onLogout: _goToLogin,
+          bottomLabels: _bottomLabels,
+        );
       case AppScreen.director:
         return DirectorPerformanceScreen(onLogout: _goToLogin);
       case AppScreen.login:
@@ -248,25 +252,22 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkTheme = VisualThemeController.globalThemeNotifier.value;
+    final activeTheme = _getThemeData(_themeMode);
+    final isDarkTheme = activeTheme.brightness == Brightness.dark;
+    final currentPage = _buildCurrentPage(isDarkTheme);
 
     return AccessibilityTextScaleScope(
       controller: _textScaleController,
       child: VisualThemeController(
         isDarkTheme: isDarkTheme,
         onThemeChanged: _handleVisualThemeChanged,
-        child: ValueListenableBuilder<bool>(
-          valueListenable: VisualThemeController.globalThemeNotifier,
-          builder: (context, themeValue, _) {
-            final effectiveIsDark = themeValue;
-            final currentPage = _buildCurrentPage(effectiveIsDark);
-
-            return MaterialApp(
+        child: MaterialApp(
               title: 'Code4All',
               debugShowCheckedModeBanner: false,
-              themeMode: effectiveIsDark ? ThemeMode.dark : ThemeMode.light,
-              theme: _getThemeData(AppThemeMode.light),
-              darkTheme: _getThemeData(AppThemeMode.dark),
+              theme: activeTheme,
+              // ThemeMode solo entiende claro, oscuro o sistema. La paleta
+              // concreta ya fue seleccionada arriba mediante _themeMode.
+              themeMode: ThemeMode.light,
               builder: (context, child) {
                 final mediaQuery = MediaQuery.of(context);
                 return MediaQuery(
@@ -282,9 +283,7 @@ class _AppState extends State<App> {
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
                     child: KeyedSubtree(
-                      key: ValueKey(
-                        '${_currentScreen.name}_${(effectiveIsDark ? 'dark' : 'light')}',
-                      ),
+                      key: ValueKey(_currentScreen.name),
                       child: currentPage,
                     ),
                   ),
@@ -306,9 +305,7 @@ class _AppState extends State<App> {
                     ),
                 ],
               ),
-            );
-          },
-        ),
+            ),
       ),
     );
   }

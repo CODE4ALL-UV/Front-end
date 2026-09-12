@@ -1,14 +1,21 @@
 import 'dart:async';
-import 'dart:js_interop';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+
+import 'accessibility_announcer.dart';
+
+import 'web_speech_stub.dart'
+    if (dart.library.js_interop) 'web_speech_web.dart'
+    as web_speech;
 
 final accessibilityReadingState = AccessibilityReadingState();
 
 class ScreenContentExtractor {
+  /// Límite de caracteres que se envían al motor de voz de una sola vez.
+  static const int maxLength = 2000;
+
   static String extractFromContext(BuildContext context) {
     final buffer = StringBuffer();
     final seen = <Element>{};
@@ -20,28 +27,11 @@ class ScreenContentExtractor {
 
       if (widget is Text) {
         final text = widget.data ?? widget.textSpan?.toPlainText() ?? '';
-        if (text.trim().isNotEmpty) {
-          if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
-            buffer.write(' ');
-          }
-          buffer.write(text.trim());
-        }
+        _appendChunk(buffer, text);
       } else if (widget is TextField) {
         final decoration = widget.decoration;
-        final labelText = decoration?.labelText?.trim();
-        if (labelText != null && labelText.isNotEmpty) {
-          if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
-            buffer.write(' ');
-          }
-          buffer.write(labelText);
-        }
-        final hintText = decoration?.hintText?.trim();
-        if (hintText != null && hintText.isNotEmpty) {
-          if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
-            buffer.write(' ');
-          }
-          buffer.write(hintText);
-        }
+        _appendChunk(buffer, decoration?.labelText ?? '');
+        _appendChunk(buffer, decoration?.hintText ?? '');
       }
 
       element.visitChildElements(visit);
@@ -63,77 +53,53 @@ class ScreenContentExtractor {
     visit(startElement);
 
     final text = buffer.toString().replaceAll(RegExp(r'\s+'), ' ').trim();
-    if (text.isNotEmpty) {
-      return text.length > 260 ? text.substring(0, 260) : text;
+    if (text.isEmpty) {
+      return '';
     }
 
-    final fallback = context.widget.toString();
-    return fallback.replaceAll(RegExp(r'\s+'), ' ').trim();
+    return text.length > maxLength ? text.substring(0, maxLength) : text;
+  }
+
+  static void _appendChunk(StringBuffer buffer, String raw) {
+    final value = raw.trim();
+    if (value.isEmpty) return;
+    if (buffer.isNotEmpty) {
+      buffer.write(' ');
+    }
+    buffer.write(value);
   }
 }
 
-@JS()
-@staticInterop
-class SpeechSynthesisUtterance {
-  external factory SpeechSynthesisUtterance(String text);
-}
-
-extension SpeechSynthesisUtteranceExtension on SpeechSynthesisUtterance {
-  external set lang(String value);
-  external set rate(double value);
-  external set pitch(double value);
-}
-
-@JS()
-@staticInterop
-class SpeechSynthesis {}
-
-extension SpeechSynthesisExtension on SpeechSynthesis {
-  external void cancel();
-  external void speak(SpeechSynthesisUtterance utterance);
-}
-
-@JS('window.speechSynthesis')
-external SpeechSynthesis? get speechSynthesis;
-
+/// Controla la lectura en voz alta de una pantalla y el resaltado palabra por
+/// palabra que acompaña a la voz.
+///
+/// Está pensado para dos públicos a la vez: quien no ve la pantalla escucha el
+/// texto, y quien no oye lee la transcripción resaltada en la franja inferior.
 class AccessibilityReadingState {
   final ValueNotifier<String?> currentText = ValueNotifier<String?>(null);
   final ValueNotifier<bool> isHighlighting = ValueNotifier<bool>(false);
   final ValueNotifier<int> currentWordIndex = ValueNotifier<int>(0);
+
   final FlutterTts _flutterTts = FlutterTts();
   bool _ttsInitialized = false;
+  Timer? _fallbackTimer;
 
   Future<void> initialize() async {
     if (_ttsInitialized || kIsWeb) return;
 
     try {
-      await _flutterTts.setSharedInstance(true);
       await _flutterTts.setLanguage('es-ES');
-      await _flutterTts.setSpeechRate(0.95);
+      await _flutterTts.setSpeechRate(0.5);
       await _flutterTts.setPitch(1.0);
       await _flutterTts.setVolume(1.0);
-      await _flutterTts.awaitSpeakCompletion(true);
+      _flutterTts.setProgressHandler((text, start, end, word) {
+        _syncHighlightWithSpokenWord(start);
+      });
+      _flutterTts.setCompletionHandler(clearHighlight);
+      _flutterTts.setCancelHandler(clearHighlight);
       _ttsInitialized = true;
     } catch (e, st) {
       debugPrint('Error inicializando TTS: $e');
-      debugPrint(st.toString());
-    }
-  }
-
-  void _speakWithBrowserVoice(String text) {
-    try {
-      final speech = speechSynthesis;
-      if (speech == null) return;
-
-      final utterance = SpeechSynthesisUtterance(text);
-      utterance.lang = 'es-ES';
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
-
-      speech.cancel();
-      speech.speak(utterance);
-    } catch (e, st) {
-      debugPrint('Error usando SpeechSynthesis: $e');
       debugPrint(st.toString());
     }
   }
@@ -142,66 +108,106 @@ class AccessibilityReadingState {
     final content = text.trim();
     if (content.isEmpty) return;
 
+    await stop();
+
     currentText.value = content;
     currentWordIndex.value = 0;
     isHighlighting.value = true;
 
+    if (context.mounted) {
+      announceForAccessibility(context, content);
+    }
+
     if (kIsWeb) {
-      _speakWithBrowserVoice(content);
+      web_speech.speakWithBrowserVoice(content);
+      _startFallbackHighlight(content);
+      return;
+    }
+
+    try {
+      await initialize();
+      await _flutterTts.speak(content);
+    } catch (e, st) {
+      debugPrint('Error al reproducir TTS: $e');
+      debugPrint(st.toString());
+      _startFallbackHighlight(content);
+    }
+  }
+
+  Future<void> stop() async {
+    _fallbackTimer?.cancel();
+    _fallbackTimer = null;
+
+    if (kIsWeb) {
+      web_speech.cancelBrowserVoice();
     } else {
       try {
-        await initialize();
         await _flutterTts.stop();
-        await _flutterTts.speak(content);
-      } catch (e, st) {
-        debugPrint('Error al reproducir TTS: $e');
-        debugPrint(st.toString());
+      } catch (e) {
+        debugPrint('Error deteniendo TTS: $e');
       }
     }
 
-    if (context.mounted) {
-      SemanticsBinding.instance.ensureSemantics();
-      // ignore: deprecated_member_use
-      SemanticsService.announce(content, Directionality.of(context));
-    }
-
-    final words = content
-        .split(RegExp(r'\s+'))
-        .where((w) => w.isNotEmpty)
-        .toList();
-    if (words.isEmpty) return;
-
-    var index = 0;
-    final timer = Timer.periodic(const Duration(milliseconds: 800), (tick) {
-      if (!isHighlighting.value) {
-        tick.cancel();
-        return;
-      }
-
-      if (index < words.length) {
-        currentWordIndex.value = index;
-        index++;
-      } else {
-        tick.cancel();
-        isHighlighting.value = false;
-        currentWordIndex.value = 0;
-      }
-    });
-
-    Future.delayed(const Duration(seconds: 6), () {
-      timer.cancel();
-      if (isHighlighting.value) {
-        isHighlighting.value = false;
-        currentWordIndex.value = 0;
-      }
-    });
+    clearHighlight();
   }
 
   void clearHighlight() {
+    _fallbackTimer?.cancel();
+    _fallbackTimer = null;
     isHighlighting.value = false;
+    currentWordIndex.value = 0;
+  }
+
+  /// Traduce el offset de caracteres que reporta el motor de voz al índice de
+  /// palabra que debe resaltarse en la transcripción.
+  void _syncHighlightWithSpokenWord(int startOffset) {
+    final content = currentText.value;
+    if (content == null || content.isEmpty) return;
+
+    final safeOffset = startOffset.clamp(0, content.length);
+    final wordsBefore = content
+        .substring(0, safeOffset)
+        .split(RegExp(r'\s+'))
+        .where((word) => word.isNotEmpty)
+        .length;
+
+    currentWordIndex.value = wordsBefore;
+  }
+
+  /// Resaltado aproximado para plataformas sin callbacks de progreso (web).
+  ///
+  /// Avanza al ritmo estimado de lectura en voz alta en español y se detiene
+  /// solo cuando termina el texto, no con un tiempo fijo.
+  void _startFallbackHighlight(String content) {
+    final words = _splitWords(content);
+    if (words.isEmpty) return;
+
+    var index = 0;
+    _fallbackTimer?.cancel();
+    _fallbackTimer = Timer.periodic(const Duration(milliseconds: 380), (timer) {
+      if (!isHighlighting.value || index >= words.length) {
+        timer.cancel();
+        clearHighlight();
+        return;
+      }
+      currentWordIndex.value = index;
+      index++;
+    });
+  }
+
+  static List<String> _splitWords(String content) =>
+      content.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).toList();
+
+  void dispose() {
+    _fallbackTimer?.cancel();
+    currentText.dispose();
+    isHighlighting.dispose();
+    currentWordIndex.dispose();
   }
 }
 
+/// Envuelve una pantalla y muestra, mientras se lee en voz alta, una franja
+/// inferior con la transcripción y la palabra actual resaltada.
 class ReadableScreenHighlight extends StatelessWidget {
   const ReadableScreenHighlight({super.key, required this.child});
 
@@ -209,61 +215,72 @@ class ReadableScreenHighlight extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String?>(
-      valueListenable: accessibilityReadingState.currentText,
-      builder: (_, currentText, _) {
-        final isActive =
-            accessibilityReadingState.isHighlighting.value &&
-            (currentText?.trim().isNotEmpty ?? false);
-
-        if (!isActive) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: accessibilityReadingState.isHighlighting,
+      builder: (context, isActive, _) {
+        final text = accessibilityReadingState.currentText.value;
+        if (!isActive || text == null || text.trim().isEmpty) {
           return child;
         }
 
-        final words = currentText!
-            .split(RegExp(r'\s+'))
-            .where((w) => w.isNotEmpty)
-            .toList();
-        final index = accessibilityReadingState.currentWordIndex.value;
+        final words = AccessibilityReadingState._splitWords(text);
 
         return Column(
           children: [
             Expanded(child: child),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.yellow.shade200,
-                border: Border(
-                  top: BorderSide(color: Colors.orange.shade700, width: 1.2),
-                ),
-              ),
-              child: RichText(
-                text: TextSpan(
-                  style: const TextStyle(
-                    color: Colors.black87,
-                    fontSize: 14,
-                    height: 1.4,
-                  ),
-                  children: List.generate(words.length, (i) {
-                    final word = words[i];
-                    final isCurrent = i == index;
-                    return TextSpan(
-                      text: '$word ',
-                      style: TextStyle(
-                        fontWeight: isCurrent
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                        backgroundColor: isCurrent
-                            ? Colors.yellow.shade400
-                            : null,
-                        decoration: isCurrent ? TextDecoration.underline : null,
-                        textBaseline: TextBaseline.alphabetic,
+            ValueListenableBuilder<int>(
+              valueListenable: accessibilityReadingState.currentWordIndex,
+              builder: (context, index, _) {
+                return Semantics(
+                  liveRegion: true,
+                  label: 'Transcripción de la lectura en voz alta',
+                  child: Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(maxHeight: 140),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.yellow.shade100,
+                      border: Border(
+                        top: BorderSide(
+                          color: Colors.orange.shade800,
+                          width: 2,
+                        ),
                       ),
-                    );
-                  }),
-                ),
-              ),
+                    ),
+                    child: SingleChildScrollView(
+                      child: RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15,
+                            height: 1.5,
+                          ),
+                          children: List.generate(words.length, (i) {
+                            final isCurrent = i == index;
+                            return TextSpan(
+                              text: '${words[i]} ',
+                              style: TextStyle(
+                                fontWeight: isCurrent
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                backgroundColor: isCurrent
+                                    ? Colors.yellow.shade600
+                                    : null,
+                                decoration: isCurrent
+                                    ? TextDecoration.underline
+                                    : null,
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         );

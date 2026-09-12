@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:flutter_code4all/data/services/api_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart'; //REFACTOR-APPBAR
@@ -12,20 +13,15 @@ import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/detail_card_widget.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_light_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_dark_screen.dart';
-import 'quiz_screen.dart';
-import 'quiz_with_video_screen.dart';
-import 'laboratory_console_screen.dart';
-import 'quiz_screen_dark.dart';
-import 'quiz_with_video_screen_dark.dart';
-import 'laboratory_console_screen_dark.dart';
-import 'final_evaluation_screen.dart';
-import '../../users_management/widgets/live_translation_box.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor.dart';
+import 'package:flutter_code4all/ui/users_management/screens/teacher_module_editor.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_page.dart';
+import 'package:flutter_code4all/data/course/python_course_catalog.dart';
+import 'package:flutter_code4all/data/services/course_progress_store.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart';
 
 class ModuloAprendizaje extends StatefulWidget {
   final String userName;
@@ -49,7 +45,6 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
   bool _isNavigatingToModule2 = false;
   bool _isTeacher = false;
   String _moduleName = 'Módulo 1';
-  List<String> _topics = [];
 
   final _authStorage = AuthStorage();
 
@@ -69,35 +64,31 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
   }
 
   Future<void> _fetchModuleAndApply(String moduleId) async {
-    final backend = dotenv.env['BACKEND_URL'] ?? 'http://127.0.0.1:8000';
+    final backend = ApiService().baseUrl;
     try {
       final res = await http.get(Uri.parse('$backend/api/modules/$moduleId'));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
+        final name = data['name'] ?? 'Módulo 1';
         if (!mounted) return;
         setState(() {
-          _moduleName = data['name'] ?? 'Módulo 1';
-          _topics = (data['topics'] as List<dynamic>? ?? []).cast<String>();
+          _moduleName = name;
+        });
+      } else if (mounted) {
+        setState(() {
+          _moduleName = 'Módulo 1';
         });
       } else {
         _setDefaultState();
       }
     } catch (_) {
-      _setDefaultState();
+      if (mounted) {
+        setState(() {
+          _moduleName = 'Módulo 1';
+        });
+      }
     }
   }
-
-  void _setDefaultState() {
-    if (mounted) {
-      setState(() {
-        _moduleName = 'Módulo 1';
-        _topics = [];
-      });
-    }
-  }
-
-  String _topicOrFallback(int idx, String fallback) =>
-      (idx >= 0 && idx < _topics.length) ? _topics[idx] : fallback;
 
   void _goToModulo2() {
     if (_isNavigatingToModule2) return;
@@ -164,15 +155,34 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
                         iconColor: const Color(0xFF1976D2),
                         bgColor: const Color(0xFFE3F2FD),
                         size: bigSize,
-                        progress: 0.75,
-                        onTap: () =>
-                            _navigateToDetail(const Capitulo2DetalleLight()),
+                        moduleNumber: 1,
+                        sectionNumber: 3,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CourseChapterPage(
+                                moduleNumber: 1,
+                                sectionNumber: 3,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       _LessonBox(
                         number: 3,
-                        title: _topicOrFallback(2, 'Tema 3'),
-                        onTap: () =>
-                            _navigateToDetail(const Capitulo2DetalleLight()),
+                        title: PythonCourseCatalog.section(1, 3)!.boxTitle,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CourseChapterPage(
+                                moduleNumber: 1,
+                                sectionNumber: 3,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -184,18 +194,37 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
                     children: [
                       _LessonBox(
                         number: 2,
-                        title: _topicOrFallback(1, 'Tema 2'),
-                        onTap: () =>
-                            _navigateToDetail(const Capitulo2DetalleLight()),
+                        title: PythonCourseCatalog.section(1, 2)!.boxTitle,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CourseChapterPage(
+                                moduleNumber: 1,
+                                sectionNumber: 2,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       _BigCircle(
                         icon: Icons.manage_search,
                         iconColor: const Color(0xFF8E24AA),
                         bgColor: const Color(0xFFF3E5F5),
                         size: bigSize,
-                        progress: 0.6,
-                        onTap: () =>
-                            _navigateToDetail(const Capitulo2DetalleLight()),
+                        moduleNumber: 1,
+                        sectionNumber: 2,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CourseChapterPage(
+                                moduleNumber: 1,
+                                sectionNumber: 2,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -210,15 +239,36 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
                         iconColor: const Color(0xFF5C6BC0),
                         bgColor: const Color(0xFFE8EAF6),
                         size: bigSize,
-                        progress: 0.3,
-                        onTap: () =>
-                            _navigateToDetail(const CapituloDetalleLight()),
+                        moduleNumber: 1,
+                        sectionNumber: 1,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CourseChapterPage(
+                                moduleNumber: 1,
+                                sectionNumber: 1,
+                                enableTeacherEditor: true,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       _LessonBox(
                         number: 1,
-                        title: _topicOrFallback(0, 'Tema 1'),
-                        onTap: () =>
-                            _navigateToDetail(const CapituloDetalleLight()),
+                        title: PythonCourseCatalog.section(1, 1)!.boxTitle,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CourseChapterPage(
+                                moduleNumber: 1,
+                                sectionNumber: 1,
+                                enableTeacherEditor: true,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -239,79 +289,18 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
         ],
       ),
       bottomNavigationBar: MultimodalNavBar(
-        previousLabel: labels.isNotEmpty ? labels[0] : null,
-        playLabel: labels.length > 1 ? labels[1] : null,
-        nextLabel: labels.length > 2 ? labels[2] : null,
-      ),
-    );
-  }
-}
-
-class _NavButton extends StatelessWidget {
-  final String label;
-
-  const _NavButton({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E88E5),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Text(
-        '▶ $label',
-        style: const TextStyle(color: Colors.white, fontSize: 18),
-      ),
-    );
-  }
-}
-
-class _LecturaCard extends StatelessWidget {
-  final String title;
-  final String body;
-  final Color color;
-  final Color backgroundColor;
-
-  const _LecturaCard({
-    required this.title,
-    required this.body,
-    required this.color,
-    required this.backgroundColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            body,
-            style: TextStyle(
-              fontSize: 15,
-              height: 1.5,
-              color: color.withValues(alpha: 0.9),
-            ),
-          ),
-        ],
+        previousLabel:
+            widget.bottomLabels != null && widget.bottomLabels!.isNotEmpty
+            ? widget.bottomLabels![0]
+            : null,
+        playLabel:
+            widget.bottomLabels != null && widget.bottomLabels!.length > 1
+            ? widget.bottomLabels![1]
+            : null,
+        nextLabel:
+            widget.bottomLabels != null && widget.bottomLabels!.length > 2
+            ? widget.bottomLabels![2]
+            : null,
       ),
     );
   }
@@ -322,7 +311,8 @@ class _BigCircle extends StatelessWidget {
   final Color iconColor;
   final Color bgColor;
   final double size;
-  final double progress;
+  final int moduleNumber;
+  final int sectionNumber;
   final VoidCallback? onTap;
 
   const _BigCircle({
@@ -330,16 +320,28 @@ class _BigCircle extends StatelessWidget {
     required this.iconColor,
     required this.bgColor,
     required this.size,
-    required this.progress,
+    required this.moduleNumber,
+    required this.sectionNumber,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final percentage = (progress * 100).toInt();
+    // El almacen avisa cuando se completa una actividad, asi que la
+    // circunferencia se redibuja sola sin que nadie la refresque a mano.
+    ensureProgressLoaded();
+    return ListenableBuilder(
+      listenable: CourseProgressStore.instance,
+      builder: (context, _) => _buildCircle(context),
+    );
+  }
+
+  Widget _buildCircle(BuildContext context) {
+    final progress = sectionProgress(moduleNumber, sectionNumber);
+    final percentage = (progress * 100).round();
     return Semantics(
       button: true,
-      label: 'Lección con $percentage% de progreso',
+      label: sectionProgressLabel(moduleNumber, sectionNumber),
       hint: 'Toca para abrir la lección',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,

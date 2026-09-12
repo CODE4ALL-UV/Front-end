@@ -1,5 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Para leer el alfabeto manual con la camara. La foto se analiza
+         y se descarta: no se guarda ninguna imagen. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- La camara es opcional: sin ella la aplicacion funciona igual,
+         solo que sin esa practica. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
         android:label="flutter_code4all"
         android:name="${applicationName}"

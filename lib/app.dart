@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'ui/core/themes/app_theme.dart';
 import 'ui/core/ui/accessibility_text_scale.dart';
+import 'data/services/course_progress_store.dart';
+import 'data/services/session_controller.dart';
+import 'data/services/learning_analytics_service.dart';
 import 'ui/core/ui/visual_theme_controller.dart';
+import 'ui/director/director_home_screen.dart';
+import 'ui/teacher/teacher_course_screen.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'ui/users_management/widgets/login_screen.dart';
 import 'ui/users_management/widgets/login_dark_screen.dart';
@@ -9,6 +14,12 @@ import 'ui/users_management/widgets/form_light_screen.dart';
 import 'ui/users_management/widgets/form_dark_screen.dart';
 import 'ui/python_course_content/widgets/learning_module_light_screen.dart';
 import 'ui/director/director_performance_screen.dart';
+import 'ui/users_management/screens/login_screen.dart';
+import 'ui/users_management/screens/login_dark_screen.dart';
+import 'ui/users_management/screens/form_light_screen.dart';
+import 'ui/users_management/screens/form_dark_screen.dart';
+import 'ui/python_course_content/widgets/learning_module_light_screen.dart';
+import 'ui/python_course_content/widgets/learning_module_dark_screen.dart';
 
 // Definimos los 6 estados de tema posibles de tu TG
 enum AppThemeMode {
@@ -20,7 +31,7 @@ enum AppThemeMode {
   achromatopsia,
 }
 
-enum AppScreen { login, register, modulo, director }
+enum AppScreen { login, register, modulo, docente, director }
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -41,6 +52,21 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
+
+    // Cada actividad que un estudiante termina pasa por el almacen de
+    // progreso. Enganchando aqui el aviso, el curso entero queda registrado
+    // sin tocar ninguna pantalla: lecturas, videos, capsulas, ejemplos,
+    // ejercicios, quiz, evaluaciones y laboratorio.
+    // Cualquier pantalla puede ofrecer cerrar sesion sin recibir nada.
+    SessionController.instance.registerLogout(_goToLogin);
+
+    CourseProgressStore.instance.reportCompletionsTo(
+      (sectionId, kind) => LearningAnalyticsService.instance.recordCompletion(
+        sectionId: sectionId,
+        kind: kind,
+      ),
+    );
+
     VisualThemeController.globalThemeNotifier.value = false;
     VisualThemeController.globalThemeNotifier.addListener(
       _handleGlobalVisualThemeChanged,
@@ -106,8 +132,14 @@ class _AppState extends State<App> {
 
   void _handleSuccessfulLogin(String role) {
     final r = role.toLowerCase();
-    if (r == 'estudiante' || r == 'docente') {
+    if (r == 'estudiante') {
       _goToModulo();
+      return;
+    }
+    // El docente no necesita el mapa de circulos: necesita el temario entero
+    // para editarlo.
+    if (r == 'docente') {
+      setState(() => _currentScreen = AppScreen.docente);
       return;
     }
     if (r == 'director') {
@@ -149,25 +181,7 @@ class _AppState extends State<App> {
     }
   }
 
-  Widget _buildScaledModulePage(BuildContext context, Widget page) {
-    if (_currentScreen != AppScreen.modulo) {
-      return page;
-    }
-
-    final scale = _textScaleController.scale;
-    if (scale <= 1.0) {
-      return page;
-    }
-
-    final screenSize = MediaQuery.of(context).size;
-    return Transform.scale(
-      scale: scale,
-      alignment: Alignment.topCenter,
-      child: SizedBox(width: screenSize.width / scale, child: page),
-    );
-  }
-
-  // Muestra las seis paletas configuradas en AppTheme.
+  // Mostrar selector con tres opciones y actualizar etiquetas
   void _showThemeOptions(BuildContext context) async {
     final choice = await showModalBottomSheet<AppThemeMode>(
       context: context,
@@ -198,8 +212,7 @@ class _AppState extends State<App> {
               ),
               ListTile(
                 title: const Text('Acromatopsia'),
-                onTap: () =>
-                    Navigator.of(ctx).pop(AppThemeMode.achromatopsia),
+                onTap: () => Navigator.of(ctx).pop(AppThemeMode.achromatopsia),
               ),
             ],
           ),
@@ -219,14 +232,20 @@ class _AppState extends State<App> {
             ? FormPageDark(onBack: _goToLogin, onSuccess: _goToLogin)
             : FormPageLight(onBack: _goToLogin, onSuccess: _goToLogin);
       case AppScreen.modulo:
-        return ModuloAprendizaje(
-          //LearningModuleScreen
-          userName: _userName,
-          onLogout: _goToLogin,
-          bottomLabels: _bottomLabels,
-        );
+        return isDarkTheme
+            ? ModuloAprendizajeDark(
+                userName: _userName,
+                bottomLabels: _bottomLabels,
+              )
+            : ModuloAprendizaje(
+                userName: _userName,
+                onLogout: _goToLogin,
+                bottomLabels: _bottomLabels,
+              );
+      case AppScreen.docente:
+        return TeacherCourseScreen(userName: _userName, onLogout: _goToLogin);
       case AppScreen.director:
-        return DirectorPerformanceScreen(onLogout: _goToLogin);
+        return DirectorHomeScreen(userName: _userName, onLogout: _goToLogin);
       case AppScreen.login:
         return isDarkTheme
             ? LoginPageDark(
@@ -262,50 +281,53 @@ class _AppState extends State<App> {
         isDarkTheme: isDarkTheme,
         onThemeChanged: _handleVisualThemeChanged,
         child: MaterialApp(
-              title: 'Code4All',
-              debugShowCheckedModeBanner: false,
-              theme: activeTheme,
-              // ThemeMode solo entiende claro, oscuro o sistema. La paleta
-              // concreta ya fue seleccionada arriba mediante _themeMode.
-              themeMode: ThemeMode.light,
-              builder: (context, child) {
-                final mediaQuery = MediaQuery.of(context);
-                return MediaQuery(
-                  //HERE IS THE ERROR The relevant error-causing widget failed
-                  data: mediaQuery.copyWith(
-                    textScaler: TextScaler.linear(_textScaleController.scale),
-                  ),
-                  child: child ?? const SizedBox.shrink(),
-                );
-              },
-              home: Stack(
-                children: [
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    child: KeyedSubtree(
-                      key: ValueKey(_currentScreen.name),
-                      child: currentPage,
-                    ),
-                  ),
-                  if (_currentScreen != AppScreen.modulo)
-                    Positioned(
-                      left: 16,
-                      bottom: 24,
-                      child: Semantics(
-                        button: true,
-                        label: 'Cambiar tema',
-                        hint: 'Cambia el tema de la aplicación',
-                        child: FloatingActionButton(
-                          heroTag: 'theme-toggle',
-                          backgroundColor: const Color(0xFF5C6BC0),
-                          onPressed: () => _showThemeOptions(context),
-                          child: const Icon(Icons.palette, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                ],
+          title: 'Code4All',
+          debugShowCheckedModeBanner: false,
+          theme: activeTheme,
+          // ThemeMode solo entiende claro, oscuro o sistema. La paleta
+          // concreta ya fue seleccionada arriba mediante _themeMode.
+          themeMode: ThemeMode.light,
+          builder: (context, child) {
+            final mediaQuery = MediaQuery.of(context);
+            return MediaQuery(
+              //HERE IS THE ERROR The relevant error-causing widget failed
+              data: mediaQuery.copyWith(
+                textScaler: TextScaler.linear(_textScaleController.scale),
               ),
-            ),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
+          home: Stack(
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: KeyedSubtree(
+                  key: ValueKey(_currentScreen.name),
+                  child: currentPage,
+                ),
+              ),
+              // Ni el estudiante ni el docente llevan este boton: los dos
+              // tienen su propio sitio para cambiar el tema.
+              if (_currentScreen != AppScreen.modulo &&
+                  _currentScreen != AppScreen.docente)
+                Positioned(
+                  left: 16,
+                  bottom: 24,
+                  child: Semantics(
+                    button: true,
+                    label: 'Cambiar tema',
+                    hint: 'Cambia el tema de la aplicación',
+                    child: FloatingActionButton(
+                      heroTag: 'theme-toggle',
+                      backgroundColor: const Color(0xFF5C6BC0),
+                      onPressed: () => _showThemeOptions(context),
+                      child: const Icon(Icons.palette, color: Colors.white),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

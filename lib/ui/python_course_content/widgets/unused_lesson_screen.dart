@@ -1,0 +1,1 @@
+// este es un ejemple de leccion page dart que sirve para mostrar como se pueden crear vistas en Dart

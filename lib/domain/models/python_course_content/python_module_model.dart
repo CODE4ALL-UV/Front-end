@@ -13,6 +13,7 @@ class ActivityItem {
 
 class ChapterModel {
   final String id;
+  final String capituloNombre;
   final String moduloTitulo;
   final String capituloTitulo;
   final String resumenTexto;
@@ -20,6 +21,7 @@ class ChapterModel {
 
   const ChapterModel({
     required this.id,
+    required this.capituloNombre,
     required this.moduloTitulo,
     required this.capituloTitulo,
     required this.resumenTexto,

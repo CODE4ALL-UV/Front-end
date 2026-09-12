@@ -8,12 +8,12 @@ class AvatarWidget extends StatelessWidget {
   final double radius;
 
   const AvatarWidget({
-    Key? key,
+    super.key,
     this.photoUrl,
     this.name,
     this.size = 40,
     this.radius = 20,
-  }) : super(key: key);
+  });
 
   bool _looksLikePlaceholder(String s) {
     final blacklist = [

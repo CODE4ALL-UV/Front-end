@@ -1,4 +1,4 @@
-//REFACTOR-APROVED - COLOR TEST REMAINING - DONT TESTED IN UI
+//REFACTOR-APROVED x 2 - COLOR TEST REMAINING - DONT TESTED IN UI YET
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 //import 'package:flutter_svg/flutter_svg.dart';
@@ -16,7 +16,7 @@ class GlobalAppBarWidget extends StatelessWidget
   final VoidCallback? onLogout;
 
   const GlobalAppBarWidget({
-    super.key, //Key? key,
+    super.key,
     this.title = 'CODE4ALL', // Fusionado: Valor por defecto para no repetirlo,
     this.leading,
     this.actions,
@@ -26,7 +26,7 @@ class GlobalAppBarWidget extends StatelessWidget
     this.userEmail,
     this.userRole,
     this.onLogout,
-  }); // : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +85,9 @@ class GlobalAppBarWidget extends StatelessWidget
             (showUserIcon
                 ? [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.only(
+                        right: 12,
+                      ), //ORIGINAL ES/ERA EdgeInsets.symmetric(horizontal: 8.0)
                       child: UserProfileMenu(
                         userName: userName,
                         userPhotoUrl: userPhotoUrl,

@@ -4,6 +4,7 @@ import 'package:flutter_code4all/domain/models/python_course_content/python_modu
 final List<ChapterModel> capitulosModulo1 = [
   const ChapterModel(
     id: 'cap_1',
+    capituloNombre: 'Capítulo 1: Fundamentos',
     moduloTitulo: 'Módulo 1. Preparación',
     capituloTitulo: 'Capítulo 1: Fundamentos',
     resumenTexto:
@@ -23,6 +24,7 @@ final List<ChapterModel> capitulosModulo1 = [
   ),
   const ChapterModel(
     id: 'cap_2',
+    capituloNombre: 'Capítulo 2: El entorno',
     moduloTitulo: 'Módulo 1. Preparación',
     capituloTitulo: 'Capítulo 2: El entorno',
     resumenTexto:
@@ -49,6 +51,7 @@ final List<ChapterModel> capitulosModulo1 = [
   ),
   const ChapterModel(
     id: 'cap_3',
+    capituloNombre: 'Capítulo 3: Desarrollo',
     moduloTitulo: 'Módulo 1. Preparación',
     capituloTitulo: 'Capítulo 3: Desarrollo',
     resumenTexto:

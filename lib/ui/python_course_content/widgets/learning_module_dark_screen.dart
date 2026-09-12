@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
-import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
+import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:http/http.dart' as http;

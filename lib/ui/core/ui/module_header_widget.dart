@@ -1,18 +1,18 @@
-//REFACTOR-APROVED - COLOR TEST REMAINING - DONT TESTED IN UI
+//REFACTOR-APROVED x 2 - COLOR TEST REMAINING - DONT TESTED IN UI YET
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor.dart';
 
-class ModuleHeaderCard extends StatelessWidget {
+class ModuleHeaderWidget extends StatelessWidget {
   final String moduleName;
   final bool isTeacher;
   final Function(String?) onEditCompleted;
 
-  const ModuleHeaderCard({
-    super.key, //Key? key,
+  const ModuleHeaderWidget({
+    super.key,
     required this.moduleName,
     required this.isTeacher,
     required this.onEditCompleted,
-  }); // : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

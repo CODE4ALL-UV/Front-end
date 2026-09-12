@@ -38,6 +38,19 @@ class AppTheme {
       comment: Color(0xFF6A737D),
       error: Color(0xFFD32F2F),
     ),
+    activityThemeColors: const ActivityThemeColors(
+      background: Color(0xFFF8FBFF),
+      border: Color(0xFFE3ECF7),
+      iconBackground: Color(0xFFE8F1FF),
+      textTitle: Color(0xFF263238),
+      textSubtitle: Color(0xFF607D8B),
+      successBackground: Color(0xFFE8F5E9),
+      successBorder: Color(0xFF66BB6A),
+      successText: Color(0xFF2E7D32),
+      actionBackground: Color(0xFFE3F2FD),
+      actionBorder: Color(0xFF90CAF9),
+      actionText: Color(0xFF1565C0),
+    ),
   );
 
   static ThemeData get darkTheme => _buildTheme(
@@ -70,6 +83,19 @@ class AppTheme {
       string: Color(0xFFE0C97D),
       comment: Color(0xFF94A3B8),
       error: Color(0xFFEF9A9A),
+    ),
+    activityThemeColors: const ActivityThemeColors(
+      background: Color(0xFFF8FBFF),
+      border: Color(0xFFE3ECF7),
+      iconBackground: Color(0xFFE8F1FF),
+      textTitle: Color(0xFF263238),
+      textSubtitle: Color(0xFF607D8B),
+      successBackground: Color(0xFFE8F5E9),
+      successBorder: Color(0xFF66BB6A),
+      successText: Color(0xFF2E7D32),
+      actionBackground: Color(0xFFE3F2FD),
+      actionBorder: Color(0xFF90CAF9),
+      actionText: Color(0xFF1565C0),
     ),
   );
 
@@ -104,6 +130,19 @@ class AppTheme {
       comment: Color(0xFF4B5563),
       error: Color(0xFF7F1D1D),
     ),
+    activityThemeColors: const ActivityThemeColors(
+      background: Color(0xFFF8FBFF),
+      border: Color(0xFFE3ECF7),
+      iconBackground: Color(0xFFE8F1FF),
+      textTitle: Color(0xFF263238),
+      textSubtitle: Color(0xFF607D8B),
+      successBackground: Color(0xFFE8F5E9),
+      successBorder: Color(0xFF66BB6A),
+      successText: Color(0xFF2E7D32),
+      actionBackground: Color(0xFFE3F2FD),
+      actionBorder: Color(0xFF90CAF9),
+      actionText: Color(0xFF1565C0),
+    ),
   );
 
   static ThemeData get deuteranopiaTheme => _buildTheme(
@@ -136,6 +175,19 @@ class AppTheme {
       string: Color(0xFF7C2D12),
       comment: Color(0xFF475569),
       error: Color(0xFF991B1B),
+    ),
+    activityThemeColors: const ActivityThemeColors(
+      background: Color(0xFFF8FBFF),
+      border: Color(0xFFE3ECF7),
+      iconBackground: Color(0xFFE8F1FF),
+      textTitle: Color(0xFF263238),
+      textSubtitle: Color(0xFF607D8B),
+      successBackground: Color(0xFFE8F5E9),
+      successBorder: Color(0xFF66BB6A),
+      successText: Color(0xFF2E7D32),
+      actionBackground: Color(0xFFE3F2FD),
+      actionBorder: Color(0xFF90CAF9),
+      actionText: Color(0xFF1565C0),
     ),
   );
 
@@ -170,6 +222,19 @@ class AppTheme {
       comment: Color(0xFF52525B),
       error: Color(0xFF991B1B),
     ),
+    activityThemeColors: const ActivityThemeColors(
+      background: Color(0xFFF8FBFF),
+      border: Color(0xFFE3ECF7),
+      iconBackground: Color(0xFFE8F1FF),
+      textTitle: Color(0xFF263238),
+      textSubtitle: Color(0xFF607D8B),
+      successBackground: Color(0xFFE8F5E9),
+      successBorder: Color(0xFF66BB6A),
+      successText: Color(0xFF2E7D32),
+      actionBackground: Color(0xFFE3F2FD),
+      actionBorder: Color(0xFF90CAF9),
+      actionText: Color(0xFF1565C0),
+    ),
   );
   // 6. TEMA ACROMATOPSIA (Escala de grises estricta / Contraste radical)
   static ThemeData get achromatopsiaTheme => _buildTheme(
@@ -203,6 +268,19 @@ class AppTheme {
       comment: Color(0xFFBDBDBD),
       error: Colors.white,
     ),
+    activityThemeColors: const ActivityThemeColors(
+      background: Color(0xFFF8FBFF),
+      border: Color(0xFFE3ECF7),
+      iconBackground: Color(0xFFE8F1FF),
+      textTitle: Color(0xFF263238),
+      textSubtitle: Color(0xFF607D8B),
+      successBackground: Color(0xFFE8F5E9),
+      successBorder: Color(0xFF66BB6A),
+      successText: Color(0xFF2E7D32),
+      actionBackground: Color(0xFFE3F2FD),
+      actionBorder: Color(0xFF90CAF9),
+      actionText: Color(0xFF1565C0),
+    ),
   );
 
   static ThemeData _buildTheme({
@@ -211,6 +289,7 @@ class AppTheme {
     required ColorScheme colorScheme,
     required CourseTheme courseTheme,
     required CodeConsoleTheme codeConsoleTheme,
+    required ActivityThemeColors activityThemeColors,
   }) {
     final baseTheme = ThemeData(useMaterial3: true, brightness: brightness);
     final baseTextTheme = baseTheme.textTheme;
@@ -247,9 +326,13 @@ class AppTheme {
         unselectedIconTheme: const IconThemeData(size: 24),
       ),
       cardTheme: CardThemeData(
-        color: colorScheme.surface,
+        color: Colors.white,//color: colorScheme.surface,
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: Color(0xFFE0E0E0)),
+        ),
+        shadowColor: const Color(0x14000000), //FALTAN blurRadius: 6, offset: Offset(0, 2),
       ),
       splashColor: colorScheme.primary.withValues(alpha: 0.15),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -323,7 +406,7 @@ class AppTheme {
               : null;
         }),
       ),
-      extensions: [courseTheme, codeConsoleTheme],
+      extensions: [courseTheme, codeConsoleTheme, activityThemeColors],
     );
   }
 }
@@ -444,6 +527,116 @@ class CodeConsoleTheme extends ThemeExtension<CodeConsoleTheme> {
   }
 }
 
+class ModuleCardThemeColors {
+  // Lógica 2 + 2 + 2 + 1 para el fondo
+  static Color getBackgroundColor(int moduleId) {
+    if (moduleId == 1 || moduleId == 2) {
+      return const Color(0xFFE8F7FA); // Módulos 1 y 2 (Celeste claro)
+    } else if (moduleId == 3 || moduleId == 4) {
+      return const Color(0xFF...); // Reemplaza con el color para 3 y 4
+    } else if (moduleId == 5 || moduleId == 6) {
+      return const Color(0xFF...); // Reemplaza con el color para 5 y 6
+    } else if (moduleId == 7) {
+      return const Color(0xFF...); // Reemplaza con el color para el 7
+    }
+    // Color por defecto por seguridad
+    return const Color(0xFFE8F7FA); 
+  }
+
+  // Lógica para el color del texto (si es que cambia por módulo)
+  static Color getTextColor(int moduleId) {
+    if (moduleId == 1 || moduleId == 2) {
+      return const Color(0xFF607D8B); // Módulos 1 y 2
+    }
+    // Añade el resto de condiciones o retorna un solo color si el texto siempre es igual
+    return const Color(0xFF607D8B); 
+  }
+}
+
+class ActivityColors {
+  // Colores base de la tarjeta
+  static const Color background = Color(0xFFF8FBFF);
+  static const Color border = Color(0xFFE3ECF7);
+  static const Color iconBackground = Color(0xFFE8F1FF);
+  
+  // Textos
+  static const Color textTitle = Color(0xFF263238);
+  static const Color textSubtitle = Color(0xFF607D8B);
+
+  // Estado: Completado (Verdes)
+  static const Color successBackground = Color(0xFFE8F5E9);
+  static const Color successBorder = Color(0xFF66BB6A);
+  static const Color successText = Color(0xFF2E7D32);
+
+  // Estado: Acción / Abrir (Azules)
+  static const Color actionBackground = Color(0xFFE3F2FD);
+  static const Color actionBorder = Color(0xFF90CAF9);
+  static const Color actionText = Color(0xFF1565C0);
+}
+
+class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
+  final Color background;
+  final Color border;
+  final Color iconBackground;
+  final Color textTitle;
+  final Color textSubtitle;
+  final Color successBackground;
+  final Color successBorder;
+  final Color successText;
+  final Color actionBackground;
+  final Color actionBorder;
+  final Color actionText;
+
+  const ActivityThemeColors({
+    required this.background,
+    required this.border,
+    required this.iconBackground,
+    required this.textTitle,
+    required this.textSubtitle,
+    required this.successBackground,
+    required this.successBorder,
+    required this.successText,
+    required this.actionBackground,
+    required this.actionBorder,
+    required this.actionText,
+  });
+
+  @override
+  ActivityThemeColors copyWith({Color? background, /* ... resto de variables ... */}) {
+    return ActivityThemeColors(
+      background: background ?? this.background,
+      border: border ?? this.border,
+      iconBackground: iconBackground ?? this.iconBackground,
+      textTitle: textTitle ?? this.textTitle,
+      textSubtitle: textSubtitle ?? this.textSubtitle,
+      successBackground: successBackground ?? this.successBackground,
+      successBorder: successBorder ?? this.successBorder,
+      successText: successText ?? this.successText,
+      actionBackground: actionBackground ?? this.actionBackground,
+      actionBorder: actionBorder ?? this.actionBorder,
+      actionText: actionText ?? this.actionText,
+    );
+  }
+
+  @override
+  ActivityThemeColors lerp(ThemeExtension<ActivityThemeColors>? other, double t) {
+    if (other is! ActivityThemeColors) return this;
+    return ActivityThemeColors(
+      background: Color.lerp(background, other.background, t)!,
+      border: Color.lerp(border, other.border, t)!,
+      iconBackground: Color.lerp(iconBackground, other.iconBackground, t)!,
+      textTitle: Color.lerp(textTitle, other.textTitle, t)!,
+      textSubtitle: Color.lerp(textSubtitle, other.textSubtitle, t)!,
+      successBackground: Color.lerp(successBackground, other.successBackground, t)!,
+      successBorder: Color.lerp(successBorder, other.successBorder, t)!,
+      successText: Color.lerp(successText, other.successText, t)!,
+      actionBackground: Color.lerp(actionBackground, other.actionBackground, t)!,
+      actionBorder: Color.lerp(actionBorder, other.actionBorder, t)!,
+      actionText: Color.lerp(actionText, other.actionText, t)!,
+    );
+  }
+}
+
 /*
 PENDIENTES
 */
@@ -451,7 +644,7 @@ PENDIENTES
 PARA EL APPBAR GLOBAL header_widget.dart,
 DEFINIR UN ESTILO DE TEXTO PARA EL TÍTULO QUE SEA
 MÁS GRANDE Y MÁS LEGIBLE, POR EJEMPLO:
-style: TextStyle(
+titleTextStyle o style: TextStyle(
   color: Colors.white,
   fontWeight: FontWeight.bold,
   fontSize: 18,

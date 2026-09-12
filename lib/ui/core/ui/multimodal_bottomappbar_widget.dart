@@ -1,9 +1,10 @@
+//REFACTOR-APROVED x 2 - COLOR TEST REMAINING - DONT TESTED IN UI YET
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/config/static_messages.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
 
-class MultimodalNavBar extends StatelessWidget {
-  const MultimodalNavBar({
+class MultimodalBottomAppBarWidget extends StatelessWidget {
+  const MultimodalBottomAppBarWidget({
     super.key,
     this.announcementText,
     this.previousLabel,
@@ -34,9 +35,10 @@ class MultimodalNavBar extends StatelessWidget {
     final footerTheme = Theme.of(context).bottomNavigationBarTheme;
 
     return Material(
+      //ANTES CONTAINER()
       elevation: footerTheme.elevation ?? 0,
       child: Container(
-        color: footerTheme.backgroundColor,
+        color: footerTheme.backgroundColor ?? const Color(0xFFE53935),
         height: 56,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -50,7 +52,7 @@ class MultimodalNavBar extends StatelessWidget {
                 onTap: () {},
                 child: Icon(
                   Icons.skip_previous,
-                  color: footerTheme.unselectedItemColor,
+                  color: footerTheme.unselectedItemColor ?? Colors.black,
                   size: footerTheme.unselectedIconTheme?.size ?? 28,
                 ),
               ),
@@ -66,7 +68,7 @@ class MultimodalNavBar extends StatelessWidget {
                 onTap: () async => _announceCurrentScreen(context),
                 child: Icon(
                   Icons.play_arrow,
-                  color: footerTheme.selectedItemColor,
+                  color: footerTheme.selectedItemColor ?? Colors.black,
                   size: footerTheme.selectedIconTheme?.size ?? 32,
                 ),
               ),
@@ -81,7 +83,7 @@ class MultimodalNavBar extends StatelessWidget {
                 onTap: () {},
                 child: Icon(
                   Icons.skip_next,
-                  color: footerTheme.unselectedItemColor,
+                  color: footerTheme.unselectedItemColor ?? Colors.black,
                   size: footerTheme.unselectedIconTheme?.size ?? 28,
                 ),
               ),

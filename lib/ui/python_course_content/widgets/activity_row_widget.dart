@@ -1,91 +1,15 @@
-//REFACTOR-APROVED - COLOR TEST REMAINING - DONT TESTED IN UI
+//REFACTOR-APROVED x 2 - COLOR TEST REMAINING - DONT TESTED IN UI YET
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/python_module_model.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
-class DetailCard extends StatelessWidget {
-  final String title;
-  final bool expanded;
-  final VoidCallback onToggle;
-  final Widget child;
-  final Widget? actionIcon;
-
-  const DetailCard({
-    super.key,
-    required this.title,
-    required this.expanded,
-    required this.onToggle,
-    required this.child,
-    this.actionIcon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: onToggle,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Color(0xFF212121),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8), // Espacio entre el texto y el icono
-                actionIcon ??
-                    const SizedBox.shrink(), //PILAS PUES if (actionIcon != null) actionIcon!, // <-- 3. Lo muestras si no es nulo
-                const Spacer(), // Empuja la flecha de expandir a la derecha
-                Icon(
-                  expanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: const Color(0xFF424242),
-                ),
-              ],
-            ),
-          ),
-          if (expanded) ...[const SizedBox(height: 10), child],
-        ],
-      ),
-    );
-  }
-}
-
-class ActivityItem {
-  final String label;
-  final String emoji;
-
-  const ActivityItem(this.label, this.emoji);
-}
-
-class ActivityRow extends StatelessWidget {
+class ActivityRowWidget extends StatelessWidget {
   final ActivityItem item;
   final VoidCallback? onBookTap;
   final VoidCallback? onVideoTap;
   final bool isCompleted;
 
-  const ActivityRow({
+  const ActivityRowWidget({
     super.key,
     required this.item,
     this.onBookTap,
@@ -114,6 +38,7 @@ class ActivityRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final activityColors = Theme.of(context).extension<ActivityThemeColors>()!;
     // Si pasamos alguna función, consideramos que tiene acción
     final hasAction = onBookTap != null || onVideoTap != null;
     final badgeText = _getBadgeText();
@@ -122,9 +47,9 @@ class ActivityRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FBFF),
+        color: activityColors.background,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE3ECF7)),
+        border: Border.all(color: activityColors.border),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -133,7 +58,7 @@ class ActivityRow extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFFE8F1FF),
+              color: activityColors.iconBackground,
               borderRadius: BorderRadius.circular(10),
             ),
             alignment: Alignment.center,
@@ -146,9 +71,9 @@ class ActivityRow extends StatelessWidget {
               children: [
                 Text(
                   item.label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFF263238),
+                    color: activityColors.textTitle,
                     height: 1.35,
                     fontWeight: FontWeight.w600,
                   ),
@@ -158,7 +83,7 @@ class ActivityRow extends StatelessWidget {
                   'Actividad educativa',
                   style: TextStyle(
                     fontSize: 12,
-                    color: const Color(0xFF607D8B),
+                    color: activityColors.textSubtitle,
                   ),
                 ),
               ],
@@ -169,20 +94,24 @@ class ActivityRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
+                color: activityColors.successBackground,
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: const Color(0xFF66BB6A)),
+                border: Border.all(color: activityColors.successBorder),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.check_circle, size: 16, color: Color(0xFF2E7D32)),
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    size: 16,
+                    color: activityColors.successText,
+                  ),
                   SizedBox(width: 6),
                   Text(
                     'Completado',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF2E7D32),
+                      color: activityColors.successText,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -201,15 +130,15 @@ class ActivityRow extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE3F2FD),
+                    color: activityColors.actionBackground,
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: const Color(0xFF90CAF9)),
+                    border: Border.all(color: activityColors.actionBorder),
                   ),
                   child: Text(
                     badgeText,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF1565C0),
+                      color: activityColors.actionText,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

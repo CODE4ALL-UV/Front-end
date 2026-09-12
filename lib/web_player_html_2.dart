@@ -13,10 +13,6 @@ class _CustomAudioPlayerScreenState extends State<CustomAudioPlayerScreen> {
   // Instanciamos el reproductor
   late AudioPlayer _audioPlayer;
 
-  // URL de ejemplo (puedes cambiarlo por tu propio endpoint o archivo)
-  final String _audioUrl =
-      'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
-
   @override
   void initState() {
     super.initState();

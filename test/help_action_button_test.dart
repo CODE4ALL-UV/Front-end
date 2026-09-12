@@ -3,42 +3,40 @@ import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('HelpActionButton expands floating accessibility icons', (
+  testWidgets('HelpActionButton despliega las categorías de ayuda', (
     tester,
   ) async {
     await tester.pumpWidget(
       const MaterialApp(home: Scaffold(body: HelpActionButton())),
     );
 
-    // Verifica que el botón inicial está presente
-    expect(find.byIcon(Icons.help_outline), findsOneWidget);
+    // Botón cerrado: un único signo de interrogación.
+    expect(find.byIcon(Icons.question_mark), findsOneWidget);
 
-    // Toca el botón principal para expandir el menú
-    await tester.tap(find.byIcon(Icons.help_outline));
+    await tester.tap(find.byIcon(Icons.question_mark));
     await tester.pumpAndSettle();
 
-    // Verifica que el botón cambió a icono de cerrar
+    // El menú se dibuja en un Overlay: el botón principal pasa a ser una X y
+    // aparecen las tres categorías.
     expect(find.byIcon(Icons.close), findsOneWidget);
+    expect(find.byIcon(Icons.help), findsOneWidget);
+    expect(find.byIcon(Icons.psychology), findsOneWidget);
+    expect(find.byIcon(Icons.volunteer_activism), findsOneWidget);
 
-    // Verifica que los iconos de accesibilidad están visibles
-    expect(find.byIcon(Icons.settings), findsOneWidget);
-    expect(find.byIcon(Icons.zoom_in), findsOneWidget);
-    expect(find.byIcon(Icons.wb_sunny), findsOneWidget);
-    expect(find.byIcon(Icons.record_voice_over), findsOneWidget);
-    expect(find.byIcon(Icons.translate), findsOneWidget);
-
-    await tester.tap(find.byIcon(Icons.zoom_in));
+    // Al abrir "Ayuda" se muestran sus opciones de accesibilidad.
+    await tester.tap(find.byIcon(Icons.help));
     await tester.pumpAndSettle();
 
-    expect(find.text('Tamaño de texto'), findsNWidgets(2));
-    expect(find.text('Ajustar el tamaño de texto.'), findsOneWidget);
+    expect(find.byIcon(Icons.text_fields), findsOneWidget);
+    expect(find.byIcon(Icons.brightness_4), findsOneWidget);
+    expect(find.byIcon(Icons.hearing), findsOneWidget);
+    expect(find.byIcon(Icons.language), findsOneWidget);
 
-    // Toca el botón de nuevo para colapsar
-    await tester.tap(find.byIcon(Icons.close).last);
+    // Cerrar devuelve el botón a su estado inicial.
+    await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle();
 
-    // Verifica que los iconos desaparecieron
-    expect(find.byIcon(Icons.help_outline), findsOneWidget);
+    expect(find.byIcon(Icons.question_mark), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing);
   });
 }

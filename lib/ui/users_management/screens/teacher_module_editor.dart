@@ -33,7 +33,9 @@ class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
   @override
   void dispose() {
     _nameCtrl.dispose();
-    for (final c in _topicCtrls) c.dispose();
+    for (final c in _topicCtrls) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -54,23 +56,29 @@ class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
       final res = await http.get(
         Uri.parse('$backendUrl/api/modules/$_moduleId'),
       );
+      if (!mounted) return;
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
         _nameCtrl.text = data['name'] ?? '';
         final topics = (data['topics'] as List<dynamic>? ?? []).cast<String>();
         _topicCtrls.clear();
-        for (final t in topics) _addTopic(t);
+        for (final t in topics) {
+          _addTopic(t);
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('No se pudo cargar el módulo')),
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
-      setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
@@ -98,6 +106,7 @@ class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),
       );
+      if (!mounted) return;
       if (res.statusCode == 201) {
         final data = jsonDecode(res.body);
         final savedId = (data['id'] ?? _moduleId ?? _defaultModuleId)
@@ -113,11 +122,14 @@ class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
-      setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 

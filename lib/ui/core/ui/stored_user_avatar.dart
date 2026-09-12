@@ -8,11 +8,11 @@ class StoredUserAvatar extends StatelessWidget {
   final bool showName;
 
   const StoredUserAvatar({
-    Key? key,
+    super.key,
     this.size = 28,
     this.radius = 14,
     this.showName = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -17,7 +17,7 @@ class _QuizScreenDarkState extends State<QuizScreenDark> {
     'B) Para gestionar e instalar librerías externas',
   ];
   int _currentPage = 0;
-  bool _largeText = false;
+  final bool _largeText = false;
 
   ColorScheme get _colors => ColorScheme.fromSeed(
     seedColor: const Color(0xFF60A5FA),

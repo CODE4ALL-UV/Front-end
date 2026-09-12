@@ -1,12 +1,12 @@
 import 'package:flutter/widgets.dart';
 
 class VisualThemeController extends InheritedWidget {
-  VisualThemeController({
+  const VisualThemeController({
     super.key,
-    required bool isDarkTheme,
+    required this.isDarkTheme,
     required this.onThemeChanged,
     required super.child,
-  }) : isDarkTheme = isDarkTheme;
+  });
 
   final bool isDarkTheme;
   final ValueChanged<bool> onThemeChanged;

@@ -12,8 +12,8 @@ class QuizWithVideoScreen extends StatefulWidget {
 
 class _QuizWithVideoScreenState extends State<QuizWithVideoScreen> {
   String? _selected;
-  bool _largeText = false;
-  bool _highContrast = false;
+  final bool _largeText = false;
+  final bool _highContrast = false;
 
   static const String _videoUrl =
       'https://www.youtube.com/watch?v=nKPbfIU442g&t=89s';

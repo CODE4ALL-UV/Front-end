@@ -31,17 +31,8 @@ class TranslateService {
       'translation.googleapis.com',
       '/language/translate/v2',
     );
-    // The API accepts multiple q parameters for batching
-    final request = {'key': apiKey, 'target': target};
-
-    // Build query with multiple q entries
-    final queryParameters = Map<String, dynamic>.from(request);
-    for (var t in texts) {
-      queryParameters.putIfAbsent('q', () => <String>[]);
-    }
-
-    // Unfortunately `http` package doesn't allow repeated keys easily with Map,
-    // so we build the Uri manually.
+    // El paquete `http` no permite repetir la misma clave en un Map, y la API
+    // necesita un parametro `q` por cada texto, asi que la URL se arma a mano.
     final sb = StringBuffer();
     sb.write('${uri.toString()}?key=$apiKey&target=$target');
     for (var t in texts) {

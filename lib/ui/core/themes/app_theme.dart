@@ -389,9 +389,3 @@ class AppTheme {
     };
   }
 }
-
-// CONSERVAR SI TIENE USO, DE LO CONTRARIO ELIMINAR
-// Extensión utilitaria para convertir Color a TextStyle fácilmente
-extension on Color {
-  TextStyle toTextStyle() => TextStyle(color: this);
-}

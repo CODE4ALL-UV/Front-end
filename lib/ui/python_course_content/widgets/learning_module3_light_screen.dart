@@ -1,8 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'quiz_screen.dart';
-import 'quiz_screen_dark.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
@@ -11,6 +9,10 @@ import 'package:flutter_code4all/ui/python_course_content/widgets/learning_modul
 import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_dark_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module4_light_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module4_dark_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_page.dart';
+import 'package:flutter_code4all/data/course/python_course_catalog.dart';
+import 'package:flutter_code4all/data/services/course_progress_store.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart';
 
 class Modulo3AprendizajeLight extends StatefulWidget {
   const Modulo3AprendizajeLight({super.key});
@@ -198,24 +200,31 @@ class _Modulo3AprendizajeLightState extends State<Modulo3AprendizajeLight> {
                           iconColor: const Color(0xFF1E88E5),
                           bgColor: const Color(0xFFE8F5E9),
                           size: bigSize,
-                          progress: 0.75,
+                          moduleNumber: 3,
+                          sectionNumber: 3,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const Capitulo3ErroresLight(),
+                                builder: (_) => const CourseChapterPage(
+                                  moduleNumber: 3,
+                                  sectionNumber: 3,
+                                ),
                               ),
                             );
                           },
                         ),
                         _LessonBox(
                           number: 3,
-                          title: 'Manejo de\nerrores',
+                          title: PythonCourseCatalog.section(3, 3)!.boxTitle,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const Capitulo3ErroresLight(),
+                                builder: (_) => const CourseChapterPage(
+                                  moduleNumber: 3,
+                                  sectionNumber: 3,
+                                ),
                               ),
                             );
                           },
@@ -229,12 +238,15 @@ class _Modulo3AprendizajeLightState extends State<Modulo3AprendizajeLight> {
                       children: [
                         _LessonBox(
                           number: 2,
-                          title: 'Bucles y\nestructuras\niterativas',
+                          title: PythonCourseCatalog.section(3, 2)!.boxTitle,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const Capitulo2BuclesLight(),
+                                builder: (_) => const CourseChapterPage(
+                                  moduleNumber: 3,
+                                  sectionNumber: 2,
+                                ),
                               ),
                             );
                           },
@@ -244,12 +256,16 @@ class _Modulo3AprendizajeLightState extends State<Modulo3AprendizajeLight> {
                           iconColor: const Color(0xFF3F51B5),
                           bgColor: const Color(0xFFE8F5E9),
                           size: bigSize,
-                          progress: 0.6,
+                          moduleNumber: 3,
+                          sectionNumber: 2,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const Capitulo2BuclesLight(),
+                                builder: (_) => const CourseChapterPage(
+                                  moduleNumber: 3,
+                                  sectionNumber: 2,
+                                ),
                               ),
                             );
                           },
@@ -266,24 +282,31 @@ class _Modulo3AprendizajeLightState extends State<Modulo3AprendizajeLight> {
                           iconColor: const Color(0xFF5C6BC0),
                           bgColor: const Color(0xFFE8F5E9),
                           size: bigSize,
-                          progress: 0.3,
+                          moduleNumber: 3,
+                          sectionNumber: 1,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const Capitulo1DecisionLight(),
+                                builder: (_) => const CourseChapterPage(
+                                  moduleNumber: 3,
+                                  sectionNumber: 1,
+                                ),
                               ),
                             );
                           },
                         ),
                         _LessonBox(
                           number: 1,
-                          title: 'Estructuras\nde decisión',
+                          title: PythonCourseCatalog.section(3, 1)!.boxTitle,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const Capitulo1DecisionLight(),
+                                builder: (_) => const CourseChapterPage(
+                                  moduleNumber: 3,
+                                  sectionNumber: 1,
+                                ),
                               ),
                             );
                           },
@@ -327,297 +350,13 @@ class _Modulo3AprendizajeLightState extends State<Modulo3AprendizajeLight> {
   }
 }
 
-class Capitulo1DecisionLight extends StatelessWidget {
-  const Capitulo1DecisionLight({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _ChapterDetailLight(
-      chapterTitle: 'Capítulo 1: Estructuras de decisión',
-      moduleLabel: 'Módulo 3. Control de flujo',
-      rutaItems: const [
-        _ActivityItem('If - else', '📚🖥️🎧'),
-        _ActivityItem('Nombre del Tip/Cápsula de conocimiento', '🎁'),
-        _ActivityItem('Ejemplo', '⚙️'),
-        _ActivityItem('If - else - if', '📚🖥️🎧'),
-        _ActivityItem('Nombre del Tip/Cápsula de conocimiento', '🎁'),
-        _ActivityItem('Ejercicio', '🏋️'),
-        _ActivityItem('Recorrido de colecciones', '📚🖥️🎧'),
-        _ActivityItem('Nombre de la buena práctica', '🏅'),
-        _ActivityItem('Quiz', '❓'),
-        _ActivityItem('Laboratorio', '🧪'),
-        _ActivityItem('Evaluación final', '📋'),
-      ],
-      onPreviousChapter: () => Navigator.pop(context),
-      onNextChapter: () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Capitulo2BuclesLight()),
-      ),
-    );
-  }
-}
-
-class Capitulo2BuclesLight extends StatelessWidget {
-  const Capitulo2BuclesLight({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _ChapterDetailLight(
-      chapterTitle: 'Capítulo 2: Bucles y estructuras iterativas',
-      moduleLabel: 'Módulo 3. Control de flujo',
-      rutaItems: const [
-        _ActivityItem('For', '📚🖥️🎧'),
-        _ActivityItem('Nombre del Tip/Cápsula de conocimiento', '🎁'),
-        _ActivityItem('Ejemplo', '⚙️'),
-        _ActivityItem('While', '📚🖥️🎧'),
-        _ActivityItem('Nombre del Tip/Cápsula de conocimiento', '🎁'),
-        _ActivityItem('Ejercicio', '🏋️'),
-        _ActivityItem('Recorrido de colecciones', '📚🖥️🎧'),
-        _ActivityItem('Nombre de la buena práctica', '🏅'),
-        _ActivityItem('Quiz', '❓'),
-        _ActivityItem('Laboratorio', '🧪'),
-        _ActivityItem('Evaluación final', '📋'),
-      ],
-      onPreviousChapter: () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Capitulo1DecisionLight()),
-      ),
-      onNextChapter: () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Capitulo3ErroresLight()),
-      ),
-    );
-  }
-}
-
-class Capitulo3ErroresLight extends StatelessWidget {
-  const Capitulo3ErroresLight({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _ChapterDetailLight(
-      chapterTitle: 'Capítulo 3: Manejo de errores',
-      moduleLabel: 'Módulo 3. Control de flujo',
-      rutaItems: const [
-        _ActivityItem('¿Qué es una excepción?', '📚🖥️🎧'),
-        _ActivityItem('Nombre del Tip/Cápsula de conocimiento', '🎁'),
-        _ActivityItem('Ejemplo', '⚙️'),
-        _ActivityItem('Try - Except', '📚🖥️🎧'),
-        _ActivityItem('Nombre del Tip/Cápsula de conocimiento', '🎁'),
-        _ActivityItem('Ejercicio', '🏋️'),
-        _ActivityItem('Errores comunes en Python', '📚🖥️🎧'),
-        _ActivityItem('Nombre de la buena práctica', '🏅'),
-        _ActivityItem('Quiz', '❓'),
-        _ActivityItem('Laboratorio', '🧪'),
-        _ActivityItem('Evaluación final', '📋'),
-      ],
-      onPreviousChapter: () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Capitulo2BuclesLight()),
-      ),
-    );
-  }
-}
-
-class _ChapterDetailLight extends StatefulWidget {
-  final String chapterTitle;
-  final String moduleLabel;
-  final List<_ActivityItem> rutaItems;
-  final VoidCallback? onPreviousChapter;
-  final VoidCallback? onNextChapter;
-
-  const _ChapterDetailLight({
-    required this.chapterTitle,
-    required this.moduleLabel,
-    required this.rutaItems,
-    this.onPreviousChapter,
-    this.onNextChapter,
-  });
-
-  @override
-  State<_ChapterDetailLight> createState() => _ChapterDetailLightState();
-}
-
-class _ChapterDetailLightState extends State<_ChapterDetailLight> {
-  bool _resumenExpanded = true;
-  bool _rutaExpanded = true;
-
-  void _goPreviousChapter() {
-    if (widget.onPreviousChapter != null) {
-      widget.onPreviousChapter!.call();
-      return;
-    }
-    Navigator.maybePop(context);
-  }
-
-  void _goNextChapter() {
-    if (widget.onNextChapter != null) {
-      widget.onNextChapter!.call();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDarkTheme = VisualThemeController.resolveIsDark(context);
-    final width = MediaQuery.sizeOf(context).width;
-    final horizontalPadding = width < 360 ? 10.0 : 16.0;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFE53935),
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        title: const Text(
-          'CODE4ALL',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 1,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onHorizontalDragEnd: (details) {
-          final velocity = details.primaryVelocity ?? 0;
-          if (velocity > 250) {
-            _goPreviousChapter();
-          } else if (velocity < -250) {
-            _goNextChapter();
-          }
-        },
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              color: const Color(0xFFE8F7E9),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Text(
-                widget.moduleLabel,
-                style: const TextStyle(
-                  color: Color(0xFF4E6E50),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding,
-                  12,
-                  horizontalPadding,
-                  16,
-                ),
-                child: Column(
-                  children: [
-                    _DetailCard(
-                      title: widget.chapterTitle,
-                      expanded: _resumenExpanded,
-                      onToggle: () =>
-                          setState(() => _resumenExpanded = !_resumenExpanded),
-                      child: const _ResumenContenido(),
-                    ),
-                    const SizedBox(height: 12),
-                    _DetailCard(
-                      title: 'Ruta de actividades',
-                      expanded: _rutaExpanded,
-                      onToggle: () =>
-                          setState(() => _rutaExpanded = !_rutaExpanded),
-                      child: Column(
-                        children: widget.rutaItems
-                            .map(
-                              (item) => Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                ),
-                                child: item.label == 'Quiz'
-                                    ? Row(
-                                        children: [
-                                          Expanded(
-                                            child: _ActivityRow(item: item),
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(
-                                              Icons.quiz,
-                                              color: Color(0xFF1E88E5),
-                                            ),
-                                            onPressed: () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => isDarkTheme
-                                                    ? const QuizScreenDark()
-                                                    : const QuizScreen(),
-                                              ),
-                                            ),
-                                            tooltip: 'Abrir Quiz',
-                                          ),
-                                        ],
-                                      )
-                                    : _ActivityRow(item: item),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16, bottom: 8),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: const HelpActionButton(),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        color: const Color(0xFFE53935),
-        height: 56,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-              onPressed: widget.onPreviousChapter,
-              icon: const Icon(
-                Icons.skip_previous,
-                color: Colors.black,
-                size: 32,
-              ),
-            ),
-            const Icon(Icons.play_arrow, color: Colors.black, size: 36),
-            IconButton(
-              onPressed: widget.onNextChapter,
-              icon: Icon(
-                Icons.skip_next,
-                color: widget.onNextChapter == null
-                    ? Colors.black26
-                    : Colors.black,
-                size: 32,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _BigCircle extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final Color bgColor;
   final double size;
-  final double progress;
+  final int moduleNumber;
+  final int sectionNumber;
   final VoidCallback? onTap;
 
   const _BigCircle({
@@ -625,16 +364,28 @@ class _BigCircle extends StatelessWidget {
     required this.iconColor,
     required this.bgColor,
     required this.size,
-    required this.progress,
+    required this.moduleNumber,
+    required this.sectionNumber,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final percentage = (progress * 100).toInt();
+    // El almacen avisa cuando se completa una actividad, asi que la
+    // circunferencia se redibuja sola sin que nadie la refresque a mano.
+    ensureProgressLoaded();
+    return ListenableBuilder(
+      listenable: CourseProgressStore.instance,
+      builder: (context, _) => _buildCircle(context),
+    );
+  }
+
+  Widget _buildCircle(BuildContext context) {
+    final progress = sectionProgress(moduleNumber, sectionNumber);
+    final percentage = (progress * 100).round();
     return Semantics(
       button: true,
-      label: 'Lección con $percentage% de progreso',
+      label: sectionProgressLabel(moduleNumber, sectionNumber),
       hint: 'Toca para abrir la lección',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -845,191 +596,5 @@ class _ArcPainter extends CustomPainter {
   @override
   bool shouldRepaint(_ArcPainter oldDelegate) {
     return oldDelegate.progress != progress || oldDelegate.isDark != isDark;
-  }
-}
-
-class _DetailCard extends StatelessWidget {
-  final String title;
-  final bool expanded;
-  final VoidCallback onToggle;
-  final Widget child;
-
-  const _DetailCard({
-    required this.title,
-    required this.expanded,
-    required this.onToggle,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFD9DEE3)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: onToggle,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Color(0xFF263238),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Icon(
-                  expanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: const Color(0xFF607D8B),
-                ),
-              ],
-            ),
-          ),
-          if (expanded) ...[const SizedBox(height: 10), child],
-        ],
-      ),
-    );
-  }
-}
-
-class _ResumenContenido extends StatelessWidget {
-  const _ResumenContenido();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Resumen del capítulo',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-            color: Color(0xFF263238),
-          ),
-        ),
-        SizedBox(height: 8),
-        Text('• 📖 5 Temas', style: TextStyle(fontSize: 14)),
-        SizedBox(height: 4),
-        Text('• 💡 2 Cápsulas', style: TextStyle(fontSize: 14)),
-        SizedBox(height: 4),
-        Text('• 🧩 3 Ejercicios', style: TextStyle(fontSize: 14)),
-        SizedBox(height: 4),
-        Text('• 📝 1 Quiz parcial', style: TextStyle(fontSize: 14)),
-      ],
-    );
-  }
-}
-
-class _ActivityItem {
-  final String label;
-  final String emoji;
-
-  const _ActivityItem(this.label, this.emoji);
-}
-
-class _ActivityRow extends StatelessWidget {
-  final _ActivityItem item;
-
-  const _ActivityRow({required this.item});
-
-  String _badgeText() {
-    if (item.label == 'Quiz') return 'Comenzar';
-    if (item.label == 'Laboratorio') return 'Explorar';
-    if (item.label == 'Ejercicio') return 'Resolver';
-    if (item.label == 'Ejemplo') return 'Ver';
-    if (item.label == 'Descarga y puesta en marcha') return 'Abrir';
-    if (item.label == 'Preparando la versión instalada') return 'Ver';
-    return 'Abrir';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final badgeText = _badgeText();
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FBFF),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE3ECF7)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE8F1FF),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            alignment: Alignment.center,
-            child: Text(item.emoji, style: const TextStyle(fontSize: 20)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.label,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF263238),
-                    height: 1.35,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Actividad educativa',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: const Color(0xFF607D8B),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE3F2FD),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: const Color(0xFF90CAF9)),
-            ),
-            child: Text(
-              badgeText,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF1565C0),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

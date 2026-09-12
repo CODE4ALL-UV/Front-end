@@ -15,7 +15,7 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
   );
   final TextEditingController _outputController = TextEditingController();
 
-  String _expectedOutput = 'Hola Code4All';
+  final String _expectedOutput = 'Hola Code4All';
   String? _feedback;
   bool _hasRun = false;
 
@@ -130,8 +130,6 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: HeaderWidget(
@@ -221,7 +219,7 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Objetivo: imprimir "${_expectedOutput}"',
+                  'Objetivo: imprimir "$_expectedOutput"',
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
                     color: const Color(0xFF2563EB),

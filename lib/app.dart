@@ -3,7 +3,7 @@ import 'ui/core/themes/app_theme.dart';
 import 'ui/core/ui/accessibility_text_scale.dart';
 import 'ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
-import 'ui/users_management/widgets/login_screen.dart';
+import 'ui/users_management/screens/login_screen.dart';
 import 'ui/users_management/screens/login_dark_screen.dart';
 import 'ui/users_management/screens/form_light_screen.dart';
 import 'ui/users_management/screens/form_dark_screen.dart';
@@ -151,24 +151,6 @@ class _AppState extends State<App> {
       case AppThemeMode.light:
         return AppTheme.lightTheme;
     }
-  }
-
-  Widget _buildScaledModulePage(BuildContext context, Widget page) {
-    if (_currentScreen != AppScreen.modulo) {
-      return page;
-    }
-
-    final scale = _textScaleController.scale;
-    if (scale <= 1.0) {
-      return page;
-    }
-
-    final screenSize = MediaQuery.of(context).size;
-    return Transform.scale(
-      scale: scale,
-      alignment: Alignment.topCenter,
-      child: SizedBox(width: screenSize.width / scale, child: page),
-    );
   }
 
   // Mostrar selector con tres opciones y actualizar etiquetas

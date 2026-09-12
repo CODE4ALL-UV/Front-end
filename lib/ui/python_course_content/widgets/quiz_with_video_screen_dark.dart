@@ -13,7 +13,7 @@ class QuizWithVideoScreenDark extends StatefulWidget {
 
 class _QuizWithVideoScreenDarkState extends State<QuizWithVideoScreenDark> {
   String? _selected;
-  bool _largeText = false;
+  final bool _largeText = false;
 
   static const String _videoUrl =
       'https://www.youtube.com/watch?v=nKPbfIU442g&t=89s';

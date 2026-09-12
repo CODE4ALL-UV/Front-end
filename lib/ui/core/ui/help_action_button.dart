@@ -145,8 +145,6 @@ class _HelpActionButtonState extends State<HelpActionButton>
     final overlay = Overlay.of(context);
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
-    final screenWidth = mediaQuery.size.width;
-    final safeWidth = (screenWidth - 24).clamp(220.0, 380.0);
 
     // Calculate the exact bottom and left coordinates based on the real button
     // We subtract 56 (the button height) to get the distance from the bottom edge
@@ -174,8 +172,6 @@ class _HelpActionButtonState extends State<HelpActionButton>
           ),
         );
         final panelHeight = (screenHeight * 0.65).clamp(280.0, 380.0);
-        final availableBottomSpace =
-            overlayHeight - 24 - overlayMediaQuery.padding.bottom;
 
         // --- NEW BOTTOM-TO-BOTTOM ALIGNMENT ---
         // Calculate vertical alignment so the modal's TOP aligns with the vertical button's TOP
@@ -291,7 +287,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                               optionData['label'] as String,
                                             ),
                                           );
-                                        }).toList(),
+                                        }),
                                         const SizedBox(height: 12),
                                       ],
 
@@ -356,7 +352,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                     ],
                                   ),
                                 );
-                              }).toList(),
+                              }),
 
                             // Main and Close Button, Same circle and icons Sizes as Horizontal Buttons
                             Column(
@@ -661,7 +657,6 @@ class _OptionPanel extends StatefulWidget {
   final VoidCallback onRefresh;
 
   const _OptionPanel({
-    super.key,
     required this.option,
     required this.onClose,
     required this.width,
@@ -680,9 +675,6 @@ Handling the UI states for these accessibility toggles this way is a very solid 
 
 I assume the final parts of the file contain the small helper widgets mentioned here (like _buildInfoBanner, _ModeButton, _LevelButton, and _buildSpeedPill).
   */
-  bool _textSizeEnabled = false;
-  bool _visualModeEnabled = false;
-  double _textSize = 1.0;
   AccessibilityTextScaleController? _textScaleController;
 
   @override
@@ -694,8 +686,6 @@ I assume the final parts of the file contain the small helper widgets mentioned 
       _textScaleController = controller;
       _textScaleController?.addListener(_handleTextScaleChanged);
     }
-    _textSizeEnabled = controller.scale != 1.0;
-    _textSize = controller.scale;
   }
 
   @override
@@ -704,12 +694,11 @@ I assume the final parts of the file contain the small helper widgets mentioned 
     super.dispose();
   }
 
+  /// El panel lee la escala directamente del controlador al construirse, asi
+  /// que basta con volver a pintar cuando esta cambia.
   void _handleTextScaleChanged() {
     if (!mounted) return;
-    setState(() {
-      _textSizeEnabled = (_textScaleController?.scale ?? 1.0) != 1.0;
-      _textSize = _textScaleController?.scale ?? 1.0;
-    });
+    setState(() {});
   }
 
   void _applyVisualMode(bool isDarkTheme) {
@@ -1216,17 +1205,6 @@ Widget _buildInfoBanner({
           ),
         ),
       ],
-    ),
-  );
-}
-
-Widget _buildScaleMarker(String label, double fontSize) {
-  return Text(
-    label,
-    style: TextStyle(
-      fontSize: fontSize,
-      fontWeight: FontWeight.bold,
-      color: const Color(0xFF424242),
     ),
   );
 }

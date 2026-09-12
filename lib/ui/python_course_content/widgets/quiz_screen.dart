@@ -17,8 +17,8 @@ class _QuizScreenState extends State<QuizScreen> {
     'B) Para gestionar e instalar librerías externas',
   ];
   int _currentPage = 0;
-  bool _largeText = false;
-  bool _highContrast = false;
+  final bool _largeText = false;
+  final bool _highContrast = false;
 
   ColorScheme get _colors => _highContrast
       ? const ColorScheme.highContrastLight()

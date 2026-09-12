@@ -34,24 +34,26 @@ class _DirectorPerformanceScreenState extends State<DirectorPerformanceScreen> {
     try {
       if (token == null) throw Exception('No auth token');
       final rows = await _api.getPerformancesAverage(bearerToken: token);
+      if (!mounted) return;
       setState(() {
         _aggregate = List<Map<String, dynamic>>.from(
           rows.map((e) => Map<String, dynamic>.from(e)),
         );
       });
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error cargando datos: $e')));
     } finally {
-      setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final screenH = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -197,7 +199,7 @@ class _DirectorPerformanceScreenState extends State<DirectorPerformanceScreen> {
                                 ],
                               ),
                             );
-                          }).toList(),
+                          }),
                         ],
                       ),
                     ),
@@ -372,99 +374,6 @@ class _DirectorPerformanceScreenState extends State<DirectorPerformanceScreen> {
     );
   }
 
-  Widget _buildChart() {
-    if (_aggregate.isEmpty) return const Center(child: Text('No hay datos'));
-    // Representación simple: barras horizontales proporcionales al `score`.
-    final maxScore = _aggregate
-        .map((r) => ((r['avg_score'] ?? 0.0) as double).round())
-        .fold<int>(0, (a, b) => a > b ? a : b);
-    return ListView.separated(
-      itemCount: _aggregate.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (context, index) {
-        final row = _aggregate[index];
-        final lesson = row['lesson_name'] ?? '';
-        final score = ((row['avg_score'] ?? 0.0) as double).round();
-        final pct = maxScore == 0 ? 0.0 : (score / maxScore);
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(lesson, style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      Container(
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
-                      FractionallySizedBox(
-                        widthFactor: pct.clamp(0.0, 1.0),
-                        child: Container(
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.blueAccent,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 48,
-                  child: Text('$score', textAlign: TextAlign.right),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildTable() {
-    if (_aggregate.isEmpty)
-      return const Center(child: Text('No hay registros'));
-
-    return Card(
-      child: SingleChildScrollView(
-        child: DataTable(
-          columns: const [
-            DataColumn(label: Text('Lección')),
-            DataColumn(label: Text('Puntaje')),
-            DataColumn(label: Text('Fallidos')),
-            DataColumn(label: Text('Buenos')),
-            DataColumn(label: Text('Excelentes')),
-          ],
-          rows: _aggregate.map((r) {
-            return DataRow(
-              cells: [
-                DataCell(Text(r['lesson_name'] ?? '')),
-                DataCell(
-                  Text('${((r['avg_score'] ?? 0.0) as double).round()}'),
-                ),
-                DataCell(
-                  Text('${((r['avg_failed'] ?? 0.0) as double).round()}'),
-                ),
-                DataCell(Text('${((r['avg_good'] ?? 0.0) as double).round()}')),
-                DataCell(
-                  Text('${((r['avg_excellent'] ?? 0.0) as double).round()}'),
-                ),
-              ],
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
   Future<void> _exportPdf() async {
     try {
       final doc = pw.Document();
@@ -507,6 +416,7 @@ class _DirectorPerformanceScreenState extends State<DirectorPerformanceScreen> {
       final bytes = await doc.save();
       await Printing.layoutPdf(onLayout: (format) async => bytes);
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error exportando PDF: $e')));

@@ -259,13 +259,13 @@ class _LiveTranslationBoxState extends State<LiveTranslationBox> {
               ),
               ElevatedButton(
                 onPressed: _startedAt == null ? null : _stopSync,
-                child: const Text('Detener'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,
                   ),
                 ),
+                child: const Text('Detener'),
               ),
               ElevatedButton(
                 onPressed: _startedAt == null
@@ -274,13 +274,13 @@ class _LiveTranslationBoxState extends State<LiveTranslationBox> {
                         _startedAt = DateTime.now();
                         setState(() {});
                       },
-                child: const Text('Re-sincronizar'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 10,
                   ),
                 ),
+                child: const Text('Re-sincronizar'),
               ),
             ],
           ),

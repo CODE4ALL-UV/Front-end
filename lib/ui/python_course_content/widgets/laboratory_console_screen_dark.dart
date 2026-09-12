@@ -16,7 +16,7 @@ class _LaboratoryConsoleScreenDarkState
   );
   final TextEditingController _outputController = TextEditingController();
 
-  String _expectedOutput = 'Hola Code4All';
+  final String _expectedOutput = 'Hola Code4All';
   String? _feedback;
   bool _hasRun = false;
 
@@ -219,7 +219,7 @@ class _LaboratoryConsoleScreenDarkState
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Objetivo: imprimir "${_expectedOutput}"',
+                  'Objetivo: imprimir "$_expectedOutput"',
                   style: const TextStyle(
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF60A5FA),

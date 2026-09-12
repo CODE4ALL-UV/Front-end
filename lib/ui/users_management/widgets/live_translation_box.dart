@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'package:flutter_code4all/data/services/api_service.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 
@@ -45,9 +45,9 @@ class _LiveTranslationBoxState extends State<LiveTranslationBox> {
     }
 
     try {
-      return dotenv.env['BACKEND_URL'] ?? 'http://127.0.0.1:8000';
+      return ApiService().baseUrl;
     } catch (_) {
-      return 'http://127.0.0.1:8000';
+      return ApiService().baseUrl;
     }
   }
 

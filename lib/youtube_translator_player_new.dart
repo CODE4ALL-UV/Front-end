@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'package:flutter_code4all/data/services/api_service.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:youtube_player_flutter/youtube_player_flutter.dart' as ypf;
 import 'package:url_launcher/url_launcher_string.dart';
@@ -91,8 +91,10 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
       return;
     }
 
-    final backendUrl = widget.backendUrl ?? dotenv.env['BACKEND_URL'];
-    if (backendUrl == null || backendUrl.isEmpty) {
+    // ApiService siempre da una direccion, asi que ya no puede ser nula: solo
+    // queda comprobar que no venga vacia.
+    final backendUrl = widget.backendUrl ?? ApiService().baseUrl;
+    if (backendUrl.isEmpty) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;

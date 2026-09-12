@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:flutter_code4all/data/services/api_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
@@ -6,7 +7,6 @@ import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_footer_bar.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_light_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_code4all/data/services/auth_storage.dart';
@@ -57,7 +57,7 @@ class _ModuloAprendizajeState extends State<ModuloAprendizaje> {
   }
 
   Future<void> _fetchModuleAndApply(String moduleId) async {
-    final backend = dotenv.env['BACKEND_URL'] ?? 'http://127.0.0.1:8000';
+    final backend = ApiService().baseUrl;
     try {
       final res = await http.get(Uri.parse('$backend/api/modules/$moduleId'));
       if (res.statusCode == 200) {

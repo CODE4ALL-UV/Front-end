@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'package:flutter_code4all/data/services/api_service.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class TeacherModuleEditor extends StatefulWidget {
@@ -20,7 +20,7 @@ class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
   bool _loading = false;
   String? _moduleId;
 
-  String get backendUrl => dotenv.env['BACKEND_URL'] ?? 'http://127.0.0.1:8000';
+  String get backendUrl => ApiService().baseUrl;
 
   @override
   void initState() {

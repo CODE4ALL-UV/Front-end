@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/web_player_embedded.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+
+import 'data/services/api_service.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart' as ypf;
 
 class CaptionCue {
@@ -67,9 +68,12 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
   bool _loading = true;
   bool _hasValidId = true;
 
-  String get _backendUrl =>
-      widget.backendUrl ??
-      (dotenv.env['BACKEND_URL'] ?? 'http://127.0.0.1:8000');
+  /// Una sola fuente para la direccion del backend.
+  ///
+  /// Antes tenia su propio valor por defecto, asi que al desplegar habia que
+  /// acordarse de cambiarlo en dos sitios. Ahora cae en ApiService, que ya
+  /// sabe leer la que se fija al compilar.
+  String get _backendUrl => widget.backendUrl ?? ApiService().baseUrl;
 
   @override
   void initState() {

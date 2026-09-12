@@ -12,11 +12,29 @@ class ApiService {
 
   final String _baseUrl;
 
+  /// La dirección del servidor, sin barra al final.
+  String get baseUrl => _baseUrl;
+
+  /// Dirección del backend cuando nadie dice otra cosa.
+  ///
+  /// En producción se fija al compilar:
+  ///
+  ///     flutter build web --dart-define=BACKEND_URL=https://tu-api.onrender.com
+  ///
+  /// Sin eso, la aplicación desplegada apuntaría a `127.0.0.1`, que es el
+  /// ordenador de quien la abre, no el servidor. Funcionaría en tu máquina y
+  /// en ninguna otra.
+  static const String _configuredUrl = String.fromEnvironment('BACKEND_URL');
+
   static String _defaultBaseUrl() {
+    if (_configuredUrl.isNotEmpty) return _configuredUrl;
+
+    // En desarrollo, cada plataforma llega al servidor local por su camino.
     if (kIsWeb) {
       return 'http://127.0.0.1:8000';
     }
 
+    // El emulador de Android ve el ordenador anfitrión en esta dirección.
     if (io.Platform.isAndroid) {
       return 'http://10.0.2.2:8000';
     }

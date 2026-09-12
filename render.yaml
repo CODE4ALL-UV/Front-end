@@ -1,0 +1,41 @@
+# Cómo se despliega la aplicación web en Render.
+#
+# Es un sitio estático: Flutter compila a HTML, CSS y JavaScript, y Render solo
+# tiene que servir esos archivos. No hace falta ningún servidor propio.
+#
+# Render no trae Flutter instalado, así que el comando de compilación se lo
+# descarga. Tarda unos minutos la primera vez.
+
+services:
+  - type: web
+    name: code4all-web
+    runtime: static
+    plan: free
+
+    # Se descarga Flutter, se instalan las dependencias y se compila.
+    #
+    # BACKEND_URL es imprescindible: sin él la web quedaría apuntando a
+    # 127.0.0.1, que para cada visitante es su propio ordenador. Funcionaría
+    # en la máquina donde se compiló y en ninguna otra.
+    buildCommand: |
+      git clone --depth 1 --branch stable https://github.com/flutter/flutter.git $HOME/flutter
+      export PATH="$HOME/flutter/bin:$PATH"
+      flutter --version
+      flutter pub get
+      flutter build web --release --dart-define=BACKEND_URL=$BACKEND_URL
+
+    staticPublishPath: ./build/web
+
+    envVars:
+      # La dirección del backend ya desplegado. Se escribe en el panel de
+      # Render, no aquí.
+      - key: BACKEND_URL
+        sync: false
+
+    # Flutter web es una aplicación de una sola página: cualquier ruta tiene
+    # que servir index.html. Sin esto, recargar con la URL de una sección daría
+    # un 404.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

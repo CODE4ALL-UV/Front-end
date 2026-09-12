@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
 
+import 'dart:async';
+
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
+import 'package:flutter_code4all/data/services/learning_analytics_service.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
 
@@ -49,6 +52,22 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
   int _correctCount = 0;
   bool _finished = false;
 
+  /// Si se acerto cada pregunta, en el orden en que se mostraron.
+  ///
+  /// Hace falta el detalle, no solo el total: es lo que permite al docente
+  /// saber que pregunta concreta esta fallando todo el mundo.
+  late final List<bool> _results = List<bool>.filled(_questions.length, false);
+
+  /// Cuanto tardo en contestar cada pregunta, en milisegundos.
+  ///
+  /// Se mide desde que la pregunta aparece hasta que elige opcion. Dice cosas
+  /// que el acierto solo no dice: una pregunta acertada por todos pero que
+  /// cuesta un minuto suele estar mal redactada.
+  late final List<int?> _elapsed = List<int?>.filled(_questions.length, null);
+
+  /// Cuando se mostro la pregunta que esta en pantalla.
+  DateTime _shownAt = DateTime.now();
+
   List<QuizQuestion> get _questions => widget.questions;
   QuizQuestion get _question => _questions[_index];
   bool get _isLast => _index == _questions.length - 1;
@@ -63,6 +82,8 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
     setState(() {
       _selected = optionIndex;
       _answered = true;
+      _results[_index] = isCorrect;
+      _elapsed[_index] = DateTime.now().difference(_shownAt).inMilliseconds;
       if (isCorrect) _correctCount++;
     });
 
@@ -86,6 +107,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
         _index++;
         _selected = null;
         _answered = false;
+        _shownAt = DateTime.now();
       });
       announceForAccessibility(
         context,
@@ -100,6 +122,18 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
         widget.activityKind,
       );
     }
+
+    // Se manda sin esperar: el estudiante ya tiene su resultado en pantalla y
+    // no debe quedarse mirando mientras viaja una estadistica.
+    unawaited(
+      LearningAnalyticsService.instance.recordAttempt(
+        sectionId: widget.section.id,
+        kind: widget.activityKind,
+        prompts: [for (final q in _questions) q.prompt],
+        results: _results,
+        elapsedMs: _elapsed,
+      ),
+    );
 
     if (!mounted) return;
     setState(() => _finished = true);
@@ -121,6 +155,11 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
       _answered = false;
       _correctCount = 0;
       _finished = false;
+      // Un intento nuevo empieza de cero: si no, arrastraria los aciertos del
+      // anterior y el docente veria mejor nota de la que hubo.
+      _results.fillRange(0, _results.length, false);
+      _elapsed.fillRange(0, _elapsed.length, null);
+      _shownAt = DateTime.now();
     });
     announceForAccessibility(
       context,

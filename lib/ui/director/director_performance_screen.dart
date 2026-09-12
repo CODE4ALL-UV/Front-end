@@ -54,7 +54,6 @@ class _DirectorPerformanceScreenState extends State<DirectorPerformanceScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rendimiento de estudiantes'),

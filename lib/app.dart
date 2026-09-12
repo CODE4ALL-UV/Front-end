@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'ui/core/themes/app_theme.dart';
 import 'ui/core/ui/accessibility_text_scale.dart';
+import 'data/services/course_progress_store.dart';
+import 'data/services/session_controller.dart';
+import 'data/services/learning_analytics_service.dart';
 import 'ui/core/ui/visual_theme_controller.dart';
+import 'ui/director/director_home_screen.dart';
+import 'ui/teacher/teacher_course_screen.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'ui/users_management/screens/login_screen.dart';
 import 'ui/users_management/screens/login_dark_screen.dart';
@@ -9,7 +14,6 @@ import 'ui/users_management/screens/form_light_screen.dart';
 import 'ui/users_management/screens/form_dark_screen.dart';
 import 'ui/python_course_content/widgets/learning_module_light_screen.dart';
 import 'ui/python_course_content/widgets/learning_module_dark_screen.dart';
-import 'ui/director/director_performance_screen.dart';
 
 // Definimos los 6 estados de tema posibles de tu TG
 enum AppThemeMode {
@@ -21,7 +25,7 @@ enum AppThemeMode {
   achromatopsia,
 }
 
-enum AppScreen { login, register, modulo, director }
+enum AppScreen { login, register, modulo, docente, director }
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -40,6 +44,21 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
+
+    // Cada actividad que un estudiante termina pasa por el almacen de
+    // progreso. Enganchando aqui el aviso, el curso entero queda registrado
+    // sin tocar ninguna pantalla: lecturas, videos, capsulas, ejemplos,
+    // ejercicios, quiz, evaluaciones y laboratorio.
+    // Cualquier pantalla puede ofrecer cerrar sesion sin recibir nada.
+    SessionController.instance.registerLogout(_goToLogin);
+
+    CourseProgressStore.instance.reportCompletionsTo(
+      (sectionId, kind) => LearningAnalyticsService.instance.recordCompletion(
+        sectionId: sectionId,
+        kind: kind,
+      ),
+    );
+
     VisualThemeController.globalThemeNotifier.value = false;
     VisualThemeController.globalThemeNotifier.addListener(
       _handleGlobalVisualThemeChanged,
@@ -110,8 +129,14 @@ class _AppState extends State<App> {
 
   void _handleSuccessfulLogin(String role) {
     final r = role.toLowerCase();
-    if (r == 'estudiante' || r == 'docente') {
+    if (r == 'estudiante') {
       _goToModulo();
+      return;
+    }
+    // El docente no necesita el mapa de circulos: necesita el temario entero
+    // para editarlo.
+    if (r == 'docente') {
+      setState(() => _currentScreen = AppScreen.docente);
       return;
     }
     if (r == 'director') {
@@ -203,8 +228,10 @@ class _AppState extends State<App> {
                 onLogout: _goToLogin,
                 bottomLabels: _bottomLabels,
               );
+      case AppScreen.docente:
+        return TeacherCourseScreen(userName: _userName, onLogout: _goToLogin);
       case AppScreen.director:
-        return DirectorPerformanceScreen(onLogout: _goToLogin);
+        return DirectorHomeScreen(userName: _userName, onLogout: _goToLogin);
       case AppScreen.login:
         return isDarkTheme
             ? LoginPageDark(
@@ -270,7 +297,10 @@ class _AppState extends State<App> {
                       child: currentPage,
                     ),
                   ),
-                  if (_currentScreen != AppScreen.modulo)
+                  // Ni el estudiante ni el docente llevan este boton: los dos
+                  // tienen su propio sitio para cambiar el tema.
+                  if (_currentScreen != AppScreen.modulo &&
+                      _currentScreen != AppScreen.docente)
                     Positioned(
                       left: 16,
                       bottom: 24,

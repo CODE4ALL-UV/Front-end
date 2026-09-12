@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -110,6 +111,24 @@ class CourseProgressStore extends ChangeNotifier {
 
     notifyListeners();
     await _persist();
+
+    // Todas las actividades pasan por aqui, asi que engancharse en este punto
+    // registra el curso entero sin tener que tocar cada pantalla. Va sin
+    // esperar: el estudiante ya vio que termino y no debe aguardar a que
+    // viaje una estadistica.
+    unawaited(_report?.call(sectionId, kind) ?? Future<void>.value());
+  }
+
+  /// A quien avisar cuando se termina una actividad.
+  ///
+  /// Se inyecta desde fuera para que el almacen no dependa de la red: asi se
+  /// puede probar el progreso sin levantar ningun servidor.
+  Future<void> Function(String sectionId, CourseActivityKind kind)? _report;
+
+  void reportCompletionsTo(
+    Future<void> Function(String sectionId, CourseActivityKind kind)? report,
+  ) {
+    _report = report;
   }
 
   Future<void> resetSection(

@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
+import 'package:flutter_code4all/data/services/session_controller.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -84,8 +86,17 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
     });
   }
 
-  Future<void> _handleLogout() async {
-    await _authStorage.clear();
+  void _handleLogout() {
+    // El borrado se lanza, pero **no se espera**. El almacenamiento seguro no
+    // siempre responde —en algunos navegadores se queda colgado sin error— y
+    // esperandolo el boton no hacia nada por mucho que se pulsara: la persona
+    // quedaba atrapada dentro de la sesion.
+    //
+    // Salir es lo importante y no depende del disco. Se lanza antes de
+    // navegar para que el borrado ya este en marcha si alguien entra
+    // inmediatamente despues con otra cuenta.
+    unawaited(_authStorage.clear());
+
     if (!mounted) return;
 
     setState(() {
@@ -99,6 +110,11 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
       widget.onLogout!.call();
       return;
     }
+
+    // Sin funcion propia se recurre a la que registro la aplicacion. Es lo
+    // que permite poner este menu dentro de una lectura o de un editor, donde
+    // nadie puede pasarle como volver al login.
+    if (SessionController.instance.logout()) return;
 
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
@@ -277,7 +293,7 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
     if (hasValidPhoto) {
       return CircleAvatar(
         radius: radius,
-        backgroundColor: theme.colorScheme.primaryContainer,
+        backgroundColor: Colors.white,
         child: ClipOval(
           child: Image.network(
             resolvedPhotoUrl,
@@ -287,7 +303,10 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
             errorBuilder: (context, error, stackTrace) => Center(
               child: Text(
                 initials,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -295,13 +314,17 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
       );
     }
 
+    // El circulo va en blanco y la inicial en color, no al reves: este avatar
+    // se dibuja sobre la barra superior, que es roja o casi negra segun el
+    // tema. Usando el color principal de fondo se confundia con la barra y
+    // parecia una letra suelta flotando.
     return CircleAvatar(
       radius: radius,
-      backgroundColor: theme.colorScheme.primary,
+      backgroundColor: Colors.white,
       child: Text(
         initials,
         style: TextStyle(
-          color: theme.colorScheme.onPrimary,
+          color: theme.colorScheme.primary,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -326,35 +349,42 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
     return PopupMenuButton<String>(
       tooltip: 'Opciones de perfil',
       position: PopupMenuPosition.under,
-      onSelected: (value) async {
+      onSelected: (value) {
         if (value == 'profile') {
           _showProfileDialog();
         } else if (value == 'logout') {
-          await _handleLogout();
+          _handleLogout();
         }
       },
-      itemBuilder: (context) => [
-        const PopupMenuItem<String>(
-          value: 'profile',
-          child: Row(
-            children: [
-              Icon(Icons.person_outline),
-              SizedBox(width: 8),
-              Text('Mi perfil'),
-            ],
+      // El color va explicito. Sin el, los iconos heredan el blanco de la
+      // barra de arriba y desaparecen sobre el fondo claro del menu: se veia
+      // el texto pero no el icono.
+      itemBuilder: (context) {
+        final onMenu = theme.colorScheme.onSurface;
+
+        return [
+          PopupMenuItem<String>(
+            value: 'profile',
+            child: Row(
+              children: [
+                Icon(Icons.person_outline, color: onMenu),
+                const SizedBox(width: 8),
+                Text('Mi perfil', style: TextStyle(color: onMenu)),
+              ],
+            ),
           ),
-        ),
-        const PopupMenuItem<String>(
-          value: 'logout',
-          child: Row(
-            children: [
-              Icon(Icons.logout),
-              SizedBox(width: 8),
-              Text('Cerrar sesión'),
-            ],
+          PopupMenuItem<String>(
+            value: 'logout',
+            child: Row(
+              children: [
+                Icon(Icons.logout, color: onMenu),
+                const SizedBox(width: 8),
+                Text('Cerrar sesión', style: TextStyle(color: onMenu)),
+              ],
+            ),
           ),
-        ),
-      ],
+        ];
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Row(

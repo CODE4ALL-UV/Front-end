@@ -195,6 +195,15 @@ abstract final class SectionActivityLauncher {
       context,
     ).push<bool>(MaterialPageRoute(builder: (_) => screen));
 
+    // El laboratorio es una consola libre: no hay respuesta correcta que
+    // comprobar, asi que no puede decir por si mismo si se "supero". Se da
+    // por hecha al volver de ella. Sin esto una seccion con laboratorio nunca
+    // llegaba al cien por cien, por mucho que el estudiante lo usara.
+    if (kind == CourseActivityKind.laboratorio) {
+      await CourseProgressStore.instance.markCompleted(section.id, kind);
+      return true;
+    }
+
     return result ?? false;
   }
 

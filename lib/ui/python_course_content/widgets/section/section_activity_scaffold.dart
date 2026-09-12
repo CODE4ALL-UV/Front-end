@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
 
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_text_scale.dart';
-import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
 
 import 'section_theme.dart';
 import 'section_widgets.dart';
@@ -119,8 +119,11 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
         centerTitle: true,
         actions: const [
           Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: StoredUserAvatar(radius: 14, size: 28, showName: false),
+            padding: EdgeInsets.only(right: 8),
+            // El menu completo, no solo el avatar: antes esto era una foto
+            // que no se podia tocar, asi que dentro de una actividad no habia
+            // forma de cerrar sesion sin salir hasta la pantalla principal.
+            child: UserProfileMenu(showName: false),
           ),
         ],
       ),

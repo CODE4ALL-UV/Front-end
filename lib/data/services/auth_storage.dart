@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthStorage {
@@ -58,8 +59,17 @@ class AuthStorage {
     return value == null ? null : int.tryParse(value);
   }
 
+  /// Borra los datos de la sesión.
+  ///
+  /// Si el almacenamiento seguro falla —pasa en algunos navegadores— no se
+  /// propaga el error: quedarse dentro de la sesión por no poder borrar un
+  /// token es peor que el token sin borrar. Quien llama debe poder salir
+  /// igualmente.
   Future<void> clear() async {
-    // Remove all stored auth data on logout, including photo URL
-    await _storage.deleteAll();
+    try {
+      await _storage.deleteAll();
+    } catch (e) {
+      debugPrint('No se pudo borrar la sesión guardada: $e');
+    }
   }
 }

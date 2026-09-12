@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
+import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/users_management/screens/teacher_module_editor.dart';
 
 import 'chapter_section_screen.dart';
@@ -33,6 +35,8 @@ class CourseChapterPage extends StatefulWidget {
 }
 
 class _CourseChapterPageState extends State<CourseChapterPage> {
+  final CourseContentStore _content = CourseContentStore.instance;
+
   bool _isTeacher = false;
 
   @override
@@ -41,6 +45,22 @@ class _CourseChapterPageState extends State<CourseChapterPage> {
     if (widget.enableTeacherEditor) {
       _checkRole();
     }
+
+    // Lo que el docente haya cambiado se pide al abrir el capítulo, no al
+    // arrancar la aplicación: así el estudiante ve la última versión aunque
+    // lleve la app abierta desde antes de la clase.
+    _content.addListener(_onContentChanged);
+    _content.refresh();
+  }
+
+  @override
+  void dispose() {
+    _content.removeListener(_onContentChanged);
+    super.dispose();
+  }
+
+  void _onContentChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _checkRole() async {
@@ -63,19 +83,32 @@ class _CourseChapterPageState extends State<CourseChapterPage> {
 
   @override
   Widget build(BuildContext context) {
-    final module = PythonCourseCatalog.moduleByNumber(widget.moduleNumber);
-    final section = module?.sectionByNumber(widget.sectionNumber);
+    final base = PythonCourseCatalog.moduleByNumber(widget.moduleNumber);
 
-    if (module == null || section == null) {
+    // La sección llega ya combinada: el material de fábrica con encima lo que
+    // el docente haya cambiado. Si el servidor no responde, lo que llega es el
+    // material de fábrica, así que el capítulo se abre igual.
+    final section = _content.section(
+      widget.moduleNumber,
+      widget.sectionNumber,
+    );
+
+    if (base == null || section == null) {
       return _ChapterNotFound(
         moduleNumber: widget.moduleNumber,
         sectionNumber: widget.sectionNumber,
       );
     }
 
-    final hasPrevious =
-        module.sectionByNumber(widget.sectionNumber - 1) != null;
-    final hasNext = module.sectionByNumber(widget.sectionNumber + 1) != null;
+    // El nombre del módulo también puede haberlo cambiado el docente.
+    final module = CourseModule(
+      number: base.number,
+      title: _content.moduleTitle(base.number, base.title),
+      sections: base.sections,
+    );
+
+    final hasPrevious = base.sectionByNumber(widget.sectionNumber - 1) != null;
+    final hasNext = base.sectionByNumber(widget.sectionNumber + 1) != null;
 
     return ChapterSectionScreen(
       module: module,

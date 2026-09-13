@@ -1,4 +1,3 @@
-//REFACTOR-APROVED x 2 - COLOR TEST REMAINING - DONT TESTED IN UI YET
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/config/static_messages.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';

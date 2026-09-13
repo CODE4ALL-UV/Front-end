@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 
 class ReadingTopicScreen extends StatefulWidget {
   final String actividad;
@@ -64,7 +65,7 @@ class ReadingTopicScreenState extends State<ReadingTopicScreen> {
   @override
   Widget build(BuildContext context) {
     final actividadActual = _lecturasDisponibles[_indiceActual];
-    final contenidoActual = _textoLecturaPorActividad(actividadActual);
+    //final contenidoActual = _textoLecturaPorActividad(actividadActual);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -129,33 +130,33 @@ class ReadingTopicScreenState extends State<ReadingTopicScreen> {
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _LecturaCard(
-                                  title: 'Por qué importa',
-                                  body:
-                                      'Python se ha vuelto clave porque combina una sintaxis clara con una gran capacidad para resolver problemas reales en ciencia de datos, desarrollo web, automatización e inteligencia artificial.',
-                                  color: const Color(0xFF0B4F6C),
-                                  backgroundColor: const Color(0xFFEAF7FF),
-                                ),
+                                // _LecturaCard(
+                                //   title: 'Por qué importa',
+                                //   body:
+                                //       'Python se ha vuelto clave porque combina una sintaxis clara con una gran capacidad para resolver problemas reales en ciencia de datos, desarrollo web, automatización e inteligencia artificial.',
+                                //   color: const Color(0xFF0B4F6C),
+                                //   backgroundColor: const Color(0xFFEAF7FF),
+                                // ),
                                 const SizedBox(height: 12),
-                                _LecturaCard(
-                                  title: '¿Dónde se usa?',
-                                  body:
-                                      'Empresas y equipos tecnológicos lo utilizan para crear prototipos rápidos, servicios digitales y herramientas que conectan distintos sistemas.',
-                                  color: const Color(0xFF0B4F6C),
-                                  backgroundColor: const Color(0xFFEAF7FF),
-                                ),
+                                // _LecturaCard(
+                                //   title: '¿Dónde se usa?',
+                                //   body:
+                                //       'Empresas y equipos tecnológicos lo utilizan para crear prototipos rápidos, servicios digitales y herramientas que conectan distintos sistemas.',
+                                //   color: const Color(0xFF0B4F6C),
+                                //   backgroundColor: const Color(0xFFEAF7FF),
+                                // ),
                                 const SizedBox(height: 12),
-                                _LecturaCard(
-                                  title: 'Ventajas para aprender',
-                                  body:
-                                      'Su lectura sencilla y su comunidad activa hacen que aprender Python sea más accesible, más entretenido y más fácil de mantener a lo largo del tiempo.',
-                                  color: const Color(0xFF0B4F6C),
-                                  backgroundColor: const Color(0xFFEAF7FF),
-                                ),
+                                // _LecturaCard(
+                                //   title: 'Ventajas para aprender',
+                                //   body:
+                                //       'Su lectura sencilla y su comunidad activa hacen que aprender Python sea más accesible, más entretenido y más fácil de mantener a lo largo del tiempo.',
+                                //   color: const Color(0xFF0B4F6C),
+                                //   backgroundColor: const Color(0xFFEAF7FF),
+                                // ),
                               ],
                             )
                           : Text(
-                              contenidoActual,
+                              "",
                               style: const TextStyle(
                                 fontSize: 17,
                                 height: 1.45,
@@ -258,17 +259,17 @@ class ReadingTopicScreenState extends State<ReadingTopicScreen> {
                       children: [
                         GestureDetector(
                           onTap: () => _cambiarLectura(-1),
-                          child: const _NavButton(label: 'Anterior'),
+                          //child: const _NavButton(label: 'Anterior'),
                         ),
                         const SizedBox(width: 10),
                         GestureDetector(
                           onTap: () => _cambiarLectura(1),
-                          child: _NavButton(
-                            label:
-                                _indiceActual == _lecturasDisponibles.length - 1
-                                ? 'Finalizar'
-                                : 'Siguiente',
-                          ),
+                          // child: _NavButton(
+                          //   label:
+                          //       _indiceActual == _lecturasDisponibles.length - 1
+                          //       ? 'Finalizar'
+                          //       : 'Siguiente',
+                          // ),
                         ),
                       ],
                     ),
@@ -287,4 +288,4 @@ class ReadingTopicScreenState extends State<ReadingTopicScreen> {
       ),
     );
   }
-}s
+}

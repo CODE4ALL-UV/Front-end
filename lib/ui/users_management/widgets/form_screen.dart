@@ -4,17 +4,17 @@ import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
-class FormPageLight extends StatefulWidget {
+class FormScreen extends StatefulWidget {
   final VoidCallback? onBack;
   final VoidCallback? onSuccess;
 
-  const FormPageLight({super.key, this.onBack, this.onSuccess});
+  const FormScreen({super.key, this.onBack, this.onSuccess});
 
   @override
-  State<FormPageLight> createState() => _FormPageLightState();
+  State<FormScreen> createState() => _FormScreenState();
 }
 
-class _FormPageLightState extends State<FormPageLight> {
+class _FormScreenState extends State<FormScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();

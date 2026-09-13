@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'youtube_translator_player.dart';
-// import 'package:flutter_dotenv/flutter_dotenv.dart'; // Duplicate import removed
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {

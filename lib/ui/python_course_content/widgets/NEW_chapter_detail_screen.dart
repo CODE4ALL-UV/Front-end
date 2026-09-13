@@ -1,19 +1,19 @@
 //REFACTOR-APROVED - COLOR TEST REMAINING - DONT TESTED IN UI
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/domain/models/python_course_content/python_module_model.dart';
+import 'package:flutter_code4all/domain/models/python_course_content/NEW_python_module_model.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/UNUSED_knowledge_nugget_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/activity_row_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_activity_row_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/chapter_summary_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/example_code_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/final_evaluation_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/interactive_example.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen_dark.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/detail_card_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_detail_card_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen_dark.dart';

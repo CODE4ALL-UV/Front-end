@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
-import 'package:flutter_code4all/ui/python_course_content/circle_progress_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/UNUSED_circle_progress_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/lesson_box_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_page.dart';
 

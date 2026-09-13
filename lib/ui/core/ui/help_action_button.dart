@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/web_player_html.dart'; //Daniel Pruebas
 import 'package:flutter_code4all/web_player_html_2.dart'; //Daniel Pruebas
 import 'accessibility_settings_screen.dart';
@@ -668,7 +669,7 @@ class _OptionPanel extends StatefulWidget {
 
 class _OptionPanelState extends State<_OptionPanel> {
   /*
-  This _OptionPanelState is the core brain of the white modal card. Your classmate used a very clean switch(widget.option) statement to dynamically render different UI layouts (the font size slider, the visual mode toggles, the sign language buttons) depending on which vertical button was tapped. It also properly connects to the AccessibilityTextScaleScope and VisualThemeControlle to actually apply the changes to the app.
+  This _OptionPanelState is the core brain of the white modal card. Your classmate used a very clean switch(widget.option) statement to dynamically render different UI layouts (the font size slider, the visual mode toggles, the sign language buttons) depending on which vertical button was tapped. It also properly connects to the AccessibilityTextScaleScope and app_theme.dart to actually apply the changes to the app.
 
 Handling the UI states for these accessibility toggles this way is a very solid approach for this stage of your TG.
 
@@ -700,14 +701,11 @@ I assume the final parts of the file contain the small helper widgets mentioned 
     setState(() {});
   }
 
-  void _applyVisualMode(bool isDarkTheme) {
-    //VisualThemeControlle.updateTheme(isDarkTheme); //OJO USAR APP_THEME
-
-    final controller = null; //VisualThemeControlle.of(context); //APP_THEME
-    if (controller != null) {
-      controller.onThemeChanged(isDarkTheme);
-    }
-
+  void _applyVisualMode(AppThemeMode mode) {
+    // 1. Le decimos al manager global que cambie el tema
+    ThemeManager.changeTheme(mode);
+    // 2. Actualizamos la pantalla actual (opcional, pero buena práctica
+    // si tienes elementos locales que deban reaccionar al instante)
     if (mounted) {
       setState(() {});
     }
@@ -896,19 +894,30 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                 _ModeButton(
                   icon: Icons.brightness_2,
                   label: 'Oscuro',
-                  onTap: () => _applyVisualMode(true),
+                  onTap: () => _applyVisualMode(AppThemeMode.dark),
                 ),
                 _ModeButton(
                   icon: Icons.brightness_5,
                   label: 'Claro',
-                  onTap: () => _applyVisualMode(false),
+                  onTap: () => _applyVisualMode(AppThemeMode.light),
                 ),
                 _ModeButton(
                   icon: Icons.brightness_auto,
                   label: 'Auto',
-                  onTap: () => _applyVisualMode(
-                    Theme.of(context).brightness == Brightness.dark,
-                  ),
+                  onTap: () {
+                    // 1. Leemos el brillo real del celular (sistema operativo)
+                    final systemBrightness = MediaQuery.platformBrightnessOf(
+                      context,
+                    );
+
+                    // 2. Decidimos qué modo de tu enum usar basados en el sistema
+                    final modeToApply = (systemBrightness == Brightness.dark)
+                        ? AppThemeMode.dark
+                        : AppThemeMode.light;
+
+                    // 3. Aplicamos el tema
+                    _applyVisualMode(modeToApply);
+                  },
                 ),
               ],
             ),

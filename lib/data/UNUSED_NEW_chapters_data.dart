@@ -1,5 +1,5 @@
 //REFACTOR-APROVED - COLOR TEST REMAINING - DONT TESTED IN UI
-import 'package:flutter_code4all/domain/models/python_course_content/python_module_model.dart';
+import 'package:flutter_code4all/domain/models/python_course_content/NEW_python_module_model.dart';
 
 final List<ChapterModel> capitulosModulo1 = [
   const ChapterModel(

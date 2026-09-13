@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-// Asegúrate de importar tu app_theme.dart donde está ActivityThemeColors
 
 class ChapterSummaryWidget extends StatelessWidget {
   final String title;

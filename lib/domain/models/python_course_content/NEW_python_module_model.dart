@@ -1,5 +1,4 @@
 // este es un ejempl ode modulo dart que sirve para mostrar como se pueden crear modelos de datos en Dart
-//REFACTOR-APROVED - COLOR TEST REMAINING - DONT TESTED IN UI
 class ActivityItem {
   final String label;
   final String emoji;

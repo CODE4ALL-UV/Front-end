@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
-
 /// Paleta de la ruta de aprendizaje, en versión clara y oscura.
 ///
 /// Todos los pares texto/fondo de esta paleta superan la relación de contraste
@@ -107,8 +105,8 @@ class SectionPalette {
     appBar: Color(0xFF262B30),
   );
 
-  static SectionPalette of(BuildContext context) =>
-      VisualThemeController.resolveIsDark(context) ? dark : light;
+  //static SectionPalette of(BuildContext context) =>
+  //VisualThemeControlle.resolveIsDark(context) ? dark : light;
 
   /// Color de acento y su fondo suave según la intención del bloque.
   ({Color foreground, Color background}) tone(SectionTone tone) =>

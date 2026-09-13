@@ -1,6 +1,6 @@
 //REFACTOR-APROVED x 2 - COLOR TEST REMAINING - DONT TESTED IN UI YET
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor.dart';
+import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart';
 
 class ModuleHeaderWidget extends StatelessWidget {
   final String moduleName;

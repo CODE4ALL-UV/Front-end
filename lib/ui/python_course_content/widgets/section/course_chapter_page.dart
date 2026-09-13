@@ -4,7 +4,7 @@ import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/users_management/screens/teacher_module_editor.dart';
+import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart';
 
 import 'chapter_section_screen.dart';
 import 'section_theme.dart';
@@ -88,10 +88,7 @@ class _CourseChapterPageState extends State<CourseChapterPage> {
     // La sección llega ya combinada: el material de fábrica con encima lo que
     // el docente haya cambiado. Si el servidor no responde, lo que llega es el
     // material de fábrica, así que el capítulo se abre igual.
-    final section = _content.section(
-      widget.moduleNumber,
-      widget.sectionNumber,
-    );
+    final section = _content.section(widget.moduleNumber, widget.sectionNumber);
 
     if (base == null || section == null) {
       return _ChapterNotFound(

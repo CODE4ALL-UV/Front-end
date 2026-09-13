@@ -1,5 +1,25 @@
 import 'package:flutter/material.dart';
+// Definimos los tipos de temas que soporta tu app
+enum AppThemeMode {
+  light,
+  dark,
+  protanopia,
+  deuteranopia,
+  tritanopia,
+  achromatopsia,
+}
 
+class ThemeManager {
+  // ValueNotifier global que ahora maneja el ENUM en lugar de un booleano
+  static final ValueNotifier<AppThemeMode> themeNotifier = 
+      ValueNotifier<AppThemeMode>(AppThemeMode.light);
+      //USAR ESTE OTRO SI ALGO
+      //static final ValueNotifier<AppThemeMode> themeNotifier = ValueNotifier(AppThemeMode.light);
+
+  static void changeTheme(AppThemeMode mode) {
+    themeNotifier.value = mode;
+  }
+}
 /// Define los seis temas visuales disponibles en la aplicación.
 ///
 /// Cada getter declara únicamente su paleta. [_buildTheme] aplica los estilos
@@ -605,16 +625,16 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
   ActivityThemeColors copyWith({Color? background, /* ... resto de variables ... */}) {
     return ActivityThemeColors(
       background: background ?? this.background,
-      border: border ?? this.border,
-      iconBackground: iconBackground ?? this.iconBackground,
-      textTitle: textTitle ?? this.textTitle,
-      textSubtitle: textSubtitle ?? this.textSubtitle,
-      successBackground: successBackground ?? this.successBackground,
-      successBorder: successBorder ?? this.successBorder,
-      successText: successText ?? this.successText,
-      actionBackground: actionBackground ?? this.actionBackground,
-      actionBorder: actionBorder ?? this.actionBorder,
-      actionText: actionText ?? this.actionText,
+      border: border,
+      iconBackground: iconBackground,
+      textTitle: textTitle,
+      textSubtitle: textSubtitle,
+      successBackground: successBackground,
+      successBorder: successBorder,
+      successText: successText,
+      actionBackground: actionBackground,
+      actionBorder: actionBorder,
+      actionText: actionText,
     );
   }
 

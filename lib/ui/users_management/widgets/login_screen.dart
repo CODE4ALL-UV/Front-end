@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_code4all/data/models/auth_models.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/social_auth_block.dart';
 import 'package:flutter_code4all/data/services/google_auth_service.dart';
 
-class LoginPageDark extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   final VoidCallback? onRegister;
   final void Function(String role)? onSuccess;
 
-  const LoginPageDark({super.key, this.onRegister, this.onSuccess});
+  const LoginPage({super.key, this.onRegister, this.onSuccess});
 
   @override
-  State<LoginPageDark> createState() => _LoginPageDarkState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageDarkState extends State<LoginPageDark> {
+class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _apiService = ApiService();
@@ -46,6 +48,7 @@ class _LoginPageDarkState extends State<LoginPageDark> {
       );
 
       if (!mounted) return;
+
       await _authStorage.saveToken(response.accessToken);
       await _authStorage.saveRole(response.rol);
       await _authStorage.saveName(response.nombre);
@@ -56,6 +59,7 @@ class _LoginPageDarkState extends State<LoginPageDark> {
           ? response.photoUrl!
           : (existingPhotoUrl ?? '');
       await _authStorage.savePhotoUrl(nextPhotoUrl);
+
       _showMessage(_buildWelcomeMessage(response));
       widget.onSuccess?.call(response.rol);
     } on ApiException catch (e) {
@@ -98,29 +102,17 @@ class _LoginPageDarkState extends State<LoginPageDark> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final logoSize = screenWidth < 360 ? 180.0 : 220.0;
+    final isWide = screenWidth >= 800;
+    final logoSize = screenWidth < 360 ? 180.0 : (isWide ? 250.0 : 220.0);
     final horizontalPadding = screenWidth < 480 ? 20.0 : 32.0;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: const Color(0xFF1A1A1A),
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 136, 135, 135),
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Image.asset('assets/images/logoUV_Oficial_Rojo.png'),
-        ),
-        title: const Text(
-          'CODE4ALL',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 2,
-          ),
-        ),
-        centerTitle: true,
+      appBar: GlobalAppBarWidget(
+        title: 'CODE4ALL v0.1.',
+        showUserIcon: false,
+        userName: 'Usuario',
+        onLogout: () => widget.onSuccess?.call('logout'),
       ),
       body: SafeArea(
         child: Center(
@@ -135,20 +127,16 @@ class _LoginPageDarkState extends State<LoginPageDark> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset(
-                    'assets/images/logoblancoTg.png',
+                    'assets/images/logo-flutter.png',
                     height: logoSize,
                     width: logoSize,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Correo electrónico',
-                      labelStyle: const TextStyle(color: Colors.white70),
-                      filled: true,
-                      fillColor: const Color(0xFF2C2C2C),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -158,12 +146,8 @@ class _LoginPageDarkState extends State<LoginPageDark> {
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
-                      labelStyle: const TextStyle(color: Colors.white70),
-                      filled: true,
-                      fillColor: const Color(0xFF2C2C2C),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -176,7 +160,7 @@ class _LoginPageDarkState extends State<LoginPageDark> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFD600),
+                        backgroundColor: const Color(0xFF1E88E5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -187,72 +171,52 @@ class _LoginPageDarkState extends State<LoginPageDark> {
                               height: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Color(0xFF1A1A1A),
+                                color: Colors.white,
                               ),
                             )
-                          : const Text(
-                              'INICIAR SESIÓN',
-                              style: TextStyle(color: Color(0xFF1A1A1A)),
-                            ),
+                          : const Text('INICIAR SESIÓN'),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _SocialButtonDark(
-                        onTap: _isLoading ? null : () => _handleGoogleSignIn(),
-                        backgroundColor: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(6.0),
-                          child: SvgPicture.network(
-                            'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-                            width: 28,
-                            height: 28,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      _SocialButtonDark(
-                        onTap: () {},
-                        backgroundColor: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Image.network(
-                            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/2023_Facebook_icon.svg/800px-2023_Facebook_icon.svg.png',
-                            width: 28,
-                            height: 28,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(
-                                  Icons.facebook,
-                                  color: Color(0xFF1877F2),
-                                  size: 28,
-                                ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  SocialAuthBlock(
+                    onGoogleTap: () {
+                      _handleGoogleSignIn();
+                    },
+                    onFacebookTap: () {
+                      // TODO: Conectar con authViewModel.signInWithFacebook()
+                    },
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     height: 52,
-                    child: ElevatedButton(
-                      onPressed: widget.onRegister ?? () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFD600),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
                         ),
-                        elevation: 0,
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                      child: const Text(
-                        'REGISTRARSE',
-                        style: TextStyle(
-                          color: Color(0xFF1A1A1A),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2,
+                      child: ElevatedButton(
+                        onPressed: widget.onRegister ?? () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'REGISTRARSE',
+                          style: TextStyle(
+                            color: Color(0xFFFFD600),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
                         ),
                       ),
                     ),
@@ -263,19 +227,8 @@ class _LoginPageDarkState extends State<LoginPageDark> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        color: const Color.fromARGB(255, 136, 135, 135),
-        height: 56,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: const [
-            Icon(Icons.skip_previous, color: Colors.white, size: 28),
-            Icon(Icons.play_arrow, color: Colors.white, size: 32),
-            Icon(Icons.skip_next, color: Colors.white, size: 28),
-            Icon(Icons.settings, color: Colors.white, size: 26),
-          ],
-        ),
-      ),
+      // No local floatingActionButton here — keep only the global theme FAB.
+      bottomNavigationBar: const MultimodalBottomAppBarWidget(),
     );
   }
 
@@ -305,48 +258,16 @@ class _LoginPageDarkState extends State<LoginPageDark> {
       if (!mounted) return;
       _showMessage(e.message);
     } on ApiException catch (e) {
+      debugPrint('Google SignIn ApiException: ${e.toString()}');
       if (!mounted) return;
       _showMessage(e.message);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('Google SignIn exception: $e');
+      debugPrint(st.toString());
       if (!mounted) return;
       _showMessage('Error en autenticación con Google: ${e.toString()}');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-}
-
-class _SocialButtonDark extends StatelessWidget {
-  final Widget child;
-  final VoidCallback? onTap;
-  final Color backgroundColor;
-
-  const _SocialButtonDark({
-    required this.child,
-    required this.onTap,
-    this.backgroundColor = Colors.white,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Center(child: child),
-      ),
-    );
   }
 }

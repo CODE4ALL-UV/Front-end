@@ -1,35 +1,16 @@
+// REFACTOR-APROVED x 2 - COLOR TEST REMAINING - DONT TESTED IN UI YET
 import 'package:flutter/material.dart';
 import 'ui/core/themes/app_theme.dart';
 import 'ui/core/ui/accessibility_text_scale.dart';
 import 'data/services/course_progress_store.dart';
 import 'data/services/session_controller.dart';
 import 'data/services/learning_analytics_service.dart';
-import 'ui/core/ui/visual_theme_controller.dart';
 import 'ui/director/director_home_screen.dart';
 import 'ui/teacher/teacher_course_screen.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'ui/users_management/widgets/login_screen.dart';
-import 'ui/users_management/widgets/login_dark_screen.dart';
-import 'ui/users_management/widgets/form_light_screen.dart';
-import 'ui/users_management/widgets/form_dark_screen.dart';
-import 'ui/python_course_content/widgets/learning_module_light_screen.dart';
-import 'ui/director/director_performance_screen.dart';
-import 'ui/users_management/screens/login_screen.dart';
-import 'ui/users_management/screens/login_dark_screen.dart';
-import 'ui/users_management/screens/form_light_screen.dart';
-import 'ui/users_management/screens/form_dark_screen.dart';
-import 'ui/python_course_content/widgets/learning_module_light_screen.dart';
-import 'ui/python_course_content/widgets/learning_module_dark_screen.dart';
-
-// Definimos los 6 estados de tema posibles de tu TG
-enum AppThemeMode {
-  light,
-  dark,
-  protanopia,
-  deuteranopia,
-  tritanopia,
-  achromatopsia,
-}
+import 'ui/users_management/widgets/form_screen.dart';
+import 'ui/python_course_content/widgets/learning_module_screen.dart';
 
 enum AppScreen { login, register, modulo, docente, director }
 
@@ -67,11 +48,11 @@ class _AppState extends State<App> {
       ),
     );
 
-    VisualThemeController.globalThemeNotifier.value = false;
-    VisualThemeController.globalThemeNotifier.addListener(
-      _handleGlobalVisualThemeChanged,
-    );
     _textScaleController.addListener(_handleTextScaleChanged);
+
+    // NUEVO: Escuchamos los cambios del ThemeManager
+    ThemeManager.themeNotifier.addListener(_onGlobalThemeChanged);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _refreshTheme();
@@ -81,22 +62,36 @@ class _AppState extends State<App> {
 
   @override
   void dispose() {
-    VisualThemeController.globalThemeNotifier.removeListener(
-      _handleGlobalVisualThemeChanged,
-    );
     _textScaleController.removeListener(_handleTextScaleChanged);
+    // NUEVO: Dejamos de escuchar cuando la app se cierra
+    ThemeManager.themeNotifier.removeListener(_onGlobalThemeChanged);
     super.dispose();
+  }
+
+  // NUEVO: Método que se ejecuta cada vez que ThemeManager cambia
+  void _onGlobalThemeChanged() {
+    if (!mounted) return;
+
+    final newMode = ThemeManager.themeNotifier.value;
+
+    //DUDA PARA PAPACHO
+    //Si tus textos van a ser iguales para todos los temas ('Anterior', 'Reproducir', 'Siguiente'),
+    //puedes eliminar el switch por completo y dejar la lista estática.
+    //Ese switch solo tiene sentido si intencionalmente quieres que las
+    //palabras cambien cuando el usuario active el modo oscuro u otro modo.
+    setState(() {
+      _themeMode = newMode;
+      _bottomLabels = switch (newMode) {
+        AppThemeMode.dark => ['Volver', 'Play', 'Adelantar'],
+        _ => ['Anterior', 'Reproducir', 'Siguiente'],
+      };
+    });
   }
 
   void _handleTextScaleChanged() {
     if (mounted) {
       setState(() {});
     }
-  }
-
-  void _handleGlobalVisualThemeChanged() {
-    if (!mounted) return;
-    setState(() {});
   }
 
   void _goToRegister() => setState(() => _currentScreen = AppScreen.register);
@@ -106,23 +101,9 @@ class _AppState extends State<App> {
   void _applyThemeMode(AppThemeMode mode) {
     if (_themeMode == mode) return;
 
-    setState(() {
-      _themeMode = mode;
-
-      // Solo compatibilidad temporal con widgets viejos que aún consultan
-      // VisualThemeController.
-      VisualThemeController.globalThemeNotifier.value =
-          mode == AppThemeMode.dark || mode == AppThemeMode.achromatopsia;
-
-      _bottomLabels = switch (mode) {
-        AppThemeMode.dark => ['Volver', 'Play', 'Adelantar'],
-        _ => ['Anterior', 'Reproducir', 'Siguiente'],
-      };
-    });
-  }
-
-  void _handleVisualThemeChanged(bool isDark) {
-    _applyThemeMode(isDark ? AppThemeMode.dark : AppThemeMode.light);
+    // Solo le decimos al manager que cambie.
+    // Esto automáticamente disparará _onGlobalThemeChanged y actualizará el setState.
+    ThemeManager.changeTheme(mode);
   }
 
   void _refreshTheme() {
@@ -225,108 +206,89 @@ class _AppState extends State<App> {
     _applyThemeMode(choice);
   }
 
-  Widget _buildCurrentPage(bool isDarkTheme) {
+  Widget _buildCurrentPage() {
     switch (_currentScreen) {
       case AppScreen.register:
-        return isDarkTheme
-            ? FormPageDark(onBack: _goToLogin, onSuccess: _goToLogin)
-            : FormPageLight(onBack: _goToLogin, onSuccess: _goToLogin);
+        return FormPageLight(onBack: _goToLogin, onSuccess: _goToLogin);
       case AppScreen.modulo:
-        return isDarkTheme
-            ? ModuloAprendizajeDark(
-                userName: _userName,
-                bottomLabels: _bottomLabels,
-              )
-            : ModuloAprendizaje(
-                userName: _userName,
-                onLogout: _goToLogin,
-                bottomLabels: _bottomLabels,
-              );
+        return LearningModuleScreen(
+          userName: _userName,
+          onLogout: _goToLogin,
+          bottomLabels: _bottomLabels,
+        );
       case AppScreen.docente:
         return TeacherCourseScreen(userName: _userName, onLogout: _goToLogin);
       case AppScreen.director:
         return DirectorHomeScreen(userName: _userName, onLogout: _goToLogin);
       case AppScreen.login:
-        return isDarkTheme
-            ? LoginPageDark(
-                onRegister: _goToRegister,
-                onSuccess: (role) {
-                  _handleSuccessfulLogin(role);
-                  if (role.toLowerCase() != 'logout') {
-                    _updateUserNameFromStorage();
-                  }
-                },
-              )
-            : LoginPage(
-                onRegister: _goToRegister,
-                onSuccess: (role) {
-                  _handleSuccessfulLogin(role);
-                  if (role.toLowerCase() != 'logout') {
-                    _updateUserNameFromStorage();
-                  }
-                },
-              );
+        return LoginPage(
+          onRegister: _goToRegister,
+          onSuccess: (role) {
+            _handleSuccessfulLogin(role);
+            if (role.toLowerCase() != 'logout') {
+              _updateUserNameFromStorage();
+            }
+          },
+        );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final activeTheme = _getThemeData(_themeMode);
-    final isDarkTheme = activeTheme.brightness == Brightness.dark;
-    final currentPage = _buildCurrentPage(isDarkTheme);
+    final currentPage = _buildCurrentPage();
 
     return AccessibilityTextScaleScope(
       controller: _textScaleController,
-      child: VisualThemeController(
-        isDarkTheme: isDarkTheme,
-        onThemeChanged: _handleVisualThemeChanged,
-        child: MaterialApp(
-          title: 'Code4All',
-          debugShowCheckedModeBanner: false,
-          theme: activeTheme,
-          // ThemeMode solo entiende claro, oscuro o sistema. La paleta
-          // concreta ya fue seleccionada arriba mediante _themeMode.
-          themeMode: ThemeMode.light,
-          builder: (context, child) {
-            final mediaQuery = MediaQuery.of(context);
-            return MediaQuery(
-              //HERE IS THE ERROR The relevant error-causing widget failed
-              data: mediaQuery.copyWith(
-                textScaler: TextScaler.linear(_textScaleController.scale),
+      child: MaterialApp(
+        title: 'Code4All',
+        debugShowCheckedModeBanner: false,
+        theme: activeTheme,
+        // ThemeMode solo entiende claro, oscuro o sistema. La paleta
+        // concreta ya fue seleccionada arriba mediante _themeMode.
+        themeMode: ThemeMode.light,
+        builder: (context, child) {
+          final mediaQuery = MediaQuery.of(context);
+          return MediaQuery(
+            data: mediaQuery.copyWith(
+              // SOBRE EL ERROR: 'textScaler' funciona en Flutter 3.16 o superior.
+              // Si tienes una versión anterior de Flutter, comenta la línea de
+              // textScaler y usa 'textScaleFactor' en su lugar:
+              textScaler: TextScaler.linear(_textScaleController.scale),
+              // textScaleFactor: _textScaleController.scale,
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
+        home: Stack(
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: KeyedSubtree(
+                key: ValueKey(_currentScreen.name),
+                child: currentPage,
               ),
-              child: child ?? const SizedBox.shrink(),
-            );
-          },
-          home: Stack(
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                child: KeyedSubtree(
-                  key: ValueKey(_currentScreen.name),
-                  child: currentPage,
-                ),
-              ),
-              // Ni el estudiante ni el docente llevan este boton: los dos
-              // tienen su propio sitio para cambiar el tema.
-              if (_currentScreen != AppScreen.modulo &&
-                  _currentScreen != AppScreen.docente)
-                Positioned(
-                  left: 16,
-                  bottom: 24,
-                  child: Semantics(
-                    button: true,
-                    label: 'Cambiar tema',
-                    hint: 'Cambia el tema de la aplicación',
-                    child: FloatingActionButton(
-                      heroTag: 'theme-toggle',
-                      backgroundColor: const Color(0xFF5C6BC0),
-                      onPressed: () => _showThemeOptions(context),
-                      child: const Icon(Icons.palette, color: Colors.white),
-                    ),
+            ),
+            // Ni el estudiante ni el docente llevan este boton: los dos
+            // tienen su propio sitio para cambiar el tema.
+            if (_currentScreen != AppScreen.modulo &&
+                _currentScreen != AppScreen.docente)
+              Positioned(
+                left: 16,
+                bottom: 24,
+                child: Semantics(
+                  button: true,
+                  label: 'Cambiar tema',
+                  hint: 'Cambia el tema de la aplicación',
+                  child: FloatingActionButton(
+                    heroTag: 'theme-toggle',
+                    backgroundColor: const Color(0xFF5C6BC0),
+                    onPressed: () => _showThemeOptions(context),
+                    child: const Icon(Icons.palette, color: Colors.white),
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     );

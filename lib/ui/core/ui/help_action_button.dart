@@ -3,7 +3,6 @@ import 'package:flutter_code4all/web_player_html.dart'; //Daniel Pruebas
 import 'package:flutter_code4all/web_player_html_2.dart'; //Daniel Pruebas
 import 'accessibility_settings_screen.dart';
 import 'accessibility_text_scale.dart';
-import 'visual_theme_controller.dart';
 
 //TAREAS
 // SOLVED BUG DE PANTALLAZO ROJO AL PRESIONAR EL BOTÓN DE CONFIGURACIÓN ATTE MI PAPACHO
@@ -669,7 +668,7 @@ class _OptionPanel extends StatefulWidget {
 
 class _OptionPanelState extends State<_OptionPanel> {
   /*
-  This _OptionPanelState is the core brain of the white modal card. Your classmate used a very clean switch(widget.option) statement to dynamically render different UI layouts (the font size slider, the visual mode toggles, the sign language buttons) depending on which vertical button was tapped. It also properly connects to the AccessibilityTextScaleScope and VisualThemeController to actually apply the changes to the app.
+  This _OptionPanelState is the core brain of the white modal card. Your classmate used a very clean switch(widget.option) statement to dynamically render different UI layouts (the font size slider, the visual mode toggles, the sign language buttons) depending on which vertical button was tapped. It also properly connects to the AccessibilityTextScaleScope and VisualThemeControlle to actually apply the changes to the app.
 
 Handling the UI states for these accessibility toggles this way is a very solid approach for this stage of your TG.
 
@@ -702,9 +701,9 @@ I assume the final parts of the file contain the small helper widgets mentioned 
   }
 
   void _applyVisualMode(bool isDarkTheme) {
-    VisualThemeController.updateTheme(isDarkTheme);
+    //VisualThemeControlle.updateTheme(isDarkTheme); //OJO USAR APP_THEME
 
-    final controller = VisualThemeController.of(context);
+    final controller = null; //VisualThemeControlle.of(context); //APP_THEME
     if (controller != null) {
       controller.onThemeChanged(isDarkTheme);
     }

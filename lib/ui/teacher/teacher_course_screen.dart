@@ -4,7 +4,6 @@ import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
-import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 
 import 'teacher_section_detail.dart';
@@ -102,9 +101,9 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
         // La misma barra que ve el estudiante: mismo logo, mismo nombre y el
         // mismo menú de cuenta. Cambiar de rol no debería parecer cambiar de
         // aplicación.
-        backgroundColor: VisualThemeController.resolveIsDark(context)
-            ? const Color(0xFF2A2A2A)
-            : const Color(0xFFE53935),
+        backgroundColor: //VisualThemeControlle.resolveIsDark(context) OJO USAR APP_THEME
+            //? const Color(0xFF2A2A2A)
+            Color(0xFFE53935),
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(6),

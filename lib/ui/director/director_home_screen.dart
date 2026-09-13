@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
-import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_stats_screen.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_students_screen.dart';
@@ -65,16 +64,15 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = VisualThemeController.resolveIsDark(context);
     final palette = SectionPalette.of(context);
 
     return Scaffold(
       backgroundColor: palette.background,
       appBar: AppBar(
         // La misma barra que ven el estudiante y el docente.
-        backgroundColor: isDark
-            ? const Color(0xFF2A2A2A)
-            : const Color(0xFFE53935),
+        backgroundColor:
+            //? const Color(0xFF2A2A2A) //OJO USAR APP_THEME
+            const Color(0xFFE53935),
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(6),

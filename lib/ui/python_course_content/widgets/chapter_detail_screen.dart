@@ -5,14 +5,13 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart';
-import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/activity_row_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/chapter_summary_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/final_evaluation_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen_dark.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/detail_card_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module_light_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen_dark.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_with_video_screen.dart';
@@ -169,13 +168,9 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
   }
 
   Future<void> _openQuiz(String actividad) async {
-    final isDarkTheme = VisualThemeController.resolveIsDark(context);
     final completed = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) =>
-            isDarkTheme ? const QuizScreenDark() : const QuizScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const QuizScreen()),
     );
 
     if (completed == true && mounted) {
@@ -193,14 +188,9 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
   }
 
   Future<void> _openLaboratorio(String actividad) async {
-    final isDarkTheme = VisualThemeController.resolveIsDark(context);
     final completed = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => isDarkTheme
-            ? const LaboratoryConsoleScreenDark()
-            : const LaboratoryConsoleScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const LaboratoryConsoleScreen()),
     );
 
     if (completed == true && mounted) {

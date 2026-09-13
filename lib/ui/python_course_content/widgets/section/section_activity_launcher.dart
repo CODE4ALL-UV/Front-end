@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen_dark.dart';
 
@@ -91,14 +90,11 @@ abstract final class SectionActivityLauncher {
     BuildContext context,
     CourseActivityKind kind,
   ) {
-    final isDark = VisualThemeController.resolveIsDark(context);
+    //final isDark = VisualThemeControlle.resolveIsDark(context);
     final entry = _activityColors[kind]!;
-    return isDark
-        ? (foreground: entry.darkForeground, background: entry.darkBackground)
-        : (
-            foreground: entry.lightForeground,
-            background: entry.lightBackground,
-          );
+    return
+    //? (foreground: entry.darkForeground, background: entry.darkBackground)
+    (foreground: entry.lightForeground, background: entry.lightBackground);
   }
 
   static const Map<CourseActivityKind, _ActivityColor> _activityColors = {
@@ -258,9 +254,9 @@ abstract final class SectionActivityLauncher {
         );
 
       case CourseActivityKind.laboratorio:
-        return VisualThemeController.resolveIsDark(context)
-            ? const LaboratoryConsoleScreenDark()
-            : const LaboratoryConsoleScreen();
+        return //VisualThemeControlle.resolveIsDark(context)
+        //? const LaboratoryConsoleScreenDark()
+        const LaboratoryConsoleScreen();
     }
   }
 }

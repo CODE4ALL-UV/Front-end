@@ -1,26 +1,25 @@
 import 'dart:math' as math;
 import 'package:flutter_code4all/data/services/api_service.dart';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
+import 'package:flutter_code4all/ui/core/ui/help_action_button.dart'; //MIX
+//import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart'; //PAPACHO - ELIMINADO USAR app_theme.dart
+import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart'; //REFACTOR-MULTIMODALBOTTOMAPPBARWIDGET - RENOMBRADO DE multimodal_footer_bar
+//import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart'; //PAPACHO - MOVIDO A GlobalAppBarWidget
+//import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_light_screen.dart'; //PAPACHO - ELIMINADO USAR LearningModuleScreen
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_code4all/data/services/auth_storage.dart'; //PAPACHO
+//import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart'; //PAPACHO - MOVIDO A ModuleHeaderWidget
+//import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_page.dart'; //PAPACHO - MOVIDO A ModuleRowWidget
+//import 'package:flutter_code4all/data/course/python_course_catalog.dart'; //PAPACHO - MOVIDO A ModuleRowWidget
+//import 'package:flutter_code4all/data/services/course_progress_store.dart'; //PAPACHO - MOVIDO A CircleProgressWidget
+//import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart'; //PAPACHO - MOVIDO A CircleProgressWidget
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart'; //REFACTOR-APPBAR
 import 'package:flutter_code4all/ui/core/ui/module_header_widget.dart'; //REFACTOR-MODULEHEADERCARD
 import 'package:flutter_code4all/ui/python_course_content/widgets/chapter_detail_screen.dart'; //REFACTOR-CHAPTERDETAILSCREEN
 import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
-
-import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart';
-import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/detail_card_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/module_row_widget.dart';
-import 'package:flutter_code4all/utils/external_url_opener.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter_code4all/data/services/auth_storage.dart';
-import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_page.dart';
-import 'package:flutter_code4all/data/course/python_course_catalog.dart';
-import 'package:flutter_code4all/data/services/course_progress_store.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/module_row_widget.dart'; //REFACTOR-MODULEROWWIDGET
 
 class LearningModuleScreen extends StatefulWidget {
   final int moduleNumber; // Remplaza la necesidad de tener 6 pantallas

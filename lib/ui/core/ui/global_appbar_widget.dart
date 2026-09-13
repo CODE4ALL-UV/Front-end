@@ -1,7 +1,6 @@
 //REFACTOR-APROVED x 2 - COLOR TEST REMAINING - DONT TESTED IN UI YET
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
-//import 'package:flutter_svg/flutter_svg.dart';
 
 class GlobalAppBarWidget extends StatelessWidget
     implements PreferredSizeWidget {

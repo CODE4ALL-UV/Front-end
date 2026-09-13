@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart';
-
 import 'chapter_section_screen.dart';
 import 'section_theme.dart';
 import 'section_widgets.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
 /// Punto de entrada a un capítulo del curso.
 ///

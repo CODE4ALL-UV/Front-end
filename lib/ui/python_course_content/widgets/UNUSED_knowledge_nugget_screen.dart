@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
-class CapsulaConocimientoLightScreen extends StatelessWidget {
+class KnowledgeNuggetScreen extends StatelessWidget {
   final String actividad;
 
-  const CapsulaConocimientoLightScreen({super.key, required this.actividad});
+  const KnowledgeNuggetScreen({super.key, required this.actividad});
 
   @override
   Widget build(BuildContext context) {
@@ -64,29 +64,29 @@ class CapsulaConocimientoLightScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              _LecturaCard(
-                title: 'El poder de los nombres descriptivos',
-                body:
-                    'Cuando escribes código en Python, toma un momento extra para elegir nombres claros y descriptivos para tus variables y funciones. Python premia la claridad, y un buen nombre reduce el esfuerzo de entender el programa.',
-                color: const Color(0xFF0B4F6C),
-                backgroundColor: const Color(0xFFEAF7FF),
-              ),
+              // _LecturaCard(
+              //   title: 'El poder de los nombres descriptivos',
+              //   body:
+              //       'Cuando escribes código en Python, toma un momento extra para elegir nombres claros y descriptivos para tus variables y funciones. Python premia la claridad, y un buen nombre reduce el esfuerzo de entender el programa.',
+              //   color: const Color(0xFF0B4F6C),
+              //   backgroundColor: const Color(0xFFEAF7FF),
+              // ),
               const SizedBox(height: 12),
-              _LecturaCard(
-                title: 'Ejemplo',
-                body:
-                    'Malo: x = 25\n\ny = "Juan"\n\ndef f(a, b):\n    return a + b\n\nBueno: edad_usuario = 25\n\nnombre_cliente = "Juan"\n\ndef sumar_numeros(numero1, numero2):\n    return numero1 + numero2',
-                color: const Color(0xFF1565C0),
-                backgroundColor: const Color(0xFFF4F8FC),
-              ),
+              // _LecturaCard(
+              //   title: 'Ejemplo',
+              //   body:
+              //       'Malo: x = 25\n\ny = "Juan"\n\ndef f(a, b):\n    return a + b\n\nBueno: edad_usuario = 25\n\nnombre_cliente = "Juan"\n\ndef sumar_numeros(numero1, numero2):\n    return numero1 + numero2',
+              //   color: const Color(0xFF1565C0),
+              //   backgroundColor: const Color(0xFFF4F8FC),
+              // ),
               const SizedBox(height: 12),
-              _LecturaCard(
-                title: '¿Por qué importa?',
-                body:
-                    '• Tu código será más fácil de mantener\n• Otros desarrolladores lo entenderán rápido\n• Los errores serán más fáciles de encontrar\n• Python prioriza la legibilidad',
-                color: const Color(0xFF1E88E5),
-                backgroundColor: const Color(0xFFF8FBFF),
-              ),
+              // _LecturaCard(
+              //   title: '¿Por qué importa?',
+              //   body:
+              //       '• Tu código será más fácil de mantener\n• Otros desarrolladores lo entenderán rápido\n• Los errores serán más fáciles de encontrar\n• Python prioriza la legibilidad',
+              //   color: const Color(0xFF1E88E5),
+              //   backgroundColor: const Color(0xFFF8FBFF),
+              // ),
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,

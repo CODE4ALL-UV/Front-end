@@ -5,9 +5,12 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/UNUSED_knowledge_nugget_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/activity_row_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/chapter_summary_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/example_code_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/final_evaluation_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/interactive_example.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen_dark.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/detail_card_widget.dart';
@@ -16,6 +19,7 @@ import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen.da
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen_dark.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_with_video_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_with_video_screen_dark.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/reading_topic_screen.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -50,7 +54,7 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
     final completed = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => LecturaTemaLightScreen(
+        builder: (_) => ReadingTopicScreen(
           actividad: actividad,
           contenido: _textoLecturaPorActividad(actividad),
         ),
@@ -81,7 +85,7 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
     final completed = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CapsulaConocimientoLightScreen(actividad: actividad),
+        builder: (_) => KnowledgeNuggetScreen(actividad: actividad),
       ),
     );
 
@@ -103,7 +107,7 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
     final completed = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => EjemploPythonLightScreen(actividad: actividad),
+        builder: (_) => ExampleCodeScreen(actividad: actividad),
       ),
     );
 
@@ -127,7 +131,7 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
     final completed = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => EjercicioInteractivoLightScreen(actividad: actividad),
+        builder: (_) => InteractiveExampleScreen(actividad: actividad),
       ),
     );
 

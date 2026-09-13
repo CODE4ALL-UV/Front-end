@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
-class EjemploPythonLightScreen extends StatelessWidget {
+class ExampleCodeScreen extends StatelessWidget {
   final String actividad;
 
-  const EjemploPythonLightScreen({super.key, required this.actividad});
+  const ExampleCodeScreen({super.key, required this.actividad});
 
   @override
   Widget build(BuildContext context) {

@@ -2,18 +2,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
-class EjercicioInteractivoLightScreen extends StatefulWidget {
+class InteractiveExampleScreen extends StatefulWidget {
   final String actividad;
 
-  const EjercicioInteractivoLightScreen({super.key, required this.actividad});
+  const InteractiveExampleScreen({super.key, required this.actividad});
 
   @override
-  State<EjercicioInteractivoLightScreen> createState() =>
-      _EjercicioInteractivoLightScreenState();
+  State<InteractiveExampleScreen> createState() =>
+      _InteractiveExampleScreenState();
 }
 
-class _EjercicioInteractivoLightScreenState
-    extends State<EjercicioInteractivoLightScreen> {
+class _InteractiveExampleScreenState extends State<InteractiveExampleScreen> {
   late final PageController _pageController;
   final List<String?> _selecciones = List.filled(2, null);
   final List<String?> _feedbacks = List.filled(2, null);

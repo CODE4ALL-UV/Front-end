@@ -2,21 +2,21 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
-class LecturaTemaLightScreen extends StatefulWidget {
+class ReadingTopicScreen extends StatefulWidget {
   final String actividad;
   final String contenido;
 
-  const LecturaTemaLightScreen({
+  const ReadingTopicScreen({
     super.key,
     required this.actividad,
     required this.contenido,
   });
 
   @override
-  State<LecturaTemaLightScreen> createState() => _LecturaTemaLightScreenState();
+  State<ReadingTopicScreen> createState() => ReadingTopicScreenState();
 }
 
-class _LecturaTemaLightScreenState extends State<LecturaTemaLightScreen> {
+class ReadingTopicScreenState extends State<ReadingTopicScreen> {
   static const List<String> _lecturasDisponibles = [
     'Relevancia del lenguaje Python',
     '¿Qué es un IDE/Editor?',

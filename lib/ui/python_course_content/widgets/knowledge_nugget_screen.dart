@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+
 class CapsulaConocimientoLightScreen extends StatelessWidget {
   final String actividad;
 
@@ -7,24 +11,9 @@ class CapsulaConocimientoLightScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        title: const Text(
-          'CODE4ALL',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 1,
-          ),
-        ),
-        centerTitle: true,
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

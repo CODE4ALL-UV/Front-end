@@ -9,6 +9,7 @@ import 'package:flutter_code4all/domain/models/sign_language/hand_alphabet.dart'
 import 'package:flutter_code4all/domain/models/sign_language/hand_landmark_classifier.dart';
 import 'package:flutter_code4all/domain/models/sign_language/sign_dictation.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
 import 'section_theme.dart';
 
@@ -289,12 +290,9 @@ class _SignCameraScreenState extends State<SignCameraScreen>
 
     return Scaffold(
       backgroundColor: palette.background,
-      appBar: AppBar(
-        backgroundColor: palette.appBar,
-        foregroundColor: palette.onAccent,
-        title: Text(
-          _isPractice ? 'Practica la ${widget.targetLetter}' : 'Lee mi mano',
-        ),
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: SafeArea(
         child: LayoutBuilder(

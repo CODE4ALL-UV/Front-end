@@ -5,21 +5,21 @@
 library;
 
 import 'package:flutter/material.dart';
-
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
 /// Señal de que algo tiene cambios del docente.
 ///
 /// Además del punto de color lleva su etiqueta para el lector de pantalla: un
 /// estado que solo se comunica con color deja fuera a quien no lo distingue.
 class EditedDot extends StatelessWidget {
-  const EditedDot({super.key, required this.palette, required this.label});
+  const EditedDot({super.key, required this.label});
 
-  final SectionPalette palette;
   final String label;
 
   @override
   Widget build(BuildContext context) {
+    // 1. El widget extrae sus propios colores aquí adentro:
+    final activityColors = Theme.of(context).extension<ActivityThemeColors>()!;
     return Semantics(
       label: label,
       child: Container(
@@ -27,7 +27,7 @@ class EditedDot extends StatelessWidget {
         height: 9,
         margin: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
-          color: palette.accent,
+          color: activityColors.infoBorder,
           shape: BoxShape.circle,
         ),
       ),
@@ -39,36 +39,38 @@ class EditedDot extends StatelessWidget {
 class TeacherBanner extends StatelessWidget {
   const TeacherBanner({
     super.key,
-    required this.palette,
+    required this.themeColors,
     required this.icon,
     required this.text,
     this.tone,
   });
 
-  final SectionPalette palette;
+  final ActivityThemeColors themeColors;
   final IconData icon;
   final String text;
   final Color? tone;
 
   @override
   Widget build(BuildContext context) {
-    final color = tone ?? palette.warning;
-
     return Semantics(
       liveRegion: true,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        color: palette.warningSoft,
+        color: themeColors.warningBackground,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 18, color: color),
+            Icon(icon, size: 18, color: themeColors.warningBorder),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 text,
-                style: TextStyle(fontSize: 13, height: 1.4, color: color),
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.4,
+                  color: themeColors.warningBorder,
+                ),
               ),
             ),
           ],
@@ -85,7 +87,7 @@ class TeacherBanner extends StatelessWidget {
 class TeacherField extends StatelessWidget {
   const TeacherField({
     super.key,
-    required this.palette,
+    required this.themeColors,
     required this.label,
     required this.controller,
     this.hint,
@@ -95,7 +97,7 @@ class TeacherField extends StatelessWidget {
     this.onChanged,
   });
 
-  final SectionPalette palette;
+  final ActivityThemeColors themeColors;
   final String label;
   final TextEditingController controller;
   final String? hint;
@@ -109,6 +111,7 @@ class TeacherField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -117,7 +120,7 @@ class TeacherField extends StatelessWidget {
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: palette.textSecondary,
+            color: theme.colorScheme.secondary,
           ),
         ),
         const SizedBox(height: 5),
@@ -131,25 +134,28 @@ class TeacherField extends StatelessWidget {
           style: TextStyle(
             fontSize: 14.5,
             height: 1.45,
-            color: palette.textPrimary,
+            color: theme.colorScheme.primary,
             fontFamily: monospace ? 'monospace' : null,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: palette.textSecondary, fontSize: 14),
+            hintStyle: TextStyle(
+              color: theme.colorScheme.secondary,
+              fontSize: 14,
+            ),
             filled: true,
-            fillColor: palette.surface,
+            fillColor: themeColors.surface,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 12,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
-              borderSide: BorderSide(color: palette.border),
+              borderRadius: BorderRadius.circular(themeColors.cardRadius),
+              borderSide: BorderSide(color: themeColors.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
-              borderSide: BorderSide(color: palette.accent, width: 2),
+              borderRadius: BorderRadius.circular(themeColors.cardRadius),
+              borderSide: BorderSide(color: themeColors.accent, width: 2),
             ),
           ),
         ),
@@ -157,7 +163,7 @@ class TeacherField extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             helper!,
-            style: TextStyle(fontSize: 12, color: palette.textSecondary),
+            style: TextStyle(fontSize: 12, color: themeColors.textSecondary),
           ),
         ],
       ],
@@ -169,13 +175,13 @@ class TeacherField extends StatelessWidget {
 class TeacherCard extends StatelessWidget {
   const TeacherCard({
     super.key,
-    required this.palette,
+    required this.themeColors,
     required this.child,
     this.title,
     this.action,
   });
 
-  final SectionPalette palette;
+  final ActivityThemeColors themeColors;
   final Widget child;
   final String? title;
   final Widget? action;
@@ -186,13 +192,13 @@ class TeacherCard extends StatelessWidget {
     // que permite meter dentro cosas que se pulsan —un ListTile, un
     // interruptor— sin que su efecto de pulsación quede tapado.
     return Material(
-      color: palette.surface,
-      borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+      color: themeColors.surface,
+      borderRadius: BorderRadius.circular(themeColors.cardRadius),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          border: Border.all(color: palette.border),
-          borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+          border: Border.all(color: themeColors.border),
+          borderRadius: BorderRadius.circular(themeColors.cardRadius),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,7 +212,7 @@ class TeacherCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: palette.textPrimary,
+                        color: themeColors.textPrimary,
                       ),
                     ),
                   ),
@@ -227,12 +233,12 @@ class TeacherCard extends StatelessWidget {
 class TeacherAddButton extends StatelessWidget {
   const TeacherAddButton({
     super.key,
-    required this.palette,
+    required this.themeColors,
     required this.label,
     required this.onPressed,
   });
 
-  final SectionPalette palette;
+  final ActivityThemeColors themeColors;
   final String label;
   final VoidCallback onPressed;
 
@@ -241,9 +247,9 @@ class TeacherAddButton extends StatelessWidget {
     return OutlinedButton.icon(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: palette.accent,
-        side: BorderSide(color: palette.border),
-        minimumSize: const Size(0, SectionMetrics.minTapTarget),
+        foregroundColor: themeColors.accent,
+        side: BorderSide(color: themeColors.border),
+        minimumSize: const Size(0, themeColors.minTapTarget),
       ),
       icon: const Icon(Icons.add, size: 18),
       label: Text(label),
@@ -257,19 +263,19 @@ Future<bool> confirmDelete(
   required String what,
   String? detail,
 }) async {
-  final palette = SectionPalette.of(context);
+  final themeColors = Theme.of(context).extension<ActivityThemeColors>()!;
 
   final answer = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      backgroundColor: palette.surface,
+      backgroundColor: themeColors.surface,
       title: Text(
         '¿Borrar $what?',
-        style: TextStyle(color: palette.textPrimary),
+        style: TextStyle(color: themeColors.textPrimary),
       ),
       content: Text(
         detail ?? 'Esto no se puede deshacer una vez guardes la sección.',
-        style: TextStyle(color: palette.textSecondary, height: 1.4),
+        style: TextStyle(color: themeColors.textSecondary, height: 1.4),
       ),
       actions: [
         TextButton(
@@ -279,8 +285,8 @@ Future<bool> confirmDelete(
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: FilledButton.styleFrom(
-            backgroundColor: palette.danger,
-            foregroundColor: palette.onAccent,
+            backgroundColor: themeColors.danger,
+            foregroundColor: themeColors.onAccent,
           ),
           child: const Text('Borrar'),
         ),
@@ -295,7 +301,7 @@ Future<bool> confirmDelete(
 class TeacherListRow extends StatelessWidget {
   const TeacherListRow({
     super.key,
-    required this.palette,
+    required this.themeColors,
     required this.title,
     required this.subtitle,
     required this.position,
@@ -307,7 +313,7 @@ class TeacherListRow extends StatelessWidget {
     this.leading,
   });
 
-  final SectionPalette palette;
+  final ActivityThemeColors themeColors;
   final String title;
   final String subtitle;
   final int position;
@@ -323,9 +329,9 @@ class TeacherListRow extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: palette.surfaceAlt,
-        borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
-        border: Border.all(color: palette.border),
+        color: themeColors.surfaceAlt,
+        borderRadius: BorderRadius.circular(themeColors.cardRadius),
+        border: Border.all(color: themeColors.border),
       ),
       child: Column(
         children: [
@@ -335,7 +341,7 @@ class TeacherListRow extends StatelessWidget {
             child: ExcludeSemantics(
               child: InkWell(
                 onTap: onTap,
-                borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+                borderRadius: BorderRadius.circular(themeColors.cardRadius),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Row(
@@ -357,8 +363,8 @@ class TeacherListRow extends StatelessWidget {
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: title.isEmpty
-                                    ? palette.textSecondary
-                                    : palette.textPrimary,
+                                    ? themeColors.textSecondary
+                                    : themeColors.textPrimary,
                               ),
                             ),
                             if (subtitle.isNotEmpty)
@@ -368,14 +374,17 @@ class TeacherListRow extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 12.5,
-                                  color: palette.textSecondary,
+                                  color: themeColors.textSecondary,
                                 ),
                               ),
                           ],
                         ),
                       ),
                       if (onTap != null)
-                        Icon(Icons.chevron_right, color: palette.textSecondary),
+                        Icon(
+                          Icons.chevron_right,
+                          color: themeColors.textSecondary,
+                        ),
                     ],
                   ),
                 ),
@@ -387,23 +396,23 @@ class TeacherListRow extends StatelessWidget {
           Row(
             children: [
               _RowAction(
-                palette: palette,
+                themeColors: themeColors,
                 icon: Icons.arrow_upward,
                 label: 'Subir $title',
                 onPressed: onMoveUp,
               ),
               _RowAction(
-                palette: palette,
+                themeColors: themeColors,
                 icon: Icons.arrow_downward,
                 label: 'Bajar $title',
                 onPressed: onMoveDown,
               ),
               const Spacer(),
               _RowAction(
-                palette: palette,
+                themeColors: themeColors,
                 icon: Icons.delete_outline,
                 label: 'Borrar $title',
-                color: palette.danger,
+                color: themeColors.danger,
                 onPressed: onDelete,
               ),
             ],
@@ -416,14 +425,14 @@ class TeacherListRow extends StatelessWidget {
 
 class _RowAction extends StatelessWidget {
   const _RowAction({
-    required this.palette,
+    required this.themeColors,
     required this.icon,
     required this.label,
     required this.onPressed,
     this.color,
   });
 
-  final SectionPalette palette;
+  final ActivityThemeColors themeColors;
   final IconData icon;
   final String label;
   final VoidCallback? onPressed;
@@ -435,10 +444,10 @@ class _RowAction extends StatelessWidget {
       onPressed: onPressed,
       tooltip: label,
       iconSize: 20,
-      color: color ?? palette.textSecondary,
+      color: color ?? themeColors.textSecondary,
       constraints: const BoxConstraints(
-        minWidth: SectionMetrics.minTapTarget,
-        minHeight: SectionMetrics.minTapTarget,
+        minWidth: themeColors.minTapTarget,
+        minHeight: themeColors.minTapTarget,
       ),
       icon: Icon(icon),
     );

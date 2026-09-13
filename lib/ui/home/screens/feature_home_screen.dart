@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,9 +20,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter Demo Home Page'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: Center(
         child: Column(

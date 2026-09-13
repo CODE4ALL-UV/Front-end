@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
@@ -40,34 +41,9 @@ class EditorScaffold extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: palette.background,
-      appBar: AppBar(
-        backgroundColor: palette.appBar,
-        foregroundColor: palette.onAccent,
-        title: Text(title),
-        actions: [
-          if (onDelete != null)
-            IconButton(
-              tooltip: deleteLabel ?? 'Quitar de la sección',
-              onPressed: onDelete,
-              icon: const Icon(Icons.delete_outline),
-            ),
-          // Tambien dentro de un editor se puede salir de la sesion.
-          const Padding(
-            padding: EdgeInsets.only(right: 4),
-            child: UserProfileMenu(showName: false),
-          ),
-          TextButton(
-            onPressed: onDone,
-            style: TextButton.styleFrom(
-              foregroundColor: palette.onAccent,
-              minimumSize: const Size(0, SectionMetrics.minTapTarget),
-            ),
-            child: const Text(
-              'Listo',
-              style: TextStyle(fontWeight: FontWeight.w700),
-            ),
-          ),
-        ],
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: SafeArea(
         child: LayoutBuilder(

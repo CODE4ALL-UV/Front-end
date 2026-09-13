@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// Definimos los tipos de temas que soporta tu app
+
 enum AppThemeMode {
   light,
   dark,
@@ -10,7 +10,6 @@ enum AppThemeMode {
 }
 
 class ThemeManager {
-  // ValueNotifier global que ahora maneja el ENUM en lugar de un booleano
   static final ValueNotifier<AppThemeMode> themeNotifier = 
       ValueNotifier<AppThemeMode>(AppThemeMode.light);
       //USAR ESTE OTRO SI ALGO
@@ -20,8 +19,34 @@ class ThemeManager {
     themeNotifier.value = mode;
   }
 }
+
+/// Medidas compartidas por toda la ruta de aprendizaje/App Code4All
+abstract final class AppMetrics {
+  /// Tamaño mínimo de cualquier elemento pulsable.
+  /// 48 dp es el mínimo que recomiendan tanto Material como WCAG 2.1 para que
+  /// una persona con motricidad reducida pueda acertar sin esfuerzo.
+  static const double minTapTarget = 48;
+  static const double cardRadius = 16;
+  static const double pillRadius = 999;
+  static const double gap = 12;
+  static const double sectionGap = 20;
+  static const double radius = 8.0;
+  static const double dialogRadius = 16.0;
+  static const double paddingH = 24.0;
+  static const double paddingV = 12.0;
+
+  /// Ancho máximo de una columna de texto.
+  /// Más allá de ~720 px el ojo pierde el renglón al saltar de línea, así que
+  /// en pantallas anchas el contenido se centra en lugar de estirarse.
+  static const double maxContentWidth = 720;
+
+  static EdgeInsets pagePadding(double width) =>
+      EdgeInsets.symmetric(horizontal: width < 380 ? 14 : 20, vertical: 18);
+
+  static final BorderRadius defaultBorder = BorderRadius.circular(radius);
+}
+
 /// Define los seis temas visuales disponibles en la aplicación.
-///
 /// Cada getter declara únicamente su paleta. [_buildTheme] aplica los estilos
 /// Material compartidos para que ninguna paleta quede incompleta.
 class AppTheme {
@@ -64,9 +89,18 @@ class AppTheme {
       iconBackground: Color(0xFFE8F1FF),
       textTitle: Color(0xFF263238),
       textSubtitle: Color(0xFF607D8B),
+      infoBackground: Color(0xFFE3F2FD),
+      infoBorder: Color(0xFF90CAF9),
+      infoText: Color(0xFF1565C0),
       successBackground: Color(0xFFE8F5E9),
       successBorder: Color(0xFF66BB6A),
       successText: Color(0xFF2E7D32),
+      warningBackground: Color(0xFFFFCDD2),
+      warningBorder: Color(0xFFFFAB91),
+      warningText: Color(0xFFF57C00),
+      dangerBackground: Color(0xFFE53935),
+      dangerBorder: Color(0xFFD32F2F),
+      dangerText: Color(0xFFB71C1C),
       actionBackground: Color(0xFFE3F2FD),
       actionBorder: Color(0xFF90CAF9),
       actionText: Color(0xFF1565C0),
@@ -110,9 +144,18 @@ class AppTheme {
       iconBackground: Color(0xFFE8F1FF),
       textTitle: Color(0xFF263238),
       textSubtitle: Color(0xFF607D8B),
+      infoBackground: Color(0xFFE3F2FD),
+      infoBorder: Color(0xFF90CAF9),
+      infoText: Color(0xFF1565C0),
       successBackground: Color(0xFFE8F5E9),
       successBorder: Color(0xFF66BB6A),
       successText: Color(0xFF2E7D32),
+      warningBackground: Color(0xFFFFCDD2),
+      warningBorder: Color(0xFFFFAB91),
+      warningText: Color(0xFFF57C00),
+      dangerBackground: Color(0xFFE53935),
+      dangerBorder: Color(0xFFD32F2F),
+      dangerText: Color(0xFFB71C1C),
       actionBackground: Color(0xFFE3F2FD),
       actionBorder: Color(0xFF90CAF9),
       actionText: Color(0xFF1565C0),
@@ -156,9 +199,18 @@ class AppTheme {
       iconBackground: Color(0xFFE8F1FF),
       textTitle: Color(0xFF263238),
       textSubtitle: Color(0xFF607D8B),
+      infoBackground: Color(0xFFE3F2FD),
+      infoBorder: Color(0xFF90CAF9),
+      infoText: Color(0xFF1565C0),
       successBackground: Color(0xFFE8F5E9),
       successBorder: Color(0xFF66BB6A),
       successText: Color(0xFF2E7D32),
+      warningBackground: Color(0xFFFFCDD2),
+      warningBorder: Color(0xFFFFAB91),
+      warningText: Color(0xFFF57C00),
+      dangerBackground: Color(0xFFE53935),
+      dangerBorder: Color(0xFFD32F2F),
+      dangerText: Color(0xFFB71C1C),
       actionBackground: Color(0xFFE3F2FD),
       actionBorder: Color(0xFF90CAF9),
       actionText: Color(0xFF1565C0),
@@ -202,9 +254,18 @@ class AppTheme {
       iconBackground: Color(0xFFE8F1FF),
       textTitle: Color(0xFF263238),
       textSubtitle: Color(0xFF607D8B),
+      infoBackground: Color(0xFFE3F2FD),
+      infoBorder: Color(0xFF90CAF9),
+      infoText: Color(0xFF1565C0),
       successBackground: Color(0xFFE8F5E9),
       successBorder: Color(0xFF66BB6A),
       successText: Color(0xFF2E7D32),
+      warningBackground: Color(0xFFFFCDD2),
+      warningBorder: Color(0xFFFFAB91),
+      warningText: Color(0xFFF57C00),
+      dangerBackground: Color(0xFFE53935),
+      dangerBorder: Color(0xFFD32F2F),
+      dangerText: Color(0xFFB71C1C),
       actionBackground: Color(0xFFE3F2FD),
       actionBorder: Color(0xFF90CAF9),
       actionText: Color(0xFF1565C0),
@@ -248,9 +309,18 @@ class AppTheme {
       iconBackground: Color(0xFFE8F1FF),
       textTitle: Color(0xFF263238),
       textSubtitle: Color(0xFF607D8B),
+      infoBackground: Color(0xFFE3F2FD),
+      infoBorder: Color(0xFF90CAF9),
+      infoText: Color(0xFF1565C0),
       successBackground: Color(0xFFE8F5E9),
       successBorder: Color(0xFF66BB6A),
       successText: Color(0xFF2E7D32),
+      warningBackground: Color(0xFFFFCDD2),
+      warningBorder: Color(0xFFFFAB91),
+      warningText: Color(0xFFF57C00),
+      dangerBackground: Color(0xFFE53935),
+      dangerBorder: Color(0xFFD32F2F),
+      dangerText: Color(0xFFB71C1C),
       actionBackground: Color(0xFFE3F2FD),
       actionBorder: Color(0xFF90CAF9),
       actionText: Color(0xFF1565C0),
@@ -294,9 +364,18 @@ class AppTheme {
       iconBackground: Color(0xFFE8F1FF),
       textTitle: Color(0xFF263238),
       textSubtitle: Color(0xFF607D8B),
+      infoBackground: Color(0xFFE3F2FD),
+      infoBorder: Color(0xFF90CAF9),
+      infoText: Color(0xFF1565C0),
       successBackground: Color(0xFFE8F5E9),
       successBorder: Color(0xFF66BB6A),
       successText: Color(0xFF2E7D32),
+      warningBackground: Color(0xFFFFCDD2),
+      warningBorder: Color(0xFFFFAB91),
+      warningText: Color(0xFFF57C00),
+      dangerBackground: Color(0xFFE53935),
+      dangerBorder: Color(0xFFD32F2F),
+      dangerText: Color(0xFFB71C1C),
       actionBackground: Color(0xFFE3F2FD),
       actionBorder: Color(0xFF90CAF9),
       actionText: Color(0xFF1565C0),
@@ -346,7 +425,7 @@ class AppTheme {
         unselectedIconTheme: const IconThemeData(size: 24),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,//color: colorScheme.surface,
+        color: colorScheme.surface,
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
@@ -364,8 +443,9 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          minimumSize: const Size(0, AppMetrics.minTapTarget), // Accesibilidad garantizada
+          padding: const EdgeInsets.symmetric(horizontal: AppMetrics.paddingH, vertical: AppMetrics.paddingV),
+          shape: RoundedRectangleBorder(borderRadius: AppMetrics.defaultBorder),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -409,7 +489,7 @@ class AppTheme {
           fontWeight: FontWeight.bold,
         ),
         contentTextStyle: baseTextTheme.bodyMedium?.copyWith(color: mutedText),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppMetrics.dialogRadius)),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: colorScheme.primary,
@@ -427,6 +507,148 @@ class AppTheme {
         }),
       ),
       extensions: [courseTheme, codeConsoleTheme, activityThemeColors],
+    );
+  }
+}
+
+enum AppThemeTone { info, success, warning, danger, action }
+
+class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
+  final Color background;
+  final Color border;
+  final Color iconBackground;
+  final Color textTitle;
+  final Color textSubtitle;
+
+  final Color infoBackground;
+  final Color infoBorder;
+  final Color infoText;
+
+  final Color successBackground;
+  final Color successBorder;
+  final Color successText;
+
+  final Color warningBackground;
+  final Color warningBorder;
+  final Color warningText;
+
+  final Color dangerBackground;
+  final Color dangerBorder;
+  final Color dangerText;
+
+  final Color actionBackground;
+  final Color actionBorder;
+  final Color actionText;
+
+  const ActivityThemeColors({
+    required this.background,
+    required this.border,
+    required this.iconBackground,
+    required this.textTitle,
+    required this.textSubtitle,
+
+    required this.infoBackground,
+    required this.infoBorder,
+    required this.infoText,
+
+    required this.successBackground,
+    required this.successBorder,
+    required this.successText,
+
+    required this.warningBackground,
+    required this.warningBorder,
+    required this.warningText,
+
+    required this.dangerBackground,
+    required this.dangerBorder,
+    required this.dangerText,
+
+    required this.actionBackground,
+    required this.actionBorder,
+    required this.actionText,
+  });
+
+  /// Función mágica que devuelve el trío de colores perfecto según la intención,
+  /// garantizando que el texto y el borde siempre combinen con el fondo.
+  ({Color background, Color border, Color text}) tone(AppThemeTone tone) =>
+      switch (tone) {
+        AppThemeTone.info => (
+          background: infoBackground,
+          border: infoBorder,
+          text: infoText
+        ),
+        AppThemeTone.success => (
+          background: successBackground,
+          border: successBorder,
+          text: successText
+        ),
+        AppThemeTone.warning => (
+          background: warningBackground,
+          border: warningBorder,
+          text: warningText
+        ),
+        AppThemeTone.danger => (
+          background: dangerBackground,
+          border: dangerBorder,
+          text: dangerText
+      ),
+        AppThemeTone.action => (
+          background: actionBackground,
+          border: actionBorder,
+          text: actionText
+        ),
+      };
+
+  @override
+  ActivityThemeColors copyWith({Color? background, /* ... resto de variables ... */}) {
+    return ActivityThemeColors(
+      background: background ?? this.background,
+      border: border,
+      iconBackground: iconBackground,
+      textTitle: textTitle,
+      textSubtitle: textSubtitle,
+      infoBackground: infoBackground,
+      infoBorder: infoBorder,
+      infoText: infoText,
+      successBackground: successBackground,
+      successBorder: successBorder,
+      successText: successText,
+      warningBackground: warningBackground,
+      warningBorder: warningBorder,
+      warningText: warningText,
+      dangerBackground: dangerBackground,
+      dangerBorder: dangerBorder,
+      dangerText: dangerText,
+      actionBackground: actionBackground,
+      actionBorder: actionBorder,
+      actionText: actionText,
+    );
+  }
+
+  @override
+  ActivityThemeColors lerp(ThemeExtension<ActivityThemeColors>? other, double t) {
+    if (other is! ActivityThemeColors) return this;
+    return ActivityThemeColors(
+      background: Color.lerp(background, other.background, t)!,
+      border: Color.lerp(border, other.border, t)!,
+      iconBackground: Color.lerp(iconBackground, other.iconBackground, t)!,
+      textTitle: Color.lerp(textTitle, other.textTitle, t)!,
+      textSubtitle: Color.lerp(textSubtitle, other.textSubtitle, t)!,
+      infoBackground: Color.lerp(infoBackground, other.infoBackground, t)!,
+      infoBorder: Color.lerp(infoBorder, other.infoBorder, t)!,
+      infoText: Color.lerp(infoText, other.infoText, t)!,
+      successBackground: Color.lerp(successBackground, other.successBackground, t)!,
+      successBorder: Color.lerp(successBorder, other.successBorder, t)!,
+      successText: Color.lerp(successText, other.successText, t)!,
+      warningBackground: Color.lerp(warningBackground, other.warningBackground, t)!,
+      warningBorder: Color.lerp(warningBorder, other.warningBorder, t)!,
+      warningText: Color.lerp(warningText, other.warningText, t)!,
+      dangerBackground: Color.lerp(dangerBackground, other.dangerBackground, t)!,
+      dangerBorder: Color.lerp(dangerBorder, other.dangerBorder, t)!,
+      dangerText: Color.lerp(dangerText, other.dangerText, t)!,
+      actionBackground: Color.lerp(actionBackground, other.actionBackground, t)!,
+      actionBorder: Color.lerp(actionBorder, other.actionBorder, t)!,
+      actionText: Color.lerp(actionText, other.actionText, t)!,
     );
   }
 }
@@ -594,67 +816,16 @@ class ActivityColors {
   static const Color actionText = Color(0xFF1565C0);
 }
 
-class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
-  final Color background;
-  final Color border;
-  final Color iconBackground;
-  final Color textTitle;
-  final Color textSubtitle;
-  final Color successBackground;
-  final Color successBorder;
-  final Color successText;
-  final Color actionBackground;
-  final Color actionBorder;
-  final Color actionText;
-
-  const ActivityThemeColors({
-    required this.background,
-    required this.border,
-    required this.iconBackground,
-    required this.textTitle,
-    required this.textSubtitle,
-    required this.successBackground,
-    required this.successBorder,
-    required this.successText,
-    required this.actionBackground,
-    required this.actionBorder,
-    required this.actionText,
-  });
-
-  @override
-  ActivityThemeColors copyWith({Color? background, /* ... resto de variables ... */}) {
-    return ActivityThemeColors(
-      background: background ?? this.background,
-      border: border,
-      iconBackground: iconBackground,
-      textTitle: textTitle,
-      textSubtitle: textSubtitle,
-      successBackground: successBackground,
-      successBorder: successBorder,
-      successText: successText,
-      actionBackground: actionBackground,
-      actionBorder: actionBorder,
-      actionText: actionText,
-    );
-  }
-
-  @override
-  ActivityThemeColors lerp(ThemeExtension<ActivityThemeColors>? other, double t) {
-    if (other is! ActivityThemeColors) return this;
-    return ActivityThemeColors(
-      background: Color.lerp(background, other.background, t)!,
-      border: Color.lerp(border, other.border, t)!,
-      iconBackground: Color.lerp(iconBackground, other.iconBackground, t)!,
-      textTitle: Color.lerp(textTitle, other.textTitle, t)!,
-      textSubtitle: Color.lerp(textSubtitle, other.textSubtitle, t)!,
-      successBackground: Color.lerp(successBackground, other.successBackground, t)!,
-      successBorder: Color.lerp(successBorder, other.successBorder, t)!,
-      successText: Color.lerp(successText, other.successText, t)!,
-      actionBackground: Color.lerp(actionBackground, other.actionBackground, t)!,
-      actionBorder: Color.lerp(actionBorder, other.actionBorder, t)!,
-      actionText: Color.lerp(actionText, other.actionText, t)!,
-    );
-  }
+/// Esta extensión te permite acceder a tus temas personalizados 
+/// directamente desde el 'context' con una sintaxis súper corta.
+extension AppThemeContext on BuildContext {
+  // Atajo para los colores principales (Material)
+  ColorScheme get colorScheme => Theme.of(this).colorScheme;
+  
+  // Atajos para TUS extensiones personalizadas
+  CourseTheme get courseTheme => Theme.of(this).extension<CourseTheme>()!;
+  CodeConsoleTheme get codeConsoleTheme => Theme.of(this).extension<CodeConsoleTheme>()!;
+  ActivityThemeColors get activityColors => Theme.of(this).extension<ActivityThemeColors>()!;
 }
 
 /*

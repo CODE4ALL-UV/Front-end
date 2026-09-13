@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 
@@ -76,10 +77,9 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
         MaterialPageRoute<void>(
           builder: (_) => Scaffold(
             backgroundColor: SectionPalette.of(context).background,
-            appBar: AppBar(
-              backgroundColor: SectionPalette.of(context).appBar,
-              foregroundColor: SectionPalette.of(context).onAccent,
-              title: const Text('Editar sección'),
+            appBar: GlobalAppBarWidget(
+              userName: '', //widget.userName,
+              onLogout: null, //widget.onLogout,
             ),
             body: TeacherSectionDetail(
               moduleNumber: moduleNumber,
@@ -97,55 +97,9 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
 
     return Scaffold(
       backgroundColor: palette.background,
-      appBar: AppBar(
-        // La misma barra que ve el estudiante: mismo logo, mismo nombre y el
-        // mismo menú de cuenta. Cambiar de rol no debería parecer cambiar de
-        // aplicación.
-        backgroundColor: //VisualThemeControlle.resolveIsDark(context) OJO USAR APP_THEME
-            //? const Color(0xFF2A2A2A)
-            Color(0xFFE53935),
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6),
-          child: Image.asset('assets/images/logoUV_Gris1.png'),
-        ),
-        title: const Text(
-          'CODE4ALL',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 2,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            tooltip: 'Volver a consultar los cambios guardados',
-            onPressed: _content.isLoading ? null : _content.refresh,
-            color: Colors.white,
-            icon: const Icon(Icons.refresh),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: UserProfileMenu(
-              userName: widget.userName,
-              onLogout: widget.onLogout,
-              showName: true,
-            ),
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabs,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          tabs: const [
-            Tab(icon: Icon(Icons.menu_book), text: 'Temario'),
-            Tab(icon: Icon(Icons.insights), text: 'Estadísticas'),
-            Tab(icon: Icon(Icons.groups_outlined), text: 'Estudiantes'),
-          ],
-        ),
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: SafeArea(
         child: TabBarView(

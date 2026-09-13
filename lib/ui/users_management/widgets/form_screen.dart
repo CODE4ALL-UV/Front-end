@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/models/auth_models.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
 class FormPageLight extends StatefulWidget {
   final VoidCallback? onBack;
@@ -102,38 +103,9 @@ class _FormPageLightState extends State<FormPageLight> {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: const Color(0xFFE53935),
-          elevation: 0,
-          leading: widget.onBack != null
-              ? IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: widget.onBack,
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(6.0),
-                  child: Image.asset('assets/images/logoUV_Gris1.png'),
-                ),
-          title: const Text(
-            'CODE4ALL',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              letterSpacing: 2,
-            ),
-          ),
-          centerTitle: true,
-          actions: const [
-            Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Icon(
-                Icons.account_circle_outlined,
-                color: Colors.white,
-                size: 28,
-              ),
-            ),
-          ],
+        appBar: GlobalAppBarWidget(
+          userName: '', //widget.userName,
+          onLogout: null, //widget.onLogout,
         ),
         body: SafeArea(
           child: Center(

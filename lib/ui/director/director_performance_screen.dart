@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
@@ -55,14 +56,9 @@ class _DirectorPerformanceScreenState extends State<DirectorPerformanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Rendimiento de estudiantes'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: UserProfileMenu(showName: true, onLogout: widget.onLogout),
-          ),
-        ],
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())

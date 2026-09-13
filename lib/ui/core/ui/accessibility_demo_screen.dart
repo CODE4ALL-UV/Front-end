@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
 class AccessibilityDemoScreen extends StatefulWidget {
   const AccessibilityDemoScreen({super.key});
@@ -23,7 +24,10 @@ class _AccessibilityDemoScreenState extends State<AccessibilityDemoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Demo de accesibilidad')),
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),

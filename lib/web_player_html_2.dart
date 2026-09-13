@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
 class CustomAudioPlayerScreen extends StatefulWidget {
   const CustomAudioPlayerScreen({super.key});
@@ -29,9 +30,9 @@ class _CustomAudioPlayerScreenState extends State<CustomAudioPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reproductor de Audio'),
-        centerTitle: true,
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: Center(
         child: Column(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
@@ -98,34 +99,9 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
 
     return Scaffold(
       backgroundColor: palette.background,
-      appBar: AppBar(
-        backgroundColor: palette.appBar,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: widget.onBack ?? () => Navigator.of(context).maybePop(),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          tooltip: 'Volver',
-        ),
-        title: const Text(
-          'CODE4ALL',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 1,
-          ),
-        ),
-        centerTitle: true,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8),
-            // El menu completo, no solo el avatar: antes esto era una foto
-            // que no se podia tocar, asi que dentro de una actividad no habia
-            // forma de cerrar sesion sin salir hasta la pantalla principal.
-            child: UserProfileMenu(showName: false),
-          ),
-        ],
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: ReadableScreenHighlight(
         child: Column(

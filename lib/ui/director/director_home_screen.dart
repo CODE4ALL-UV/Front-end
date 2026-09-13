@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_stats_screen.dart';
@@ -68,66 +69,9 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
 
     return Scaffold(
       backgroundColor: palette.background,
-      appBar: AppBar(
-        // La misma barra que ven el estudiante y el docente.
-        backgroundColor:
-            //? const Color(0xFF2A2A2A) //OJO USAR APP_THEME
-            const Color(0xFFE53935),
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6),
-          child: Image.asset('assets/images/logoUV_Gris1.png'),
-        ),
-        title: const Text(
-          'CODE4ALL',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 2,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            tooltip: 'Volver a consultar',
-            onPressed: _store.isLoading ? null : _store.refresh,
-            color: Colors.white,
-            icon: const Icon(Icons.refresh),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: UserProfileMenu(
-              userName: widget.userName,
-              onLogout: widget.onLogout,
-              showName: true,
-            ),
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabs,
-          isScrollable: true,
-          tabAlignment: TabAlignment.center,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          tabs: [
-            const Tab(icon: Icon(Icons.insights), text: 'Curso'),
-            const Tab(icon: Icon(Icons.groups_outlined), text: 'Estudiantes'),
-            // El número en la pestaña evita tener que entrar para descubrir
-            // que había algo esperando.
-            _TabWithCount(
-              icon: Icons.school_outlined,
-              label: 'Docentes',
-              count: _pendingTeachers,
-            ),
-            _TabWithCount(
-              icon: Icons.fact_check_outlined,
-              label: 'Contenido',
-              count: _pendingContent,
-            ),
-          ],
-        ),
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: SafeArea(
         child: TabBarView(

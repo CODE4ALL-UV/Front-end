@@ -90,7 +90,9 @@ void main() {
   });
 
   group('la fila de lista se dibuja entera', () {
-    testWidgets('con sus controles y sin desbordarse en 320 px', (tester) async {
+    testWidgets('con sus controles y sin desbordarse en 320 px', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(320, 640);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
@@ -116,7 +118,9 @@ void main() {
       expect(find.textContaining('Una pregunta'), findsOneWidget);
     });
 
-    testWidgets('un título vacío se dice, no se deja en blanco', (tester) async {
+    testWidgets('un título vacío se dice, no se deja en blanco', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         wrap(
           Builder(

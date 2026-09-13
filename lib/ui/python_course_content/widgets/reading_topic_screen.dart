@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+
 class LecturaTemaLightScreen extends StatefulWidget {
   final String actividad;
   final String contenido;
@@ -64,30 +68,9 @@ class _LecturaTemaLightScreenState extends State<LecturaTemaLightScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Image.asset('assets/images/logoUV_Gris1.png'),
-        ),
-        title: const Text(
-          'CODE4ALL',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 1,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: StoredUserAvatar(radius: 14, size: 28, showName: true),
-          ),
-        ],
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: Column(
         children: [

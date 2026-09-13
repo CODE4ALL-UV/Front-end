@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
@@ -16,13 +17,9 @@ void main() {
   Widget inAppBar({VoidCallback? onLogout, String name = 'Mateo'}) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color(0xFFE53935),
-          foregroundColor: Colors.white,
-          title: const Text('CODE4ALL'),
-          actions: [
-            UserProfileMenu(userName: name, onLogout: onLogout, showName: true),
-          ],
+        appBar: GlobalAppBarWidget(
+          userName: '', //widget.userName,
+          onLogout: null, //widget.onLogout,
         ),
         body: const SizedBox.expand(),
       ),
@@ -53,7 +50,11 @@ void main() {
 
       for (final icon in [Icons.person_outline, Icons.logout]) {
         final widget = tester.widget<Icon>(find.byIcon(icon));
-        expect(widget.color, isNotNull, reason: 'el icono $icon no lleva color');
+        expect(
+          widget.color,
+          isNotNull,
+          reason: 'el icono $icon no lleva color',
+        );
         expect(
           widget.color,
           isNot(Colors.white),

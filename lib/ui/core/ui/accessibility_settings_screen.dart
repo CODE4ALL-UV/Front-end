@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'accessibility_text_scale.dart';
 
 class AccessibilitySettingsScreen extends StatefulWidget {
@@ -30,27 +31,15 @@ class _AccessibilitySettingsScreenState
     super.didChangeDependencies();
     _textScaleController = AccessibilityTextScaleScope.of(context);
     _textSizeEnabled = _textScaleController?.scale != 1.0;
-}
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F3F8),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF7E57C2),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Configuración de Accesibilidad',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

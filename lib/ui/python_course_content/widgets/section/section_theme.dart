@@ -105,8 +105,12 @@ class SectionPalette {
     appBar: Color(0xFF262B30),
   );
 
-  //static SectionPalette of(BuildContext context) =>
-  //VisualThemeControlle.resolveIsDark(context) ? dark : light;
+  static SectionPalette of(BuildContext context) {
+    // Le preguntamos al Theme de Flutter si el brillo actual es oscuro
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return isDark ? dark : light;
+  }
 
   /// Color de acento y su fondo suave según la intención del bloque.
   ({Color foreground, Color background}) tone(SectionTone tone) =>

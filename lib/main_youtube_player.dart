@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'youtube_translator_player.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart'; // Duplicate import removed
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -38,7 +39,10 @@ class _DemoPageState extends State<DemoPage> {
   Widget build(BuildContext context) {
     // final service = _makeService(); // Leftover service variable reference removed
     return Scaffold(
-      appBar: AppBar(title: const Text('YouTube Translator Player')),
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
+      ),
       body: Column(
         children: [
           Padding(

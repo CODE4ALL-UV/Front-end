@@ -136,8 +136,9 @@ class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_moduleId == null ? 'Crear Módulo' : 'Editar Módulo'),
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())

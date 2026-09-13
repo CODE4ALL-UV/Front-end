@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 
@@ -73,16 +74,9 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
 
     return Scaffold(
       backgroundColor: palette.background,
-      appBar: AppBar(
-        backgroundColor: palette.appBar,
-        foregroundColor: palette.onAccent,
-        title: Text(teacher.name.isEmpty ? 'Docente' : teacher.name),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: UserProfileMenu(showName: false),
-          ),
-        ],
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openReviewSheet,

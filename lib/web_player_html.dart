@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class YoutubeIframeTestScreen extends StatefulWidget {
@@ -39,9 +40,9 @@ class _YoutubeIframeTestScreenState extends State<YoutubeIframeTestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reproductor Personalizado'),
-        centerTitle: true,
+      appBar: GlobalAppBarWidget(
+        userName: '', //widget.userName,
+        onLogout: null, //widget.onLogout,
       ),
       body: Center(
         child: Padding(

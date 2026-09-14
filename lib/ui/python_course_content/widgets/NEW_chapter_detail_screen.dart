@@ -8,9 +8,9 @@ import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart'
 import 'package:flutter_code4all/ui/python_course_content/widgets/UNUSED_knowledge_nugget_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_activity_row_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/chapter_summary_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/example_code_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_example_code_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/final_evaluation_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/interactive_example.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_interactive_example.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen_dark.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_detail_card_widget.dart';
@@ -19,7 +19,7 @@ import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen.da
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen_dark.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_with_video_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_with_video_screen_dark.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/reading_topic_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_reading_topic_screen.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';

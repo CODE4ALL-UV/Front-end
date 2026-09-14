@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/lesson_box_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_lesson_box_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart';
 
 class CircleProgressWidget extends StatelessWidget {

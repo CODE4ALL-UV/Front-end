@@ -15,11 +15,11 @@ import 'package:flutter_code4all/data/services/auth_storage.dart'; //PAPACHO
 //import 'package:flutter_code4all/data/services/course_progress_store.dart'; //PAPACHO - MOVIDO A CircleProgressWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart'; //PAPACHO - MOVIDO A CircleProgressWidget
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart'; //REFACTOR-APPBAR
-import 'package:flutter_code4all/ui/core/ui/module_header_widget.dart'; //REFACTOR-MODULEHEADERCARD
-import 'package:flutter_code4all/ui/python_course_content/widgets/chapter_detail_screen.dart'; //REFACTOR-CHAPTERDETAILSCREEN
+import 'package:flutter_code4all/ui/core/ui/NEW_module_header_widget.dart'; //REFACTOR-MODULEHEADERCARD
+import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_chapter_detail_screen.dart'; //REFACTOR-CHAPTERDETAILSCREEN
 import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/detail_card_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/module_row_widget.dart'; //REFACTOR-MODULEROWWIDGET
+import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_detail_card_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_module_row_widget.dart'; //REFACTOR-MODULEROWWIDGET
 
 class LearningModuleScreen extends StatefulWidget {
   final int moduleNumber; // Remplaza la necesidad de tener 6 pantallas

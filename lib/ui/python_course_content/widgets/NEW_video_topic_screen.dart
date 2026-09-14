@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 
-class VideoTemaLightScreen extends StatelessWidget {
+class VideoTopicScreen extends StatelessWidget {
   final String actividad;
 
-  const VideoTemaLightScreen({super.key, required this.actividad});
+  const VideoTopicScreen({super.key, required this.actividad});
 
   static const String _videoUrl =
       'https://www.youtube.com/watch?v=nKPbfIU442g&t=89s';

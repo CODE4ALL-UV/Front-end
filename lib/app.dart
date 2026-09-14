@@ -12,7 +12,7 @@ import 'ui/users_management/widgets/login_screen.dart';
 //import 'ui/users_management/screens/login_dark_screen.dart'; // PAPACHO - ELIMINADO USAR login_screen.dart en pro de app_theme.dart
 import 'ui/users_management/widgets/form_screen.dart';
 //import 'ui/users_management/screens/form_dark_screen.dart'; // PAPACHO - ELIMINADO USAR form_screen.dart en pro de app_theme.dart
-import 'ui/python_course_content/widgets/learning_module_screen.dart';
+import 'ui/python_course_content/widgets/learning_module_screen.dart'; // MIX - PAPACHO - REFACTOR que reemplaza los otros learning_module_screen light y dark en pro de app_theme.dart
 //import 'ui/python_course_content/widgets/learning_module_dark_screen.dart'; // PAPACHO - ELIMINADO USAR learning_module_screen.dart en pro de app_theme.dart
 
 enum AppScreen { login, register, modulo, docente, director }

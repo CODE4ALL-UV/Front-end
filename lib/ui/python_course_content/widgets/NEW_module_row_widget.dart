@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
-import 'package:flutter_code4all/ui/python_course_content/UNUSED_circle_progress_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_lesson_box_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_page.dart';
+import 'package:flutter_code4all/ui/python_course_content/unused_circle_progress_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/new_lesson_box_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_screen.dart';
 
 /// Componente modularizado que maneja la intercalación y semántica de las filas
 

@@ -1,5 +1,4 @@
 /// Piezas que se repiten por todo el editor del docente.
-///
 /// Están aquí, y no copiadas en cada pantalla, para que un cambio de aspecto
 /// —o de tamaño mínimo de un botón— valga para todas a la vez.
 library;
@@ -8,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
 /// Señal de que algo tiene cambios del docente.
-///
 /// Además del punto de color lleva su etiqueta para el lector de pantalla: un
 /// estado que solo se comunica con color deja fuera a quien no lo distingue.
 class EditedDot extends StatelessWidget {
@@ -39,19 +37,19 @@ class EditedDot extends StatelessWidget {
 class TeacherBanner extends StatelessWidget {
   const TeacherBanner({
     super.key,
-    required this.themeColors,
     required this.icon,
     required this.text,
     this.tone,
   });
 
-  final ActivityThemeColors themeColors;
   final IconData icon;
   final String text;
   final Color? tone;
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = Theme.of(context).extension<ActivityThemeColors>()!;
+
     return Semantics(
       liveRegion: true,
       child: Container(
@@ -87,7 +85,6 @@ class TeacherBanner extends StatelessWidget {
 class TeacherField extends StatelessWidget {
   const TeacherField({
     super.key,
-    required this.themeColors,
     required this.label,
     required this.controller,
     this.hint,
@@ -97,7 +94,6 @@ class TeacherField extends StatelessWidget {
     this.onChanged,
   });
 
-  final ActivityThemeColors themeColors;
   final String label;
   final TextEditingController controller;
   final String? hint;
@@ -111,7 +107,9 @@ class TeacherField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final appTheme = Theme.of(context);
+    final themeColors = appTheme.extension<ActivityThemeColors>()!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -120,7 +118,7 @@ class TeacherField extends StatelessWidget {
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: theme.colorScheme.secondary,
+            color: appTheme.colorScheme.secondary,
           ),
         ),
         const SizedBox(height: 5),
@@ -134,28 +132,28 @@ class TeacherField extends StatelessWidget {
           style: TextStyle(
             fontSize: 14.5,
             height: 1.45,
-            color: theme.colorScheme.primary,
+            color: appTheme.colorScheme.primary,
             fontFamily: monospace ? 'monospace' : null,
           ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: theme.colorScheme.secondary,
+              color: appTheme.colorScheme.secondary,
               fontSize: 14,
             ),
             filled: true,
-            fillColor: themeColors.surface,
+            fillColor: themeColors.actionBackground,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 12,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(themeColors.cardRadius),
+              borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
               borderSide: BorderSide(color: themeColors.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(themeColors.cardRadius),
-              borderSide: BorderSide(color: themeColors.accent, width: 2),
+              borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
+              borderSide: BorderSide(color: themeColors.infoBorder, width: 2),
             ),
           ),
         ),
@@ -163,7 +161,7 @@ class TeacherField extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             helper!,
-            style: TextStyle(fontSize: 12, color: themeColors.textSecondary),
+            style: TextStyle(fontSize: 12, color: themeColors.textSubtitle),
           ),
         ],
       ],
@@ -173,32 +171,27 @@ class TeacherField extends StatelessWidget {
 
 /// Tarjeta que agrupa un trozo del editor.
 class TeacherCard extends StatelessWidget {
-  const TeacherCard({
-    super.key,
-    required this.themeColors,
-    required this.child,
-    this.title,
-    this.action,
-  });
+  const TeacherCard({super.key, required this.child, this.title, this.action});
 
-  final ActivityThemeColors themeColors;
   final Widget child;
   final String? title;
   final Widget? action;
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = Theme.of(context).extension<ActivityThemeColors>()!;
+
     // El fondo lo pinta un Material, no la decoración del contenedor. Es lo
     // que permite meter dentro cosas que se pulsan —un ListTile, un
     // interruptor— sin que su efecto de pulsación quede tapado.
     return Material(
-      color: themeColors.surface,
-      borderRadius: BorderRadius.circular(themeColors.cardRadius),
+      color: themeColors.background,
+      borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           border: Border.all(color: themeColors.border),
-          borderRadius: BorderRadius.circular(themeColors.cardRadius),
+          borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +205,7 @@ class TeacherCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: themeColors.textPrimary,
+                        color: themeColors.infoText,
                       ),
                     ),
                   ),
@@ -233,23 +226,23 @@ class TeacherCard extends StatelessWidget {
 class TeacherAddButton extends StatelessWidget {
   const TeacherAddButton({
     super.key,
-    required this.themeColors,
     required this.label,
     required this.onPressed,
   });
 
-  final ActivityThemeColors themeColors;
   final String label;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = Theme.of(context).extension<ActivityThemeColors>()!;
+
     return OutlinedButton.icon(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: themeColors.accent,
+        foregroundColor: themeColors.infoBorder,
         side: BorderSide(color: themeColors.border),
-        minimumSize: const Size(0, themeColors.minTapTarget),
+        minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.add, size: 18),
       label: Text(label),
@@ -268,14 +261,14 @@ Future<bool> confirmDelete(
   final answer = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      backgroundColor: themeColors.surface,
+      backgroundColor: themeColors.background,
       title: Text(
         '¿Borrar $what?',
-        style: TextStyle(color: themeColors.textPrimary),
+        style: TextStyle(color: themeColors.infoText),
       ),
       content: Text(
         detail ?? 'Esto no se puede deshacer una vez guardes la sección.',
-        style: TextStyle(color: themeColors.textSecondary, height: 1.4),
+        style: TextStyle(color: themeColors.infoText, height: 1.4),
       ),
       actions: [
         TextButton(
@@ -285,8 +278,8 @@ Future<bool> confirmDelete(
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: FilledButton.styleFrom(
-            backgroundColor: themeColors.danger,
-            foregroundColor: themeColors.onAccent,
+            backgroundColor: themeColors.dangerBackground,
+            foregroundColor: themeColors.dangerBorder,
           ),
           child: const Text('Borrar'),
         ),
@@ -301,7 +294,6 @@ Future<bool> confirmDelete(
 class TeacherListRow extends StatelessWidget {
   const TeacherListRow({
     super.key,
-    required this.themeColors,
     required this.title,
     required this.subtitle,
     required this.position,
@@ -313,7 +305,6 @@ class TeacherListRow extends StatelessWidget {
     this.leading,
   });
 
-  final ActivityThemeColors themeColors;
   final String title;
   final String subtitle;
   final int position;
@@ -330,7 +321,7 @@ class TeacherListRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: themeColors.surfaceAlt,
-        borderRadius: BorderRadius.circular(themeColors.cardRadius),
+        borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         border: Border.all(color: themeColors.border),
       ),
       child: Column(
@@ -425,14 +416,12 @@ class TeacherListRow extends StatelessWidget {
 
 class _RowAction extends StatelessWidget {
   const _RowAction({
-    required this.themeColors,
     required this.icon,
     required this.label,
     required this.onPressed,
     this.color,
   });
 
-  final ActivityThemeColors themeColors;
   final IconData icon;
   final String label;
   final VoidCallback? onPressed;

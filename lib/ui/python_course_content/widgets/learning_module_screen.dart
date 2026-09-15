@@ -10,16 +10,16 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_code4all/data/services/auth_storage.dart'; //PAPACHO
 //import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart'; //PAPACHO - MOVIDO A ModuleHeaderWidget
-//import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_page.dart'; //PAPACHO - MOVIDO A ModuleRowWidget
+//import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_screen.dart'; //PAPACHO - MOVIDO A ModuleRowWidget
 //import 'package:flutter_code4all/data/course/python_course_catalog.dart'; //PAPACHO - MOVIDO A ModuleRowWidget
 //import 'package:flutter_code4all/data/services/course_progress_store.dart'; //PAPACHO - MOVIDO A CircleProgressWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart'; //PAPACHO - MOVIDO A CircleProgressWidget
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart'; //REFACTOR-APPBAR
-import 'package:flutter_code4all/ui/core/ui/NEW_module_header_widget.dart'; //REFACTOR-MODULEHEADERCARD
-import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_chapter_detail_screen.dart'; //REFACTOR-CHAPTERDETAILSCREEN
+import 'package:flutter_code4all/ui/core/ui/new_module_header_widget.dart'; //REFACTOR-MODULEHEADERCARD
+import 'package:flutter_code4all/ui/python_course_content/widgets/new_chapter_detail_screen.dart'; //REFACTOR-CHAPTERDETAILSCREEN
 import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_detail_card_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_module_row_widget.dart'; //REFACTOR-MODULEROWWIDGET
+import 'package:flutter_code4all/ui/python_course_content/widgets/new_detail_card_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/new_module_row_widget.dart'; //REFACTOR-MODULEROWWIDGET
 
 class LearningModuleScreen extends StatefulWidget {
   final int moduleNumber; // Remplaza la necesidad de tener 6 pantallas
@@ -211,13 +211,8 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
 class _ArcPainter extends CustomPainter {
   final double progress;
   final double strokeWidth;
-  final bool isDark;
 
-  const _ArcPainter({
-    required this.progress,
-    required this.strokeWidth,
-    this.isDark = false,
-  });
+  const _ArcPainter({required this.progress, required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -231,7 +226,8 @@ class _ArcPainter extends CustomPainter {
       2 * math.pi,
       false,
       Paint()
-        ..color = isDark ? const Color(0xFF2E3A4A) : const Color(0xFFE3F2FD)
+        ..color =
+            const Color(0xFF2E3A4A) // : const Color(0xFFE3F2FD)
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round,
@@ -244,17 +240,17 @@ class _ArcPainter extends CustomPainter {
       final gradient = SweepGradient(
         startAngle: -math.pi / 2,
         endAngle: -math.pi / 2 + progressSweep,
-        colors: isDark
-            ? [
-                const Color(0xFF42A5F5),
-                const Color(0xFF1E88E5),
-                const Color(0xFF1565C0),
-              ]
-            : [
-                const Color(0xFF64B5F6),
-                const Color(0xFF1E88E5),
-                const Color(0xFF0D47A1),
-              ],
+        colors:
+            // [
+            //     const Color(0xFF42A5F5),
+            //     const Color(0xFF1E88E5),
+            //     const Color(0xFF1565C0),
+            //   ]
+            [
+              const Color(0xFF64B5F6),
+              const Color(0xFF1E88E5),
+              const Color(0xFF0D47A1),
+            ],
         transform: const GradientRotation(-math.pi / 2),
       );
 
@@ -274,6 +270,6 @@ class _ArcPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ArcPainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.isDark != isDark;
+    return oldDelegate.progress != progress;
   }
 }

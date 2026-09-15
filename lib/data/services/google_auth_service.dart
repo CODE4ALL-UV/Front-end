@@ -60,7 +60,7 @@ class GoogleAuthService {
         );
       }
 
-      return _apiService.signInWithGoogle(
+      return await _apiService.signInWithGoogle(
         accessToken: accessToken,
         idToken: idToken,
       );

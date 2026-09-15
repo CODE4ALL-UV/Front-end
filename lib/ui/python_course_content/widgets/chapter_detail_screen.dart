@@ -5,12 +5,7 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_video_topic_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_detail_card_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_reading_topic_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_with_video_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/new_video_topic_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/unused_knowledge_nugget_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/new_activity_row_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/chapter_summary_widget.dart';
@@ -18,8 +13,12 @@ import 'package:flutter_code4all/ui/python_course_content/widgets/new_example_co
 import 'package:flutter_code4all/ui/python_course_content/widgets/final_evaluation_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/new_interactive_example.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen.dart';
-
-// Asegúrate de importar tu GlobalHeaderWidget aquí
+import 'package:flutter_code4all/ui/python_course_content/widgets/new_detail_card_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_with_video_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_with_video_screen_dark.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/new_reading_topic_screen.dart';
 
 class ChapterDetailScreen extends StatefulWidget {
   final String userName; // NO EN EL ORIGINAL, VA EN MODULOAPRENDIZAJE
@@ -256,11 +255,16 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
 
   // 2. Función auxiliar para decidir qué abrir al tocar el botón de video
   VoidCallback? _getOnVideoTapAction(BuildContext context, ActivityItem item) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (item.label == 'Quiz') {
       return () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => QuizWithVideoScreen(actividad: item.label),
+          builder: (_) =>
+              isDark // Asumiendo que tienes esta variable accesible
+              ? QuizWithVideoScreenDark(actividad: item.label)
+              : QuizWithVideoScreen(actividad: item.label),
         ),
       );
     } else if (item.emoji.contains('🖥️')) {

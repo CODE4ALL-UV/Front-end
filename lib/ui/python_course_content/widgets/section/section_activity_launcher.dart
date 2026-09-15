@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen_dark.dart';
-
 import 'section_capsule_screen.dart';
 import 'section_example_screen.dart';
 import 'section_exercise_screen.dart';

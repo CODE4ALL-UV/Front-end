@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-
 import '../../data/services/api_service.dart';
 import '../../data/services/auth_storage.dart';
-import '../core/ui/user_profile_menu.dart';
 
 class DirectorPerformanceScreen extends StatefulWidget {
   final VoidCallback? onLogout;

@@ -1,4 +1,3 @@
-//REFACTOR-APROVED x 2 - COLOR TEST REMAINING - DONT TESTED IN UI YET
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart';
 
@@ -83,7 +82,7 @@ class ModuleHeaderWidget extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(6.0),
               child: Image.asset(
-                'assets/images/logoUV_Gris1.png',
+                'assets/images/logoUV_Oficial_Blanco_1.png',
                 fit: BoxFit.contain,
               ),
             ),

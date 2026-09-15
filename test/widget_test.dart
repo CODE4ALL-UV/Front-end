@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_page.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_screen.dart';
 
 /// Prueba de humo de la ruta de aprendizaje.
 ///

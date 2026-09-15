@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
-import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_stats_screen.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_students_screen.dart';
-
 import 'director_content_screen.dart';
 import 'director_teachers_screen.dart';
 
@@ -37,7 +34,6 @@ class DirectorHomeScreen extends StatefulWidget {
 class _DirectorHomeScreenState extends State<DirectorHomeScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs = TabController(length: 4, vsync: this);
-
   final DirectorOversightStore _store = DirectorOversightStore.instance;
 
   @override
@@ -65,13 +61,35 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Scaffold(
-      backgroundColor: palette.background,
+      backgroundColor: appTheme.background,
       appBar: GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
+        bottom: TabBar(
+          controller: _tabs,
+          isScrollable: true,
+          tabAlignment: TabAlignment.center,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          tabs: [
+            const Tab(icon: Icon(Icons.insights), text: 'Curso'),
+            const Tab(icon: Icon(Icons.groups_outlined), text: 'Estudiantes'),
+            _TabWithCount(
+              icon: Icons.school_outlined,
+              label: 'Docentes',
+              count: _pendingTeachers,
+            ),
+            _TabWithCount(
+              icon: Icons.fact_check_outlined,
+              label: 'Contenido',
+              count: _pendingContent,
+            ),
+          ],
+        ),
       ),
       body: SafeArea(
         child: TabBarView(

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
-import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
-
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 
 /// El armazón común de todos los editores del docente.
-///
 /// Todos funcionan igual a propósito: se escribe, se pulsa «Listo» y el
 /// resultado vuelve a la sección; se sale sin guardar y no cambia nada. Que la
 /// forma de salir sea siempre la misma es lo que evita que alguien pierda un
@@ -37,10 +35,11 @@ class EditorScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context);
+    final courseTheme = appTheme.extension<CourseTheme>()!;
 
     return Scaffold(
-      backgroundColor: palette.background,
+      backgroundColor: appTheme.scaffoldBackgroundColor,
       appBar: GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
@@ -64,7 +63,7 @@ class EditorScaffold extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             height: 1.45,
-                            color: palette.textSecondary,
+                            color: courseTheme.mutedText,
                           ),
                         ),
                         const SizedBox(height: SectionMetrics.sectionGap),
@@ -89,14 +88,12 @@ class EditorScaffold extends StatelessWidget {
 class EditorEmptyState extends StatelessWidget {
   const EditorEmptyState({
     super.key,
-    required this.palette,
     required this.icon,
     required this.text,
     required this.buttonLabel,
     required this.onCreate,
   });
 
-  final SectionPalette palette;
   final IconData icon;
   final String text;
   final String buttonLabel;
@@ -104,16 +101,22 @@ class EditorEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Extraemos los colores del contexto
+    final appTheme = Theme.of(context);
+    final colorScheme = appTheme.colorScheme;
+    final courseTheme = appTheme.extension<CourseTheme>()!;
+    final activityColors = appTheme.extension<ActivityThemeColors>()!;
+
     return Container(
       padding: const EdgeInsets.all(SectionMetrics.sectionGap),
       decoration: BoxDecoration(
-        color: palette.surface,
-        border: Border.all(color: palette.border),
+        color: colorScheme.surface,
+        border: Border.all(color: activityColors.border),
         borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 40, color: palette.textSecondary),
+          Icon(icon, size: 40, color: courseTheme.mutedText),
           const SizedBox(height: SectionMetrics.gap),
           Text(
             text,
@@ -121,15 +124,15 @@ class EditorEmptyState extends StatelessWidget {
             style: TextStyle(
               fontSize: 14.5,
               height: 1.45,
-              color: palette.textSecondary,
+              color: courseTheme.mutedText,
             ),
           ),
           const SizedBox(height: SectionMetrics.sectionGap),
           FilledButton.icon(
             onPressed: onCreate,
             style: FilledButton.styleFrom(
-              backgroundColor: palette.accent,
-              foregroundColor: palette.onAccent,
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
               minimumSize: const Size(0, SectionMetrics.minTapTarget),
             ),
             icon: const Icon(Icons.add),

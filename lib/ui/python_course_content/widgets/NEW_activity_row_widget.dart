@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/domain/models/python_course_content/NEW_python_module_model.dart';
+import 'package:flutter_code4all/domain/models/python_course_content/new_python_module_model.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
 class ActivityRowWidget extends StatelessWidget {

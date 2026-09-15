@@ -12,6 +12,8 @@ class GlobalAppBarWidget extends StatelessWidget
   final String? userEmail;
   final String? userRole;
   final VoidCallback? onLogout;
+  final PreferredSizeWidget?
+  bottom; // <-- Permite pestañas o elementos inferiores opcionales
 
   const GlobalAppBarWidget({
     super.key,
@@ -24,6 +26,7 @@ class GlobalAppBarWidget extends StatelessWidget
     this.userEmail,
     this.userRole,
     this.onLogout,
+    this.bottom,
   });
 
   @override
@@ -36,7 +39,7 @@ class GlobalAppBarWidget extends StatelessWidget
 
     // Logo dinámico según el tema claro/oscuro
     final logoAsset = brightness == Brightness.light
-        ? 'assets/images/logoUV_Gris1.png'
+        ? 'assets/images/logoUV_Oficial_Blanco_1.png'
         : 'assets/images/logoUV_Oficial_Rojo.png';
 
     // FUSIÓN: Lógica inteligente para el lado izquierdo (leading)
@@ -70,11 +73,10 @@ class GlobalAppBarWidget extends StatelessWidget
       header: true, // Avisa al lector de pantalla que es un navbar
       label: 'Encabezado de la pantalla: $title',
       child: AppBar(
-        backgroundColor: toolbarColor,
+        backgroundColor:
+            toolbarColor, //const Color(0xFF2A2A2A) const Color(0xFFE53935)
         foregroundColor: theme.foregroundColor,
-        elevation:
-            theme.elevation ??
-            0, // Fusionado: elevation 0 por defecto si el tema no lo dicta
+        elevation: theme.elevation,
         leading: buildLeading(),
         title: Text(title, style: theme.titleTextStyle),
         centerTitle: true,
@@ -98,6 +100,8 @@ class GlobalAppBarWidget extends StatelessWidget
                     ),
                   ]
                 : null),
+        bottom:
+            bottom, // <-- Renderiza el TabBar pasándole el control desde la pantalla
       ),
     );
   }

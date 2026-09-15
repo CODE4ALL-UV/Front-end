@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 
 import 'director_widgets.dart';
@@ -60,24 +61,21 @@ class _DirectorTeachersScreenState extends State<DirectorTeachersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     if (_store.isLoading && !_store.isLoaded) {
-      return Center(child: CircularProgressIndicator(color: palette.accent));
+      return Center(
+        child: CircularProgressIndicator(color: appTheme.actionBackground),
+      );
     }
 
     if (_store.problem != null) {
-      return DirectorProblem(
-        palette: palette,
-        message: _store.problem!,
-        onRetry: _store.refresh,
-      );
+      return DirectorProblem(message: _store.problem!, onRetry: _store.refresh);
     }
 
     final teachers = _ordered;
     if (teachers.isEmpty) {
       return DirectorEmpty(
-        palette: palette,
         icon: Icons.person_off_outlined,
         title: 'No hay docentes registrados',
         body:
@@ -106,7 +104,6 @@ class _DirectorTeachersScreenState extends State<DirectorTeachersScreen> {
                     children: [
                       if (pending.isNotEmpty) ...[
                         DirectorNotice(
-                          palette: palette,
                           icon: Icons.campaign_outlined,
                           title: pending.length == 1
                               ? 'Un docente espera tu respuesta'
@@ -119,7 +116,6 @@ class _DirectorTeachersScreenState extends State<DirectorTeachersScreen> {
                       ],
                       for (final teacher in teachers)
                         _TeacherCard(
-                          palette: palette,
                           teacher: teacher,
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute<void>(
@@ -143,18 +139,14 @@ class _DirectorTeachersScreenState extends State<DirectorTeachersScreen> {
 
 /// Un docente, con lo que ha hecho y cómo está valorado.
 class _TeacherCard extends StatelessWidget {
-  const _TeacherCard({
-    required this.palette,
-    required this.teacher,
-    required this.onTap,
-  });
+  const _TeacherCard({required this.teacher, required this.onTap});
 
-  final SectionPalette palette;
   final TeacherSummary teacher;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final needsFeedback = teacher.edits > 0 && teacher.neverReviewed;
 
     return Semantics(
@@ -168,7 +160,7 @@ class _TeacherCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Material(
-            color: palette.surface,
+            color: appTheme.background,
             borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
             child: InkWell(
               onTap: onTap,
@@ -180,7 +172,9 @@ class _TeacherCard extends StatelessWidget {
                     SectionMetrics.cardRadius,
                   ),
                   border: Border.all(
-                    color: needsFeedback ? palette.warning : palette.border,
+                    color: needsFeedback
+                        ? appTheme.warningBorder
+                        : appTheme.border,
                     width: needsFeedback ? 1.6 : 1,
                   ),
                 ),
@@ -191,7 +185,7 @@ class _TeacherCard extends StatelessWidget {
                       builder: (context, constraints) {
                         final avatar = CircleAvatar(
                           radius: 21,
-                          backgroundColor: palette.accentSoft,
+                          backgroundColor: appTheme.infoBackground,
                           child: Text(
                             teacher.name.isEmpty
                                 ? '?'
@@ -199,7 +193,7 @@ class _TeacherCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w800,
-                              color: palette.accent,
+                              color: appTheme.infoText,
                             ),
                           ),
                         );
@@ -215,23 +209,20 @@ class _TeacherCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 15.5,
                                 fontWeight: FontWeight.w700,
-                                color: palette.textPrimary,
+                                color: appTheme.textTitle,
                               ),
                             ),
                             Text(
                               teacher.email,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: palette.textSecondary,
+                                color: appTheme.textSubtitle,
                               ),
                             ),
                           ],
                         );
 
-                        final stars = ScoreStars(
-                          palette: palette,
-                          score: teacher.lastScore,
-                        );
+                        final stars = ScoreStars(score: teacher.lastScore);
 
                         // Las cinco estrellas no se pueden encoger. En una
                         // pantalla estrecha, o con el texto agrandado, no caben
@@ -269,31 +260,28 @@ class _TeacherCard extends StatelessWidget {
                       runSpacing: 6,
                       children: [
                         DirectorBadge(
-                          palette: palette,
                           icon: Icons.edit_outlined,
                           label: teacher.hasNotEdited
                               ? 'Sin editar nada'
                               : '${teacher.edits} '
                                     '${teacher.edits == 1 ? "edición" : "ediciones"}',
                           tone: teacher.hasNotEdited
-                              ? palette.textSecondary
+                              ? appTheme.textSubtitle
                               : null,
                         ),
                         if (teacher.lastEdit != null)
                           DirectorBadge(
-                            palette: palette,
                             icon: Icons.schedule,
                             label: relativeDate(teacher.lastEdit!),
                           ),
                         DirectorBadge(
-                          palette: palette,
                           icon: Icons.rate_review_outlined,
                           label: teacher.neverReviewed
                               ? 'Sin valorar'
                               : '${teacher.reviews} '
                                     '${teacher.reviews == 1 ? "valoración" : "valoraciones"}'
                                     '${teacher.avgScore == null ? "" : " · media ${teacher.avgScore}"}',
-                          tone: needsFeedback ? palette.warning : null,
+                          tone: needsFeedback ? appTheme.warningBorder : null,
                         ),
                       ],
                     ),

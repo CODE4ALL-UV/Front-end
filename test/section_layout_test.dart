@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_page.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/sign_asset_index.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/sign_language_panel.dart';
 

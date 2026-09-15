@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
@@ -55,13 +54,13 @@ class ExampleCodeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              _LecturaCard(
-                title: 'Ejemplo: Mi primer programa en Python',
-                body:
-                    '## Ejemplo: Mi primer programa en Python\n\n```python\n# Mi primer programa en Python\n\nprint("¡Bienvenido a Python!")\n\nprint("Este es mi primer código")\n\nnumero = 10\n\nmensaje = "Python es genial"\n\nprint(f"Número: {numero}")\n\nprint(f"Mensaje: {mensaje}")\n```\n\nResultado en la terminal:\n\n¡Bienvenido a Python!\n\nEste es mi primer código\n\nNúmero: 10\n\nMensaje: Python es genial\n\n### Explicación línea por línea:\n\n1. print("¡Bienvenido a Python!") — Imprime un texto en la pantalla\n2. print("Este es mi primer código") — Imprime otra línea de texto\n3. numero = 10 — Crea una variable llamada numero y le asigna el valor 10\n4. mensaje = "Python es genial" — Crea una variable llamada mensaje con un texto\n5. print(f"Número: {numero}") — Imprime el valor de la variable numero dentro del texto\n6. print(f"Mensaje: {mensaje}") — Imprime el valor de la variable mensaje dentro del texto',
-                color: const Color(0xFF1565C0),
-                backgroundColor: const Color(0xFFF4F8FC),
-              ),
+              // _LecturaCard(
+              //   title: 'Ejemplo: Mi primer programa en Python',
+              //   body:
+              //       '## Ejemplo: Mi primer programa en Python\n\n```python\n# Mi primer programa en Python\n\nprint("¡Bienvenido a Python!")\n\nprint("Este es mi primer código")\n\nnumero = 10\n\nmensaje = "Python es genial"\n\nprint(f"Número: {numero}")\n\nprint(f"Mensaje: {mensaje}")\n```\n\nResultado en la terminal:\n\n¡Bienvenido a Python!\n\nEste es mi primer código\n\nNúmero: 10\n\nMensaje: Python es genial\n\n### Explicación línea por línea:\n\n1. print("¡Bienvenido a Python!") — Imprime un texto en la pantalla\n2. print("Este es mi primer código") — Imprime otra línea de texto\n3. numero = 10 — Crea una variable llamada numero y le asigna el valor 10\n4. mensaje = "Python es genial" — Crea una variable llamada mensaje con un texto\n5. print(f"Número: {numero}") — Imprime el valor de la variable numero dentro del texto\n6. print(f"Mensaje: {mensaje}") — Imprime el valor de la variable mensaje dentro del texto',
+              //   color: const Color(0xFF1565C0),
+              //   backgroundColor: const Color(0xFFF4F8FC),
+              // ),
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,

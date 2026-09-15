@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 
@@ -12,13 +13,14 @@ import 'package:flutter_code4all/ui/python_course_content/widgets/section/sectio
 /// «sin valorar» en lugar de enseñar cinco estrellas vacías, que se leen como
 /// un cero.
 class ScoreStars extends StatelessWidget {
-  const ScoreStars({super.key, required this.palette, required this.score});
+  const ScoreStars({super.key, required this.score});
 
-  final SectionPalette palette;
   final int? score;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+
     if (score == null) {
       return Semantics(
         label: 'Sin valorar',
@@ -26,7 +28,7 @@ class ScoreStars extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
             decoration: BoxDecoration(
-              color: palette.surfaceAlt,
+              color: appTheme.iconBackground,
               borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
             ),
             child: Text(
@@ -34,7 +36,7 @@ class ScoreStars extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w700,
-                color: palette.textSecondary,
+                color: appTheme.textSubtitle,
               ),
             ),
           ),
@@ -44,8 +46,8 @@ class ScoreStars extends StatelessWidget {
 
     final value = score!;
     final tone = value >= 4
-        ? palette.success
-        : (value >= 3 ? palette.warning : palette.danger);
+        ? appTheme.successBorder
+        : (value >= 3 ? appTheme.warningBorder : appTheme.dangerBorder);
 
     return Semantics(
       label: 'Nota $value de 5',
@@ -57,7 +59,7 @@ class ScoreStars extends StatelessWidget {
               Icon(
                 i <= value ? Icons.star_rounded : Icons.star_outline_rounded,
                 size: 15,
-                color: i <= value ? tone : palette.border,
+                color: i <= value ? tone : appTheme.border,
               ),
             const SizedBox(width: 5),
             Text(
@@ -79,27 +81,26 @@ class ScoreStars extends StatelessWidget {
 class DirectorBadge extends StatelessWidget {
   const DirectorBadge({
     super.key,
-    required this.palette,
     required this.icon,
     required this.label,
     this.tone,
   });
 
-  final SectionPalette palette;
   final IconData icon;
   final String label;
   final Color? tone;
 
   @override
   Widget build(BuildContext context) {
-    final color = tone ?? palette.textSecondary;
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final color = appTheme.textSubtitle;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: palette.surfaceAlt,
+        color: appTheme.iconBackground,
         borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
-        border: Border.all(color: palette.border),
+        border: Border.all(color: appTheme.border),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -130,14 +131,12 @@ class DirectorBadge extends StatelessWidget {
 class DirectorNotice extends StatelessWidget {
   const DirectorNotice({
     super.key,
-    required this.palette,
     required this.icon,
     required this.title,
     required this.body,
     this.tone,
   });
 
-  final SectionPalette palette;
   final IconData icon;
   final String title;
   final String body;
@@ -145,7 +144,8 @@ class DirectorNotice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = tone ?? palette.warning;
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final color = appTheme.tone(AppThemeTone.warning);
 
     return Semantics(
       liveRegion: true,
@@ -154,14 +154,14 @@ class DirectorNotice extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
-            color: palette.warningSoft,
+            color: appTheme.warningBackground,
             borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
-            border: Border.all(color: color.withValues(alpha: 0.35)),
+            border: Border.all(color: color.border.withValues(alpha: 0.35)),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, size: 20, color: color),
+              Icon(icon, size: 20, color: color.background),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -173,7 +173,7 @@ class DirectorNotice extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
-                        color: color,
+                        color: color.text,
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -182,7 +182,7 @@ class DirectorNotice extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12.5,
                         height: 1.4,
-                        color: palette.textPrimary,
+                        color: appTheme.textTitle,
                       ),
                     ),
                   ],
@@ -200,19 +200,19 @@ class DirectorNotice extends StatelessWidget {
 class DirectorEmpty extends StatelessWidget {
   const DirectorEmpty({
     super.key,
-    required this.palette,
     required this.icon,
     required this.title,
     required this.body,
   });
 
-  final SectionPalette palette;
   final IconData icon;
   final String title;
   final String body;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(SectionMetrics.sectionGap),
@@ -221,7 +221,7 @@ class DirectorEmpty extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 44, color: palette.textSecondary),
+              Icon(icon, size: 44, color: appTheme.textSubtitle),
               const SizedBox(height: SectionMetrics.gap),
               Text(
                 title,
@@ -229,7 +229,7 @@ class DirectorEmpty extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  color: palette.textPrimary,
+                  color: appTheme.textTitle,
                 ),
               ),
               const SizedBox(height: 8),
@@ -239,7 +239,7 @@ class DirectorEmpty extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.5,
-                  color: palette.textSecondary,
+                  color: appTheme.textSubtitle,
                 ),
               ),
             ],
@@ -254,24 +254,24 @@ class DirectorEmpty extends StatelessWidget {
 class DirectorProblem extends StatelessWidget {
   const DirectorProblem({
     super.key,
-    required this.palette,
     required this.message,
     required this.onRetry,
   });
 
-  final SectionPalette palette;
   final String message;
   final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(SectionMetrics.sectionGap),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.cloud_off, size: 40, color: palette.danger),
+            Icon(Icons.cloud_off, size: 40, color: appTheme.dangerBackground),
             const SizedBox(height: SectionMetrics.gap),
             Text(
               message,
@@ -279,15 +279,15 @@ class DirectorProblem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.5,
                 height: 1.45,
-                color: palette.textPrimary,
+                color: appTheme.textTitle,
               ),
             ),
             const SizedBox(height: SectionMetrics.sectionGap),
             FilledButton.icon(
               onPressed: onRetry,
               style: FilledButton.styleFrom(
-                backgroundColor: palette.accent,
-                foregroundColor: palette.onAccent,
+                backgroundColor: appTheme.infoBackground,
+                foregroundColor: appTheme.infoBorder,
                 minimumSize: const Size(0, SectionMetrics.minTapTarget),
               ),
               icon: const Icon(Icons.refresh),

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
-
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
 import 'editor_scaffold.dart';
 
 /// La cápsula de conocimiento: los consejos que resumen lo esencial.
-///
 /// Permite además enseñar el mismo código mal y bien escrito, que es la forma
 /// más rápida de que se entienda una buena práctica.
 class CapsuleEditorScreen extends StatefulWidget {
@@ -103,7 +101,9 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    // 1. Extraemos el tema global y tu extensión
+    final appTheme = Theme.of(context);
+    final courseTheme = appTheme.extension<CourseTheme>()!;
 
     return EditorScaffold(
       title: 'Cápsula de conocimiento',
@@ -122,7 +122,6 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
       onDone: () => Navigator.of(context).pop(_result),
       child: _capsule == null
           ? EditorEmptyState(
-              palette: palette,
               icon: Icons.lightbulb_outline,
               text: 'Esta sección no tiene cápsula de conocimiento.',
               buttonLabel: 'Crear la cápsula',
@@ -142,17 +141,11 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TeacherCard(
-                  palette: palette,
                   child: Column(
                     children: [
-                      TeacherField(
-                        palette: palette,
-                        label: 'Título',
-                        controller: _title,
-                      ),
+                      TeacherField(label: 'Título', controller: _title),
                       const SizedBox(height: SectionMetrics.gap),
                       TeacherField(
-                        palette: palette,
                         label: 'Frase principal',
                         controller: _headline,
                         maxLines: 2,
@@ -160,7 +153,6 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                       ),
                       const SizedBox(height: SectionMetrics.gap),
                       TeacherField(
-                        palette: palette,
                         label: 'Introducción',
                         controller: _intro,
                         maxLines: 3,
@@ -174,7 +166,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: palette.textPrimary,
+                    color: appTheme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: SectionMetrics.gap),
@@ -182,7 +174,6 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: TeacherCard(
-                      palette: palette,
                       title: 'Consejo ${i + 1}',
                       action: IconButton(
                         tooltip: 'Quitar el consejo ${i + 1}',
@@ -198,19 +189,17 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                             });
                           }
                         },
-                        color: palette.textSecondary,
+                        color: courseTheme.mutedText,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(
                         children: [
                           TeacherField(
-                            palette: palette,
                             label: 'Título',
                             controller: _tips[i].title,
                           ),
                           const SizedBox(height: 10),
                           TeacherField(
-                            palette: palette,
                             label: 'Explicación',
                             controller: _tips[i].body,
                             maxLines: 3,
@@ -220,14 +209,12 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                     ),
                   ),
                 TeacherAddButton(
-                  palette: palette,
                   label: 'Añadir consejo',
                   onPressed: () =>
                       setState(() => _tips = [..._tips, _TipFields('', '')]),
                 ),
                 const SizedBox(height: SectionMetrics.sectionGap),
                 TeacherCard(
-                  palette: palette,
                   title: 'Comparar código (opcional)',
                   child: Column(
                     children: [
@@ -238,12 +225,11 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                         style: TextStyle(
                           fontSize: 12.5,
                           height: 1.4,
-                          color: palette.textSecondary,
+                          color: courseTheme.mutedText,
                         ),
                       ),
                       const SizedBox(height: SectionMetrics.gap),
                       TeacherField(
-                        palette: palette,
                         label: 'Cómo NO hacerlo',
                         controller: _badCode,
                         maxLines: 6,
@@ -251,14 +237,12 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                       ),
                       const SizedBox(height: 10),
                       TeacherField(
-                        palette: palette,
                         label: 'Qué está mal, en palabras',
                         controller: _badCaption,
                         maxLines: 2,
                       ),
                       const SizedBox(height: SectionMetrics.gap),
                       TeacherField(
-                        palette: palette,
                         label: 'Cómo SÍ hacerlo',
                         controller: _goodCode,
                         maxLines: 6,
@@ -266,7 +250,6 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                       ),
                       const SizedBox(height: 10),
                       TeacherField(
-                        palette: palette,
                         label: 'Por qué está mejor, en palabras',
                         controller: _goodCaption,
                         maxLines: 2,
@@ -276,9 +259,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                 ),
                 const SizedBox(height: SectionMetrics.gap),
                 TeacherCard(
-                  palette: palette,
                   child: TeacherField(
-                    palette: palette,
                     label: 'Cierre',
                     controller: _closing,
                     maxLines: 3,

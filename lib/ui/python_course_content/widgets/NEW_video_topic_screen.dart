@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
+import 'package:flutter_code4all/utils/external_url_opener.dart';
 
 class VideoTopicScreen extends StatelessWidget {
   final String actividad;
@@ -149,7 +150,7 @@ class VideoTopicScreen extends StatelessWidget {
                       children: [
                         GestureDetector(
                           onTap: () => Navigator.pop(context),
-                          child: const _NavButton(label: 'Anterior'),
+                          // child: const _NavButton(label: 'Anterior'),
                         ),
                       ],
                     ),

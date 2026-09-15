@@ -4,6 +4,7 @@ import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/chapter_section_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
@@ -61,11 +62,12 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
 
   Future<void> _judge(CourseSection section) async {
     final verdict = _store.verdictOf(section.id);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     final saved = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: SectionPalette.of(context).surface,
+      backgroundColor: appTheme.background,
       builder: (_) => _JudgeSheet(section: section, current: verdict),
     );
 
@@ -93,24 +95,20 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appToneWarning = appTheme.tone(AppThemeTone.warning);
 
     if (_store.isLoading && !_store.isLoaded) {
-      return Center(child: CircularProgressIndicator(color: palette.accent));
+      return Center(child: CircularProgressIndicator(color: appTheme.infoText));
     }
 
     if (_store.problem != null) {
-      return DirectorProblem(
-        palette: palette,
-        message: _store.problem!,
-        onRetry: _store.refresh,
-      );
+      return DirectorProblem(message: _store.problem!, onRetry: _store.refresh);
     }
 
     final edited = _edited;
     if (edited.isEmpty) {
       return DirectorEmpty(
-        palette: palette,
         icon: Icons.fact_check_outlined,
         title: 'No hay nada que revisar',
         body:
@@ -140,7 +138,6 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
                     children: [
                       if (outdated.isNotEmpty) ...[
                         DirectorNotice(
-                          palette: palette,
                           icon: Icons.update,
                           title: outdated.length == 1
                               ? 'Una aprobación se quedó vieja'
@@ -154,9 +151,8 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
                       ],
                       if (flagged.isNotEmpty) ...[
                         DirectorNotice(
-                          palette: palette,
                           icon: Icons.error_outline,
-                          tone: palette.danger,
+                          tone: appToneWarning.border,
                           title: flagged.length == 1
                               ? 'Una sección con observaciones'
                               : '${flagged.length} secciones con observaciones',
@@ -166,7 +162,6 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
                       ],
                       for (final section in edited)
                         _SectionCard(
-                          palette: palette,
                           section: section,
                           verdict: _store.verdictOf(section.id),
                           onJudge: () => _judge(section),
@@ -187,14 +182,12 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
 
 class _SectionCard extends StatelessWidget {
   const _SectionCard({
-    required this.palette,
     required this.section,
     required this.verdict,
     required this.onJudge,
     required this.onPreview,
   });
 
-  final SectionPalette palette;
   final CourseSection section;
   final ContentVerdict? verdict;
   final VoidCallback onJudge;
@@ -203,14 +196,19 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final current = verdict;
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     final (String label, IconData icon, Color tone) = current == null
-        ? ('Sin revisar', Icons.pending_outlined, palette.textSecondary)
+        ? ('Sin revisar', Icons.pending_outlined, appTheme.textSubtitle)
         : current.outdated
-        ? ('Revisado antes del último cambio', Icons.update, palette.warning)
+        ? (
+            'Revisado antes del último cambio',
+            Icons.update,
+            appTheme.warningText,
+          )
         : current.isApproved
-        ? ('Aprobado', Icons.check_circle_outline, palette.success)
-        : ('Con observaciones', Icons.error_outline, palette.danger);
+        ? ('Aprobado', Icons.check_circle_outline, appTheme.successBorder)
+        : ('Con observaciones', Icons.error_outline, appTheme.dangerBorder);
 
     return Semantics(
       label:
@@ -221,12 +219,12 @@ class _SectionCard extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: palette.surface,
+            color: appTheme.background,
             borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
             border: Border.all(
               color: current == null || current.outdated || !current.isApproved
                   ? tone.withValues(alpha: 0.45)
-                  : palette.border,
+                  : appTheme.border,
             ),
           ),
           child: Column(
@@ -243,7 +241,7 @@ class _SectionCard extends StatelessWidget {
                           'Módulo ${section.moduleNumber} · Sección ${section.number}',
                           style: TextStyle(
                             fontSize: 11.5,
-                            color: palette.textSecondary,
+                            color: appTheme.textSubtitle,
                           ),
                         ),
                         Text(
@@ -251,7 +249,7 @@ class _SectionCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: palette.textPrimary,
+                            color: appTheme.textTitle,
                           ),
                         ),
                       ],
@@ -261,19 +259,14 @@ class _SectionCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              DirectorBadge(
-                palette: palette,
-                icon: icon,
-                label: label,
-                tone: tone,
-              ),
+              DirectorBadge(icon: icon, label: label, tone: tone),
               if ((current?.comment ?? '').isNotEmpty) ...[
                 const SizedBox(height: 9),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: palette.surfaceAlt,
+                    color: appTheme.iconBackground,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -281,7 +274,7 @@ class _SectionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.5,
                       height: 1.45,
-                      color: palette.textPrimary,
+                      color: appTheme.textTitle,
                     ),
                   ),
                 ),
@@ -293,8 +286,8 @@ class _SectionCard extends StatelessWidget {
                     child: OutlinedButton.icon(
                       onPressed: onPreview,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: palette.accent,
-                        side: BorderSide(color: palette.border),
+                        foregroundColor: appTheme.infoBorder,
+                        side: BorderSide(color: appTheme.border),
                         minimumSize: const Size(0, SectionMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.visibility_outlined, size: 18),
@@ -306,8 +299,8 @@ class _SectionCard extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: onJudge,
                       style: FilledButton.styleFrom(
-                        backgroundColor: palette.accent,
-                        foregroundColor: palette.onAccent,
+                        backgroundColor: appTheme.infoBackground,
+                        foregroundColor: appTheme.infoBorder,
                         minimumSize: const Size(0, SectionMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.fact_check_outlined, size: 18),
@@ -383,7 +376,9 @@ class _JudgeSheetState extends State<_JudgeSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appToneSucess = appTheme.tone(AppThemeTone.success);
+    final appToneDanger = appTheme.tone(AppThemeTone.danger);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -402,7 +397,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
-                color: palette.textPrimary,
+                color: appTheme.textTitle,
               ),
             ),
             const SizedBox(height: SectionMetrics.sectionGap),
@@ -411,10 +406,9 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               children: [
                 Expanded(
                   child: _Choice(
-                    palette: palette,
                     icon: Icons.check_circle_outline,
                     label: 'Aprobado',
-                    tone: palette.success,
+                    tone: appToneSucess.text,
                     selected: _approved,
                     onTap: () => setState(() {
                       _approved = true;
@@ -425,10 +419,9 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: _Choice(
-                    palette: palette,
                     icon: Icons.error_outline,
                     label: 'Con observaciones',
-                    tone: palette.danger,
+                    tone: appToneDanger.text,
                     selected: !_approved,
                     onTap: () => setState(() => _approved = false),
                   ),
@@ -442,7 +435,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               maxLines: 5,
               minLines: 3,
               onChanged: (_) => setState(() => _error = null),
-              style: TextStyle(fontSize: 14.5, color: palette.textPrimary),
+              style: TextStyle(fontSize: 14.5, color: appTheme.textTitle),
               decoration: InputDecoration(
                 labelText: _approved
                     ? 'Comentario (opcional)'
@@ -450,14 +443,14 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                 hintText: _approved
                     ? 'Puedes dejarlo vacío'
                     : 'Explica qué está mal para que pueda arreglarlo',
-                hintStyle: TextStyle(color: palette.textSecondary),
+                hintStyle: TextStyle(color: appTheme.textSubtitle),
                 filled: true,
-                fillColor: palette.surfaceAlt,
+                fillColor: appTheme.iconBackground,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(
                     SectionMetrics.cardRadius,
                   ),
-                  borderSide: BorderSide(color: palette.border),
+                  borderSide: BorderSide(color: appTheme.border),
                 ),
               ),
             ),
@@ -466,7 +459,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               const SizedBox(height: SectionMetrics.gap),
               Text(
                 _error!,
-                style: TextStyle(fontSize: 13, color: palette.danger),
+                style: TextStyle(fontSize: 13, color: appToneDanger.text),
               ),
             ],
 
@@ -489,8 +482,8 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                   child: FilledButton(
                     onPressed: _saving ? null : _save,
                     style: FilledButton.styleFrom(
-                      backgroundColor: palette.accent,
-                      foregroundColor: palette.onAccent,
+                      backgroundColor: appTheme.background,
+                      foregroundColor: appTheme.border,
                       minimumSize: const Size(0, SectionMetrics.minTapTarget),
                     ),
                     child: Text(_saving ? 'Guardando…' : 'Guardar'),
@@ -507,7 +500,6 @@ class _JudgeSheetState extends State<_JudgeSheet> {
 
 class _Choice extends StatelessWidget {
   const _Choice({
-    required this.palette,
     required this.icon,
     required this.label,
     required this.tone,
@@ -515,7 +507,6 @@ class _Choice extends StatelessWidget {
     required this.onTap,
   });
 
-  final SectionPalette palette;
   final IconData icon;
   final String label;
   final Color tone;
@@ -524,13 +515,17 @@ class _Choice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+
     return Semantics(
       button: true,
       selected: selected,
       label: label,
       child: ExcludeSemantics(
         child: Material(
-          color: selected ? tone.withValues(alpha: 0.12) : palette.surfaceAlt,
+          color: selected
+              ? tone.withValues(alpha: 0.12)
+              : appTheme.iconBackground,
           borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
           child: InkWell(
             onTap: onTap,
@@ -543,7 +538,7 @@ class _Choice extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
                 border: Border.all(
-                  color: selected ? tone : palette.border,
+                  color: selected ? tone : appTheme.border,
                   width: selected ? 1.8 : 1,
                 ),
               ),
@@ -553,7 +548,7 @@ class _Choice extends StatelessWidget {
                   Icon(
                     icon,
                     size: 22,
-                    color: selected ? tone : palette.textSecondary,
+                    color: selected ? tone : appTheme.textSubtitle,
                   ),
                   const SizedBox(height: 5),
                   Text(
@@ -562,7 +557,7 @@ class _Choice extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                      color: selected ? tone : palette.textPrimary,
+                      color: selected ? tone : appTheme.textTitle,
                     ),
                   ),
                 ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/domain/models/python_course_content/NEW_python_module_model.dart';
 
 class DetailCard extends StatelessWidget {
   final String title;

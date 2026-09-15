@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
-import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
-
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
-
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
-
 import 'section_activity_launcher.dart';
 import 'section_theme.dart';
 import 'section_widgets.dart';

@@ -6,6 +6,7 @@ class LessonBoxWidget extends StatelessWidget {
   final VoidCallback? onTap;
 
   const LessonBoxWidget({
+    super.key,
     required this.number,
     required this.title,
     this.onTap,

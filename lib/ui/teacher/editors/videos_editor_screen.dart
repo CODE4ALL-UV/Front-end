@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
-
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
 import 'editor_scaffold.dart';
@@ -58,7 +55,6 @@ class _VideosEditorScreenState extends State<VideosEditorScreen> {
         children: [
           if (_videos.isEmpty)
             EditorEmptyState(
-              palette: palette,
               icon: Icons.play_circle_outline,
               text: 'Esta sección todavía no tiene videos.',
               buttonLabel: 'Añadir el primer video',
@@ -67,7 +63,6 @@ class _VideosEditorScreenState extends State<VideosEditorScreen> {
           else ...[
             for (var i = 0; i < _videos.length; i++)
               TeacherListRow(
-                palette: palette,
                 title: _videos[i].title,
                 subtitle: _videos[i].youtubeId.isEmpty
                     ? '⚠ falta el enlace del video'
@@ -101,11 +96,7 @@ class _VideosEditorScreenState extends State<VideosEditorScreen> {
                 },
               ),
             const SizedBox(height: SectionMetrics.gap),
-            TeacherAddButton(
-              palette: palette,
-              label: 'Añadir video',
-              onPressed: _add,
-            ),
+            TeacherAddButton(label: 'Añadir video', onPressed: _add),
           ],
         ],
       ),
@@ -190,18 +181,15 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TeacherCard(
-            palette: palette,
             child: Column(
               children: [
                 TeacherField(
-                  palette: palette,
                   label: 'Título',
                   controller: _title,
                   onChanged: (_) => setState(() => _error = null),
                 ),
                 const SizedBox(height: SectionMetrics.gap),
                 TeacherField(
-                  palette: palette,
                   label: 'Enlace de YouTube',
                   controller: _link,
                   hint: 'https://www.youtube.com/watch?v=...',
@@ -212,14 +200,12 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
                 ),
                 const SizedBox(height: SectionMetrics.gap),
                 TeacherField(
-                  palette: palette,
                   label: 'Duración',
                   controller: _duration,
                   hint: '8:24',
                 ),
                 const SizedBox(height: SectionMetrics.gap),
                 TeacherField(
-                  palette: palette,
                   label: 'Descripción',
                   controller: _description,
                   maxLines: 3,
@@ -229,9 +215,7 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
           ),
           const SizedBox(height: SectionMetrics.gap),
           TeacherCard(
-            palette: palette,
             child: TeacherField(
-              palette: palette,
               label: 'Transcripción',
               controller: _transcript,
               maxLines: 10,
@@ -244,7 +228,6 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
           if (_error != null) ...[
             const SizedBox(height: SectionMetrics.gap),
             TeacherBanner(
-              palette: palette,
               icon: Icons.error_outline,
               text: _error!,
               tone: palette.danger,

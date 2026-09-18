@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
-
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-
 import 'section_activity_scaffold.dart';
-import 'section_theme.dart';
 import 'section_widgets.dart';
 
 /// Cápsula de conocimiento: el consejo breve que cierra cada sección.
@@ -54,7 +51,7 @@ class SectionCapsuleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     return SectionActivityScaffold(
       moduleLabel: module.label,
@@ -65,7 +62,6 @@ class SectionCapsuleScreen extends StatelessWidget {
       bottomBar: SectionPrimaryButton(
         label: 'Entendido, marcar como vista',
         icon: Icons.check_circle_outline,
-        tone: SectionTone.success,
         semanticHint: 'Marca la cápsula como completada y vuelve a la ruta',
         onPressed: () => _finish(context),
       ),
@@ -73,40 +69,35 @@ class SectionCapsuleScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionCard(
-            background: palette.accentSoft,
-            borderColor: palette.accent.withValues(alpha: 0.4),
+            background: appTheme.background,
+            borderColor: appTheme.border.withValues(alpha: 0.4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SectionStatusChip(
                   label: _capsule.title,
                   icon: Icons.auto_awesome,
-                  tone: SectionTone.info,
                 ),
                 const SizedBox(height: 14),
                 SectionHeading(
                   title: _capsule.headline,
                   subtitle: _capsule.intro,
-                  color: palette.accent,
+                  color: appTheme.textTitle,
                 ),
               ],
             ),
           ),
           if (_capsule.hasCodeComparison) ...[
-            const SizedBox(height: SectionMetrics.sectionGap),
+            const SizedBox(height: AppMetrics.sectionGap),
             _CodeComparison(capsule: _capsule),
           ],
-          const SizedBox(height: SectionMetrics.sectionGap),
+          const SizedBox(height: AppMetrics.sectionGap),
           for (var i = 0; i < _capsule.tips.length; i++) ...[
-            if (i > 0) const SizedBox(height: SectionMetrics.gap),
+            if (i > 0) const SizedBox(height: AppMetrics.gap),
             _TipCard(index: i + 1, tip: _capsule.tips[i]),
           ],
-          const SizedBox(height: SectionMetrics.sectionGap),
-          SectionCallout(
-            title: 'Para recordar',
-            body: _capsule.closing,
-            tone: SectionTone.success,
-          ),
+          const SizedBox(height: AppMetrics.sectionGap),
+          SectionCallout(title: 'Para recordar', body: _capsule.closing),
           const SizedBox(height: 8),
         ],
       ),
@@ -122,7 +113,7 @@ class _TipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     return SectionCard(
       child: Row(
@@ -133,7 +124,7 @@ class _TipCard extends StatelessWidget {
             height: 34,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: palette.accentSoft,
+              color: appTheme.infoBackground,
               shape: BoxShape.circle,
             ),
             child: Text(
@@ -141,7 +132,7 @@ class _TipCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
-                color: palette.accent,
+                color: appTheme.textTitle,
               ),
             ),
           ),
@@ -158,7 +149,7 @@ class _TipCard extends StatelessWidget {
                       fontSize: 16.5,
                       height: 1.35,
                       fontWeight: FontWeight.w700,
-                      color: palette.textPrimary,
+                      color: appTheme.textTitle,
                     ),
                   ),
                 ),
@@ -183,20 +174,17 @@ class _CodeComparison extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionCard(
-          borderColor: palette.danger.withValues(alpha: 0.5),
+          borderColor: Colors.red.withValues(alpha: 0.5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SectionStatusChip(
                 label: 'Así no',
                 icon: Icons.thumb_down_alt_outlined,
-                tone: SectionTone.danger,
               ),
               const SizedBox(height: 12),
               SectionCodeBlock(
@@ -206,16 +194,15 @@ class _CodeComparison extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: SectionMetrics.gap),
+        const SizedBox(height: AppMetrics.gap),
         SectionCard(
-          borderColor: palette.success.withValues(alpha: 0.5),
+          borderColor: Colors.green.withValues(alpha: 0.5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SectionStatusChip(
                 label: 'Así sí',
                 icon: Icons.thumb_up_alt_outlined,
-                tone: SectionTone.success,
               ),
               const SizedBox(height: 12),
               SectionCodeBlock(

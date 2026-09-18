@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 import 'teacher_section_detail.dart';
 import 'teacher_stats_screen.dart';
 import 'teacher_students_screen.dart';
@@ -64,6 +64,7 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
   }
 
   void _select(int moduleNumber, int sectionNumber, {required bool isWide}) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     setState(() {
       _moduleNumber = moduleNumber;
       _sectionNumber = sectionNumber;
@@ -73,7 +74,7 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => Scaffold(
-            backgroundColor: SectionPalette.of(context).background,
+            backgroundColor: appTheme.background,
             appBar: GlobalAppBarWidget(
               userName: '', //widget.userName,
               onLogout: null, //widget.onLogout,
@@ -90,10 +91,9 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
-
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return Scaffold(
-      backgroundColor: palette.background,
+      backgroundColor: appTheme.background,
       appBar: GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
@@ -102,7 +102,7 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
         child: TabBarView(
           controller: _tabs,
           children: [
-            _buildTemario(palette),
+            _buildTemario(),
             const TeacherStatsScreen(),
             const TeacherStudentsScreen(),
           ],
@@ -111,14 +111,14 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
     );
   }
 
-  Widget _buildTemario(SectionPalette palette) {
+  Widget _buildTemario() {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return LayoutBuilder(
       builder: (context, constraints) {
         // 900 px es donde caben cómodos el temario y la sección a la vez.
         final isWide = constraints.maxWidth >= 900;
 
         final tree = _ModuleTree(
-          palette: palette,
           content: _content,
           selectedModule: _moduleNumber,
           selectedSection: _sectionNumber,
@@ -131,7 +131,6 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
             children: [
               if (_content.problem != null)
                 TeacherBanner(
-                  palette: palette,
                   icon: Icons.cloud_off,
                   text:
                       'No se pudo consultar el servidor. Estás viendo el '
@@ -147,13 +146,12 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(width: 300, child: tree),
-            VerticalDivider(width: 1, color: palette.border),
+            VerticalDivider(width: 1, color: appTheme.border),
             Expanded(
               child: Column(
                 children: [
                   if (_content.problem != null)
                     TeacherBanner(
-                      palette: palette,
                       icon: Icons.cloud_off,
                       text:
                           'No se pudo consultar el servidor. Estás viendo '
@@ -195,7 +193,6 @@ IconData _moduleIcon(int number) => switch (number) {
 /// El temario: módulos que se despliegan en secciones.
 class _ModuleTree extends StatelessWidget {
   const _ModuleTree({
-    required this.palette,
     required this.content,
     required this.selectedModule,
     required this.selectedSection,
@@ -203,7 +200,6 @@ class _ModuleTree extends StatelessWidget {
     required this.onSelect,
   });
 
-  final SectionPalette palette;
   final CourseContentStore content;
   final int selectedModule;
   final int selectedSection;
@@ -227,7 +223,6 @@ class _ModuleTree extends StatelessWidget {
         final edited = content.isModuleEdited(module.number);
 
         return _ModuleTile(
-          palette: palette,
           module: module,
           title: title,
           titleEdited: edited,
@@ -236,7 +231,6 @@ class _ModuleTree extends StatelessWidget {
             children: [
               for (final section in module.sections)
                 _SectionRow(
-                  palette: palette,
                   section: section,
                   edited: content.isSectionEdited(section.id),
                   selected:
@@ -255,7 +249,6 @@ class _ModuleTree extends StatelessWidget {
 
 class _ModuleTile extends StatefulWidget {
   const _ModuleTile({
-    required this.palette,
     required this.module,
     required this.title,
     required this.titleEdited,
@@ -263,7 +256,6 @@ class _ModuleTile extends StatefulWidget {
     required this.child,
   });
 
-  final SectionPalette palette;
   final CourseModule module;
   final String title;
   final bool titleEdited;
@@ -279,7 +271,7 @@ class _ModuleTileState extends State<_ModuleTile> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = widget.palette;
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -295,7 +287,7 @@ class _ModuleTileState extends State<_ModuleTile> {
               onTap: () => setState(() => _open = !_open),
               child: Container(
                 constraints: const BoxConstraints(
-                  minHeight: SectionMetrics.minTapTarget,
+                  minHeight: AppMetrics.minTapTarget,
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -306,7 +298,7 @@ class _ModuleTileState extends State<_ModuleTile> {
                     Icon(
                       _open ? Icons.expand_more : Icons.chevron_right,
                       size: 20,
-                      color: palette.textSecondary,
+                      color: appTheme.textSubtitle,
                     ),
                     const SizedBox(width: 4),
                     Container(
@@ -314,13 +306,17 @@ class _ModuleTileState extends State<_ModuleTile> {
                       height: 30,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: _open ? palette.accentSoft : palette.surfaceAlt,
+                        color: _open
+                            ? appTheme.actionBackground
+                            : appTheme.warningBackground,
                         borderRadius: BorderRadius.circular(9),
                       ),
                       child: Icon(
                         _moduleIcon(widget.module.number),
                         size: 17,
-                        color: _open ? palette.accent : palette.textSecondary,
+                        color: _open
+                            ? appTheme.infoBackground
+                            : appTheme.textSubtitle,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -335,7 +331,7 @@ class _ModuleTileState extends State<_ModuleTile> {
                               fontSize: 10.5,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.6,
-                              color: palette.textSecondary,
+                              color: appTheme.textSubtitle,
                             ),
                           ),
                           Text(
@@ -344,14 +340,13 @@ class _ModuleTileState extends State<_ModuleTile> {
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               height: 1.2,
-                              color: palette.textPrimary,
+                              color: appTheme.textTitle,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    if (widget.titleEdited)
-                      EditedDot(palette: palette, label: 'Nombre cambiado'),
+                    if (widget.titleEdited) EditedDot(label: 'Nombre cambiado'),
                   ],
                 ),
               ),
@@ -411,36 +406,32 @@ List<(String, IconData)> _sectionBadges(CourseSection section) {
 
 /// Un distintivo suelto: icono pequeño y su texto.
 class _Badge extends StatelessWidget {
-  const _Badge({
-    required this.palette,
-    required this.label,
-    required this.icon,
-  });
+  const _Badge({required this.label, required this.icon});
 
-  final SectionPalette palette;
   final String label;
   final IconData icon;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: palette.surfaceAlt,
-        borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
-        border: Border.all(color: palette.border),
+        color: appTheme.actionBackground,
+        borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
+        border: Border.all(color: appTheme.border),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: palette.textSecondary),
+          Icon(icon, size: 12, color: appTheme.textSubtitle),
           const SizedBox(width: 4),
           Text(
             label,
             style: TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w600,
-              color: palette.textSecondary,
+              color: appTheme.textSubtitle,
             ),
           ),
         ],
@@ -451,14 +442,12 @@ class _Badge extends StatelessWidget {
 
 class _SectionRow extends StatelessWidget {
   const _SectionRow({
-    required this.palette,
     required this.section,
     required this.edited,
     required this.selected,
     required this.onTap,
   });
 
-  final SectionPalette palette;
   final CourseSection section;
   final bool edited;
   final bool selected;
@@ -467,6 +456,7 @@ class _SectionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final badges = _sectionBadges(section);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Semantics(
       button: true,
@@ -481,22 +471,24 @@ class _SectionRow extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
           child: Material(
-            color: selected ? palette.accentSoft : palette.surface,
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            color: selected
+                ? appTheme.actionBackground
+                : appTheme.warningBackground,
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             child: InkWell(
               onTap: onTap,
-              borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+              borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
               child: Container(
                 constraints: const BoxConstraints(
-                  minHeight: SectionMetrics.minTapTarget,
+                  minHeight: AppMetrics.minTapTarget,
                 ),
                 padding: const EdgeInsets.all(11),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                    SectionMetrics.cardRadius,
-                  ),
+                  borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                   border: Border.all(
-                    color: selected ? palette.accent : palette.border,
+                    color: selected
+                        ? appTheme.actionBackground
+                        : appTheme.border,
                     width: selected ? 1.6 : 1,
                   ),
                 ),
@@ -514,8 +506,8 @@ class _SectionRow extends StatelessWidget {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: selected
-                                ? palette.accent
-                                : palette.surfaceAlt,
+                                ? appTheme.actionBackground
+                                : appTheme.warningBackground,
                             borderRadius: BorderRadius.circular(7),
                           ),
                           child: Text(
@@ -524,8 +516,8 @@ class _SectionRow extends StatelessWidget {
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                               color: selected
-                                  ? palette.onAccent
-                                  : palette.textSecondary,
+                                  ? appTheme.border
+                                  : appTheme.textSubtitle,
                             ),
                           ),
                         ),
@@ -540,19 +532,17 @@ class _SectionRow extends StatelessWidget {
                                   ? FontWeight.w700
                                   : FontWeight.w600,
                               color: selected
-                                  ? palette.accent
-                                  : palette.textPrimary,
+                                  ? appTheme.actionBackground
+                                  : appTheme.textTitle,
                             ),
                           ),
                         ),
-                        if (edited)
-                          EditedDot(palette: palette, label: 'Editada'),
+                        if (edited) EditedDot(label: 'Editada'),
                       ],
                     ),
                     const SizedBox(height: 8),
                     if (section.isPlaceholder)
                       _Badge(
-                        palette: palette,
                         label: 'Sin contenido',
                         icon: Icons.hourglass_empty,
                       )
@@ -565,11 +555,7 @@ class _SectionRow extends StatelessWidget {
                         runSpacing: 5,
                         children: [
                           for (final badge in badges)
-                            _Badge(
-                              palette: palette,
-                              label: badge.$1,
-                              icon: badge.$2,
-                            ),
+                            _Badge(label: badge.$1, icon: badge.$2),
                         ],
                       ),
                   ],

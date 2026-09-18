@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
-
 import 'dart:async';
-
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/data/services/learning_analytics_service.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
-
 import 'section_activity_scaffold.dart';
-import 'section_theme.dart';
 import 'section_widgets.dart';
 
 /// Pantalla de preguntas de opción múltiple.
-///
 /// La usan tanto el quiz como la evaluación final: sólo cambian el título, el
 /// icono y el tipo de actividad que se marca como completada.
 class SectionQuizScreen extends StatefulWidget {
@@ -202,8 +197,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
   }
 
   Widget _buildQuestion() {
-    final palette = SectionPalette.of(context);
-
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final hasIntro =
         _index == 0 &&
         widget.introBody != null &&
@@ -218,7 +212,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
             title: widget.introTitle ?? 'Instrucciones',
             body: widget.introBody!,
           ),
-          const SizedBox(height: SectionMetrics.sectionGap),
+          const SizedBox(height: AppMetrics.sectionGap),
         ],
         SectionCard(
           child: Column(
@@ -230,7 +224,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
-                  color: palette.textSecondary,
+                  color: appTheme.textSubtitle,
                 ),
               ),
               const SizedBox(height: 10),
@@ -242,14 +236,14 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                     fontSize: 18,
                     height: 1.45,
                     fontWeight: FontWeight.w700,
-                    color: palette.textPrimary,
+                    color: appTheme.textTitle,
                   ),
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: SectionMetrics.sectionGap),
+        const SizedBox(height: AppMetrics.sectionGap),
         for (var i = 0; i < _question.options.length; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
@@ -276,9 +270,6 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                       '${_letters[_question.correctIndex]}: '
                       '${_question.correctOption}.'
                       '${_question.explanation.isNotEmpty ? ' ${_question.explanation}' : ''}',
-            tone: _selected == _question.correctIndex
-                ? SectionTone.success
-                : SectionTone.warning,
           ),
         ],
         const SizedBox(height: 8),
@@ -287,7 +278,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
   }
 
   Widget _buildResult() {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
     final total = _questions.length;
     final percent = ((_correctCount / total) * 100).round();
 
@@ -295,10 +286,11 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionCard(
-          background: _passed ? palette.successSoft : palette.warningSoft,
-          borderColor: (_passed ? palette.success : palette.warning).withValues(
-            alpha: 0.5,
-          ),
+          background: _passed
+              ? appTheme.successBackground
+              : appTheme.warningBackground,
+          borderColor: (_passed ? appTheme.border : appTheme.warningBorder)
+              .withValues(alpha: 0.5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -316,7 +308,9 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                 icon: _passed
                     ? Icons.emoji_events_outlined
                     : Icons.refresh_outlined,
-                color: _passed ? palette.success : palette.warning,
+                color: _passed
+                    ? appTheme.successBackground
+                    : appTheme.warningBackground,
               ),
               const SizedBox(height: 16),
               SectionProgressBar(
@@ -326,7 +320,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
             ],
           ),
         ),
-        const SizedBox(height: SectionMetrics.sectionGap),
+        const SizedBox(height: AppMetrics.sectionGap),
         SectionCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -344,7 +338,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                     fontSize: 15,
                     height: 1.45,
                     fontWeight: FontWeight.w700,
-                    color: palette.textPrimary,
+                    color: appTheme.textTitle,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -354,7 +348,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                     Icon(
                       Icons.check_circle_outline,
                       size: 18,
-                      color: palette.success,
+                      color: appTheme.successBorder,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -363,7 +357,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                         style: TextStyle(
                           fontSize: 14.5,
                           height: 1.5,
-                          color: palette.textSecondary,
+                          color: appTheme.textSubtitle,
                         ),
                       ),
                     ),
@@ -395,7 +389,6 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
             child: SectionPrimaryButton(
               label: 'Volver',
               icon: Icons.arrow_back,
-              tone: _passed ? SectionTone.success : SectionTone.info,
               semanticHint: 'Regresa al listado de actividades de la sección',
               onPressed: () => Navigator.of(context).pop(_passed),
             ),
@@ -436,8 +429,7 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
-
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final showAsCorrect = revealed && isCorrect;
     final showAsWrong = revealed && isSelected && !isCorrect;
 
@@ -446,17 +438,17 @@ class _OptionTile extends StatelessWidget {
     final Color foreground;
 
     if (showAsCorrect) {
-      borderColor = palette.success;
-      background = palette.successSoft;
-      foreground = palette.success;
+      borderColor = appTheme.successBorder;
+      background = appTheme.successBackground;
+      foreground = appTheme.successBorder;
     } else if (showAsWrong) {
-      borderColor = palette.danger;
-      background = palette.dangerSoft;
-      foreground = palette.danger;
+      borderColor = appTheme.dangerBorder;
+      background = appTheme.dangerBackground;
+      foreground = appTheme.dangerBorder;
     } else {
-      borderColor = palette.border;
-      background = palette.surface;
-      foreground = palette.textSecondary;
+      borderColor = appTheme.border;
+      background = appTheme.background;
+      foreground = appTheme.textSubtitle;
     }
 
     final statusLabel = showAsCorrect
@@ -474,17 +466,17 @@ class _OptionTile extends StatelessWidget {
       child: ExcludeSemantics(
         child: Material(
           color: background,
-          borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+          borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             child: Container(
               constraints: const BoxConstraints(
-                minHeight: SectionMetrics.minTapTarget + 8,
+                minHeight: AppMetrics.minTapTarget + 8,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+                borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 border: Border.all(
                   color: borderColor,
                   width: showAsCorrect || showAsWrong ? 2 : 1.2,
@@ -522,7 +514,7 @@ class _OptionTile extends StatelessWidget {
                             fontSize: 15.5,
                             height: 1.5,
                             fontWeight: FontWeight.w600,
-                            color: palette.textPrimary,
+                            color: appTheme.textTitle,
                           ),
                         ),
                         if (statusLabel != null) ...[
@@ -532,9 +524,6 @@ class _OptionTile extends StatelessWidget {
                             icon: showAsCorrect
                                 ? Icons.check_circle
                                 : Icons.cancel,
-                            tone: showAsCorrect
-                                ? SectionTone.success
-                                : SectionTone.danger,
                           ),
                         ],
                       ],

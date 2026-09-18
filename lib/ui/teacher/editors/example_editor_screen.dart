@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
-
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
 import 'editor_scaffold.dart';
@@ -78,7 +76,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return EditorScaffold(
       title: 'Ejemplo comentado',
@@ -91,7 +89,6 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
       onDone: () => Navigator.of(context).pop(_result),
       child: _example == null
           ? EditorEmptyState(
-              palette: palette,
               icon: Icons.code,
               text: 'Esta sección no tiene ejemplo comentado.',
               buttonLabel: 'Crear el ejemplo',
@@ -109,17 +106,11 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TeacherCard(
-                  palette: palette,
                   child: Column(
                     children: [
+                      TeacherField(label: 'Título', controller: _title),
+                      const SizedBox(height: AppMetrics.gap),
                       TeacherField(
-                        palette: palette,
-                        label: 'Título',
-                        controller: _title,
-                      ),
-                      const SizedBox(height: SectionMetrics.gap),
-                      TeacherField(
-                        palette: palette,
                         label: 'Descripción',
                         controller: _description,
                         maxLines: 3,
@@ -128,22 +119,19 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 TeacherCard(
-                  palette: palette,
                   title: 'El código',
                   child: Column(
                     children: [
                       TeacherField(
-                        palette: palette,
                         label: 'Código completo',
                         controller: _code,
                         maxLines: 12,
                         monospace: true,
                       ),
-                      const SizedBox(height: SectionMetrics.gap),
+                      const SizedBox(height: AppMetrics.gap),
                       TeacherField(
-                        palette: palette,
                         label: 'Qué hace, en palabras',
                         controller: _caption,
                         maxLines: 2,
@@ -151,9 +139,8 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                             'Es lo que se lee en voz alta en lugar de '
                             'deletrear el código símbolo a símbolo.',
                       ),
-                      const SizedBox(height: SectionMetrics.gap),
+                      const SizedBox(height: AppMetrics.gap),
                       TeacherField(
-                        palette: palette,
                         label: 'Lo que aparece al ejecutarlo',
                         controller: _output,
                         maxLines: 5,
@@ -162,13 +149,13 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: SectionMetrics.sectionGap),
+                const SizedBox(height: AppMetrics.sectionGap),
                 Text(
                   'Explicación paso a paso',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: palette.textPrimary,
+                    color: appTheme.textTitle,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -178,15 +165,14 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
-                    color: palette.textSecondary,
+                    color: appTheme.textSubtitle,
                   ),
                 ),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 for (var i = 0; i < _steps.length; i++)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: TeacherCard(
-                      palette: palette,
                       title: 'Paso ${i + 1}',
                       action: IconButton(
                         tooltip: 'Quitar el paso ${i + 1}',
@@ -202,13 +188,12 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                             });
                           }
                         },
-                        color: palette.textSecondary,
+                        color: appTheme.textSubtitle,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(
                         children: [
                           TeacherField(
-                            palette: palette,
                             label: 'Trozo de código',
                             controller: _steps[i].code,
                             maxLines: 4,
@@ -216,7 +201,6 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                           ),
                           const SizedBox(height: 10),
                           TeacherField(
-                            palette: palette,
                             label: 'Qué hace',
                             controller: _steps[i].explanation,
                             maxLines: 3,
@@ -226,7 +210,6 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                     ),
                   ),
                 TeacherAddButton(
-                  palette: palette,
                   label: 'Añadir paso',
                   onPressed: () =>
                       setState(() => _steps = [..._steps, _StepFields('', '')]),

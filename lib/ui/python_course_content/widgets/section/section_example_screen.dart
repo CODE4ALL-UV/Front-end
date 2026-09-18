@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
-
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-
 import 'section_activity_scaffold.dart';
-import 'section_theme.dart';
 import 'section_widgets.dart';
 
 /// Ejemplo de código con su salida y su explicación línea por línea.
@@ -58,7 +55,7 @@ class SectionExampleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     return SectionActivityScaffold(
       moduleLabel: module.label,
@@ -69,7 +66,6 @@ class SectionExampleScreen extends StatelessWidget {
       bottomBar: SectionPrimaryButton(
         label: 'Marcar ejemplo como revisado',
         icon: Icons.check_circle_outline,
-        tone: SectionTone.success,
         semanticHint: 'Marca el ejemplo como completado y vuelve a la ruta',
         onPressed: () => _finish(context),
       ),
@@ -77,16 +73,16 @@ class SectionExampleScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionCard(
-            background: palette.accentSoft,
-            borderColor: palette.accent.withValues(alpha: 0.4),
+            background: appTheme.background,
+            borderColor: appTheme.infoBorder.withValues(alpha: 0.4),
             child: SectionHeading(
               title: _example.title,
               subtitle: _example.description,
               icon: Icons.code,
-              color: palette.accent,
+              color: appTheme.actionBackground,
             ),
           ),
-          const SizedBox(height: SectionMetrics.sectionGap),
+          const SizedBox(height: AppMetrics.sectionGap),
           SectionCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,7 +101,7 @@ class SectionExampleScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: SectionMetrics.sectionGap),
+          const SizedBox(height: AppMetrics.sectionGap),
           SectionCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,7 +117,7 @@ class SectionExampleScreen extends StatelessWidget {
             ),
           ),
           if (_example.steps.isNotEmpty) ...[
-            const SizedBox(height: SectionMetrics.sectionGap),
+            const SizedBox(height: AppMetrics.sectionGap),
             SectionCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,14 +165,14 @@ class _OutputBlockState extends State<_OutputBlock> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: palette.surfaceAlt,
+        color: appTheme.successBackground,
         borderRadius: BorderRadius.circular(12),
-        border: Border(left: BorderSide(color: palette.success, width: 4)),
+        border: const Border(left: BorderSide(color: Colors.green, width: 4)),
       ),
       child: Scrollbar(
         controller: _controller,
@@ -195,7 +191,7 @@ class _OutputBlockState extends State<_OutputBlock> {
               ],
               fontSize: 14,
               height: 1.55,
-              color: palette.textPrimary,
+              color: appTheme.textTitle,
             ),
           ),
         ),
@@ -212,7 +208,7 @@ class _StepRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     return Padding(
       padding: const EdgeInsets.only(top: 14),
@@ -224,7 +220,7 @@ class _StepRow extends StatelessWidget {
             height: 28,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: palette.accentSoft,
+              color: appTheme.background,
               shape: BoxShape.circle,
             ),
             child: Text(
@@ -232,7 +228,7 @@ class _StepRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
-                color: palette.accent,
+                color: appTheme.infoText,
               ),
             ),
           ),
@@ -251,9 +247,9 @@ class _StepRow extends StatelessWidget {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: palette.codeBackground,
+                        color: appTheme.background,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: palette.codeBorder),
+                        border: Border.all(color: appTheme.border),
                       ),
                       child: SelectableText(
                         step.code,
@@ -266,7 +262,7 @@ class _StepRow extends StatelessWidget {
                           ],
                           fontSize: 13.5,
                           height: 1.5,
-                          color: palette.codeText,
+                          color: appTheme.actionText,
                         ),
                       ),
                     ),
@@ -278,7 +274,7 @@ class _StepRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     height: 1.55,
-                    color: palette.textPrimary,
+                    color: appTheme.textTitle,
                   ),
                 ),
               ],

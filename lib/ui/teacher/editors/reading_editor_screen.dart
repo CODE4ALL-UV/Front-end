@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
-
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
 import 'editor_scaffold.dart';
@@ -129,7 +127,6 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
       onDone: () => Navigator.of(context).pop(_result),
       child: reading == null
           ? EditorEmptyState(
-              palette: palette,
               icon: Icons.menu_book,
               text:
                   'Esta sección no tiene lectura.\n'
@@ -142,17 +139,14 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TeacherCard(
-                  palette: palette,
                   child: Column(
                     children: [
                       TeacherField(
-                        palette: palette,
                         label: 'Título de la lectura',
                         controller: _title,
                       ),
                       const SizedBox(height: SectionMetrics.gap),
                       TeacherField(
-                        palette: palette,
                         label: 'Introducción',
                         controller: _intro,
                         maxLines: 3,
@@ -173,7 +167,6 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
                 const SizedBox(height: SectionMetrics.gap),
                 for (var i = 0; i < reading.pages.length; i++)
                   TeacherListRow(
-                    palette: palette,
                     title: reading.pages[i].title,
                     subtitle: reading.pages[i].blocks.isEmpty
                         ? '⚠ sin contenido todavía'
@@ -212,11 +205,7 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
                           },
                   ),
                 const SizedBox(height: SectionMetrics.gap),
-                TeacherAddButton(
-                  palette: palette,
-                  label: 'Añadir página',
-                  onPressed: _addPage,
-                ),
+                TeacherAddButton(label: 'Añadir página', onPressed: _addPage),
               ],
             ),
     );
@@ -268,8 +257,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
     final kind = await showModalBottomSheet<ReadingBlockKind>(
       context: context,
       backgroundColor: SectionPalette.of(context).surface,
-      builder: (context) =>
-          _BlockKindSheet(palette: SectionPalette.of(context)),
+      builder: (context) => (context),
     );
     if (kind == null || !mounted) return;
 
@@ -304,17 +292,11 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TeacherCard(
-            palette: palette,
             child: Column(
               children: [
-                TeacherField(
-                  palette: palette,
-                  label: 'Título de la página',
-                  controller: _title,
-                ),
+                TeacherField(label: 'Título de la página', controller: _title),
                 const SizedBox(height: SectionMetrics.gap),
                 TeacherField(
-                  palette: palette,
                   label: 'Resumen',
                   controller: _summary,
                   maxLines: 2,
@@ -335,7 +317,6 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
           const SizedBox(height: SectionMetrics.gap),
           if (_page.blocks.isEmpty)
             EditorEmptyState(
-              palette: palette,
               icon: Icons.notes,
               text: 'Esta página todavía no tiene contenido.',
               buttonLabel: 'Añadir el primer bloque',
@@ -344,7 +325,6 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
           else ...[
             for (var i = 0; i < _page.blocks.length; i++)
               TeacherListRow(
-                palette: palette,
                 title: _page.blocks[i].title.isEmpty
                     ? _page.blocks[i].kind.label
                     : _page.blocks[i].title,
@@ -388,11 +368,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
                 },
               ),
             const SizedBox(height: SectionMetrics.gap),
-            TeacherAddButton(
-              palette: palette,
-              label: 'Añadir bloque',
-              onPressed: _addBlock,
-            ),
+            TeacherAddButton(label: 'Añadir bloque', onPressed: _addBlock),
           ],
         ],
       ),
@@ -534,17 +510,12 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TeacherCard(
-            palette: palette,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _kindPicker(palette),
                 const SizedBox(height: SectionMetrics.gap),
-                TeacherField(
-                  palette: palette,
-                  label: 'Título del bloque',
-                  controller: _title,
-                ),
+                TeacherField(label: 'Título del bloque', controller: _title),
               ],
             ),
           ),
@@ -552,9 +523,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
 
           if (kind != ReadingBlockKind.code || _body.text.isNotEmpty)
             TeacherCard(
-              palette: palette,
               child: TeacherField(
-                palette: palette,
                 label: isList ? 'Texto introductorio' : 'Texto',
                 controller: _body,
                 maxLines: 6,
@@ -564,7 +533,6 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
           if (isList) ...[
             const SizedBox(height: SectionMetrics.gap),
             TeacherCard(
-              palette: palette,
               title: kind == ReadingBlockKind.steps ? 'Pasos' : 'Puntos',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -622,7 +590,6 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                       ),
                     ),
                   TeacherAddButton(
-                    palette: palette,
                     label: kind == ReadingBlockKind.steps
                         ? 'Añadir paso'
                         : 'Añadir punto',
@@ -638,11 +605,9 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
           if (kind == ReadingBlockKind.code) ...[
             const SizedBox(height: SectionMetrics.gap),
             TeacherCard(
-              palette: palette,
               child: Column(
                 children: [
                   TeacherField(
-                    palette: palette,
                     label: 'Código',
                     controller: _code,
                     maxLines: 10,
@@ -650,7 +615,6 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                   ),
                   const SizedBox(height: SectionMetrics.gap),
                   TeacherField(
-                    palette: palette,
                     label: 'Qué hace este código, en palabras',
                     controller: _caption,
                     maxLines: 2,
@@ -667,7 +631,6 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
           if (kind == ReadingBlockKind.callout) ...[
             const SizedBox(height: SectionMetrics.gap),
             TeacherCard(
-              palette: palette,
               title: 'Intención del recuadro',
               child: Wrap(
                 spacing: 8,

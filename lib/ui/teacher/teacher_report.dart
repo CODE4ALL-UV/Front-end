@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_code4all/data/course/course_analytics_store.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 
 /// Arma un informe del curso en texto plano.
 ///

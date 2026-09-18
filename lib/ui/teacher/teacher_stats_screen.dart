@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/data/course/course_analytics_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
-
 import 'teacher_report.dart';
 import 'teacher_widgets.dart';
 
@@ -81,7 +78,6 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
     if (_stats.problem != null) {
       return [
         TeacherBanner(
-          palette: palette,
           icon: Icons.cloud_off,
           text: _stats.problem!,
           tone: palette.danger,

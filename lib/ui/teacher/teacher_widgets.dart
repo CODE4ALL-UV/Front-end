@@ -317,12 +317,13 @@ class TeacherListRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: themeColors.surfaceAlt,
+        color: appTheme.surfaceAlt,
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-        border: Border.all(color: themeColors.border),
+        border: Border.all(color: appTheme.border),
       ),
       child: Column(
         children: [
@@ -332,7 +333,7 @@ class TeacherListRow extends StatelessWidget {
             child: ExcludeSemantics(
               child: InkWell(
                 onTap: onTap,
-                borderRadius: BorderRadius.circular(themeColors.cardRadius),
+                borderRadius: BorderRadius.circular(appTheme.cardRadius),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Row(
@@ -354,8 +355,8 @@ class TeacherListRow extends StatelessWidget {
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: title.isEmpty
-                                    ? themeColors.textSecondary
-                                    : themeColors.textPrimary,
+                                    ? appTheme.textSubtitle
+                                    : appTheme.textTitle,
                               ),
                             ),
                             if (subtitle.isNotEmpty)
@@ -365,17 +366,14 @@ class TeacherListRow extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 12.5,
-                                  color: themeColors.textSecondary,
+                                  color: appTheme.textSubtitle,
                                 ),
                               ),
                           ],
                         ),
                       ),
                       if (onTap != null)
-                        Icon(
-                          Icons.chevron_right,
-                          color: themeColors.textSecondary,
-                        ),
+                        Icon(Icons.chevron_right, color: appTheme.textSubtitle),
                     ],
                   ),
                 ),
@@ -387,23 +385,20 @@ class TeacherListRow extends StatelessWidget {
           Row(
             children: [
               _RowAction(
-                themeColors: themeColors,
                 icon: Icons.arrow_upward,
                 label: 'Subir $title',
                 onPressed: onMoveUp,
               ),
               _RowAction(
-                themeColors: themeColors,
                 icon: Icons.arrow_downward,
                 label: 'Bajar $title',
                 onPressed: onMoveDown,
               ),
               const Spacer(),
               _RowAction(
-                themeColors: themeColors,
                 icon: Icons.delete_outline,
                 label: 'Borrar $title',
-                color: themeColors.danger,
+                color: appTheme.danger,
                 onPressed: onDelete,
               ),
             ],
@@ -433,10 +428,10 @@ class _RowAction extends StatelessWidget {
       onPressed: onPressed,
       tooltip: label,
       iconSize: 20,
-      color: color ?? themeColors.textSecondary,
+      color: color ?? appTheme.textSubtitle,
       constraints: const BoxConstraints(
-        minWidth: themeColors.minTapTarget,
-        minHeight: themeColors.minTapTarget,
+        minWidth: appTheme.minTapTarget,
+        minHeight: appTheme.minTapTarget,
       ),
       icon: Icon(icon),
     );

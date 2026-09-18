@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
 import 'section_activity_launcher.dart';
-import 'section_theme.dart';
 import 'section_widgets.dart';
 
 /// Pantalla de un capítulo: su resumen y la ruta de actividades.
@@ -85,11 +85,12 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
     final width = MediaQuery.sizeOf(context).width;
+    final appTheme = context.activityColors;
+    final colorScheme = context.colorScheme;
 
     return Scaffold(
-      backgroundColor: palette.background,
+      backgroundColor: appTheme.background,
       appBar: GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
@@ -98,12 +99,12 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
         children: [
           Container(
             width: double.infinity,
-            color: palette.surfaceAlt,
+            color: colorScheme.surfaceContainerHighest,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Text(
               widget.module.label,
               style: TextStyle(
-                color: palette.textSecondary,
+                color: appTheme.textSubtitle,
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.3,
@@ -115,26 +116,26 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
               controller: _scrollController,
               child: SingleChildScrollView(
                 controller: _scrollController,
-                padding: SectionMetrics.pagePadding(width),
+                padding: AppMetrics.pagePadding(width),
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(
-                      maxWidth: SectionMetrics.maxContentWidth,
+                      maxWidth: AppMetrics.maxContentWidth,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSummaryCard(palette),
-                        const SizedBox(height: SectionMetrics.sectionGap),
+                        _buildSummaryCard(),
+                        const SizedBox(height: AppMetrics.sectionGap),
                         if (_activities.isEmpty)
                           SectionPendingContent(
                             sectionTitle: widget.section.title,
                             objectives: widget.section.objectives,
                           )
                         else
-                          _buildActivityRoute(palette),
-                        const SizedBox(height: SectionMetrics.sectionGap),
-                        _buildChapterNav(palette),
+                          _buildActivityRoute(),
+                        const SizedBox(height: AppMetrics.sectionGap),
+                        _buildChapterNav(),
                         const SizedBox(height: 12),
                         const Align(
                           alignment: Alignment.centerLeft,
@@ -153,7 +154,9 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
     );
   }
 
-  Widget _buildSummaryCard(SectionPalette palette) {
+  Widget _buildSummaryCard() {
+    final appTheme = context.activityColors;
+
     return SectionCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +184,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
               style: TextStyle(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w700,
-                color: palette.textPrimary,
+                color: appTheme.textTitle,
               ),
             ),
             const SizedBox(height: 10),
@@ -201,7 +204,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
     );
   }
 
-  Widget _buildActivityRoute(SectionPalette palette) {
+  Widget _buildActivityRoute() {
     return SectionCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,7 +243,6 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
               body:
                   '¡Felicitaciones! Terminaste las ${_activities.length} '
                   'actividades de "${widget.section.title}".',
-              tone: SectionTone.success,
             ),
           ],
         ],
@@ -248,7 +250,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
     );
   }
 
-  Widget _buildChapterNav(SectionPalette palette) {
+  Widget _buildChapterNav() {
     final hasPrevious = widget.onPreviousChapter != null;
     final hasNext = widget.onNextChapter != null;
 
@@ -300,8 +302,9 @@ class _ActivityTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
     final activityColors = SectionActivityLauncher.colorsFor(context, kind);
+    final appTheme = context.activityColors;
+    final colorScheme = context.colorScheme;
 
     return Semantics(
       button: true,
@@ -311,30 +314,32 @@ class _ActivityTile extends StatelessWidget {
           : 'Pulsa para ${kind.actionLabel.toLowerCase()}',
       child: ExcludeSemantics(
         child: Material(
-          color: isCompleted ? palette.successSoft : palette.surfaceAlt,
-          borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+          color: isCompleted
+              ? Colors.green.withValues(alpha: 0.1)
+              : colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             child: Container(
               constraints: const BoxConstraints(
-                minHeight: SectionMetrics.minTapTarget + 16,
+                minHeight: AppMetrics.minTapTarget + 16,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+                borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 border: Border.all(
                   color: isCompleted
-                      ? palette.success.withValues(alpha: 0.55)
-                      : palette.border,
+                      ? Colors.green.withValues(alpha: 0.55)
+                      : appTheme.border,
                   width: isCompleted ? 1.8 : 1.2,
                 ),
               ),
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   // En pantallas estrechas, o con el texto muy agrandado, la
-                  // pildora de accion dejaria al titulo unos pocos pixeles.
-                  // Ahi baja a su propia linea, a todo el ancho.
+                  // píldora de acción dejaría al título unos pocos pixeles.
+                  // Ahí baja a su propia línea, a todo el ancho.
                   final stack = constraints.maxWidth < 300;
 
                   final icon = Container(
@@ -367,7 +372,7 @@ class _ActivityTile extends StatelessWidget {
                           fontSize: 15.5,
                           height: 1.35,
                           fontWeight: FontWeight.w700,
-                          color: palette.textPrimary,
+                          color: appTheme.textTitle,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -376,7 +381,7 @@ class _ActivityTile extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.5,
                           height: 1.45,
-                          color: palette.textSecondary,
+                          color: appTheme.textSubtitle,
                         ),
                       ),
                       if (detail.isNotEmpty) ...[
@@ -447,30 +452,30 @@ class _TrailingAction extends StatelessWidget {
   final bool isCompleted;
   final Color color;
 
-  /// Ocupa todo el ancho cuando va en su propia linea.
+  /// Ocupa todo el ancho cuando va en su propia línea.
   final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
-
     if (isCompleted) {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check_circle, size: 26, color: palette.success),
+          const Icon(Icons.check_circle, size: 26, color: Colors.green),
           const SizedBox(height: 4),
-          Text(
+          const Text(
             'Hecho',
             style: TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w700,
-              color: palette.success,
+              color: Colors.green,
             ),
           ),
         ],
       );
     }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       width: fullWidth ? double.infinity : null,
@@ -481,7 +486,7 @@ class _TrailingAction extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+        borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
       ),
       alignment: Alignment.center,
       child: Text(
@@ -493,7 +498,7 @@ class _TrailingAction extends StatelessWidget {
           fontWeight: FontWeight.w800,
           // Los colores de actividad son oscuros en tema claro y claros en
           // tema oscuro, así que el texto va siempre al contrario.
-          color: palette.isDark ? const Color(0xFF0B1117) : Colors.white,
+          color: isDark ? const Color(0xFF0B1117) : Colors.white,
         ),
       ),
     );
@@ -518,7 +523,7 @@ class _DetailChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+        borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
         border: Border.all(color: foreground.withValues(alpha: 0.4)),
       ),
       child: Row(

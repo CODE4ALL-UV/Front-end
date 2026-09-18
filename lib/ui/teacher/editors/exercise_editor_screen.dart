@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
-
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
 import 'editor_scaffold.dart';
@@ -81,7 +79,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return EditorScaffold(
       title: 'Ejercicio',
@@ -94,7 +92,6 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
       onDone: () => Navigator.of(context).pop(_result),
       child: _exercise == null
           ? EditorEmptyState(
-              palette: palette,
               icon: Icons.edit_note,
               text: 'Esta sección no tiene ejercicio.',
               buttonLabel: 'Crear el ejercicio',
@@ -111,17 +108,11 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TeacherCard(
-                  palette: palette,
                   child: Column(
                     children: [
+                      TeacherField(label: 'Título', controller: _title),
+                      const SizedBox(height: AppMetrics.gap),
                       TeacherField(
-                        palette: palette,
-                        label: 'Título',
-                        controller: _title,
-                      ),
-                      const SizedBox(height: SectionMetrics.gap),
-                      TeacherField(
-                        palette: palette,
                         label: 'Instrucciones',
                         controller: _instructions,
                         maxLines: 3,
@@ -130,13 +121,13 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: SectionMetrics.sectionGap),
+                const SizedBox(height: AppMetrics.sectionGap),
                 Text(
                   'Emparejar conceptos',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: palette.textPrimary,
+                    color: appTheme.textTitle,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -146,15 +137,14 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
-                    color: palette.textSecondary,
+                    color: appTheme.textSubtitle,
                   ),
                 ),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 for (var i = 0; i < _pairs.length; i++)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: TeacherCard(
-                      palette: palette,
                       title: 'Pareja ${i + 1}',
                       action: IconButton(
                         tooltip: 'Quitar la pareja ${i + 1}',
@@ -170,19 +160,17 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                             });
                           }
                         },
-                        color: palette.textSecondary,
+                        color: appTheme.textSubtitle,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(
                         children: [
                           TeacherField(
-                            palette: palette,
                             label: 'Concepto',
                             controller: _pairs[i].concept,
                           ),
                           const SizedBox(height: 10),
                           TeacherField(
-                            palette: palette,
                             label: 'Definición',
                             controller: _pairs[i].definition,
                             maxLines: 2,
@@ -192,22 +180,23 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                     ),
                   ),
                 TeacherAddButton(
-                  palette: palette,
                   label: 'Añadir pareja',
                   onPressed: () =>
                       setState(() => _pairs = [..._pairs, _PairFields('', '')]),
                 ),
-                const SizedBox(height: SectionMetrics.sectionGap),
+                const SizedBox(height: AppMetrics.sectionGap),
                 TeacherCard(
-                  palette: palette,
                   child: ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.quiz_outlined, color: palette.success),
+                    leading: Icon(
+                      Icons.quiz_outlined,
+                      color: appTheme.successBorder,
+                    ),
                     title: Text(
                       'Preguntas del ejercicio',
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: palette.textPrimary,
+                        color: appTheme.textTitle,
                       ),
                     ),
                     subtitle: Text(
@@ -215,11 +204,11 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                           ? 'Sin preguntas'
                           : '${_questions.length} '
                                 '${_questions.length == 1 ? "pregunta" : "preguntas"}',
-                      style: TextStyle(color: palette.textSecondary),
+                      style: TextStyle(color: appTheme.textSubtitle),
                     ),
                     trailing: Icon(
                       Icons.chevron_right,
-                      color: palette.textSecondary,
+                      color: appTheme.textSubtitle,
                     ),
                     onTap: _editQuestions,
                   ),

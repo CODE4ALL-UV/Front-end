@@ -12,8 +12,6 @@ enum AppThemeMode {
 class ThemeManager {
   static final ValueNotifier<AppThemeMode> themeNotifier = 
       ValueNotifier<AppThemeMode>(AppThemeMode.light);
-      //USAR ESTE OTRO SI ALGO
-      //static final ValueNotifier<AppThemeMode> themeNotifier = ValueNotifier(AppThemeMode.light);
 
   static void changeTheme(AppThemeMode mode) {
     themeNotifier.value = mode;

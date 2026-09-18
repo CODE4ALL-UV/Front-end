@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
-
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
-
 import 'section_activity_scaffold.dart';
-import 'section_theme.dart';
 import 'section_widgets.dart';
 
 /// Lectura de una sección, dividida en páginas navegables.
@@ -66,7 +63,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     return SectionActivityScaffold(
       moduleLabel: widget.module.label,
@@ -76,7 +73,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
       spokenText: _currentPage.spokenText,
       progress: (_pageIndex + 1) / _pages.length,
       progressLabel: 'Página ${_pageIndex + 1} de ${_pages.length}',
-      bottomBar: _buildBottomBar(palette),
+      bottomBar: _buildBottomBar(),
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         child: Column(
@@ -85,8 +82,8 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
           children: [
             if (_pageIndex == 0) ...[
               SectionCard(
-                background: palette.accentSoft,
-                borderColor: palette.accent.withValues(alpha: 0.4),
+                background: appTheme.actionBackground,
+                borderColor: appTheme.border.withValues(alpha: 0.4),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -94,7 +91,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
                       title: _reading.title,
                       subtitle: _reading.intro,
                       icon: Icons.auto_stories_outlined,
-                      color: palette.accent,
+                      color: appTheme.textTitle,
                     ),
                     if (widget.section.objectives.isNotEmpty) ...[
                       const SizedBox(height: 16),
@@ -103,7 +100,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
                         style: TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
-                          color: palette.textPrimary,
+                          color: appTheme.textTitle,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -115,7 +112,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: SectionMetrics.sectionGap),
+              const SizedBox(height: AppMetrics.sectionGap),
             ],
             SectionCard(
               child: Column(
@@ -128,23 +125,22 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
                   ),
                   const SizedBox(height: 18),
                   for (var i = 0; i < _currentPage.blocks.length; i++) ...[
-                    if (i > 0) const SizedBox(height: SectionMetrics.gap + 6),
+                    if (i > 0) const SizedBox(height: AppMetrics.gap + 6),
                     _ReadingBlockView(block: _currentPage.blocks[i]),
                   ],
                 ],
               ),
             ),
-            const SizedBox(height: SectionMetrics.sectionGap),
+            const SizedBox(height: AppMetrics.sectionGap),
             _PageDots(count: _pages.length, currentIndex: _pageIndex),
             if (_finished) ...[
-              const SizedBox(height: SectionMetrics.sectionGap),
+              const SizedBox(height: AppMetrics.sectionGap),
               SectionCallout(
                 title: 'Lectura completada',
                 body:
                     'Has terminado las ${_pages.length} páginas de '
                     '"${widget.section.title}". Continúa con la cápsula de '
                     'conocimiento o con el ejemplo para afianzar lo leído.',
-                tone: SectionTone.success,
               ),
             ],
             const SizedBox(height: 8),
@@ -154,12 +150,11 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
     );
   }
 
-  Widget _buildBottomBar(SectionPalette palette) {
+  Widget _buildBottomBar() {
     if (_finished) {
       return SectionPrimaryButton(
         label: 'Volver a la ruta de actividades',
         icon: Icons.check_circle_outline,
-        tone: SectionTone.success,
         semanticHint: 'Regresa al listado de actividades de la sección',
         onPressed: () => Navigator.of(context).pop(true),
       );
@@ -199,19 +194,12 @@ class _ReadingBlockView extends StatelessWidget {
 
   final ReadingBlock block;
 
-  SectionTone get _tone => switch (block.tone) {
-    CalloutTone.info => SectionTone.info,
-    CalloutTone.success => SectionTone.success,
-    CalloutTone.warning => SectionTone.warning,
-    CalloutTone.danger => SectionTone.danger,
-  };
-
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     if (block.kind == ReadingBlockKind.callout) {
-      return SectionCallout(title: block.title, body: block.body, tone: _tone);
+      return SectionCallout(title: block.title, body: block.body);
     }
 
     return Column(
@@ -226,7 +214,7 @@ class _ReadingBlockView extends StatelessWidget {
                 fontSize: 16.5,
                 fontWeight: FontWeight.w700,
                 height: 1.35,
-                color: palette.accent,
+                color: appTheme.textTitle,
               ),
             ),
           ),
@@ -259,7 +247,7 @@ class _PageDots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     return ExcludeSemantics(
       child: Row(
@@ -272,8 +260,8 @@ class _PageDots extends StatelessWidget {
             width: isActive ? 22 : 9,
             height: 9,
             decoration: BoxDecoration(
-              color: isActive ? palette.accent : palette.border,
-              borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+              color: isActive ? appTheme.actionBackground : appTheme.border,
+              borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
           );
         }),

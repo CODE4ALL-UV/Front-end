@@ -1,18 +1,14 @@
 import 'dart:async';
 import 'package:flutter_code4all/data/services/api_service.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/youtube_translator_player.dart';
-
 import 'section_activity_scaffold.dart';
 import 'sign_camera_screen.dart';
-import 'section_theme.dart';
 import 'section_widgets.dart';
 import 'sign_language_panel.dart';
 
@@ -474,9 +470,9 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
       icon: Icons.photo_camera_front,
       semanticHint:
           'Abre la cámara para que reconozca las letras que haces con la mano',
-      onPressed: () => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const SignCameraScreen()),
-      ),
+      onPressed: () => Navigator.of(
+        context,
+      ).push(MaterialPageRoute<void>(builder: (_) => const SignCameraScreen())),
     );
   }
 

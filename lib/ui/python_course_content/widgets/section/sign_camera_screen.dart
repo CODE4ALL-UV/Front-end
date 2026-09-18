@@ -1,17 +1,14 @@
 import 'dart:async';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show MissingPluginException;
-
 import 'package:flutter_code4all/data/services/sign_recognition_service.dart';
 import 'package:flutter_code4all/domain/models/sign_language/hand_alphabet.dart';
 import 'package:flutter_code4all/domain/models/sign_language/hand_landmark_classifier.dart';
 import 'package:flutter_code4all/domain/models/sign_language/sign_dictation.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
-
-import 'section_theme.dart';
 
 /// En qué punto está la pantalla.
 enum _Stage { checking, unavailable, ready, running, failed }
@@ -289,7 +286,7 @@ class _SignCameraScreenState extends State<SignCameraScreen>
     final palette = SectionPalette.of(context);
 
     return Scaffold(
-      backgroundColor: palette.background,
+      backgroundColor: appTheme.background,
       appBar: GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
@@ -298,15 +295,15 @@ class _SignCameraScreenState extends State<SignCameraScreen>
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: SectionMetrics.pagePadding(constraints.maxWidth),
+              padding: AppMetrics.pagePadding(constraints.maxWidth),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: SectionMetrics.maxContentWidth,
+                    maxWidth: AppMetrics.maxContentWidth,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: _body(palette),
+                    children: _body(),
                   ),
                 ),
               ),
@@ -317,62 +314,60 @@ class _SignCameraScreenState extends State<SignCameraScreen>
     );
   }
 
-  List<Widget> _body(SectionPalette palette) {
+  List<Widget> _body() {
     return switch (_stage) {
       _Stage.checking => [
         _Message(
-          palette: palette,
           busy: true,
           text: 'Comprobando si el reconocimiento está disponible…',
         ),
       ],
       _Stage.unavailable => [
-        _Message(palette: palette, text: _problem, icon: Icons.cloud_off),
-        const SizedBox(height: SectionMetrics.gap),
-        _retryButton(palette),
+        _Message(text: _problem, icon: Icons.cloud_off),
+        const SizedBox(height: AppMetrics.gap),
+        _retryButton(),
       ],
       _Stage.failed => [
-        _Message(palette: palette, text: _problem, icon: Icons.error_outline),
-        const SizedBox(height: SectionMetrics.gap),
-        _retryButton(palette),
+        _Message(text: _problem, icon: Icons.error_outline),
+        const SizedBox(height: AppMetrics.gap),
+        _retryButton(),
       ],
-      _Stage.ready || _Stage.running => _session(palette),
+      _Stage.ready || _Stage.running => _session(),
     };
   }
 
-  Widget _retryButton(SectionPalette palette) => Center(
+  Widget _retryButton() => Center(
     child: FilledButton.icon(
       onPressed: () {
         setState(() => _stage = _Stage.checking);
         _check();
       },
       style: FilledButton.styleFrom(
-        backgroundColor: palette.accent,
-        foregroundColor: palette.onAccent,
-        minimumSize: const Size(0, SectionMetrics.minTapTarget),
+        backgroundColor: appTheme.accent,
+        foregroundColor: appTheme.onAccent,
+        minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.refresh),
       label: const Text('Volver a intentarlo'),
     ),
   );
 
-  List<Widget> _session(SectionPalette palette) {
+  List<Widget> _session() {
     final running = _stage == _Stage.running;
 
     return [
       _Explanation(palette: palette, target: widget.targetLetter),
-      const SizedBox(height: SectionMetrics.sectionGap),
+      const SizedBox(height: AppMetrics.sectionGap),
       _Preview(palette: palette, camera: _camera, running: running),
-      const SizedBox(height: SectionMetrics.sectionGap),
+      const SizedBox(height: AppMetrics.sectionGap),
       if (running) ...[
         _ReadingBox(
-          palette: palette,
           reading: _reading,
           dictation: _dictation,
           target: widget.targetLetter,
           achieved: _achieved,
         ),
-        const SizedBox(height: SectionMetrics.gap),
+        const SizedBox(height: AppMetrics.gap),
       ],
       _controls(palette, running),
     ];
@@ -383,9 +378,9 @@ class _SignCameraScreenState extends State<SignCameraScreen>
       FilledButton.icon(
         onPressed: running ? _stop : _start,
         style: FilledButton.styleFrom(
-          backgroundColor: running ? palette.danger : palette.accent,
-          foregroundColor: palette.onAccent,
-          minimumSize: const Size(0, SectionMetrics.minTapTarget),
+          backgroundColor: running ? appTheme.danger : appTheme.accent,
+          foregroundColor: appTheme.onAccent,
+          minimumSize: const Size(0, AppMetrics.minTapTarget),
         ),
         icon: Icon(running ? Icons.stop : Icons.photo_camera),
         label: Text(running ? 'Apagar la cámara' : 'Encender la cámara'),
@@ -393,14 +388,14 @@ class _SignCameraScreenState extends State<SignCameraScreen>
       if (running && _cameras.length > 1)
         OutlinedButton.icon(
           onPressed: _switchCamera,
-          style: _outlined(palette),
+          style: _outlined(),
           icon: const Icon(Icons.cameraswitch),
           label: const Text('Cambiar de cámara'),
         ),
       if (!_isPractice && running) ...[
         OutlinedButton.icon(
           onPressed: () => setState(_dictation.addSpace),
-          style: _outlined(palette),
+          style: _outlined(),
           icon: const Icon(Icons.space_bar),
           label: const Text('Espacio'),
         ),
@@ -408,7 +403,7 @@ class _SignCameraScreenState extends State<SignCameraScreen>
           onPressed: _dictation.isEmpty
               ? null
               : () => setState(_dictation.backspace),
-          style: _outlined(palette),
+          style: _outlined(),
           icon: const Icon(Icons.backspace_outlined),
           label: const Text('Borrar'),
         ),
@@ -416,7 +411,7 @@ class _SignCameraScreenState extends State<SignCameraScreen>
           onPressed: _dictation.isEmpty
               ? null
               : () => setState(_dictation.clear),
-          style: _outlined(palette),
+          style: _outlined(),
           icon: const Icon(Icons.delete_outline),
           label: const Text('Empezar de nuevo'),
         ),
@@ -424,17 +419,17 @@ class _SignCameraScreenState extends State<SignCameraScreen>
     ];
 
     return Wrap(
-      spacing: SectionMetrics.gap,
-      runSpacing: SectionMetrics.gap,
+      spacing: AppMetrics.gap,
+      runSpacing: AppMetrics.gap,
       alignment: WrapAlignment.center,
       children: buttons,
     );
   }
 
-  ButtonStyle _outlined(SectionPalette palette) => OutlinedButton.styleFrom(
-    foregroundColor: palette.accent,
-    side: BorderSide(color: palette.border),
-    minimumSize: const Size(0, SectionMetrics.minTapTarget),
+  ButtonStyle _outlined() => OutlinedButton.styleFrom(
+    foregroundColor: appTheme.accent,
+    side: BorderSide(color: appTheme.border),
+    minimumSize: const Size(0, AppMetrics.minTapTarget),
   );
 }
 
@@ -454,11 +449,11 @@ class _Explanation extends StatelessWidget {
               'Mantén cada una quieta un momento para que cuente.';
 
     return Container(
-      padding: const EdgeInsets.all(SectionMetrics.gap),
+      padding: const EdgeInsets.all(AppMetrics.gap),
       decoration: BoxDecoration(
-        color: palette.surface,
-        border: Border.all(color: palette.border),
-        borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+        color: appTheme.surface,
+        border: Border.all(color: appTheme.border),
+        borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -468,12 +463,11 @@ class _Explanation extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               height: 1.45,
-              color: palette.textPrimary,
+              color: appTheme.textTitle,
             ),
           ),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
           _Note(
-            palette: palette,
             icon: Icons.sign_language,
             text:
                 'Esto es dactilología: el alfabeto que se deletrea letra a '
@@ -482,7 +476,6 @@ class _Explanation extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           _Note(
-            palette: palette,
             icon: Icons.lock_outline,
             text:
                 'Las fotos se analizan al momento y se descartan. No se graba '
@@ -495,9 +488,8 @@ class _Explanation extends StatelessWidget {
 }
 
 class _Note extends StatelessWidget {
-  const _Note({required this.palette, required this.icon, required this.text});
+  const _Note({required this.icon, required this.text});
 
-  final SectionPalette palette;
   final IconData icon;
   final String text;
 
@@ -506,7 +498,7 @@ class _Note extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: palette.textSecondary),
+        Icon(icon, size: 18, color: appTheme.textSubtitle),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -514,7 +506,7 @@ class _Note extends StatelessWidget {
             style: TextStyle(
               fontSize: 13.5,
               height: 1.4,
-              color: palette.textSecondary,
+              color: appTheme.textSubtitle,
             ),
           ),
         ),
@@ -525,13 +517,8 @@ class _Note extends StatelessWidget {
 
 /// Lo que ve la cámara, o un hueco que explica que está apagada.
 class _Preview extends StatelessWidget {
-  const _Preview({
-    required this.palette,
-    required this.camera,
-    required this.running,
-  });
+  const _Preview({required this.camera, required this.running});
 
-  final SectionPalette palette;
   final CameraController? camera;
   final bool running;
 
@@ -547,28 +534,28 @@ class _Preview extends StatelessWidget {
           : 'La cámara está apagada.',
       image: true,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+        borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         child: AspectRatio(
           aspectRatio: 4 / 3,
           child: ExcludeSemantics(
             child: ready
                 ? CameraPreview(controller)
                 : Container(
-                    color: palette.surfaceAlt,
+                    color: appTheme.surfaceAlt,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.no_photography_outlined,
                           size: 48,
-                          color: palette.textSecondary,
+                          color: appTheme.textSubtitle,
                         ),
-                        const SizedBox(height: SectionMetrics.gap),
+                        const SizedBox(height: AppMetrics.gap),
                         Text(
                           'La cámara está apagada',
                           style: TextStyle(
                             fontSize: 15,
-                            color: palette.textSecondary,
+                            color: appTheme.textSubtitle,
                           ),
                         ),
                       ],
@@ -610,34 +597,34 @@ class _ReadingBox extends StatelessWidget {
       if (achieved) {
         headline = target!;
         detail = '¡Esa es la $target!';
-        tone = palette.success;
+        tone = appTheme.success;
       } else if (letter == null) {
         headline = '—';
         detail = 'Todavía no veo tu mano con claridad.';
-        tone = palette.textSecondary;
+        tone = appTheme.textSubtitle;
       } else {
         headline = letter;
         detail = HandLandmarkClassifier.hint(reading.observed, target!);
-        tone = palette.warning;
+        tone = appTheme.warning;
       }
     } else if (reading.isAmbiguous) {
       headline = [letter!, ...reading.alternatives].join(' o ');
       detail =
           'Estas letras se hacen casi igual, así que no me atrevo a elegir. '
           'No la doy por buena.';
-      tone = palette.warning;
+      tone = appTheme.warning;
     } else if (letter == null) {
       headline = '—';
       detail = holding == null
           ? 'Todavía no veo tu mano con claridad.'
           : 'Sujeta la mano un poco más quieta.';
-      tone = palette.textSecondary;
+      tone = appTheme.textSubtitle;
     } else {
       headline = letter;
       detail = reading.isConfident
           ? 'Mantenla quieta para que cuente.'
           : 'Casi. Acerca un poco la mano o mejora la luz.';
-      tone = reading.isConfident ? palette.success : palette.textSecondary;
+      tone = reading.isConfident ? appTheme.success : appTheme.textSubtitle;
     }
 
     return Semantics(
@@ -645,11 +632,11 @@ class _ReadingBox extends StatelessWidget {
       label: '$headline. $detail',
       child: ExcludeSemantics(
         child: Container(
-          padding: const EdgeInsets.all(SectionMetrics.gap),
+          padding: const EdgeInsets.all(AppMetrics.gap),
           decoration: BoxDecoration(
-            color: palette.surface,
-            border: Border.all(color: palette.border),
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            color: appTheme.surface,
+            border: Border.all(color: appTheme.border),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -657,34 +644,33 @@ class _ReadingBox extends StatelessWidget {
               Row(
                 children: [
                   _LetterBadge(
-                    palette: palette,
                     letter: headline,
                     tone: tone,
                     progress: dictation.progress,
                   ),
-                  const SizedBox(width: SectionMetrics.gap),
+                  const SizedBox(width: AppMetrics.gap),
                   Expanded(
                     child: Text(
                       detail,
                       style: TextStyle(
                         fontSize: 15,
                         height: 1.4,
-                        color: palette.textPrimary,
+                        color: appTheme.textTitle,
                       ),
                     ),
                   ),
                 ],
               ),
               if (target == null) ...[
-                const SizedBox(height: SectionMetrics.gap),
-                Divider(color: palette.border, height: 1),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
+                Divider(color: appTheme.border, height: 1),
+                const SizedBox(height: AppMetrics.gap),
                 Text(
                   'Llevas escrito',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: palette.textSecondary,
+                    color: appTheme.textSubtitle,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -695,8 +681,8 @@ class _ReadingBox extends StatelessWidget {
                     letterSpacing: 2,
                     fontWeight: FontWeight.w700,
                     color: dictation.isEmpty
-                        ? palette.textSecondary
-                        : palette.textPrimary,
+                        ? appTheme.textSubtitle
+                        : appTheme.textTitle,
                   ),
                 ),
               ],
@@ -736,7 +722,7 @@ class _LetterBadge extends StatelessWidget {
             child: CircularProgressIndicator(
               value: progress == 0 ? null : progress,
               strokeWidth: 5,
-              backgroundColor: palette.surfaceAlt,
+              backgroundColor: appTheme.surfaceAlt,
               valueColor: AlwaysStoppedAnimation<Color>(tone),
             ),
           ),
@@ -757,43 +743,39 @@ class _LetterBadge extends StatelessWidget {
 
 /// Mensaje a pantalla completa, para esperar o para explicar un problema.
 class _Message extends StatelessWidget {
-  const _Message({
-    required this.palette,
-    required this.text,
-    this.icon,
-    this.busy = false,
-  });
+  const _Message({required this.text, this.icon, this.busy = false});
 
-  final SectionPalette palette;
   final String text;
   final IconData? icon;
   final bool busy;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+
     return Semantics(
       liveRegion: true,
       child: Container(
-        padding: const EdgeInsets.all(SectionMetrics.sectionGap),
+        padding: const EdgeInsets.all(AppMetrics.sectionGap),
         decoration: BoxDecoration(
-          color: palette.surface,
-          border: Border.all(color: palette.border),
-          borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+          color: appTheme.surface,
+          border: Border.all(color: appTheme.border),
+          borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: Column(
           children: [
             if (busy)
-              CircularProgressIndicator(color: palette.accent)
+              CircularProgressIndicator(color: appTheme.accent)
             else if (icon != null)
-              Icon(icon, size: 40, color: palette.textSecondary),
-            const SizedBox(height: SectionMetrics.gap),
+              Icon(icon, size: 40, color: appTheme.textSubtitle),
+            const SizedBox(height: AppMetrics.gap),
             Text(
               text,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15.5,
                 height: 1.45,
-                color: palette.textPrimary,
+                color: appTheme.textTitle,
               ),
             ),
           ],

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
-
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
 import 'editor_scaffold.dart';
@@ -59,7 +57,7 @@ class _QuizEditorScreenState extends State<QuizEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return EditorScaffold(
       title: widget.title,
@@ -73,7 +71,6 @@ class _QuizEditorScreenState extends State<QuizEditorScreen> {
         children: [
           if (_questions.isEmpty)
             EditorEmptyState(
-              palette: palette,
               icon: Icons.quiz_outlined,
               text: 'Todavía no hay preguntas.',
               buttonLabel: 'Añadir la primera pregunta',
@@ -82,14 +79,13 @@ class _QuizEditorScreenState extends State<QuizEditorScreen> {
           else ...[
             for (var i = 0; i < _questions.length; i++)
               TeacherListRow(
-                palette: palette,
                 title: _questions[i].prompt.isEmpty
                     ? 'Pregunta sin enunciado'
                     : _questions[i].prompt,
                 subtitle: _describe(_questions[i]),
                 position: i + 1,
                 total: _questions.length,
-                leading: _Number(palette: palette, value: i + 1),
+               value: i + 1),
                 onTap: () => _editQuestion(i),
                 onMoveUp: i == 0
                     ? null
@@ -111,9 +107,8 @@ class _QuizEditorScreenState extends State<QuizEditorScreen> {
                   }
                 },
               ),
-            const SizedBox(height: SectionMetrics.gap),
+            const SizedBox(height: AppMetrics.gap),
             TeacherAddButton(
-              palette: palette,
               label: 'Añadir pregunta',
               onPressed: _addQuestion,
             ),
@@ -142,19 +137,20 @@ class _QuizEditorScreenState extends State<QuizEditorScreen> {
 }
 
 class _Number extends StatelessWidget {
-  const _Number({required this.palette, required this.value});
+  const _Number({required this.value});
 
-  final SectionPalette palette;
   final int value;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme =Theme.of(context).extension<ActivityThemeColors>()!;
+
     return Container(
       width: 26,
       height: 26,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: palette.accentSoft,
+        color: appTheme.accentSoft,
         shape: BoxShape.circle,
       ),
       child: Text(
@@ -162,7 +158,7 @@ class _Number extends StatelessWidget {
         style: TextStyle(
           fontSize: 12.5,
           fontWeight: FontWeight.w800,
-          color: palette.accent,
+          color: appTheme.accent,
         ),
       ),
     );
@@ -263,7 +259,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return EditorScaffold(
       title: widget.isNew ? 'Nueva pregunta' : 'Editar pregunta',
@@ -272,18 +268,15 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TeacherCard(
-            palette: palette,
             child: TeacherField(
-              palette: palette,
               label: 'Enunciado',
               controller: _prompt,
               maxLines: 3,
               hint: '¿Qué quieres preguntar?',
             ),
           ),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
           TeacherCard(
-            palette: palette,
             title: 'Opciones',
             child: RadioGroup<int>(
               groupValue: _correct,
@@ -295,10 +288,10 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                     'Marca el círculo de la respuesta correcta.',
                     style: TextStyle(
                       fontSize: 12.5,
-                      color: palette.textSecondary,
+                      color: appTheme.textSubtitle,
                     ),
                   ),
-                  const SizedBox(height: SectionMetrics.gap),
+                  const SizedBox(height: AppMetrics.gap),
                   for (var i = 0; i < _options.length; i++)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
@@ -310,7 +303,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                                 : 'Marcar la opción ${i + 1} como correcta',
                             child: Radio<int>(
                               value: i,
-                              activeColor: palette.success,
+                              activeColor: appTheme.successBackground,
                             ),
                           ),
                           Expanded(
@@ -319,29 +312,29 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                               onChanged: (_) => setState(() => _error = null),
                               style: TextStyle(
                                 fontSize: 14.5,
-                                color: palette.textPrimary,
+                                color: appTheme.textTitle,
                               ),
                               decoration: InputDecoration(
                                 hintText: 'Opción ${i + 1}',
                                 isDense: true,
                                 filled: true,
                                 fillColor: _correct == i
-                                    ? palette.successSoft
-                                    : palette.surfaceAlt,
+                                    ? appTheme.successBackground
+                                    : appTheme.infoBackground,
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 12,
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: palette.border),
+                                  borderSide: BorderSide(color: appTheme.border),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
                                     color: _correct == i
-                                        ? palette.success
-                                        : palette.border,
+                                        ? appTheme.successBorder
+                                        : appTheme.border,
                                   ),
                                 ),
                               ),
@@ -350,10 +343,10 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                           IconButton(
                             tooltip: 'Quitar la opción ${i + 1}',
                             onPressed: () => _removeOption(i),
-                            color: palette.textSecondary,
+                            color: appTheme.textSubtitle,
                             constraints: const BoxConstraints(
-                              minWidth: SectionMetrics.minTapTarget,
-                              minHeight: SectionMetrics.minTapTarget,
+                              minWidth: AppMetrics.minTapTarget,
+                              minHeight: AppMetrics.minTapTarget,
                             ),
                             icon: const Icon(Icons.close, size: 18),
                           ),
@@ -361,7 +354,6 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                       ),
                     ),
                   TeacherAddButton(
-                    palette: palette,
                     label: 'Añadir opción',
                     onPressed: _addOption,
                   ),
@@ -369,11 +361,9 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
               ),
             ),
           ),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
           TeacherCard(
-            palette: palette,
             child: TeacherField(
-              palette: palette,
               label: 'Explicación',
               controller: _explanation,
               maxLines: 3,
@@ -383,12 +373,10 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
             ),
           ),
           if (_error != null) ...[
-            const SizedBox(height: SectionMetrics.gap),
+            const SizedBox(height: AppMetrics.gap),
             TeacherBanner(
-              palette: palette,
               icon: Icons.error_outline,
               text: _error!,
-              tone: palette.danger,
             ),
           ],
         ],

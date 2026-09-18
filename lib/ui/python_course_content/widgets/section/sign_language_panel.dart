@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/domain/models/sign_language/hand_alphabet.dart';
-
-import 'section_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'sign_asset_index.dart';
 
 /// Configuración de una letra del alfabeto manual.
@@ -146,7 +143,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final letter = _currentLetter;
     final word = _currentWord;
     final shape = signAlphabet[letter];
@@ -163,9 +160,9 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: palette.surface,
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
-            border: Border.all(color: palette.border),
+            color: appTheme.surface,
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
+            border: Border.all(color: appTheme.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

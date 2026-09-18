@@ -3,9 +3,9 @@ import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart';
 import 'chapter_section_screen.dart';
-import 'section_theme.dart';
 import 'section_widgets.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 
@@ -130,8 +130,8 @@ class _CourseChapterPageState extends State<CourseChapterPage> {
         icon: const Icon(Icons.edit_outlined),
         tooltip: 'Editar capítulo',
         constraints: const BoxConstraints(
-          minWidth: SectionMetrics.minTapTarget,
-          minHeight: SectionMetrics.minTapTarget,
+          minWidth: AppMetrics.minTapTarget,
+          minHeight: AppMetrics.minTapTarget,
         ),
       ),
     );
@@ -153,11 +153,11 @@ class _ChapterNotFound extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     return Scaffold(
-      backgroundColor: palette.background,
-      appBar: GlobalAppBarWidget(
+      backgroundColor: appTheme.background,
+      appBar: const GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
       ),
@@ -166,7 +166,7 @@ class _ChapterNotFound extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(
-              maxWidth: SectionMetrics.maxContentWidth,
+              maxWidth: AppMetrics.maxContentWidth,
             ),
             child: SectionCard(
               child: Column(
@@ -179,7 +179,7 @@ class _ChapterNotFound extends StatelessWidget {
                         'No encontramos el capítulo $sectionNumber del módulo '
                         '$moduleNumber en el catálogo del curso.',
                     icon: Icons.search_off,
-                    color: palette.warning,
+                    color: Colors.orange,
                   ),
                   const SizedBox(height: 20),
                   SectionPrimaryButton(

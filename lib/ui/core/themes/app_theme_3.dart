@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// Define los modos visuales disponibles en la aplicación.
+/// Incluye opciones para accesibilidad visual y daltonismo.
 enum AppThemeMode {
   light,
   dark,
@@ -9,15 +11,17 @@ enum AppThemeMode {
   achromatopsia,
 }
 
+/// Gestor global del estado del tema.
+/// Usa ValueNotifier para redibujar la UI sin dependencias externas.
 class ThemeManager {
   static final ValueNotifier<AppThemeMode> themeNotifier =
       ValueNotifier<AppThemeMode>(AppThemeMode.light);
 
-  static void changeTheme(AppThemeMode mode) {
-    themeNotifier.value = mode;
-  }
+  static void changeTheme(AppThemeMode mode) => themeNotifier.value = mode;
 }
 
+/// Medidas estándar de la aplicación.
+/// Garantiza consistencia en radios, márgenes y tamaños táctiles (accesibilidad).
 abstract final class AppMetrics {
   static const double minTapTarget = 48;
   static const double cardRadius = 16;
@@ -39,29 +43,26 @@ abstract final class AppMetrics {
 
 enum AppThemeTone { info, success, warning, danger, action }
 
+/// Extensión para manejar alertas y mensajes (Info, Success, Warning, Danger).
+/// Define la triada accesible: fondo suave, borde visible y texto oscuro.
 class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
   final Color background;
   final Color border;
   final Color iconBackground;
   final Color textTitle;
   final Color textSubtitle;
-
   final Color infoBackground;
   final Color infoBorder;
   final Color infoText;
-
   final Color successBackground;
   final Color successBorder;
   final Color successText;
-
   final Color warningBackground;
   final Color warningBorder;
   final Color warningText;
-
   final Color dangerBackground;
   final Color dangerBorder;
   final Color dangerText;
-
   final Color actionBackground;
   final Color actionBorder;
   final Color actionText;
@@ -72,28 +73,24 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
     required this.iconBackground,
     required this.textTitle,
     required this.textSubtitle,
-
     required this.infoBackground,
     required this.infoBorder,
     required this.infoText,
-
     required this.successBackground,
     required this.successBorder,
     required this.successText,
-
     required this.warningBackground,
     required this.warningBorder,
     required this.warningText,
-
     required this.dangerBackground,
     required this.dangerBorder,
     required this.dangerText,
-
     required this.actionBackground,
     required this.actionBorder,
     required this.actionText,
   });
 
+  /// Devuelve la triada de colores exacta según la intención.
   ({Color background, Color border, Color text}) tone(AppThemeTone tone) =>
       switch (tone) {
         AppThemeTone.info => (
@@ -124,9 +121,7 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
       };
 
   @override
-  ActivityThemeColors copyWith({
-    Color? background /* ... resto de variables ... */,
-  }) {
+  ActivityThemeColors copyWith({Color? background}) {
     return ActivityThemeColors(
       background: background ?? this.background,
       border: border,
@@ -198,7 +193,15 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
   }
 }
 
+/// Extensión para elementos específicos de las lecciones.
 class CourseTheme extends ThemeExtension<CourseTheme> {
+  final Color lessonCard;
+  final Color lessonCardBorder;
+  final Color mutedText;
+  final Color readingCard;
+  final Color knowledgeCapsule;
+  final Color progressTrack;
+
   const CourseTheme({
     required this.lessonCard,
     required this.lessonCardBorder,
@@ -208,29 +211,16 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
     required this.progressTrack,
   });
 
-  final Color lessonCard;
-  final Color lessonCardBorder;
-  final Color mutedText;
-  final Color readingCard;
-  final Color knowledgeCapsule;
-  final Color progressTrack;
-
   @override
-  CourseTheme copyWith({
-    Color? lessonCard,
-    Color? lessonCardBorder,
-    Color? mutedText,
-    Color? readingCard,
-    Color? knowledgeCapsule,
-    Color? progressTrack,
-  }) => CourseTheme(
-    lessonCard: lessonCard ?? this.lessonCard,
-    lessonCardBorder: lessonCardBorder ?? this.lessonCardBorder,
-    mutedText: mutedText ?? this.mutedText,
-    readingCard: readingCard ?? this.readingCard,
-    knowledgeCapsule: knowledgeCapsule ?? this.knowledgeCapsule,
-    progressTrack: progressTrack ?? this.progressTrack,
-  );
+  CourseTheme copyWith({Color? lessonCard, Color? lessonCardBorder}) =>
+      CourseTheme(
+        lessonCard: lessonCard ?? this.lessonCard,
+        lessonCardBorder: lessonCardBorder ?? this.lessonCardBorder,
+        mutedText: mutedText,
+        readingCard: readingCard,
+        knowledgeCapsule: knowledgeCapsule,
+        progressTrack: progressTrack,
+      );
 
   @override
   CourseTheme lerp(covariant CourseTheme? other, double t) {
@@ -254,8 +244,17 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
   }
 }
 
-/// Colores semánticos de la Consola Python/editor Python y del resaltado de sintaxis Python.
+/// Extensión para la consola interactiva de Python.
 class CodeConsoleTheme extends ThemeExtension<CodeConsoleTheme> {
+  final Color background;
+  final Color border;
+  final Color text;
+  final Color prompt;
+  final Color keyword;
+  final Color string;
+  final Color comment;
+  final Color error;
+
   const CodeConsoleTheme({
     required this.background,
     required this.border,
@@ -267,34 +266,16 @@ class CodeConsoleTheme extends ThemeExtension<CodeConsoleTheme> {
     required this.error,
   });
 
-  final Color background;
-  final Color border;
-  final Color text;
-  final Color prompt;
-  final Color keyword;
-  final Color string;
-  final Color comment;
-  final Color error;
-
   @override
-  CodeConsoleTheme copyWith({
-    Color? background,
-    Color? border,
-    Color? text,
-    Color? prompt,
-    Color? keyword,
-    Color? string,
-    Color? comment,
-    Color? error,
-  }) => CodeConsoleTheme(
+  CodeConsoleTheme copyWith({Color? background}) => CodeConsoleTheme(
     background: background ?? this.background,
-    border: border ?? this.border,
-    text: text ?? this.text,
-    prompt: prompt ?? this.prompt,
-    keyword: keyword ?? this.keyword,
-    string: string ?? this.string,
-    comment: comment ?? this.comment,
-    error: error ?? this.error,
+    border: border,
+    text: text,
+    prompt: prompt,
+    keyword: keyword,
+    string: string,
+    comment: comment,
+    error: error,
   );
 
   @override
@@ -313,53 +294,34 @@ class CodeConsoleTheme extends ThemeExtension<CodeConsoleTheme> {
   }
 }
 
-// Lógica 2 + 2 + 1 + 1 para el fondo acorde a los modulos
+/// Generador dinámico de colores según la temática del módulo.
+/// Garantiza alto contraste en textos para accesibilidad visual.
 class ModuleCardThemeColors {
   static Color getBackgroundColor(int moduleId) {
-    if (moduleId == 1 || moduleId == 2) {
-      return const Color(0xFFE8F7FA); // Módulos 1 y 2 (Celeste claro)
-    } else if (moduleId == 3 || moduleId == 4) {
-      return const Color(0xFFE8F7FA); // Reemplaza con el color para 3 y 4
-    } else if (moduleId == 5) {
-      return const Color(0xFFE8F7FA); // Reemplaza con el color para 5
-    } else if (moduleId == 6) {
-      return const Color(0xFFE8F7FA); // Reemplaza con el color para el 6
-    }
-    // Color por defecto por seguridad
-    return const Color(0xFFE8F7FA);
+    if (moduleId == 1 || moduleId == 2)
+      return const Color(0xFFE3F2FD); // Azul suave
+    if (moduleId == 3 || moduleId == 4)
+      return const Color(0xFFE8F5E9); // Verde suave
+    if (moduleId == 5) return const Color(0xFFFFF9C4); // Amarillo suave
+    if (moduleId == 6) return const Color(0xFFFFEBEE); // Rojo suave
+    return const Color(0xFFF5F5F5); // Default
   }
 
-  // Lógica para el color del texto (si es que cambia por módulo)
   static Color getTextColor(int moduleId) {
-    if (moduleId == 1 || moduleId == 2) {
-      return const Color(0xFF607D8B); // Módulos 1 y 2
-    }
-    // Añade el resto de condiciones o retorna un solo color si el texto siempre es igual
-    return const Color(0xFF607D8B);
+    if (moduleId == 1 || moduleId == 2)
+      return const Color(0xFF0D47A1); // Azul oscuro
+    if (moduleId == 3 || moduleId == 4)
+      return const Color(0xFF1B5E20); // Verde oscuro
+    if (moduleId == 5)
+      return const Color(0xFFF57F17); // Amarillo oscuro/naranja
+    if (moduleId == 6) return const Color(0xFFB71C1C); // Rojo oscuro
+    return const Color(0xFF424242); // Default
   }
 }
 
-class ActivityColors {
-  static const Color background = Color(0xFFF8FBFF);
-  static const Color border = Color(0xFFE3ECF7);
-  static const Color iconBackground = Color(0xFFE8F1FF);
-
-  static const Color textTitle = Color(0xFF263238);
-  static const Color textSubtitle = Color(0xFF607D8B);
-
-  static const Color successBackground = Color(0xFFE8F5E9);
-  static const Color successBorder = Color(0xFF66BB6A);
-  static const Color successText = Color(0xFF2E7D32);
-
-  static const Color actionBackground = Color(0xFFE3F2FD);
-  static const Color actionBorder = Color(0xFF90CAF9);
-  static const Color actionText = Color(0xFF1565C0);
-}
-
+/// Atajos rápidos para acceder al tema desde el BuildContext.
 extension AppThemeContext on BuildContext {
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
-
-  // Atajos para TUS extensiones personalizadas
   CourseTheme get courseTheme => Theme.of(this).extension<CourseTheme>()!;
   CodeConsoleTheme get codeConsoleTheme =>
       Theme.of(this).extension<CodeConsoleTheme>()!;
@@ -367,6 +329,7 @@ extension AppThemeContext on BuildContext {
       Theme.of(this).extension<ActivityThemeColors>()!;
 }
 
+/// Fábrica principal que ensambla todos los temas de la aplicación.
 class AppTheme {
   static ThemeData _buildTheme({
     required Brightness brightness,
@@ -417,9 +380,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(8),
           side: const BorderSide(color: Color(0xFFE0E0E0)),
         ),
-        shadowColor: const Color(
-          0x14000000,
-        ), //FALTAN blurRadius: 6, offset: Offset(0, 2),
+        shadowColor: const Color(0x14000000),
       ),
       splashColor: colorScheme.primary.withValues(alpha: 0.15),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -431,10 +392,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
-          minimumSize: const Size(
-            0,
-            AppMetrics.minTapTarget,
-          ), // Accesibilidad garantizada
+          minimumSize: const Size(0, AppMetrics.minTapTarget),
           padding: const EdgeInsets.symmetric(
             horizontal: AppMetrics.paddingH,
             vertical: AppMetrics.paddingV,
@@ -457,7 +415,10 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: colorScheme.primary, width: 2),
+          borderSide: BorderSide(
+            color: colorScheme.secondary,
+            width: 2,
+          ), // Usa secundario para input focus
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -470,8 +431,8 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: colorScheme.primary,
-          side: BorderSide(color: colorScheme.primary, width: 1.5),
+          foregroundColor: colorScheme.secondary,
+          side: BorderSide(color: colorScheme.secondary, width: 1.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
@@ -488,32 +449,36 @@ class AppTheme {
         ),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: colorScheme.primary,
+        color: colorScheme.secondary,
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith<Color?>((states) {
-          return states.contains(WidgetState.selected)
-              ? colorScheme.primary
-              : null;
-        }),
-        trackColor: WidgetStateProperty.resolveWith<Color?>((states) {
-          return states.contains(WidgetState.selected)
-              ? colorScheme.primary.withValues(alpha: 0.5)
-              : null;
-        }),
+        thumbColor: WidgetStateProperty.resolveWith<Color?>(
+          (states) => states.contains(WidgetState.selected)
+              ? colorScheme.secondary
+              : null,
+        ),
+        trackColor: WidgetStateProperty.resolveWith<Color?>(
+          (states) => states.contains(WidgetState.selected)
+              ? colorScheme.secondary.withValues(alpha: 0.5)
+              : null,
+        ),
       ),
       extensions: [courseTheme, codeConsoleTheme, activityThemeColors],
     );
   }
 
+  /// Construye el tema claro (Light).
+  /// Primary = Rojo Univalle, Secondary = Azul Python, Tertiary = Amarillo Python.
   static ThemeData get lightTheme => _buildTheme(
     brightness: Brightness.light,
     scaffoldBackgroundColor: const Color(0xFFF5F5F5),
     colorScheme: const ColorScheme.light(
-      primary: Color(0xFFE53935),
+      primary: Color(0xFFC62828), // Rojo Univalle (Dominante)
       onPrimary: Colors.white,
-      secondary: Color(0xFF5C6BC0),
+      secondary: Color(0xFF3776AB), // Azul Python (Secundario)
       onSecondary: Colors.white,
+      tertiary: Color(0xFFFFD43B), // Amarillo Python (Auxiliar)
+      onTertiary: Color(0xFF212121),
       surface: Colors.white,
       onSurface: Color(0xFF212121),
       error: Color(0xFFD32F2F),
@@ -521,17 +486,17 @@ class AppTheme {
     ),
     courseTheme: const CourseTheme(
       lessonCard: Colors.white,
-      lessonCardBorder: Color(0xFFE3F2FD),
+      lessonCardBorder: Color(0xFFE3ECF7),
       mutedText: Color(0xFF607D8B),
-      readingCard: Color(0xFFEAF7FF),
+      readingCard: Color(0xFFE3F2FD),
       knowledgeCapsule: Color(0xFFE8F5E9),
-      progressTrack: Color(0xFFE3F2FD),
+      progressTrack: Color(0xFFE0E0E0),
     ),
     codeConsoleTheme: const CodeConsoleTheme(
       background: Color(0xFFF8FBFF),
       border: Color(0xFFB0BEC5),
       text: Color(0xFF263238),
-      prompt: Color(0xFF1E88E5),
+      prompt: Color(0xFF3776AB),
       keyword: Color(0xFFD73A49),
       string: Color(0xFF032F62),
       comment: Color(0xFF6A737D),
@@ -549,24 +514,28 @@ class AppTheme {
       successBackground: Color(0xFFE8F5E9),
       successBorder: Color(0xFF66BB6A),
       successText: Color(0xFF2E7D32),
-      warningBackground: Color(0xFFFFCDD2),
-      warningBorder: Color(0xFFFFAB91),
-      warningText: Color(0xFFF57C00),
-      dangerBackground: Color(0xFFE53935),
-      dangerBorder: Color(0xFFD32F2F),
-      dangerText: Color(0xFFB71C1C),
+      warningBackground: Color(0xFFFFF3E0),
+      warningBorder: Color(0xFFFFB74D),
+      warningText: Color(0xFFE65100), // Corregido para contraste
+      dangerBackground: Color(
+        0xFFFFEBEE,
+      ), // Corregido: Era E53935 (texto no se leía)
+      dangerBorder: Color(0xFFEF5350),
+      dangerText: Color(0xFFC62828), // Corregido para contraste
       actionBackground: Color(0xFFE3F2FD),
       actionBorder: Color(0xFF90CAF9),
       actionText: Color(0xFF1565C0),
     ),
   );
 
+  /// Mapas de resaltado de sintaxis para el editor/consola.
+  /// Ideales para usar con paquetes como flutter_highlight.
   static Map<String, TextStyle> get pythonLightSyntax {
     return {
       'keyword': const TextStyle(
         color: Color(0xFFD73A49),
         fontWeight: FontWeight.bold,
-      ), // def, if, return
+      ),
       'string': const TextStyle(
         color: Color(0xFF032F62),
         fontStyle: FontStyle.normal,
@@ -574,12 +543,38 @@ class AppTheme {
       'comment': const TextStyle(
         color: Color(0xFF6A737D),
         fontStyle: FontStyle.italic,
-      ), // # Mi comentario
-      'number': const TextStyle(color: Color(0xFF005CC5)), // 10, 3.14
+      ),
+      'number': const TextStyle(color: Color(0xFF005CC5)),
       'title': const TextStyle(
         color: Color(0xFF6F42C1),
         fontWeight: FontWeight.bold,
-      ), // Nombre de funciones
+      ),
+    };
+  }
+
+  static Map<String, TextStyle> get pythonAchromatopsiaSyntax {
+    return {
+      'keyword': const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        decoration: TextDecoration.underline,
+      ),
+      'string': const TextStyle(
+        color: Color(0xFFE0E0E0),
+        fontStyle: FontStyle.italic,
+      ),
+      'comment': const TextStyle(
+        color: Color(0xFF757575),
+        fontStyle: FontStyle.normal,
+      ),
+      'number': const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w900,
+      ),
+      'title': const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+      ),
     };
   }
 }

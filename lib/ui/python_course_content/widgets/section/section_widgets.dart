@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'section_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
 /// Tarjeta base de la ruta de aprendizaje.
 class SectionCard extends StatelessWidget {
@@ -26,7 +25,7 @@ class SectionCard extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: background ?? palette.surface,
-        borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+        borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         border: Border.all(color: borderColor ?? palette.border),
       ),
       child: child,
@@ -403,9 +402,9 @@ class SectionPrimaryButton extends StatelessWidget {
             foregroundColor: palette.isDark ? palette.onAccent : Colors.white,
             disabledBackgroundColor: palette.border,
             disabledForegroundColor: palette.textSecondary,
-            minimumSize: const Size.fromHeight(SectionMetrics.minTapTarget),
+            minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+              borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
             textStyle: const TextStyle(
               fontSize: 16,
@@ -453,9 +452,9 @@ class SectionSecondaryButton extends StatelessWidget {
             foregroundColor: palette.accent,
             disabledForegroundColor: palette.textSecondary,
             side: BorderSide(color: palette.accent, width: 1.6),
-            minimumSize: const Size.fromHeight(SectionMetrics.minTapTarget),
+            minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+              borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
             textStyle: const TextStyle(
               fontSize: 16,
@@ -492,7 +491,7 @@ class SectionStatusChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
         color: colors.background,
-        borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+        borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
         border: Border.all(color: colors.foreground.withValues(alpha: 0.5)),
       ),
       child: Row(
@@ -566,7 +565,7 @@ class SectionProgressBar extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             ClipRRect(
-              borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+              borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
               child: LinearProgressIndicator(
                 value: value.clamp(0.0, 1.0),
                 minHeight: 10,

@@ -28,7 +28,6 @@ void main() {
           wrap(
             Builder(
               builder: (context) => TeacherField(
-                palette: SectionPalette.of(context),
                 label: 'Campo',
                 controller: controller,
                 maxLines: maxLines,
@@ -52,7 +51,6 @@ void main() {
         wrap(
           Builder(
             builder: (context) => TeacherField(
-              palette: SectionPalette.of(context),
               label: 'Transcripción',
               controller: controller,
               maxLines: 2,
@@ -75,7 +73,6 @@ void main() {
         wrap(
           Builder(
             builder: (context) => TeacherField(
-              palette: SectionPalette.of(context),
               label: 'Campo',
               controller: controller,
               maxLines: 2,
@@ -101,7 +98,6 @@ void main() {
         wrap(
           Builder(
             builder: (context) => TeacherListRow(
-              palette: SectionPalette.of(context),
               title: 'Una pregunta bastante larga para ver si cabe bien',
               subtitle: '4 opciones · correcta: la segunda',
               position: 1,
@@ -125,7 +121,6 @@ void main() {
         wrap(
           Builder(
             builder: (context) => TeacherListRow(
-              palette: SectionPalette.of(context),
               title: '',
               subtitle: 'sin contenido',
               position: 1,
@@ -145,7 +140,6 @@ void main() {
         wrap(
           Builder(
             builder: (context) => TeacherBanner(
-              palette: SectionPalette.of(context),
               icon: Icons.error_outline,
               text: 'No se pudo guardar: el servidor no responde.',
             ),

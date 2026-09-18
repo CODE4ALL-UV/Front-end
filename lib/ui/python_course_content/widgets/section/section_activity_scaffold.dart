@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_text_scale.dart';
-import 'section_theme.dart';
 import 'section_widgets.dart';
 
 /// Estructura común de todas las pantallas de actividad de la ruta.
@@ -90,12 +90,12 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
     final width = MediaQuery.sizeOf(context).width;
+    final appTheme = context.activityColors;
 
     return Scaffold(
-      backgroundColor: palette.background,
-      appBar: GlobalAppBarWidget(
+      backgroundColor: appTheme.background,
+      appBar: const GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
       ),
@@ -122,11 +122,11 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
                 controller: _scrollController,
                 child: SingleChildScrollView(
                   controller: _scrollController,
-                  padding: SectionMetrics.pagePadding(width),
+                  padding: AppMetrics.pagePadding(width),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(
-                        maxWidth: SectionMetrics.maxContentWidth,
+                        maxWidth: AppMetrics.maxContentWidth,
                       ),
                       child: widget.child,
                     ),
@@ -138,8 +138,8 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: palette.surface,
-                  border: Border(top: BorderSide(color: palette.border)),
+                  color: appTheme.actionBackground,
+                  border: Border(top: BorderSide(color: appTheme.border)),
                 ),
                 child: SafeArea(
                   top: false,
@@ -151,7 +151,7 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
                     child: Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(
-                          maxWidth: SectionMetrics.maxContentWidth,
+                          maxWidth: AppMetrics.maxContentWidth,
                         ),
                         child: widget.bottomBar!,
                       ),
@@ -181,7 +181,7 @@ class _ActivityBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     return Semantics(
       header: true,
@@ -191,13 +191,13 @@ class _ActivityBanner extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
           decoration: BoxDecoration(
-            color: palette.surface,
-            border: Border(bottom: BorderSide(color: palette.border)),
+            color: appTheme.actionBackground,
+            border: Border(bottom: BorderSide(color: appTheme.border)),
           ),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(
-                maxWidth: SectionMetrics.maxContentWidth,
+                maxWidth: AppMetrics.maxContentWidth,
               ),
               child: Row(
                 children: [
@@ -206,10 +206,14 @@ class _ActivityBanner extends StatelessWidget {
                     height: 44,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: palette.accentSoft,
+                      color: appTheme.actionBackground,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(activityIcon, size: 24, color: palette.accent),
+                    child: Icon(
+                      activityIcon,
+                      size: 24,
+                      color: appTheme.iconBackground,
+                    ),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -222,7 +226,7 @@ class _ActivityBanner extends StatelessWidget {
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.4,
-                            color: palette.textSecondary,
+                            color: appTheme.textSubtitle,
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -232,7 +236,7 @@ class _ActivityBanner extends StatelessWidget {
                             fontSize: 17,
                             height: 1.3,
                             fontWeight: FontWeight.w700,
-                            color: palette.textPrimary,
+                            color: appTheme.textTitle,
                           ),
                         ),
                       ],
@@ -256,17 +260,17 @@ class _AccessibilityToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
     final textScale = AccessibilityTextScaleScope.of(context);
+    final appTheme = context.activityColors;
 
     return Container(
       width: double.infinity,
-      color: palette.surfaceAlt,
+      color: appTheme.actionBackground,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(
-            maxWidth: SectionMetrics.maxContentWidth,
+            maxWidth: AppMetrics.maxContentWidth,
           ),
           child: Row(
             children: [
@@ -287,10 +291,11 @@ class _AccessibilityToolbar extends StatelessWidget {
                         child: TextButton.icon(
                           onPressed: () => onToggleSpeech(),
                           style: TextButton.styleFrom(
-                            foregroundColor: palette.accent,
+                            backgroundColor: appTheme.actionBackground,
+                            foregroundColor: appTheme.border,
                             minimumSize: const Size(
-                              SectionMetrics.minTapTarget,
-                              SectionMetrics.minTapTarget,
+                              AppMetrics.minTapTarget,
+                              AppMetrics.minTapTarget,
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             textStyle: const TextStyle(
@@ -329,7 +334,7 @@ class _AccessibilityToolbar extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: palette.textSecondary,
+                            color: appTheme.textSubtitle,
                           ),
                         ),
                       ),
@@ -363,7 +368,7 @@ class _TextScaleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = context.activityColors;
 
     return Semantics(
       button: true,
@@ -371,11 +376,11 @@ class _TextScaleButton extends StatelessWidget {
       child: IconButton(
         onPressed: onPressed,
         icon: Icon(icon, size: 24),
-        color: palette.accent,
+        color: appTheme.border,
         tooltip: label,
         constraints: const BoxConstraints(
-          minWidth: SectionMetrics.minTapTarget,
-          minHeight: SectionMetrics.minTapTarget,
+          minWidth: AppMetrics.minTapTarget,
+          minHeight: AppMetrics.minTapTarget,
         ),
       ),
     );

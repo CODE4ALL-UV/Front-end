@@ -85,7 +85,7 @@ class _QuizEditorScreenState extends State<QuizEditorScreen> {
                 subtitle: _describe(_questions[i]),
                 position: i + 1,
                 total: _questions.length,
-               value: i + 1),
+                leading: _Number(value: i + 1),
                 onTap: () => _editQuestion(i),
                 onMoveUp: i == 0
                     ? null
@@ -108,10 +108,7 @@ class _QuizEditorScreenState extends State<QuizEditorScreen> {
                 },
               ),
             const SizedBox(height: AppMetrics.gap),
-            TeacherAddButton(
-              label: 'Añadir pregunta',
-              onPressed: _addQuestion,
-            ),
+            TeacherAddButton(label: 'Añadir pregunta', onPressed: _addQuestion),
           ],
         ],
       ),
@@ -143,7 +140,7 @@ class _Number extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme =Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Container(
       width: 26,
@@ -327,7 +324,9 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: appTheme.border),
+                                  borderSide: BorderSide(
+                                    color: appTheme.border,
+                                  ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -374,10 +373,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
           ),
           if (_error != null) ...[
             const SizedBox(height: AppMetrics.gap),
-            TeacherBanner(
-              icon: Icons.error_outline,
-              text: _error!,
-            ),
+            TeacherBanner(icon: Icons.error_outline, text: _error!),
           ],
         ],
       ),

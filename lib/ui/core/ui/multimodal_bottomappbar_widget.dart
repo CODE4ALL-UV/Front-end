@@ -31,13 +31,15 @@ class MultimodalBottomAppBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Leemos estrictamente tu contrato de diseño centralizado en app_theme
-    final footerTheme = Theme.of(context).bottomNavigationBarTheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final bottomNavigationBarTheme = theme.bottomNavigationBarTheme;
 
     return Material(
       //ANTES CONTAINER()
-      elevation: footerTheme.elevation ?? 0,
+      elevation: bottomNavigationBarTheme.elevation ?? 0,
       child: Container(
-        color: footerTheme.backgroundColor ?? const Color(0xFFE53935),
+        color: colorScheme.primary,
         height: 56,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -51,8 +53,11 @@ class MultimodalBottomAppBarWidget extends StatelessWidget {
                 onTap: () {},
                 child: Icon(
                   Icons.skip_previous,
-                  color: footerTheme.unselectedItemColor ?? Colors.black,
-                  size: footerTheme.unselectedIconTheme?.size ?? 28,
+                  color:
+                      bottomNavigationBarTheme.unselectedItemColor ??
+                      Colors.black,
+                  size:
+                      bottomNavigationBarTheme.unselectedIconTheme?.size ?? 28,
                 ),
               ),
             ),
@@ -67,8 +72,10 @@ class MultimodalBottomAppBarWidget extends StatelessWidget {
                 onTap: () async => _announceCurrentScreen(context),
                 child: Icon(
                   Icons.play_arrow,
-                  color: footerTheme.selectedItemColor ?? Colors.black,
-                  size: footerTheme.selectedIconTheme?.size ?? 32,
+                  color:
+                      bottomNavigationBarTheme.selectedItemColor ??
+                      Colors.black,
+                  size: bottomNavigationBarTheme.selectedIconTheme?.size ?? 32,
                 ),
               ),
             ),
@@ -82,8 +89,11 @@ class MultimodalBottomAppBarWidget extends StatelessWidget {
                 onTap: () {},
                 child: Icon(
                   Icons.skip_next,
-                  color: footerTheme.unselectedItemColor ?? Colors.black,
-                  size: footerTheme.unselectedIconTheme?.size ?? 28,
+                  color:
+                      bottomNavigationBarTheme.unselectedItemColor ??
+                      Colors.black,
+                  size:
+                      bottomNavigationBarTheme.unselectedIconTheme?.size ?? 28,
                 ),
               ),
             ),

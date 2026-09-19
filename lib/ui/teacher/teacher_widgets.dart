@@ -327,7 +327,7 @@ class TeacherListRow extends StatelessWidget {
             child: ExcludeSemantics(
               child: InkWell(
                 onTap: onTap,
-                borderRadius: BorderRadius.circular(appTheme.cardRadius),
+                borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Row(
@@ -425,8 +425,8 @@ class _RowAction extends StatelessWidget {
       iconSize: 20,
       color: color ?? appTheme.textSubtitle,
       constraints: const BoxConstraints(
-        minWidth: appTheme.minTapTarget,
-        minHeight: appTheme.minTapTarget,
+        minWidth: AppMetrics.minTapTarget,
+        minHeight: AppMetrics.minTapTarget,
       ),
       icon: Icon(icon),
     );

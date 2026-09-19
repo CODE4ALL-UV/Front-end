@@ -32,13 +32,12 @@ class GlobalAppBarWidget extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     // Lee directamente los colores y fuentes definidos en el AppTheme activo
-    final theme = Theme.of(context).appBarTheme;
-    final toolbarColor =
-        theme.backgroundColor ?? Theme.of(context).colorScheme.primary;
-    final brightness = Theme.of(context).brightness;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final appBarTheme = theme.appBarTheme;
 
     // Logo dinámico según el tema claro/oscuro
-    final logoAsset = brightness == Brightness.light
+    final logoAsset = theme.brightness == Brightness.light
         ? 'assets/images/logoUV_Oficial_Blanco_1.png'
         : 'assets/images/logoUV_Oficial_Rojo.png';
 
@@ -51,10 +50,7 @@ class GlobalAppBarWidget extends StatelessWidget
       if (Navigator.canPop(context)) {
         return IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: Icon(
-            Icons.arrow_back,
-            color: theme.foregroundColor ?? Colors.white,
-          ),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
           tooltip: 'Volver',
         );
       }
@@ -73,13 +69,13 @@ class GlobalAppBarWidget extends StatelessWidget
       header: true, // Avisa al lector de pantalla que es un navbar
       label: 'Encabezado de la pantalla: $title',
       child: AppBar(
-        backgroundColor:
-            toolbarColor, //const Color(0xFF2A2A2A) const Color(0xFFE53935)
-        foregroundColor: theme.foregroundColor,
-        elevation: theme.elevation,
+        backgroundColor: colorScheme
+            .primary, //const Color(0xFF2A2A2A) const Color(0xFFE53935)
+        foregroundColor: colorScheme.onPrimary,
+        elevation: appBarTheme.elevation,
         leading: buildLeading(),
-        title: Text(title, style: theme.titleTextStyle),
-        centerTitle: true,
+        title: Text(title, style: appBarTheme.titleTextStyle),
+        centerTitle: appBarTheme.centerTitle,
         actions:
             actions ??
             (showUserIcon

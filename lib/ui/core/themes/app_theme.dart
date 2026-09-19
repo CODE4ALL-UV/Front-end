@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+class AppBreakpoints {
+  static const double mobile = 600;
+  static const double tablet = 900;
+  // Todo lo que sea > 900 se considera desktop/pantalla grande
+}
+
 enum AppThemeMode {
   light,
   dark,

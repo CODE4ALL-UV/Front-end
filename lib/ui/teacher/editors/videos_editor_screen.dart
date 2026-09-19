@@ -172,7 +172,7 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    //final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final detected = extractYoutubeId(_link.text);
 
     return EditorScaffold(

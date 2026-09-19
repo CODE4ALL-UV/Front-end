@@ -325,26 +325,26 @@ class _SignCameraScreenState extends State<SignCameraScreen>
       _Stage.unavailable => [
         _Message(text: _problem, icon: Icons.cloud_off),
         const SizedBox(height: AppMetrics.gap),
-        _retryButton(),
+        _retryButton(Theme.of(context)),
       ],
       _Stage.failed => [
         _Message(text: _problem, icon: Icons.error_outline),
         const SizedBox(height: AppMetrics.gap),
-        _retryButton(),
+        _retryButton(Theme.of(context)),
       ],
       _Stage.ready || _Stage.running => _session(),
     };
   }
 
-  Widget _retryButton() => Center(
+  Widget _retryButton(ThemeData appTheme) => Center(
     child: FilledButton.icon(
       onPressed: () {
         setState(() => _stage = _Stage.checking);
         _check();
       },
       style: FilledButton.styleFrom(
-        backgroundColor: appTheme.warningBackground,
-        foregroundColor: appTheme.onAccent,
+        backgroundColor: appTheme.colorScheme.primary,
+        foregroundColor: appTheme.colorScheme.onPrimary,
         minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.refresh),
@@ -391,14 +391,14 @@ class _SignCameraScreenState extends State<SignCameraScreen>
       if (running && _cameras.length > 1)
         OutlinedButton.icon(
           onPressed: _switchCamera,
-          style: _outlined(),
+          style: _outlined(Theme.of(context)),
           icon: const Icon(Icons.cameraswitch),
           label: const Text('Cambiar de cámara'),
         ),
       if (!_isPractice && running) ...[
         OutlinedButton.icon(
           onPressed: () => setState(_dictation.addSpace),
-          style: _outlined(),
+          style: _outlined(Theme.of(context)),
           icon: const Icon(Icons.space_bar),
           label: const Text('Espacio'),
         ),
@@ -406,7 +406,7 @@ class _SignCameraScreenState extends State<SignCameraScreen>
           onPressed: _dictation.isEmpty
               ? null
               : () => setState(_dictation.backspace),
-          style: _outlined(),
+          style: _outlined(Theme.of(context)),
           icon: const Icon(Icons.backspace_outlined),
           label: const Text('Borrar'),
         ),
@@ -414,7 +414,7 @@ class _SignCameraScreenState extends State<SignCameraScreen>
           onPressed: _dictation.isEmpty
               ? null
               : () => setState(_dictation.clear),
-          style: _outlined(),
+          style: _outlined(Theme.of(context)),
           icon: const Icon(Icons.delete_outline),
           label: const Text('Empezar de nuevo'),
         ),
@@ -429,9 +429,9 @@ class _SignCameraScreenState extends State<SignCameraScreen>
     );
   }
 
-  ButtonStyle _outlined() => OutlinedButton.styleFrom(
-    foregroundColor: appTheme.warningBackground,
-    side: BorderSide(color: appTheme.border),
+  ButtonStyle _outlined(ThemeData appTheme) => OutlinedButton.styleFrom(
+    foregroundColor: appTheme.colorScheme.primary,
+    side: BorderSide(color: appTheme.colorScheme.error),
     minimumSize: const Size(0, AppMetrics.minTapTarget),
   );
 }
@@ -706,6 +706,7 @@ class _LetterBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return SizedBox(
       width: 72,
       height: 72,
@@ -718,8 +719,8 @@ class _LetterBadge extends StatelessWidget {
             child: CircularProgressIndicator(
               value: progress == 0 ? null : progress,
               strokeWidth: 5,
-              backgroundColor: appTheme.dangerTextAlt,
-              valueColor: AlwaysStoppedAnimation<Color>(tone),
+              backgroundColor: appTheme.dangerBorder,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
             ),
           ),
           Text(

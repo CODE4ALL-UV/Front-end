@@ -1,6 +1,74 @@
 import 'package:flutter/material.dart';
 
-/// Define los modos visuales disponibles en la aplicación.
+/*
+  APP THEME
+  ----------
+  Centraliza el sistema visual de la aplicación: temas, colores, métricas,
+  estilos de componentes y extensiones específicas de la aplicación.
+
+  MODOS DE TEMA
+  AppThemeMode → Define los 6 modos visuales disponibles:
+  light, dark, protanopia, deuteranopia, tritanopia y achromatopsia.
+  Acceso: AppThemeMode.light / AppThemeMode.dark / etc.
+
+  GESTIÓN DEL TEMA
+  ThemeManager → Mantiene y cambia el modo visual seleccionado mediante ValueNotifier.
+  Acceso: ThemeManager.themeNotifier / ThemeManager.changeTheme(...).
+
+  TEMA ACTUAL
+  Theme.of(context) → Obtiene el ThemeData aplicado actualmente a la aplicación.
+  Acceso: Theme.of(context)
+
+  COLORES MATERIAL
+  ColorScheme → Contiene los colores generales de Material 3: primary, secondary,
+  tertiary, surface, error, colores para texto/iconos, etc.
+  Acceso: Theme.of(context).colorScheme
+  Atajo: context.colorScheme
+
+  ESTILOS DE COMPONENTES
+  ThemeData → Centraliza la configuración visual de componentes como AppBar, Card,
+  botones, campos de texto, diálogos, iconos, progreso, Switch, etc.
+  Acceso: Theme.of(context).appBarTheme / .cardTheme / .floatingActionButtonTheme / etc.
+  Normalmente los componentes los aplican automáticamente; no es necesario
+  acceder manualmente a estas propiedades salvo que se necesite consultar su configuración.
+
+  EXTENSIONES PERSONALIZADAS
+  CourseTheme → Colores específicos de las tarjetas y elementos de las lecciones.
+  Acceso: Theme.of(context).extension<CourseTheme>()! / context.courseTheme
+
+  CodeConsoleTheme → Colores específicos de la consola/editor de código Python.
+  Acceso: Theme.of(context).extension<CodeConsoleTheme>()! / context.codeConsoleTheme
+
+  ActivityThemeColors → Colores semánticos para información, éxito, advertencia,
+  peligro y acciones, incluyendo fondo, borde y texto.
+  Acceso: Theme.of(context).extension<ActivityThemeColors>()! / context.activityColors
+
+  TONOS SEMÁNTICOS
+  AppThemeTone → Identifica la intención visual: info, success, warning, danger o action.
+  Acceso: context.activityColors.tone(AppThemeTone.success)
+  Luego: .background / .border / .text
+
+  MÉTRICAS
+  AppMetrics → Define valores globales de espaciado, radios, tamaños táctiles y dimensiones.
+  No depende del ThemeData ni cambia entre modos de tema.
+  Acceso: AppMetrics.cardRadius / AppMetrics.paddingH / AppMetrics.minTapTarget / etc.
+
+  COLORES DE MÓDULOS
+  ModuleCardThemeColors → Proporciona colores de fondo y texto según el módulo.
+  Acceso: ModuleCardThemeColors.getBackgroundColor(moduleId)
+  Acceso: ModuleCardThemeColors.getTextColor(moduleId)
+
+  SINTAXIS DE PYTHON
+  pythonLightSyntax / pythonAchromatopsiaSyntax → Define estilos de texto para
+  resaltado de sintaxis de Python.
+  Acceso: AppTheme.pythonLightSyntax / AppTheme.pythonAchromatopsiaSyntax
+
+  CONSTRUCCIÓN DE TEMAS
+  AppTheme → Contiene la fábrica común de ThemeData y los temas concretos de la aplicación.
+  Acceso: AppTheme.lightTheme / AppTheme.darkTheme / etc.
+*/
+
+///// Define los modos visuales disponibles en la aplicación.
 /// Incluye opciones para accesibilidad visual y daltonismo.
 enum AppThemeMode {
   light,
@@ -331,6 +399,18 @@ extension AppThemeContext on BuildContext {
 
 /// Fábrica principal que ensambla todos los temas de la aplicación.
 class AppTheme {
+  /// Ensambla un ThemeData completo a partir de los tokens visuales del tema.
+  ///
+  /// Parámetros:
+  /// - brightness → Define la luminosidad base: Brightness.light o Brightness.dark.
+  /// - scaffoldBackgroundColor → Color de fondo general de las pantallas.
+  /// - colorScheme → Colores generales de Material 3 y base cromática de los componentes.
+  /// - courseTheme → Colores específicos de lecciones y cursos.
+  /// - codeConsoleTheme → Colores específicos de la consola/editor de Python.
+  /// - activityThemeColors → Colores semánticos para info, success, warning, danger y action.
+  ///
+  /// Los valores recibidos se aplican a ThemeData, sus temas de componentes y
+  /// sus ThemeExtension personalizadas.
   static ThemeData _buildTheme({
     required Brightness brightness,
     required Color scaffoldBackgroundColor,
@@ -359,17 +439,13 @@ class AppTheme {
           )
           .apply(fontFamily: 'Roboto'),
       appBarTheme: AppBarTheme(
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
         elevation: 0,
         centerTitle: true,
         actionsIconTheme: const IconThemeData(size: 28),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: colorScheme.surface,
-        selectedItemColor: colorScheme.primary,
         unselectedItemColor: mutedText,
-        elevation: 8,
+        elevation: 8.0,
         selectedIconTheme: const IconThemeData(size: 28),
         unselectedIconTheme: const IconThemeData(size: 24),
       ),

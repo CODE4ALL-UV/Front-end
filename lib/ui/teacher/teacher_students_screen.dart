@@ -166,13 +166,13 @@ class _StudentRow extends StatelessWidget {
     final percent = (student.accuracy * 100).round();
     final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
-    final tone = student.hasNotStarted
-        ? appTheme.textSubtitle
-        : (percent >= 70
-              ? appTheme.successBackground
-              : (percent >= 45
-                    ? appTheme.warningBackground
-                    : appTheme.dangerBackground));
+    // final tone = student.hasNotStarted
+    //     ? appTheme.textSubtitle
+    //     : (percent >= 70
+    //           ? appTheme.successBackground
+    //           : (percent >= 45
+    //                 ? appTheme.warningBackground
+    //                 : appTheme.dangerBackground));
 
     final initials = student.name.trim().isEmpty
         ? '?'

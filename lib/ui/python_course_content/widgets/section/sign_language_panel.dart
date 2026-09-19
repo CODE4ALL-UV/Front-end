@@ -390,15 +390,15 @@ class _SignDisplay extends StatelessWidget {
         child: Image.asset(
           path,
           fit: BoxFit.contain,
-          errorBuilder: (context, error, stack) => _fallback(),
+          errorBuilder: (context, error, stack) => _fallback(context),
         ),
       );
     }
 
-    return Container(decoration: container, child: _fallback());
+    return Container(decoration: container, child: _fallback(context));
   }
 
-  Widget _fallback() {
+  Widget _fallback(BuildContext context) {
     final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

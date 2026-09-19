@@ -196,14 +196,20 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
       opened
           ? 'Video abierto en tu navegador'
           : 'No se pudo abrir el video. Copia el enlace y ábrelo manualmente.',
-      opened ? appTheme.tone(success).success : appTheme.tone(danger).danger,
+      opened
+          ? appTheme.tone(AppThemeTone.success).background
+          : appTheme.tone(AppThemeTone.danger).background,
     );
   }
 
   Future<void> _copyLink() async {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     await Clipboard.setData(ClipboardData(text: _video.url));
     if (!mounted) return;
-    _showMessage('Enlace copiado al portapapeles', SectionTone.success);
+    _showMessage(
+      'Enlace copiado al portapapeles',
+      appTheme.tone(AppThemeTone.info).background,
+    );
   }
 
   Future<void> _finish() async {
@@ -218,8 +224,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
   }
 
   /// Muestra el aviso en pantalla y lo anuncia por voz.
-  void _showMessage(String message, SectionTone tone) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+  void _showMessage(String message, Color colorTone) {
     announceForAccessibility(context, message);
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -227,7 +232,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
         content: Row(
           children: [
             Icon(
-              tone == SectionTone.success
+              colorTone == colorTone
                   ? Icons.check_circle_outline
                   : Icons.error_outline,
               color: Colors.white,
@@ -236,7 +241,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: appTheme.tone(tone).foreground,
+        backgroundColor: colorTone,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 4),
       ),

@@ -301,18 +301,18 @@ class SectionCallout extends StatelessWidget {
   final String title;
   final String body;
 
-  IconData get _icon => switch (AppTheme) {
-    appThemeTone.info => Icons.lightbulb_outline,
-    appThemeTone.success => Icons.check_circle_outline,
-    appThemeTone.warning => Icons.warning_amber_rounded,
-    appThemeTone.danger => Icons.dangerous_outlined,
+  IconData get _icon => switch (AppThemeTone) {
+    AppThemeTone.info => Icons.lightbulb_outline,
+    AppThemeTone.success => Icons.check_circle_outline,
+    AppThemeTone.warning => Icons.warning_amber_rounded,
+    AppThemeTone.danger => Icons.dangerous_outlined,
   };
 
-  String get _prefix => switch (tone) {
-    appThemeTone.info => 'Idea clave',
-    appThemeTone.success => 'Bien hecho',
-    appThemeTone.warning => 'Atención',
-    appThemeTone.danger => 'Cuidado',
+  String get _prefix => switch (AppThemeTone) {
+    AppThemeTone.info => 'Idea clave',
+    AppThemeTone.success => 'Bien hecho',
+    AppThemeTone.warning => 'Atención',
+    AppThemeTone.danger => 'Cuidado',
   };
 
   @override

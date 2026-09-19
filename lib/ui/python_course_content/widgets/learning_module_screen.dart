@@ -107,7 +107,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final hasNextModule = widget.moduleNumber < widget.totalModules;
-    final labels = widget.bottomLabels ?? [];
+    //final labels = widget.bottomLabels ?? [];
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

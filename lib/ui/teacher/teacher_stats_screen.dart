@@ -48,7 +48,9 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
     final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     if (_stats.isLoading && !_stats.isLoaded) {
-      return Center(child: CircularProgressIndicator(color: appTheme.accent));
+      return Center(
+        child: CircularProgressIndicator(color: appTheme.successBackground),
+      );
     }
 
     return RefreshIndicator(
@@ -65,7 +67,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: _body(palette),
+                  children: _body(),
                 ),
               ),
             ),
@@ -75,7 +77,8 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
     );
   }
 
-  List<Widget> _body(SectionPalette appTheme) {
+  List<Widget> _body() {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     if (_stats.problem != null) {
       return [
         TeacherBanner(icon: Icons.cloud_off, text: _stats.problem!),
@@ -84,8 +87,8 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
           child: FilledButton.icon(
             onPressed: _stats.refresh,
             style: FilledButton.styleFrom(
-              backgroundColor: appTheme.accent,
-              foregroundColor: appTheme.onAccent,
+              backgroundColor: appTheme.background,
+              foregroundColor: appTheme.border,
               minimumSize: const Size(0, AppMetrics.minTapTarget),
             ),
             icon: const Icon(Icons.refresh),
@@ -100,7 +103,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
         Container(
           padding: const EdgeInsets.all(AppMetrics.sectionGap),
           decoration: BoxDecoration(
-            color: appTheme.surface,
+            color: appTheme.dangerBorder,
             border: Border.all(color: appTheme.border),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
@@ -142,10 +145,9 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
       _summaryRow(),
       const SizedBox(height: AppMetrics.sectionGap),
 
-      _sectionTitle(palette, 'Aciertos por sección', Icons.bar_chart),
+      _sectionTitle('Aciertos por sección', Icons.bar_chart),
       const SizedBox(height: 6),
       _note(
-        appTheme,
         'Ordenadas de la que peor va a la que mejor. Solo salen las que ya '
         'tienen al menos tres respuestas: con menos, un porcentaje bajo dice '
         'que casi nadie lo ha hecho, no que sea difícil.',
@@ -153,17 +155,15 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
       const SizedBox(height: AppMetrics.gap),
       if (hardSections.isEmpty)
         _note(
-          appTheme,
           'Ninguna sección tiene todavía suficientes respuestas para comparar.',
         )
       else
         for (final section in hardSections) _SectionBar(stats: section),
 
       const SizedBox(height: AppMetrics.sectionGap),
-      _sectionTitle(palette, 'Hasta dónde llegan', Icons.task_alt),
+      _sectionTitle('Hasta dónde llegan', Icons.task_alt),
       const SizedBox(height: 6),
       _note(
-        appTheme,
         'Cuántos estudiantes terminan cada actividad. Donde la cifra cae de '
         'golpe es donde la gente abandona la sección.',
       ),
@@ -175,37 +175,31 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
           _CompletionRow(title: section.$1, done: section.$2),
 
       const SizedBox(height: AppMetrics.sectionGap),
-      _sectionTitle(
-        appTheme,
-        'Preguntas que más tiempo cuestan',
-        Icons.timer_outlined,
-      ),
+      _sectionTitle('Preguntas que más tiempo cuestan', Icons.timer_outlined),
       const SizedBox(height: 6),
       _note(
-        appTheme,
         'Una pregunta que casi todos aciertan pero que lleva un minuto suele '
         'estar mal redactada, no ser difícil. Es una señal distinta de '
         'fallarla.',
       ),
       const SizedBox(height: AppMetrics.gap),
       if (_stats.slowestQuestions().isEmpty)
-        _note(palette, 'Todavía no hay tiempos medidos.')
+        _note('Todavía no hay tiempos medidos.')
       else
         for (final question in _stats.slowestQuestions())
           _QuestionRow(stats: question, showTime: true),
 
       const SizedBox(height: AppMetrics.sectionGap),
-      _sectionTitle(palette, 'Preguntas que más se fallan', Icons.help_outline),
+      _sectionTitle('Preguntas que más se fallan', Icons.help_outline),
       const SizedBox(height: 6),
       _note(
-        appTheme,
         'Si una pregunta la falla casi todo el mundo, suele ser que el '
         'enunciado confunde o que el tema no quedó explicado. Puedes editarla '
         'desde la pestaña del temario.',
       ),
       const SizedBox(height: AppMetrics.gap),
       if (hardQuestions.isEmpty)
-        _note(palette, 'Todavía no hay preguntas con respuestas suficientes.')
+        _note('Todavía no hay preguntas con respuestas suficientes.')
       else
         for (final question in hardQuestions) _QuestionRow(stats: question),
 
@@ -282,7 +276,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
   /// Se ordenan por el temario y no por cantidad: el docente quiere ver el
   /// recorrido del curso, que es donde se nota el abandono.
   List<(String, Map<String, int>)> _sectionsWithCompletions() {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    //final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final ids = <String>{for (final item in _stats.completions) item.sectionId};
 
     final out = <(String, Map<String, int>)>[];

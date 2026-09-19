@@ -160,7 +160,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: appTheme.surface,
+            color: appTheme.background,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             border: Border.all(color: appTheme.border),
           ),
@@ -170,7 +170,11 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.sign_language, size: 17, color: palette.accent),
+                  Icon(
+                    Icons.sign_language,
+                    size: 17,
+                    color: appTheme.infoBackground,
+                  ),
                   const SizedBox(width: 7),
                   Expanded(
                     child: Text(
@@ -178,7 +182,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
-                        color: palette.accent,
+                        color: appTheme.infoBackground,
                       ),
                     ),
                   ),
@@ -193,32 +197,23 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                   Expanded(
                     child: _HalfTile(
                       label: 'Dactilología',
-                      palette: palette,
                       caption: letter.trim().isEmpty ? '␣' : letter,
                       captionIsLarge: true,
                       footnote: (shape?.hasMotion ?? false)
                           ? 'lleva movimiento'
                           : null,
                       child: _letters.isEmpty
-                          ? _HandDrawing(
-                              shape: null,
-                              palette: palette,
-                              idle: true,
-                            )
+                          ? _HandDrawing(shape: null, idle: true)
                           : (letterAsset != null
                                 ? _AssetHand(
                                     assetPath: letterAsset,
                                     letter: letter,
-                                    palette: palette,
                                   )
                                 : AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 180),
                                     child: KeyedSubtree(
                                       key: ValueKey<String>('$letter$_index'),
-                                      child: _HandDrawing(
-                                        shape: shape,
-                                        palette: palette,
-                                      ),
+                                      child: _HandDrawing(shape: shape),
                                     ),
                                   )),
                     ),
@@ -227,13 +222,8 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                   Expanded(
                     child: _HalfTile(
                       label: 'Lengua de señas',
-                      palette: palette,
                       caption: word.isEmpty ? '—' : word,
-                      child: _SignDisplay(
-                        word: word,
-                        palette: palette,
-                        assetPath: wordAsset,
-                      ),
+                      child: _SignDisplay(word: word, assetPath: wordAsset),
                     ),
                   ),
                 ],
@@ -245,8 +235,10 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                   child: LinearProgressIndicator(
                     value: (_index + 1) / _letters.length,
                     minHeight: 4,
-                    backgroundColor: palette.border,
-                    valueColor: AlwaysStoppedAnimation<Color>(palette.accent),
+                    backgroundColor: appTheme.border,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      appTheme.infoBackground,
+                    ),
                   ),
                 ),
               ],
@@ -262,7 +254,6 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
 class _HalfTile extends StatelessWidget {
   const _HalfTile({
     required this.label,
-    required this.palette,
     required this.caption,
     required this.child,
     this.captionIsLarge = false,
@@ -276,7 +267,6 @@ class _HalfTile extends StatelessWidget {
   static const double visualHeight = 92;
 
   final String label;
-  final SectionPalette palette;
   final String caption;
   final Widget child;
   final bool captionIsLarge;
@@ -284,6 +274,7 @@ class _HalfTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -296,7 +287,7 @@ class _HalfTile extends StatelessWidget {
             fontSize: 10.5,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.3,
-            color: palette.textSecondary,
+            color: appTheme.textSubtitle,
           ),
         ),
         const SizedBox(height: 6),
@@ -312,7 +303,7 @@ class _HalfTile extends StatelessWidget {
             height: 1.1,
             fontWeight: captionIsLarge ? FontWeight.w900 : FontWeight.w700,
             letterSpacing: captionIsLarge ? 0 : 0.8,
-            color: palette.textPrimary,
+            color: appTheme.textTitle,
           ),
         ),
         if (footnote != null) ...[
@@ -325,7 +316,7 @@ class _HalfTile extends StatelessWidget {
             style: TextStyle(
               fontSize: 9.5,
               fontStyle: FontStyle.italic,
-              color: palette.textSecondary,
+              color: appTheme.textSubtitle,
             ),
           ),
         ],
@@ -336,20 +327,16 @@ class _HalfTile extends StatelessWidget {
 
 /// Dibuja la mano de una letra ocupando todo el hueco que le den.
 class _HandDrawing extends StatelessWidget {
-  const _HandDrawing({
-    required this.shape,
-    required this.palette,
-    this.idle = false,
-  });
+  const _HandDrawing({required this.shape, this.idle = false});
 
   final HandShape? shape;
-  final SectionPalette palette;
 
   /// Mano en reposo, cuando todavía no hay subtítulo.
   final bool idle;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     // SizedBox.expand es imprescindible: un CustomPaint sin hijo se queda en
     // tamaño cero cuando recibe restricciones sueltas, que es justo lo que le
     // da el Stack interno de AnimatedSwitcher. Sin esto la mano no se ve.
@@ -365,10 +352,8 @@ class _HandDrawing extends StatelessWidget {
                   pinky: 1,
                 )
               : shape,
-          tones: idle
-              ? _SkinTones.idle
-              : (palette.isDark ? _SkinTones.warmDark : _SkinTones.warm),
-          background: idle ? palette.surfaceAlt : palette.accentSoft,
+          tones: idle ? _SkinTones.idle : (_SkinTones.warm),
+          background: idle ? appTheme.background : appTheme.infoBackground,
         ),
       ),
     );
@@ -381,24 +366,20 @@ class _HandDrawing extends StatelessWidget {
 /// aquí. Mientras no lo haya, se dice con todas las letras que esa palabra se
 /// está deletreando, en lugar de fingir una seña que no existe.
 class _SignDisplay extends StatelessWidget {
-  const _SignDisplay({
-    required this.word,
-    required this.palette,
-    required this.assetPath,
-  });
+  const _SignDisplay({required this.word, required this.assetPath});
 
   final String word;
-  final SectionPalette palette;
 
   /// Clip o imagen de la seña de esta palabra, si existe.
   final String? assetPath;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final container = BoxDecoration(
-      color: palette.surfaceAlt,
+      color: appTheme.background,
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: palette.border),
+      border: Border.all(color: appTheme.border),
     );
 
     final path = assetPath;
@@ -418,13 +399,14 @@ class _SignDisplay extends StatelessWidget {
   }
 
   Widget _fallback() {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
           word.isEmpty ? Icons.hourglass_empty : Icons.spellcheck,
           size: 26,
-          color: palette.textSecondary,
+          color: appTheme.textSubtitle,
         ),
         const SizedBox(height: 6),
         Padding(
@@ -437,7 +419,7 @@ class _SignDisplay extends StatelessWidget {
               fontSize: 10.5,
               height: 1.25,
               fontWeight: FontWeight.w600,
-              color: palette.textSecondary,
+              color: appTheme.textSubtitle,
             ),
           ),
         ),
@@ -448,15 +430,10 @@ class _SignDisplay extends StatelessWidget {
 
 /// Foto real de una letra, cuando está empaquetada en la app.
 class _AssetHand extends StatelessWidget {
-  const _AssetHand({
-    required this.assetPath,
-    required this.letter,
-    required this.palette,
-  });
+  const _AssetHand({required this.assetPath, required this.letter});
 
   final String assetPath;
   final String letter;
-  final SectionPalette palette;
 
   @override
   Widget build(BuildContext context) {
@@ -466,7 +443,7 @@ class _AssetHand extends StatelessWidget {
       // Si la imagen falla al cargarse, se dibuja la mano en lugar de dejar
       // un hueco.
       errorBuilder: (context, error, stack) =>
-          _HandDrawing(shape: signAlphabet[letter], palette: palette),
+          _HandDrawing(shape: signAlphabet[letter]),
     );
   }
 }
@@ -495,15 +472,6 @@ class _SkinTones {
     light: Color(0xFFFCE4D0),
     line: Color(0xFF8A5A3C),
     nail: Color(0xFFF9E2D2),
-  );
-
-  /// Algo más profundo en oscuro, para no deslumbrar.
-  static const warmDark = _SkinTones(
-    base: Color(0xFFD9A57F),
-    shade: Color(0xFFB27E5B),
-    light: Color(0xFFEFCAAC),
-    line: Color(0xFF5E3A26),
-    nail: Color(0xFFE8C8B1),
   );
 
   /// Mano en reposo, en gris, cuando todavía no hay subtítulo.

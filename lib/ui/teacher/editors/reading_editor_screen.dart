@@ -100,7 +100,7 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final reading = _reading;
 
     return EditorScaffold(
@@ -145,7 +145,7 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
                         label: 'Título de la lectura',
                         controller: _title,
                       ),
-                      const SizedBox(height: SectionMetrics.gap),
+                      const SizedBox(height: AppMetrics.gap),
                       TeacherField(
                         label: 'Introducción',
                         controller: _intro,
@@ -155,16 +155,16 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: SectionMetrics.sectionGap),
+                const SizedBox(height: AppMetrics.sectionGap),
                 Text(
                   'Páginas',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: palette.textPrimary,
+                    color: appTheme.textTitle,
                   ),
                 ),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 for (var i = 0; i < reading.pages.length; i++)
                   TeacherListRow(
                     title: reading.pages[i].title,
@@ -204,7 +204,7 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
                             }
                           },
                   ),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 TeacherAddButton(label: 'Añadir página', onPressed: _addPage),
               ],
             ),
@@ -254,10 +254,12 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
   }
 
   Future<void> _addBlock() async {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final kind = await showModalBottomSheet<ReadingBlockKind>(
       context: context,
-      backgroundColor: SectionPalette.of(context).surface,
-      builder: (context) => (context),
+      backgroundColor: appTheme.actionBackground,
+      builder: (context) =>
+          (context).widget, //OJO REVISAR ERROR COMPARAR CON PAPACHO VERSION
     );
     if (kind == null || !mounted) return;
 
@@ -278,7 +280,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return EditorScaffold(
       title: 'Página ${widget.position}',
@@ -295,7 +297,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
             child: Column(
               children: [
                 TeacherField(label: 'Título de la página', controller: _title),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 TeacherField(
                   label: 'Resumen',
                   controller: _summary,
@@ -305,16 +307,16 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
               ],
             ),
           ),
-          const SizedBox(height: SectionMetrics.sectionGap),
+          const SizedBox(height: AppMetrics.sectionGap),
           Text(
             'Bloques',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: palette.textPrimary,
+              color: appTheme.textTitle,
             ),
           ),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
           if (_page.blocks.isEmpty)
             EditorEmptyState(
               icon: Icons.notes,
@@ -336,7 +338,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
                 leading: Icon(
                   _iconFor(_page.blocks[i].kind),
                   size: 20,
-                  color: palette.accent,
+                  color: appTheme.dangerBorder,
                 ),
                 onTap: () => _editBlock(i),
                 onMoveUp: i == 0
@@ -367,7 +369,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
                   }
                 },
               ),
-            const SizedBox(height: SectionMetrics.gap),
+            const SizedBox(height: AppMetrics.gap),
             TeacherAddButton(label: 'Añadir bloque', onPressed: _addBlock),
           ],
         ],
@@ -386,10 +388,6 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
 
 /// Elegir qué tipo de bloque añadir.
 class _BlockKindSheet extends StatelessWidget {
-  const _BlockKindSheet({required this.palette});
-
-  final SectionPalette palette;
-
   static const Map<ReadingBlockKind, String> _what = {
     ReadingBlockKind.paragraph: 'Texto corrido para explicar una idea',
     ReadingBlockKind.bullets: 'Puntos sueltos, sin orden concreto',
@@ -400,18 +398,19 @@ class _BlockKindSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.all(SectionMetrics.gap),
+            padding: const EdgeInsets.all(AppMetrics.gap),
             child: Text(
               '¿Qué quieres añadir?',
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
-                color: palette.textPrimary,
+                color: appTheme.textTitle,
               ),
             ),
           ),
@@ -420,17 +419,17 @@ class _BlockKindSheet extends StatelessWidget {
               title: Text(
                 kind.label,
                 style: TextStyle(
-                  color: palette.textPrimary,
+                  color: appTheme.textTitle,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               subtitle: Text(
                 _what[kind]!,
-                style: TextStyle(color: palette.textSecondary, fontSize: 12.5),
+                style: TextStyle(color: appTheme.textSubtitle, fontSize: 12.5),
               ),
               onTap: () => Navigator.of(context).pop(kind),
             ),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
         ],
       ),
     );
@@ -498,7 +497,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final kind = _block.kind;
     final isList =
         kind == ReadingBlockKind.bullets || kind == ReadingBlockKind.steps;
@@ -513,13 +512,13 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _kindPicker(palette),
-                const SizedBox(height: SectionMetrics.gap),
+                _kindPicker(),
+                const SizedBox(height: AppMetrics.gap),
                 TeacherField(label: 'Título del bloque', controller: _title),
               ],
             ),
           ),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
 
           if (kind != ReadingBlockKind.code || _body.text.isNotEmpty)
             TeacherCard(
@@ -531,7 +530,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
             ),
 
           if (isList) ...[
-            const SizedBox(height: SectionMetrics.gap),
+            const SizedBox(height: AppMetrics.gap),
             TeacherCard(
               title: kind == ReadingBlockKind.steps ? 'Pasos' : 'Puntos',
               child: Column(
@@ -550,25 +549,27 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                                   : '•',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                color: palette.accent,
+                                color: appTheme.background,
                               ),
                             ),
                           ),
                           Expanded(
                             child: TextField(
                               controller: _items[i],
-                              style: TextStyle(color: palette.textPrimary),
+                              style: TextStyle(color: appTheme.textTitle),
                               decoration: InputDecoration(
                                 isDense: true,
                                 filled: true,
-                                fillColor: palette.surfaceAlt,
+                                fillColor: appTheme.dangerBorder,
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 12,
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: palette.border),
+                                  borderSide: BorderSide(
+                                    color: appTheme.border,
+                                  ),
                                 ),
                               ),
                             ),
@@ -579,10 +580,10 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                               _items.removeAt(i).dispose();
                               _items = [..._items];
                             }),
-                            color: palette.textSecondary,
+                            color: appTheme.textSubtitle,
                             constraints: const BoxConstraints(
-                              minWidth: SectionMetrics.minTapTarget,
-                              minHeight: SectionMetrics.minTapTarget,
+                              minWidth: AppMetrics.minTapTarget,
+                              minHeight: AppMetrics.minTapTarget,
                             ),
                             icon: const Icon(Icons.close, size: 18),
                           ),
@@ -603,7 +604,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
           ],
 
           if (kind == ReadingBlockKind.code) ...[
-            const SizedBox(height: SectionMetrics.gap),
+            const SizedBox(height: AppMetrics.gap),
             TeacherCard(
               child: Column(
                 children: [
@@ -613,7 +614,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                     maxLines: 10,
                     monospace: true,
                   ),
-                  const SizedBox(height: SectionMetrics.gap),
+                  const SizedBox(height: AppMetrics.gap),
                   TeacherField(
                     label: 'Qué hace este código, en palabras',
                     controller: _caption,
@@ -629,7 +630,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
           ],
 
           if (kind == ReadingBlockKind.callout) ...[
-            const SizedBox(height: SectionMetrics.gap),
+            const SizedBox(height: AppMetrics.gap),
             TeacherCard(
               title: 'Intención del recuadro',
               child: Wrap(
@@ -641,12 +642,12 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                       label: Text(tone.label),
                       selected: _block.tone == tone,
                       onSelected: (_) =>
-                          setState(() => _block = _block.copyWith(tone: tone)),
-                      selectedColor: palette.accentSoft,
+                          setState(() => _block = _block.copyWith()),
+                      selectedColor: appTheme.actionText,
                       labelStyle: TextStyle(
                         color: _block.tone == tone
-                            ? palette.accent
-                            : palette.textPrimary,
+                            ? appTheme.dangerText
+                            : appTheme.textTitle,
                         fontWeight: _block.tone == tone
                             ? FontWeight.w700
                             : FontWeight.w400,
@@ -661,7 +662,8 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
     );
   }
 
-  Widget _kindPicker(SectionPalette palette) {
+  Widget _kindPicker() {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -670,7 +672,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: palette.textSecondary,
+            color: appTheme.textSubtitle,
           ),
         ),
         const SizedBox(height: 6),
@@ -685,11 +687,11 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                 // Cambiar de tipo conserva lo que quepa en el nuevo: el
                 // título y el texto no se pierden al pasar de párrafo a lista.
                 onSelected: (_) => setState(() => _block = _block.asKind(kind)),
-                selectedColor: palette.accentSoft,
+                selectedColor: appTheme.dangerText,
                 labelStyle: TextStyle(
                   color: _block.kind == kind
-                      ? palette.accent
-                      : palette.textPrimary,
+                      ? appTheme.dangerBorder
+                      : appTheme.textTitle,
                   fontWeight: _block.kind == kind
                       ? FontWeight.w700
                       : FontWeight.w400,

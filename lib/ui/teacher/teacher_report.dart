@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_code4all/data/course/course_analytics_store.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
 /// Arma un informe del curso en texto plano.
 ///
@@ -126,13 +127,13 @@ Future<void> showReportSheet(
   BuildContext context,
   CourseAnalyticsStore stats,
 ) async {
-  final palette = SectionPalette.of(context);
+  final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
   final report = buildCourseReport(stats);
 
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: palette.surface,
+    backgroundColor: appTheme.actionBorder,
     builder: (context) {
       return DraggableScrollableSheet(
         expand: false,
@@ -142,7 +143,7 @@ Future<void> showReportSheet(
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(SectionMetrics.gap),
+                padding: const EdgeInsets.all(AppMetrics.gap),
                 child: Row(
                   children: [
                     Expanded(
@@ -151,7 +152,7 @@ Future<void> showReportSheet(
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: palette.textPrimary,
+                          color: appTheme.textTitle,
                         ),
                       ),
                     ),
@@ -163,14 +164,14 @@ Future<void> showReportSheet(
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: const Text('Informe copiado.'),
-                            backgroundColor: palette.success,
+                            backgroundColor: appTheme.iconBackground,
                           ),
                         );
                       },
                       style: FilledButton.styleFrom(
-                        backgroundColor: palette.accent,
-                        foregroundColor: palette.onAccent,
-                        minimumSize: const Size(0, SectionMetrics.minTapTarget),
+                        backgroundColor: appTheme.iconBackground,
+                        foregroundColor: appTheme.dangerBorder,
+                        minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.copy, size: 18),
                       label: const Text('Copiar'),
@@ -178,18 +179,18 @@ Future<void> showReportSheet(
                   ],
                 ),
               ),
-              Divider(height: 1, color: palette.border),
+              Divider(height: 1, color: appTheme.border),
               Expanded(
                 child: SingleChildScrollView(
                   controller: controller,
-                  padding: const EdgeInsets.all(SectionMetrics.gap),
+                  padding: const EdgeInsets.all(AppMetrics.gap),
                   child: SelectableText(
                     report,
                     style: TextStyle(
                       fontFamily: 'monospace',
                       fontSize: 12.5,
                       height: 1.5,
-                      color: palette.textPrimary,
+                      color: appTheme.textTitle,
                     ),
                   ),
                 ),

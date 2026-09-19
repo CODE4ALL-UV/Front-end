@@ -283,7 +283,7 @@ class _SignCameraScreenState extends State<SignCameraScreen>
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Scaffold(
       backgroundColor: appTheme.background,
@@ -343,7 +343,7 @@ class _SignCameraScreenState extends State<SignCameraScreen>
         _check();
       },
       style: FilledButton.styleFrom(
-        backgroundColor: appTheme.accent,
+        backgroundColor: appTheme.warningBackground,
         foregroundColor: appTheme.onAccent,
         minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
@@ -356,9 +356,9 @@ class _SignCameraScreenState extends State<SignCameraScreen>
     final running = _stage == _Stage.running;
 
     return [
-      _Explanation(palette: palette, target: widget.targetLetter),
+      _Explanation(target: widget.targetLetter),
       const SizedBox(height: AppMetrics.sectionGap),
-      _Preview(palette: palette, camera: _camera, running: running),
+      _Preview(camera: _camera, running: running),
       const SizedBox(height: AppMetrics.sectionGap),
       if (running) ...[
         _ReadingBox(
@@ -369,17 +369,20 @@ class _SignCameraScreenState extends State<SignCameraScreen>
         ),
         const SizedBox(height: AppMetrics.gap),
       ],
-      _controls(palette, running),
+      _controls(running),
     ];
   }
 
-  Widget _controls(SectionPalette palette, bool running) {
+  Widget _controls(bool running) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final buttons = <Widget>[
       FilledButton.icon(
         onPressed: running ? _stop : _start,
         style: FilledButton.styleFrom(
-          backgroundColor: running ? appTheme.danger : appTheme.accent,
-          foregroundColor: appTheme.onAccent,
+          backgroundColor: running
+              ? appTheme.dangerBackground
+              : appTheme.warningBackground,
+          foregroundColor: appTheme.iconBackground,
           minimumSize: const Size(0, AppMetrics.minTapTarget),
         ),
         icon: Icon(running ? Icons.stop : Icons.photo_camera),
@@ -427,7 +430,7 @@ class _SignCameraScreenState extends State<SignCameraScreen>
   }
 
   ButtonStyle _outlined() => OutlinedButton.styleFrom(
-    foregroundColor: appTheme.accent,
+    foregroundColor: appTheme.warningBackground,
     side: BorderSide(color: appTheme.border),
     minimumSize: const Size(0, AppMetrics.minTapTarget),
   );
@@ -435,13 +438,13 @@ class _SignCameraScreenState extends State<SignCameraScreen>
 
 /// Qué es esto y qué no es, antes de encender nada.
 class _Explanation extends StatelessWidget {
-  const _Explanation({required this.palette, required this.target});
+  const _Explanation({required this.target});
 
-  final SectionPalette palette;
   final String? target;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final text = target != null
         ? 'Coloca la mano delante de la cámara y haz la letra $target. '
               'Te iré diciendo qué te falta para conseguirla.'
@@ -451,7 +454,7 @@ class _Explanation extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppMetrics.gap),
       decoration: BoxDecoration(
-        color: appTheme.surface,
+        color: appTheme.dangerText,
         border: Border.all(color: appTheme.border),
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       ),
@@ -495,6 +498,8 @@ class _Note extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -524,6 +529,7 @@ class _Preview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final controller = camera;
     final ready =
         running && controller != null && controller.value.isInitialized;
@@ -541,7 +547,7 @@ class _Preview extends StatelessWidget {
             child: ready
                 ? CameraPreview(controller)
                 : Container(
-                    color: appTheme.surfaceAlt,
+                    color: appTheme.dangerText,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -571,14 +577,12 @@ class _Preview extends StatelessWidget {
 /// Qué se está leyendo ahora mismo y qué se lleva deletreado.
 class _ReadingBox extends StatelessWidget {
   const _ReadingBox({
-    required this.palette,
     required this.reading,
     required this.dictation,
     required this.target,
     required this.achieved,
   });
 
-  final SectionPalette palette;
   final SignReading reading;
   final SignDictation dictation;
   final String? target;
@@ -586,6 +590,7 @@ class _ReadingBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final letter = reading.letter;
     final holding = dictation.holding;
 
@@ -597,7 +602,7 @@ class _ReadingBox extends StatelessWidget {
       if (achieved) {
         headline = target!;
         detail = '¡Esa es la $target!';
-        tone = appTheme.success;
+        tone = appTheme.successBackground;
       } else if (letter == null) {
         headline = '—';
         detail = 'Todavía no veo tu mano con claridad.';
@@ -605,14 +610,14 @@ class _ReadingBox extends StatelessWidget {
       } else {
         headline = letter;
         detail = HandLandmarkClassifier.hint(reading.observed, target!);
-        tone = appTheme.warning;
+        tone = appTheme.warningBackground;
       }
     } else if (reading.isAmbiguous) {
       headline = [letter!, ...reading.alternatives].join(' o ');
       detail =
           'Estas letras se hacen casi igual, así que no me atrevo a elegir. '
           'No la doy por buena.';
-      tone = appTheme.warning;
+      tone = appTheme.warningBackground;
     } else if (letter == null) {
       headline = '—';
       detail = holding == null
@@ -624,7 +629,9 @@ class _ReadingBox extends StatelessWidget {
       detail = reading.isConfident
           ? 'Mantenla quieta para que cuente.'
           : 'Casi. Acerca un poco la mano o mejora la luz.';
-      tone = reading.isConfident ? appTheme.success : appTheme.textSubtitle;
+      tone = reading.isConfident
+          ? appTheme.successBackground
+          : appTheme.textSubtitle;
     }
 
     return Semantics(
@@ -634,7 +641,7 @@ class _ReadingBox extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(AppMetrics.gap),
           decoration: BoxDecoration(
-            color: appTheme.surface,
+            color: appTheme.background,
             border: Border.all(color: appTheme.border),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
@@ -643,11 +650,7 @@ class _ReadingBox extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _LetterBadge(
-                    letter: headline,
-                    tone: tone,
-                    progress: dictation.progress,
-                  ),
+                  _LetterBadge(letter: headline, progress: dictation.progress),
                   const SizedBox(width: AppMetrics.gap),
                   Expanded(
                     child: Text(
@@ -696,16 +699,9 @@ class _ReadingBox extends StatelessWidget {
 
 /// La letra grande, con un aro que se llena mientras se sostiene.
 class _LetterBadge extends StatelessWidget {
-  const _LetterBadge({
-    required this.palette,
-    required this.letter,
-    required this.tone,
-    required this.progress,
-  });
+  const _LetterBadge({required this.letter, required this.progress});
 
-  final SectionPalette palette;
   final String letter;
-  final Color tone;
   final double progress;
 
   @override
@@ -722,7 +718,7 @@ class _LetterBadge extends StatelessWidget {
             child: CircularProgressIndicator(
               value: progress == 0 ? null : progress,
               strokeWidth: 5,
-              backgroundColor: appTheme.surfaceAlt,
+              backgroundColor: appTheme.dangerTextAlt,
               valueColor: AlwaysStoppedAnimation<Color>(tone),
             ),
           ),
@@ -732,7 +728,6 @@ class _LetterBadge extends StatelessWidget {
             style: TextStyle(
               fontSize: letter.length > 3 ? 15 : 30,
               fontWeight: FontWeight.w800,
-              color: tone,
             ),
           ),
         ],
@@ -758,14 +753,14 @@ class _Message extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppMetrics.sectionGap),
         decoration: BoxDecoration(
-          color: appTheme.surface,
+          color: appTheme.dangerText,
           border: Border.all(color: appTheme.border),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: Column(
           children: [
             if (busy)
-              CircularProgressIndicator(color: appTheme.accent)
+              CircularProgressIndicator(color: appTheme.warningBackground)
             else if (icon != null)
               Icon(icon, size: 40, color: appTheme.textSubtitle),
             const SizedBox(height: AppMetrics.gap),

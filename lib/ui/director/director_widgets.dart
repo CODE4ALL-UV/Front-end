@@ -4,8 +4,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
-
 /// Una nota de 1 a 5, en estrellas y también en número.
 ///
 /// Las estrellas solas no se pueden contar de un vistazo ni leer en voz alta,
@@ -29,7 +27,7 @@ class ScoreStars extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
             decoration: BoxDecoration(
               color: appTheme.iconBackground,
-              borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+              borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
             child: Text(
               'Sin valorar',
@@ -64,11 +62,7 @@ class ScoreStars extends StatelessWidget {
             const SizedBox(width: 5),
             Text(
               '$value',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                color: tone,
-              ),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
             ),
           ],
         ),
@@ -79,16 +73,10 @@ class ScoreStars extends StatelessWidget {
 
 /// Un distintivo con icono y texto.
 class DirectorBadge extends StatelessWidget {
-  const DirectorBadge({
-    super.key,
-    required this.icon,
-    required this.label,
-    this.tone,
-  });
+  const DirectorBadge({super.key, required this.icon, required this.label});
 
   final IconData icon;
   final String label;
-  final Color? tone;
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +87,7 @@ class DirectorBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: appTheme.iconBackground,
-        borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+        borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
         border: Border.all(color: appTheme.border),
       ),
       child: Row(
@@ -134,13 +122,11 @@ class DirectorNotice extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.body,
-    this.tone,
   });
 
   final IconData icon;
   final String title;
   final String body;
-  final Color? tone;
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +141,7 @@ class DirectorNotice extends StatelessWidget {
           padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
             color: appTheme.warningBackground,
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             border: Border.all(color: color.border.withValues(alpha: 0.35)),
           ),
           child: Row(
@@ -215,14 +201,14 @@ class DirectorEmpty extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(SectionMetrics.sectionGap),
+        padding: const EdgeInsets.all(AppMetrics.sectionGap),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, size: 44, color: appTheme.textSubtitle),
-              const SizedBox(height: SectionMetrics.gap),
+              const SizedBox(height: AppMetrics.gap),
               Text(
                 title,
                 textAlign: TextAlign.center,
@@ -267,12 +253,12 @@ class DirectorProblem extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(SectionMetrics.sectionGap),
+        padding: const EdgeInsets.all(AppMetrics.sectionGap),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.cloud_off, size: 40, color: appTheme.dangerBackground),
-            const SizedBox(height: SectionMetrics.gap),
+            const SizedBox(height: AppMetrics.gap),
             Text(
               message,
               textAlign: TextAlign.center,
@@ -282,13 +268,13 @@ class DirectorProblem extends StatelessWidget {
                 color: appTheme.textTitle,
               ),
             ),
-            const SizedBox(height: SectionMetrics.sectionGap),
+            const SizedBox(height: AppMetrics.sectionGap),
             FilledButton.icon(
               onPressed: onRetry,
               style: FilledButton.styleFrom(
                 backgroundColor: appTheme.infoBackground,
                 foregroundColor: appTheme.infoBorder,
-                minimumSize: const Size(0, SectionMetrics.minTapTarget),
+                minimumSize: const Size(0, AppMetrics.minTapTarget),
               ),
               icon: const Icon(Icons.refresh),
               label: const Text('Volver a intentarlo'),

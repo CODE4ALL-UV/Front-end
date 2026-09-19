@@ -7,8 +7,6 @@ import 'package:flutter_code4all/domain/models/python_course_content/course_cata
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/chapter_section_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
-
 import 'director_widgets.dart';
 
 /// Revisar que el contenido del curso esté bien.
@@ -96,7 +94,6 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
-    final appToneWarning = appTheme.tone(AppThemeTone.warning);
 
     if (_store.isLoading && !_store.isLoaded) {
       return Center(child: CircularProgressIndicator(color: appTheme.infoText));
@@ -126,12 +123,12 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
         builder: (context, constraints) {
           return ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: SectionMetrics.pagePadding(constraints.maxWidth),
+            padding: AppMetrics.pagePadding(constraints.maxWidth),
             children: [
               Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: SectionMetrics.maxContentWidth,
+                    maxWidth: AppMetrics.maxContentWidth,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -147,18 +144,17 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
                               'las aprobaras, así que tu visto bueno ya no dice '
                               'nada del contenido que hay ahora.',
                         ),
-                        const SizedBox(height: SectionMetrics.gap),
+                        const SizedBox(height: AppMetrics.gap),
                       ],
                       if (flagged.isNotEmpty) ...[
                         DirectorNotice(
                           icon: Icons.error_outline,
-                          tone: appToneWarning.border,
                           title: flagged.length == 1
                               ? 'Una sección con observaciones'
                               : '${flagged.length} secciones con observaciones',
                           body: 'Pendientes de que el docente las corrija.',
                         ),
-                        const SizedBox(height: SectionMetrics.gap),
+                        const SizedBox(height: AppMetrics.gap),
                       ],
                       for (final section in edited)
                         _SectionCard(
@@ -220,7 +216,7 @@ class _SectionCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: appTheme.background,
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             border: Border.all(
               color: current == null || current.outdated || !current.isApproved
                   ? tone.withValues(alpha: 0.45)
@@ -259,7 +255,7 @@ class _SectionCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              DirectorBadge(icon: icon, label: label, tone: tone),
+              DirectorBadge(icon: icon, label: label),
               if ((current?.comment ?? '').isNotEmpty) ...[
                 const SizedBox(height: 9),
                 Container(
@@ -288,7 +284,7 @@ class _SectionCard extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: appTheme.infoBorder,
                         side: BorderSide(color: appTheme.border),
-                        minimumSize: const Size(0, SectionMetrics.minTapTarget),
+                        minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.visibility_outlined, size: 18),
                       label: const Text('Ver'),
@@ -301,7 +297,7 @@ class _SectionCard extends StatelessWidget {
                       style: FilledButton.styleFrom(
                         backgroundColor: appTheme.infoBackground,
                         foregroundColor: appTheme.infoBorder,
-                        minimumSize: const Size(0, SectionMetrics.minTapTarget),
+                        minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.fact_check_outlined, size: 18),
                       label: Text(current == null ? 'Revisar' : 'Cambiar'),
@@ -382,10 +378,10 @@ class _JudgeSheetState extends State<_JudgeSheet> {
 
     return Padding(
       padding: EdgeInsets.only(
-        left: SectionMetrics.gap,
-        right: SectionMetrics.gap,
-        top: SectionMetrics.gap,
-        bottom: MediaQuery.viewInsetsOf(context).bottom + SectionMetrics.gap,
+        left: AppMetrics.gap,
+        right: AppMetrics.gap,
+        top: AppMetrics.gap,
+        bottom: MediaQuery.viewInsetsOf(context).bottom + AppMetrics.gap,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -400,7 +396,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                 color: appTheme.textTitle,
               ),
             ),
-            const SizedBox(height: SectionMetrics.sectionGap),
+            const SizedBox(height: AppMetrics.sectionGap),
 
             Row(
               children: [
@@ -408,7 +404,6 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                   child: _Choice(
                     icon: Icons.check_circle_outline,
                     label: 'Aprobado',
-                    tone: appToneSucess.text,
                     selected: _approved,
                     onTap: () => setState(() {
                       _approved = true;
@@ -421,7 +416,6 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                   child: _Choice(
                     icon: Icons.error_outline,
                     label: 'Con observaciones',
-                    tone: appToneDanger.text,
                     selected: !_approved,
                     onTap: () => setState(() => _approved = false),
                   ),
@@ -429,7 +423,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               ],
             ),
 
-            const SizedBox(height: SectionMetrics.sectionGap),
+            const SizedBox(height: AppMetrics.sectionGap),
             TextField(
               controller: _comment,
               maxLines: 5,
@@ -447,23 +441,21 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                 filled: true,
                 fillColor: appTheme.iconBackground,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                    SectionMetrics.cardRadius,
-                  ),
+                  borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                   borderSide: BorderSide(color: appTheme.border),
                 ),
               ),
             ),
 
             if (_error != null) ...[
-              const SizedBox(height: SectionMetrics.gap),
+              const SizedBox(height: AppMetrics.gap),
               Text(
                 _error!,
                 style: TextStyle(fontSize: 13, color: appToneDanger.text),
               ),
             ],
 
-            const SizedBox(height: SectionMetrics.sectionGap),
+            const SizedBox(height: AppMetrics.sectionGap),
             Row(
               children: [
                 Expanded(
@@ -472,7 +464,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                         ? null
                         : () => Navigator.of(context).pop(false),
                     style: TextButton.styleFrom(
-                      minimumSize: const Size(0, SectionMetrics.minTapTarget),
+                      minimumSize: const Size(0, AppMetrics.minTapTarget),
                     ),
                     child: const Text('Cancelar'),
                   ),
@@ -484,7 +476,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                     style: FilledButton.styleFrom(
                       backgroundColor: appTheme.background,
                       foregroundColor: appTheme.border,
-                      minimumSize: const Size(0, SectionMetrics.minTapTarget),
+                      minimumSize: const Size(0, AppMetrics.minTapTarget),
                     ),
                     child: Text(_saving ? 'Guardando…' : 'Guardar'),
                   ),
@@ -502,14 +494,12 @@ class _Choice extends StatelessWidget {
   const _Choice({
     required this.icon,
     required this.label,
-    required this.tone,
     required this.selected,
     required this.onTap,
   });
 
   final IconData icon;
   final String label;
-  final Color tone;
   final bool selected;
   final VoidCallback onTap;
 
@@ -524,21 +514,21 @@ class _Choice extends StatelessWidget {
       child: ExcludeSemantics(
         child: Material(
           color: selected
-              ? tone.withValues(alpha: 0.12)
+              ? appTheme.infoText.withValues(alpha: 0.12)
               : appTheme.iconBackground,
-          borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+          borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             child: Container(
               constraints: const BoxConstraints(
-                minHeight: SectionMetrics.minTapTarget,
+                minHeight: AppMetrics.minTapTarget,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+                borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 border: Border.all(
-                  color: selected ? tone : appTheme.border,
+                  color: selected ? appTheme.border : appTheme.border,
                   width: selected ? 1.8 : 1,
                 ),
               ),
@@ -548,7 +538,7 @@ class _Choice extends StatelessWidget {
                   Icon(
                     icon,
                     size: 22,
-                    color: selected ? tone : appTheme.textSubtitle,
+                    color: selected ? appTheme.border : appTheme.textSubtitle,
                   ),
                   const SizedBox(height: 5),
                   Text(
@@ -557,7 +547,7 @@ class _Choice extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                      color: selected ? tone : appTheme.textTitle,
+                      color: selected ? appTheme.border : appTheme.textTitle,
                     ),
                   ),
                 ],

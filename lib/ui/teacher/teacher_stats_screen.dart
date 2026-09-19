@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/course_analytics_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'teacher_report.dart';
 import 'teacher_widgets.dart';
 
@@ -44,10 +45,10 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     if (_stats.isLoading && !_stats.isLoaded) {
-      return Center(child: CircularProgressIndicator(color: palette.accent));
+      return Center(child: CircularProgressIndicator(color: appTheme.accent));
     }
 
     return RefreshIndicator(
@@ -56,11 +57,11 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
         builder: (context, constraints) {
           return SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: SectionMetrics.pagePadding(constraints.maxWidth),
+            padding: AppMetrics.pagePadding(constraints.maxWidth),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
-                  maxWidth: SectionMetrics.maxContentWidth,
+                  maxWidth: AppMetrics.maxContentWidth,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -74,22 +75,18 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
     );
   }
 
-  List<Widget> _body(SectionPalette palette) {
+  List<Widget> _body(SectionPalette appTheme) {
     if (_stats.problem != null) {
       return [
-        TeacherBanner(
-          icon: Icons.cloud_off,
-          text: _stats.problem!,
-          tone: palette.danger,
-        ),
-        const SizedBox(height: SectionMetrics.gap),
+        TeacherBanner(icon: Icons.cloud_off, text: _stats.problem!),
+        const SizedBox(height: AppMetrics.gap),
         Center(
           child: FilledButton.icon(
             onPressed: _stats.refresh,
             style: FilledButton.styleFrom(
-              backgroundColor: palette.accent,
-              foregroundColor: palette.onAccent,
-              minimumSize: const Size(0, SectionMetrics.minTapTarget),
+              backgroundColor: appTheme.accent,
+              foregroundColor: appTheme.onAccent,
+              minimumSize: const Size(0, AppMetrics.minTapTarget),
             ),
             icon: const Icon(Icons.refresh),
             label: const Text('Volver a intentarlo'),
@@ -101,22 +98,22 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
     if (_stats.isEmpty) {
       return [
         Container(
-          padding: const EdgeInsets.all(SectionMetrics.sectionGap),
+          padding: const EdgeInsets.all(AppMetrics.sectionGap),
           decoration: BoxDecoration(
-            color: palette.surface,
-            border: Border.all(color: palette.border),
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            color: appTheme.surface,
+            border: Border.all(color: appTheme.border),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
             children: [
-              Icon(Icons.insights, size: 44, color: palette.textSecondary),
-              const SizedBox(height: SectionMetrics.gap),
+              Icon(Icons.insights, size: 44, color: appTheme.textSubtitle),
+              const SizedBox(height: AppMetrics.gap),
               Text(
                 'Todavía no hay actividad',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  color: palette.textPrimary,
+                  color: appTheme.textTitle,
                 ),
               ),
               const SizedBox(height: 8),
@@ -129,7 +126,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.5,
-                  color: palette.textSecondary,
+                  color: appTheme.textSubtitle,
                 ),
               ),
             ],
@@ -142,86 +139,84 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
     final hardQuestions = _stats.hardestQuestions();
 
     return [
-      _summaryRow(palette),
-      const SizedBox(height: SectionMetrics.sectionGap),
+      _summaryRow(),
+      const SizedBox(height: AppMetrics.sectionGap),
 
       _sectionTitle(palette, 'Aciertos por sección', Icons.bar_chart),
       const SizedBox(height: 6),
       _note(
-        palette,
+        appTheme,
         'Ordenadas de la que peor va a la que mejor. Solo salen las que ya '
         'tienen al menos tres respuestas: con menos, un porcentaje bajo dice '
         'que casi nadie lo ha hecho, no que sea difícil.',
       ),
-      const SizedBox(height: SectionMetrics.gap),
+      const SizedBox(height: AppMetrics.gap),
       if (hardSections.isEmpty)
         _note(
-          palette,
+          appTheme,
           'Ninguna sección tiene todavía suficientes respuestas para comparar.',
         )
       else
-        for (final section in hardSections)
-          _SectionBar(palette: palette, stats: section),
+        for (final section in hardSections) _SectionBar(stats: section),
 
-      const SizedBox(height: SectionMetrics.sectionGap),
+      const SizedBox(height: AppMetrics.sectionGap),
       _sectionTitle(palette, 'Hasta dónde llegan', Icons.task_alt),
       const SizedBox(height: 6),
       _note(
-        palette,
+        appTheme,
         'Cuántos estudiantes terminan cada actividad. Donde la cifra cae de '
         'golpe es donde la gente abandona la sección.',
       ),
-      const SizedBox(height: SectionMetrics.gap),
+      const SizedBox(height: AppMetrics.gap),
       if (_stats.totalCompletions == 0)
-        _note(palette, 'Todavía nadie ha terminado ninguna actividad.')
+        _note('Todavía nadie ha terminado ninguna actividad.')
       else
         for (final section in _sectionsWithCompletions())
-          _CompletionRow(palette: palette, title: section.$1, done: section.$2),
+          _CompletionRow(title: section.$1, done: section.$2),
 
-      const SizedBox(height: SectionMetrics.sectionGap),
+      const SizedBox(height: AppMetrics.sectionGap),
       _sectionTitle(
-        palette,
+        appTheme,
         'Preguntas que más tiempo cuestan',
         Icons.timer_outlined,
       ),
       const SizedBox(height: 6),
       _note(
-        palette,
+        appTheme,
         'Una pregunta que casi todos aciertan pero que lleva un minuto suele '
         'estar mal redactada, no ser difícil. Es una señal distinta de '
         'fallarla.',
       ),
-      const SizedBox(height: SectionMetrics.gap),
+      const SizedBox(height: AppMetrics.gap),
       if (_stats.slowestQuestions().isEmpty)
         _note(palette, 'Todavía no hay tiempos medidos.')
       else
         for (final question in _stats.slowestQuestions())
-          _QuestionRow(palette: palette, stats: question, showTime: true),
+          _QuestionRow(stats: question, showTime: true),
 
-      const SizedBox(height: SectionMetrics.sectionGap),
+      const SizedBox(height: AppMetrics.sectionGap),
       _sectionTitle(palette, 'Preguntas que más se fallan', Icons.help_outline),
       const SizedBox(height: 6),
       _note(
-        palette,
+        appTheme,
         'Si una pregunta la falla casi todo el mundo, suele ser que el '
         'enunciado confunde o que el tema no quedó explicado. Puedes editarla '
         'desde la pestaña del temario.',
       ),
-      const SizedBox(height: SectionMetrics.gap),
+      const SizedBox(height: AppMetrics.gap),
       if (hardQuestions.isEmpty)
         _note(palette, 'Todavía no hay preguntas con respuestas suficientes.')
       else
-        for (final question in hardQuestions)
-          _QuestionRow(palette: palette, stats: question),
+        for (final question in hardQuestions) _QuestionRow(stats: question),
 
-      const SizedBox(height: SectionMetrics.sectionGap),
+      const SizedBox(height: AppMetrics.sectionGap),
       Center(
         child: OutlinedButton.icon(
           onPressed: () => showReportSheet(context, _stats),
           style: OutlinedButton.styleFrom(
-            foregroundColor: palette.accent,
-            side: BorderSide(color: palette.border),
-            minimumSize: const Size(0, SectionMetrics.minTapTarget),
+            foregroundColor: appTheme.textTitle,
+            side: BorderSide(color: appTheme.border),
+            minimumSize: const Size(0, AppMetrics.minTapTarget),
           ),
           icon: const Icon(Icons.description_outlined),
           label: const Text('Generar informe'),
@@ -231,34 +226,29 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
     ];
   }
 
-  Widget _summaryRow(SectionPalette palette) {
+  Widget _summaryRow() {
     final accuracy = (_stats.overallAccuracy * 100).round();
 
     return Wrap(
-      spacing: SectionMetrics.gap,
-      runSpacing: SectionMetrics.gap,
+      spacing: AppMetrics.gap,
+      runSpacing: AppMetrics.gap,
       children: [
         _Metric(
-          palette: palette,
           label: 'Actividades hechas',
           value: '${_stats.totalCompletions}',
           icon: Icons.task_alt,
         ),
         _Metric(
-          palette: palette,
           label: 'Respuestas',
           value: '${_stats.totalAnswers}',
           icon: Icons.checklist,
         ),
         _Metric(
-          palette: palette,
           label: 'Aciertos',
           value: '$accuracy %',
           icon: Icons.check_circle_outline,
-          tone: accuracy >= 60 ? palette.success : palette.warning,
         ),
         _Metric(
-          palette: palette,
           label: 'Han empezado',
           value: '${_stats.activeStudents} de ${_stats.students.length}',
           icon: Icons.groups_outlined,
@@ -267,10 +257,11 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
     );
   }
 
-  Widget _sectionTitle(SectionPalette palette, String text, IconData icon) {
+  Widget _sectionTitle(String text, IconData icon) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return Row(
       children: [
-        Icon(icon, size: 19, color: palette.accent),
+        Icon(icon, size: 19, color: appTheme.textTitle),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -278,7 +269,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: palette.textPrimary,
+              color: appTheme.textTitle,
             ),
           ),
         ),
@@ -291,6 +282,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
   /// Se ordenan por el temario y no por cantidad: el docente quiere ver el
   /// recorrido del curso, que es donde se nota el abandono.
   List<(String, Map<String, int>)> _sectionsWithCompletions() {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final ids = <String>{for (final item in _stats.completions) item.sectionId};
 
     final out = <(String, Map<String, int>)>[];
@@ -305,34 +297,21 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
     return out;
   }
 
-  Widget _note(SectionPalette palette, String text) => Text(
-    text,
-    style: TextStyle(
-      fontSize: 12.5,
-      height: 1.45,
-      color: palette.textSecondary,
-    ),
-  );
+  Widget _note(String text) =>
+      Text(text, style: TextStyle(fontSize: 12.5, height: 1.45));
 }
 
 /// Un número grande con su etiqueta.
 class _Metric extends StatelessWidget {
-  const _Metric({
-    required this.palette,
-    required this.label,
-    required this.value,
-    required this.icon,
-    this.tone,
-  });
+  const _Metric({required this.label, required this.value, required this.icon});
 
-  final SectionPalette palette;
   final String label;
   final String value;
   final IconData icon;
-  final Color? tone;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return Semantics(
       label: '$label: $value',
       child: ExcludeSemantics(
@@ -340,9 +319,9 @@ class _Metric extends StatelessWidget {
           width: 168,
           padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
-            color: palette.surface,
-            border: Border.all(color: palette.border),
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            color: appTheme.background,
+            border: Border.all(color: appTheme.border),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,14 +329,14 @@ class _Metric extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(icon, size: 16, color: palette.textSecondary),
+                  Icon(icon, size: 16, color: appTheme.textSubtitle),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       label,
                       style: TextStyle(
                         fontSize: 12,
-                        color: palette.textSecondary,
+                        color: appTheme.textSubtitle,
                       ),
                     ),
                   ),
@@ -369,7 +348,7 @@ class _Metric extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: tone ?? palette.textPrimary,
+                  color: appTheme.textTitle,
                 ),
               ),
             ],
@@ -382,20 +361,22 @@ class _Metric extends StatelessWidget {
 
 /// Una sección y su barra de aciertos.
 class _SectionBar extends StatelessWidget {
-  const _SectionBar({required this.palette, required this.stats});
+  const _SectionBar({required this.stats});
 
-  final SectionPalette palette;
   final SectionStats stats;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final percent = (stats.accuracy * 100).round();
 
     // El color acompaña, pero el número y el texto van siempre: un estado que
     // solo se distingue por color deja fuera a quien no lo ve.
     final tone = percent >= 70
-        ? palette.success
-        : (percent >= 45 ? palette.warning : palette.danger);
+        ? appTheme.successBackground
+        : (percent >= 45
+              ? appTheme.warningBackground
+              : appTheme.dangerBackground);
 
     return Semantics(
       label:
@@ -416,7 +397,7 @@ class _SectionBar extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
-                        color: palette.textPrimary,
+                        color: appTheme.textTitle,
                       ),
                     ),
                   ),
@@ -426,18 +407,17 @@ class _SectionBar extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w800,
-                      color: tone,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               ClipRRect(
-                borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+                borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
                 child: LinearProgressIndicator(
                   value: stats.accuracy,
                   minHeight: 9,
-                  backgroundColor: palette.surfaceAlt,
+                  backgroundColor: appTheme.actionBackground,
                   valueColor: AlwaysStoppedAnimation<Color>(tone),
                 ),
               ),
@@ -447,7 +427,7 @@ class _SectionBar extends StatelessWidget {
                 '${stats.students} '
                 '${stats.students == 1 ? "estudiante" : "estudiantes"}'
                 '${stats.avgSeconds == null ? "" : " · ${formatSeconds(stats.avgSeconds!)} de media"}',
-                style: TextStyle(fontSize: 11.5, color: palette.textSecondary),
+                style: TextStyle(fontSize: 11.5, color: appTheme.textSubtitle),
               ),
             ],
           ),
@@ -469,13 +449,8 @@ String formatSeconds(double seconds) {
 }
 
 class _QuestionRow extends StatelessWidget {
-  const _QuestionRow({
-    required this.palette,
-    required this.stats,
-    this.showTime = false,
-  });
+  const _QuestionRow({required this.stats, this.showTime = false});
 
-  final SectionPalette palette;
   final QuestionStats stats;
 
   /// Enseña el tiempo medio en vez del porcentaje de aciertos.
@@ -483,10 +458,13 @@ class _QuestionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final percent = (stats.accuracy * 100).round();
     final tone = percent >= 70
-        ? palette.success
-        : (percent >= 45 ? palette.warning : palette.danger);
+        ? appTheme.successBackground
+        : (percent >= 45
+              ? appTheme.warningBackground
+              : appTheme.dangerBackground);
 
     return Semantics(
       label:
@@ -498,9 +476,9 @@ class _QuestionRow extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: palette.surface,
-            border: Border.all(color: palette.border),
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            color: appTheme.background,
+            border: Border.all(color: appTheme.border),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -516,7 +494,7 @@ class _QuestionRow extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: tone.withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(
-                        SectionMetrics.pillRadius,
+                        AppMetrics.pillRadius,
                       ),
                     ),
                     child: Text(
@@ -526,7 +504,6 @@ class _QuestionRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
-                        color: tone,
                       ),
                     ),
                   ),
@@ -539,7 +516,7 @@ class _QuestionRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13.5,
                         height: 1.35,
-                        color: palette.textPrimary,
+                        color: appTheme.textTitle,
                       ),
                     ),
                   ),
@@ -550,7 +527,7 @@ class _QuestionRow extends StatelessWidget {
                 '${stats.sectionTitle} · ${stats.failed} fallos de '
                 '${stats.answered}'
                 '${showTime ? "" : (stats.avgSeconds == null ? "" : " · ${formatSeconds(stats.avgSeconds!)}")}',
-                style: TextStyle(fontSize: 11.5, color: palette.textSecondary),
+                style: TextStyle(fontSize: 11.5, color: appTheme.textSubtitle),
               ),
             ],
           ),
@@ -562,13 +539,8 @@ class _QuestionRow extends StatelessWidget {
 
 /// Cuántos terminan cada actividad de una sección.
 class _CompletionRow extends StatelessWidget {
-  const _CompletionRow({
-    required this.palette,
-    required this.title,
-    required this.done,
-  });
+  const _CompletionRow({required this.title, required this.done});
 
-  final SectionPalette palette;
   final String title;
   final Map<String, int> done;
 
@@ -586,6 +558,7 @@ class _CompletionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final parts = [
       for (final item in _order)
         if (done[item.$1] != null) (item, done[item.$1]!),
@@ -603,9 +576,9 @@ class _CompletionRow extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: palette.surface,
-            border: Border.all(color: palette.border),
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            color: appTheme.background,
+            border: Border.all(color: appTheme.border),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -615,7 +588,7 @@ class _CompletionRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
-                  color: palette.textPrimary,
+                  color: appTheme.textTitle,
                 ),
               ),
               const SizedBox(height: 8),
@@ -635,8 +608,8 @@ class _CompletionRow extends StatelessWidget {
                             // Se apaga cuando mucha menos gente llega hasta
                             // aqui que al principio de la seccion.
                             color: part.$2 >= most
-                                ? palette.accent
-                                : palette.textSecondary,
+                                ? appTheme.textTitle
+                                : appTheme.textSubtitle,
                           ),
                           const SizedBox(height: 3),
                           Text(
@@ -644,14 +617,14 @@ class _CompletionRow extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w800,
-                              color: palette.textPrimary,
+                              color: appTheme.textTitle,
                             ),
                           ),
                           Text(
                             part.$1.$2,
                             style: TextStyle(
                               fontSize: 10,
-                              color: palette.textSecondary,
+                              color: appTheme.textSubtitle,
                             ),
                           ),
                         ],

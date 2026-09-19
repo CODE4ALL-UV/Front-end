@@ -18,15 +18,15 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Container(
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: background ?? palette.surface,
+        color: appTheme.background,
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-        border: Border.all(color: borderColor ?? palette.border),
+        border: Border.all(color: borderColor ?? appTheme.border),
       ),
       child: child,
     );
@@ -53,8 +53,8 @@ class SectionHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
-    final effectiveColor = color ?? palette.textPrimary;
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final effectiveColor = appTheme.textTitle;
 
     return Semantics(
       header: true,
@@ -85,7 +85,7 @@ class SectionHeading extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15,
                       height: 1.5,
-                      color: palette.textSecondary,
+                      color: appTheme.textSubtitle,
                     ),
                   ),
                 ],
@@ -106,7 +106,7 @@ class SectionParagraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Text(
       text,
@@ -115,7 +115,7 @@ class SectionParagraph extends StatelessWidget {
         // 1.6 de interlineado: facilita no perder el renglón, sobre todo con
         // baja visión o dislexia.
         height: 1.6,
-        color: palette.textPrimary,
+        color: appTheme.textTitle,
       ),
     );
   }
@@ -130,7 +130,7 @@ class SectionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +146,7 @@ class SectionList extends StatelessWidget {
                   height: 26,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: palette.accentSoft,
+                    color: appTheme.border,
                     shape: BoxShape.circle,
                   ),
                   child: numbered
@@ -155,10 +155,10 @@ class SectionList extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: palette.accent,
+                            color: appTheme.actionText,
                           ),
                         )
-                      : Icon(Icons.circle, size: 8, color: palette.accent),
+                      : Icon(Icons.circle, size: 8, color: appTheme.actionText),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -167,7 +167,7 @@ class SectionList extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15.5,
                       height: 1.55,
-                      color: palette.textPrimary,
+                      color: appTheme.textTitle,
                     ),
                   ),
                 ),
@@ -210,7 +210,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final code = widget.code;
     final caption = widget.caption;
     final hasCaption = caption != null && caption.trim().isNotEmpty;
@@ -224,9 +224,9 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: palette.codeBackground,
+                color: appTheme.background,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: palette.codeBorder),
+                border: Border.all(color: appTheme.border),
               ),
               child: Scrollbar(
                 controller: _controller,
@@ -245,7 +245,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
                       ],
                       fontSize: 14,
                       height: 1.55,
-                      color: palette.codeText,
+                      color: appTheme.textTitle,
                     ),
                   ),
                 ),
@@ -259,14 +259,20 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: palette.surfaceAlt,
+              color: appTheme.actionBackground,
               borderRadius: BorderRadius.circular(10),
-              border: Border(left: BorderSide(color: palette.accent, width: 4)),
+              border: Border(
+                left: BorderSide(color: appTheme.actionText, width: 4),
+              ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.record_voice_over, size: 18, color: palette.accent),
+                Icon(
+                  Icons.record_voice_over,
+                  size: 18,
+                  color: appTheme.actionText,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -274,7 +280,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
                     style: TextStyle(
                       fontSize: 14.5,
                       height: 1.5,
-                      color: palette.textPrimary,
+                      color: appTheme.textTitle,
                     ),
                   ),
                 ),
@@ -290,48 +296,41 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
 /// Aviso destacado. El tono nunca es el único indicador: cada uno trae su
 /// propio icono y su etiqueta.
 class SectionCallout extends StatelessWidget {
-  const SectionCallout({
-    super.key,
-    required this.title,
-    required this.body,
-    this.tone = SectionTone.info,
-  });
+  const SectionCallout({super.key, required this.title, required this.body});
 
   final String title;
   final String body;
-  final SectionTone tone;
 
-  IconData get _icon => switch (tone) {
-    SectionTone.info => Icons.lightbulb_outline,
-    SectionTone.success => Icons.check_circle_outline,
-    SectionTone.warning => Icons.warning_amber_rounded,
-    SectionTone.danger => Icons.dangerous_outlined,
+  IconData get _icon => switch (AppTheme) {
+    appThemeTone.info => Icons.lightbulb_outline,
+    appThemeTone.success => Icons.check_circle_outline,
+    appThemeTone.warning => Icons.warning_amber_rounded,
+    appThemeTone.danger => Icons.dangerous_outlined,
   };
 
   String get _prefix => switch (tone) {
-    SectionTone.info => 'Idea clave',
-    SectionTone.success => 'Bien hecho',
-    SectionTone.warning => 'Atención',
-    SectionTone.danger => 'Cuidado',
+    appThemeTone.info => 'Idea clave',
+    appThemeTone.success => 'Bien hecho',
+    appThemeTone.warning => 'Atención',
+    appThemeTone.danger => 'Cuidado',
   };
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
-    final colors = palette.tone(tone);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: colors.background,
+        color: appTheme.background,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colors.foreground.withValues(alpha: 0.45)),
+        border: Border.all(color: appTheme.border.withValues(alpha: 0.45)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(_icon, size: 22, color: colors.foreground),
+          Icon(_icon, size: 22, color: appTheme.border),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -343,7 +342,7 @@ class SectionCallout extends StatelessWidget {
                     fontSize: 15.5,
                     fontWeight: FontWeight.w700,
                     height: 1.35,
-                    color: colors.foreground,
+                    color: appTheme.border,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -352,7 +351,7 @@ class SectionCallout extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     height: 1.55,
-                    color: palette.textPrimary,
+                    color: appTheme.textTitle,
                   ),
                 ),
               ],
@@ -375,19 +374,16 @@ class SectionPrimaryButton extends StatelessWidget {
     required this.onPressed,
     this.icon,
     this.semanticHint,
-    this.tone = SectionTone.info,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
   final String? semanticHint;
-  final SectionTone tone;
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
-    final colors = palette.tone(tone);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Semantics(
       button: true,
@@ -398,10 +394,10 @@ class SectionPrimaryButton extends StatelessWidget {
         child: ElevatedButton.icon(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: colors.foreground,
-            foregroundColor: palette.isDark ? palette.onAccent : Colors.white,
-            disabledBackgroundColor: palette.border,
-            disabledForegroundColor: palette.textSecondary,
+            backgroundColor: appTheme.border,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: appTheme.border,
+            disabledForegroundColor: appTheme.textSubtitle,
             minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
@@ -438,7 +434,7 @@ class SectionSecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Semantics(
       button: true,
@@ -449,9 +445,9 @@ class SectionSecondaryButton extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: onPressed,
           style: OutlinedButton.styleFrom(
-            foregroundColor: palette.accent,
-            disabledForegroundColor: palette.textSecondary,
-            side: BorderSide(color: palette.accent, width: 1.6),
+            foregroundColor: appTheme.actionText,
+            disabledForegroundColor: appTheme.textSubtitle,
+            side: BorderSide(color: appTheme.actionText, width: 1.6),
             minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
@@ -471,33 +467,26 @@ class SectionSecondaryButton extends StatelessWidget {
 
 /// Etiqueta de estado: icono más texto, nunca solo color.
 class SectionStatusChip extends StatelessWidget {
-  const SectionStatusChip({
-    super.key,
-    required this.label,
-    required this.icon,
-    this.tone = SectionTone.success,
-  });
+  const SectionStatusChip({super.key, required this.label, required this.icon});
 
   final String label;
   final IconData icon;
-  final SectionTone tone;
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
-    final colors = palette.tone(tone);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: colors.background,
+        color: appTheme.background,
         borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
-        border: Border.all(color: colors.foreground.withValues(alpha: 0.5)),
+        border: Border.all(color: appTheme.border.withValues(alpha: 0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: colors.foreground),
+          Icon(icon, size: 16, color: appTheme.border),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
@@ -505,7 +494,7 @@ class SectionStatusChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: colors.foreground,
+                color: appTheme.border,
               ),
             ),
           ),
@@ -531,7 +520,7 @@ class SectionProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final percent = (value.clamp(0.0, 1.0) * 100).round();
 
     return Semantics(
@@ -549,7 +538,7 @@ class SectionProgressBar extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
-                      color: palette.textSecondary,
+                      color: appTheme.textSubtitle,
                     ),
                   ),
                 ),
@@ -558,7 +547,7 @@ class SectionProgressBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
-                    color: palette.accent,
+                    color: appTheme.actionText,
                   ),
                 ),
               ],
@@ -569,7 +558,7 @@ class SectionProgressBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: value.clamp(0.0, 1.0),
                 minHeight: 10,
-                backgroundColor: palette.border,
+                backgroundColor: appTheme.border,
                 valueColor: AlwaysStoppedAnimation<Color>(palette.accent),
               ),
             ),
@@ -593,7 +582,7 @@ class SectionPendingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return SectionCard(
       child: Column(
@@ -606,7 +595,7 @@ class SectionPendingContent extends StatelessWidget {
                 'Mientras tanto, estos son los objetivos previstos para esta '
                 'sección.',
             icon: Icons.hourglass_empty,
-            color: palette.warning,
+            color: appTheme.warning,
           ),
           const SizedBox(height: 16),
           SectionList(items: objectives, numbered: true),

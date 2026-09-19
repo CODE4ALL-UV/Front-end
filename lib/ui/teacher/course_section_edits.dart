@@ -93,7 +93,6 @@ extension ReadingBlockEdits on ReadingBlock {
     List<String>? items,
     String? code,
     Object? codeCaption = _sinTocar,
-    CalloutTone? tone,
   }) {
     final newTitle = title ?? this.title;
     final newBody = body ?? this.body;
@@ -127,7 +126,6 @@ extension ReadingBlockEdits on ReadingBlock {
         return ReadingBlock.callout(
           title: newTitle,
           body: newBody,
-          tone: tone ?? this.tone,
           items: newItems,
         );
     }
@@ -155,12 +153,7 @@ extension ReadingBlockEdits on ReadingBlock {
           codeCaption: codeCaption,
         );
       case ReadingBlockKind.callout:
-        return ReadingBlock.callout(
-          title: title,
-          body: body,
-          tone: tone,
-          items: items,
-        );
+        return ReadingBlock.callout(title: title, body: body, items: items);
     }
   }
 

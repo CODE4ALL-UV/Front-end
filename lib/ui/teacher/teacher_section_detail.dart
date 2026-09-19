@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/chapter_section_screen.dart';
 import 'course_section_edits.dart';
@@ -172,11 +173,13 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   void _toast(String message, {bool ok = false}) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: ok ? palette.success : palette.danger,
+        backgroundColor: ok
+            ? appTheme.successBackground
+            : appTheme.dangerBackground,
       ),
     );
   }
@@ -205,7 +208,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final section = _current;
     final edited = _content.isSectionEdited(section.id);
 
@@ -215,35 +218,34 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
-                padding: SectionMetrics.pagePadding(constraints.maxWidth),
+                padding: AppMetrics.pagePadding(constraints.maxWidth),
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(
-                      maxWidth: SectionMetrics.maxContentWidth,
+                      maxWidth: AppMetrics.maxContentWidth,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _header(palette, edited),
-                        const SizedBox(height: SectionMetrics.gap),
-                        _identityCard(palette),
-                        const SizedBox(height: SectionMetrics.sectionGap),
+                        _header(edited),
+                        const SizedBox(height: AppMetrics.gap),
+                        _identityCard(),
+                        const SizedBox(height: AppMetrics.sectionGap),
                         Text(
                           'Actividades',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
-                            color: palette.textPrimary,
+                            color: appTheme.textTitle,
                           ),
                         ),
-                        const SizedBox(height: SectionMetrics.gap),
-                        ..._activityCards(palette, section),
+                        const SizedBox(height: AppMetrics.gap),
+                        ..._activityCards(section),
                         if (_error != null) ...[
-                          const SizedBox(height: SectionMetrics.gap),
+                          const SizedBox(height: AppMetrics.gap),
                           TeacherBanner(
                             icon: Icons.error_outline,
                             text: _error!,
-                            tone: palette.danger,
                           ),
                         ],
                         const SizedBox(height: 90),
@@ -255,30 +257,31 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
             },
           ),
         ),
-        _saveBar(palette, edited),
+        _saveBar(edited),
       ],
     );
   }
 
-  Widget _header(SectionPalette palette, bool edited) {
+  Widget _header(bool edited) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final where = Text(
       'Módulo ${widget.moduleNumber} · Sección ${widget.sectionNumber}',
-      style: TextStyle(fontSize: 12.5, color: palette.textSecondary),
+      style: TextStyle(fontSize: 12.5, color: appTheme.textSubtitle),
     );
 
     final badge = edited
         ? Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: palette.accentSoft,
-              borderRadius: BorderRadius.circular(SectionMetrics.pillRadius),
+              color: appTheme.background,
+              borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
             child: Text(
               'Editada',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: palette.accent,
+                color: appTheme.background,
               ),
             ),
           )
@@ -287,8 +290,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
     final preview = TextButton.icon(
       onPressed: _previewAsStudent,
       style: TextButton.styleFrom(
-        foregroundColor: palette.accent,
-        minimumSize: const Size(0, SectionMetrics.minTapTarget),
+        foregroundColor: appTheme.background,
+        minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.visibility_outlined, size: 18),
       label: const Text('Ver como estudiante'),
@@ -325,7 +328,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
     );
   }
 
-  Widget _identityCard(SectionPalette palette) {
+  Widget _identityCard() {
     return TeacherCard(
       child: Column(
         children: [
@@ -334,7 +337,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
             controller: _title,
             onChanged: (_) => setState(() {}),
           ),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
           TeacherField(
             label: 'Título corto',
             controller: _shortTitle,
@@ -344,7 +347,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                 'encoge hasta volverse ilegible.',
             onChanged: (_) => setState(() {}),
           ),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
           TeacherField(
             label: 'Descripción',
             controller: _summary,
@@ -357,12 +360,12 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
     );
   }
 
-  List<Widget> _activityCards(SectionPalette palette, CourseSection section) {
+  List<Widget> _activityCards(CourseSection section) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return [
       _ActivityCard(
-        palette: palette,
         icon: Icons.menu_book,
-        color: palette.accent,
+        color: appTheme.background,
         title: 'Lectura',
         detail: section.reading == null
             ? 'Sin lectura'
@@ -377,9 +380,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
         },
       ),
       _ActivityCard(
-        palette: palette,
         icon: Icons.lightbulb_outline,
-        color: palette.warning,
+        color: appTheme.warningBackground,
         title: 'Cápsula de conocimiento',
         detail: section.capsule == null
             ? 'Sin cápsula'
@@ -393,9 +395,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
         },
       ),
       _ActivityCard(
-        palette: palette,
         icon: Icons.play_circle_outline,
-        color: palette.danger,
+        color: appTheme.dangerBackground,
         title: 'Videos',
         detail: section.videos.isEmpty
             ? 'Sin videos'
@@ -410,9 +411,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
         },
       ),
       _ActivityCard(
-        palette: palette,
         icon: Icons.quiz_outlined,
-        color: palette.success,
+        color: appTheme.successBackground,
         title: 'Quiz',
         detail: section.quiz.isEmpty
             ? 'Sin preguntas'
@@ -430,9 +430,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
         },
       ),
       _ActivityCard(
-        palette: palette,
         icon: Icons.fact_check_outlined,
-        color: palette.success,
+        color: appTheme.successBackground,
         title: 'Evaluación final',
         detail: section.finalEvaluation.isEmpty
             ? 'Sin preguntas'
@@ -449,9 +448,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
         },
       ),
       _ActivityCard(
-        palette: palette,
         icon: Icons.code,
-        color: palette.accent,
+        color: appTheme.background,
         title: 'Ejemplo comentado',
         detail: section.example == null
             ? 'Sin ejemplo'
@@ -465,9 +463,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
         },
       ),
       _ActivityCard(
-        palette: palette,
         icon: Icons.edit_note,
-        color: palette.warning,
+        color: appTheme.warningBackground,
         title: 'Ejercicio',
         detail: section.exercise == null || section.exercise!.isEmpty
             ? 'Sin ejercicio'
@@ -482,21 +479,21 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
         },
       ),
       _LaboratoryCard(
-        palette: palette,
         enabled: section.hasLaboratory,
         onChanged: (value) => _update(_draft.copyWith(hasLaboratory: value)),
       ),
     ];
   }
 
-  Widget _saveBar(SectionPalette palette, bool edited) {
+  Widget _saveBar(bool edited) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final changed = _hasChanges;
 
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: palette.surface,
-        border: Border(top: BorderSide(color: palette.border)),
+        color: appTheme.background,
+        border: Border(top: BorderSide(color: appTheme.border)),
       ),
       child: SafeArea(
         top: false,
@@ -515,7 +512,9 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: changed ? FontWeight.w700 : FontWeight.w400,
-                  color: changed ? palette.warning : palette.textSecondary,
+                  color: changed
+                      ? appTheme.warningBackground
+                      : appTheme.textSubtitle,
                 ),
               ),
             );
@@ -524,8 +523,9 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                 ? TextButton(
                     onPressed: _saving ? null : _revert,
                     style: TextButton.styleFrom(
-                      foregroundColor: palette.danger,
-                      minimumSize: const Size(0, SectionMetrics.minTapTarget),
+                      backgroundColor: appTheme.background,
+                      foregroundColor: appTheme.dangerBackground,
+                      minimumSize: const Size(0, AppMetrics.minTapTarget),
                     ),
                     child: const Text('Volver al original'),
                   )
@@ -534,9 +534,9 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
             final save = FilledButton.icon(
               onPressed: (_saving || !changed) ? null : _save,
               style: FilledButton.styleFrom(
-                backgroundColor: palette.accent,
-                foregroundColor: palette.onAccent,
-                minimumSize: const Size(0, SectionMetrics.minTapTarget),
+                backgroundColor: appTheme.background,
+                foregroundColor: appTheme.successBackground,
+                minimumSize: const Size(0, AppMetrics.minTapTarget),
               ),
               icon: const Icon(Icons.save_outlined, size: 18),
               label: const Text('Guardar'),
@@ -581,7 +581,6 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
 /// Una actividad de la sección, con lo que contiene de un vistazo.
 class _ActivityCard extends StatelessWidget {
   const _ActivityCard({
-    required this.palette,
     required this.icon,
     required this.color,
     required this.title,
@@ -590,7 +589,6 @@ class _ActivityCard extends StatelessWidget {
     required this.onTap,
   });
 
-  final SectionPalette palette;
   final IconData icon;
   final Color color;
   final String title;
@@ -600,6 +598,7 @@ class _ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return Semantics(
       button: true,
       label: '$title. $detail. Toca para editar.',
@@ -607,28 +606,26 @@ class _ActivityCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: Material(
-            color: palette.surface,
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            color: appTheme.background,
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             child: InkWell(
               onTap: onTap,
-              borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+              borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
               child: Container(
                 constraints: const BoxConstraints(
-                  minHeight: SectionMetrics.minTapTarget,
+                  minHeight: AppMetrics.minTapTarget,
                 ),
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
-                  border: Border.all(color: palette.border),
-                  borderRadius: BorderRadius.circular(
-                    SectionMetrics.cardRadius,
-                  ),
+                  border: Border.all(color: appTheme.border),
+                  borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       icon,
                       size: 22,
-                      color: empty ? palette.textSecondary : color,
+                      color: empty ? appTheme.textSubtitle : color,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -641,20 +638,20 @@ class _ActivityCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w700,
-                              color: palette.textPrimary,
+                              color: appTheme.textTitle,
                             ),
                           ),
                           Text(
                             detail,
                             style: TextStyle(
                               fontSize: 12.5,
-                              color: palette.textSecondary,
+                              color: appTheme.textSubtitle,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Icon(Icons.chevron_right, color: palette.textSecondary),
+                    Icon(Icons.chevron_right, color: appTheme.textSubtitle),
                   ],
                 ),
               ),
@@ -668,47 +665,43 @@ class _ActivityCard extends StatelessWidget {
 
 /// El laboratorio no tiene contenido que editar: se enciende o se apaga.
 class _LaboratoryCard extends StatelessWidget {
-  const _LaboratoryCard({
-    required this.palette,
-    required this.enabled,
-    required this.onChanged,
-  });
+  const _LaboratoryCard({required this.enabled, required this.onChanged});
 
-  final SectionPalette palette;
   final bool enabled;
   final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     // El fondo va en el Material y no en la decoración: si no, el interruptor
     // pinta su pulsación por debajo y no se ve.
     return Material(
-      color: palette.surface,
-      borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+      color: appTheme.background,
+      borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
         decoration: BoxDecoration(
-          border: Border.all(color: palette.border),
-          borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+          border: Border.all(color: appTheme.border),
+          borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: SwitchListTile(
           value: enabled,
           onChanged: onChanged,
           contentPadding: EdgeInsets.zero,
-          activeThumbColor: palette.accent,
+          activeThumbColor: appTheme.background,
           title: Text(
             'Laboratorio',
             style: TextStyle(
               fontSize: 14.5,
               fontWeight: FontWeight.w700,
-              color: palette.textPrimary,
+              color: appTheme.textTitle,
             ),
           ),
           subtitle: Text(
             enabled
                 ? 'El estudiante puede escribir y ejecutar código'
                 : 'Esta sección no ofrece laboratorio',
-            style: TextStyle(fontSize: 12.5, color: palette.textSecondary),
+            style: TextStyle(fontSize: 12.5, color: appTheme.textSubtitle),
           ),
         ),
       ),

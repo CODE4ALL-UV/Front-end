@@ -55,20 +55,18 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     if (_stats.isLoading && !_stats.isLoaded) {
-      return Center(child: CircularProgressIndicator(color: palette.accent));
+      return Center(
+        child: CircularProgressIndicator(color: appTheme.actionBackground),
+      );
     }
 
     if (_stats.problem != null) {
       return Padding(
-        padding: const EdgeInsets.all(SectionMetrics.gap),
-        child: TeacherBanner(
-          icon: Icons.cloud_off,
-          text: _stats.problem!,
-          tone: palette.danger,
-        ),
+        padding: const EdgeInsets.all(AppMetrics.gap),
+        child: TeacherBanner(icon: Icons.cloud_off, text: _stats.problem!),
       );
     }
 
@@ -77,14 +75,14 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
     if (students.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(SectionMetrics.sectionGap),
+          padding: const EdgeInsets.all(AppMetrics.sectionGap),
           child: Text(
             'Todavía no hay ningún estudiante registrado en el curso.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14.5,
               height: 1.5,
-              color: palette.textSecondary,
+              color: appTheme.textSubtitle,
             ),
           ),
         ),
@@ -99,12 +97,12 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
         builder: (context, constraints) {
           return ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: SectionMetrics.pagePadding(constraints.maxWidth),
+            padding: AppMetrics.pagePadding(constraints.maxWidth),
             children: [
               Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: SectionMetrics.maxContentWidth,
+                    maxWidth: AppMetrics.maxContentWidth,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -118,7 +116,7 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
                               '${sinEmpezar > 0 ? " · $sinEmpezar sin empezar" : ""}',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: palette.textSecondary,
+                                color: appTheme.textSubtitle,
                               ),
                             ),
                           ),
@@ -127,10 +125,10 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
                               () => _strugglingFirst = !_strugglingFirst,
                             ),
                             style: TextButton.styleFrom(
-                              foregroundColor: palette.accent,
+                              foregroundColor: appTheme.infoText,
                               minimumSize: const Size(
                                 0,
-                                SectionMetrics.minTapTarget,
+                                AppMetrics.minTapTarget,
                               ),
                             ),
                             icon: const Icon(Icons.swap_vert, size: 18),
@@ -142,9 +140,9 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: SectionMetrics.gap),
+                      const SizedBox(height: AppMetrics.gap),
                       for (final student in students)
-                        _StudentRow(palette: palette, student: student),
+                        _StudentRow(student: student),
                       const SizedBox(height: 30),
                     ],
                   ),
@@ -159,20 +157,22 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
 }
 
 class _StudentRow extends StatelessWidget {
-  const _StudentRow({required this.palette, required this.student});
+  const _StudentRow({required this.student});
 
-  final SectionPalette palette;
   final StudentStats student;
 
   @override
   Widget build(BuildContext context) {
     final percent = (student.accuracy * 100).round();
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     final tone = student.hasNotStarted
-        ? palette.textSecondary
+        ? appTheme.textSubtitle
         : (percent >= 70
-              ? palette.success
-              : (percent >= 45 ? palette.warning : palette.danger));
+              ? appTheme.successBackground
+              : (percent >= 45
+                    ? appTheme.warningBackground
+                    : appTheme.dangerBackground));
 
     final initials = student.name.trim().isEmpty
         ? '?'
@@ -189,9 +189,9 @@ class _StudentRow extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: palette.surface,
-            border: Border.all(color: palette.border),
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            color: appTheme.iconBackground,
+            border: Border.all(color: appTheme.border),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Row(
             children: [
@@ -200,7 +200,7 @@ class _StudentRow extends StatelessWidget {
                 height: 38,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: palette.accentSoft,
+                  color: appTheme.dangerBackground,
                   shape: BoxShape.circle,
                 ),
                 child: Text(
@@ -208,7 +208,7 @@ class _StudentRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: palette.accent,
+                    color: appTheme.infoText,
                   ),
                 ),
               ),
@@ -223,7 +223,7 @@ class _StudentRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
-                        color: palette.textPrimary,
+                        color: appTheme.textTitle,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -233,14 +233,14 @@ class _StudentRow extends StatelessWidget {
                           Icon(
                             Icons.hourglass_empty,
                             size: 13,
-                            color: palette.textSecondary,
+                            color: appTheme.textSubtitle,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             'Sin empezar',
                             style: TextStyle(
                               fontSize: 12,
-                              color: palette.textSecondary,
+                              color: appTheme.textSubtitle,
                             ),
                           ),
                         ],
@@ -252,7 +252,7 @@ class _StudentRow extends StatelessWidget {
                         '${student.answered == 0 ? "" : " · ${student.correct} aciertos · ${student.failed} fallos"}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: palette.textSecondary,
+                          color: appTheme.textSubtitle,
                         ),
                       ),
                   ],
@@ -263,11 +263,7 @@ class _StudentRow extends StatelessWidget {
                 student.hasNotStarted
                     ? '—'
                     : (student.answered == 0 ? '—' : '$percent %'),
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: tone,
-                ),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
               ),
             ],
           ),

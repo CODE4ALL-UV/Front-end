@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
 import 'editor_scaffold.dart';
@@ -144,14 +143,14 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                   child: Column(
                     children: [
                       TeacherField(label: 'Título', controller: _title),
-                      const SizedBox(height: SectionMetrics.gap),
+                      const SizedBox(height: AppMetrics.gap),
                       TeacherField(
                         label: 'Frase principal',
                         controller: _headline,
                         maxLines: 2,
                         helper: 'La idea que quieres que se lleven.',
                       ),
-                      const SizedBox(height: SectionMetrics.gap),
+                      const SizedBox(height: AppMetrics.gap),
                       TeacherField(
                         label: 'Introducción',
                         controller: _intro,
@@ -160,7 +159,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: SectionMetrics.sectionGap),
+                const SizedBox(height: AppMetrics.sectionGap),
                 Text(
                   'Consejos',
                   style: TextStyle(
@@ -169,7 +168,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                     color: appTheme.colorScheme.onSurface,
                   ),
                 ),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 for (var i = 0; i < _tips.length; i++)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),
@@ -213,7 +212,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                   onPressed: () =>
                       setState(() => _tips = [..._tips, _TipFields('', '')]),
                 ),
-                const SizedBox(height: SectionMetrics.sectionGap),
+                const SizedBox(height: AppMetrics.sectionGap),
                 TeacherCard(
                   title: 'Comparar código (opcional)',
                   child: Column(
@@ -228,7 +227,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                           color: courseTheme.mutedText,
                         ),
                       ),
-                      const SizedBox(height: SectionMetrics.gap),
+                      const SizedBox(height: AppMetrics.gap),
                       TeacherField(
                         label: 'Cómo NO hacerlo',
                         controller: _badCode,
@@ -241,7 +240,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                         controller: _badCaption,
                         maxLines: 2,
                       ),
-                      const SizedBox(height: SectionMetrics.gap),
+                      const SizedBox(height: AppMetrics.gap),
                       TeacherField(
                         label: 'Cómo SÍ hacerlo',
                         controller: _goodCode,
@@ -257,7 +256,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 TeacherCard(
                   child: TeacherField(
                     label: 'Cierre',

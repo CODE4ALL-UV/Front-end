@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/youtube_translator_player.dart';
@@ -182,6 +183,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
   }
 
   Future<void> _openInBrowser() async {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     if (_opening) return;
     setState(() => _opening = true);
 
@@ -194,7 +196,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
       opened
           ? 'Video abierto en tu navegador'
           : 'No se pudo abrir el video. Copia el enlace y ábrelo manualmente.',
-      opened ? SectionTone.success : SectionTone.danger,
+      opened ? appTheme.tone(success).success : appTheme.tone(danger).danger,
     );
   }
 
@@ -217,7 +219,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
 
   /// Muestra el aviso en pantalla y lo anuncia por voz.
   void _showMessage(String message, SectionTone tone) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     announceForAccessibility(context, message);
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -234,7 +236,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: palette.tone(tone).foreground,
+        backgroundColor: appTheme.tone(tone).foreground,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 4),
       ),
@@ -257,7 +259,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final width = MediaQuery.sizeOf(context).width;
     final isWide = width >= 640;
 
@@ -270,7 +272,6 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
       bottomBar: SectionPrimaryButton(
         label: 'Marcar como visto',
         icon: Icons.check_circle_outline,
-        tone: SectionTone.success,
         semanticHint: 'Marca los videos de la sección como completados',
         onPressed: _finish,
       ),
@@ -283,21 +284,21 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
               currentIndex: _videoIndex,
               onSelected: _selectVideo,
             ),
-            const SizedBox(height: SectionMetrics.sectionGap),
+            const SizedBox(height: AppMetrics.sectionGap),
           ],
           SectionCard(
-            background: palette.accentSoft,
-            borderColor: palette.accent.withValues(alpha: 0.4),
+            background: appTheme.infoBackground,
+            borderColor: appTheme.background.withValues(alpha: 0.4),
             child: SectionHeading(
               title: _video.title,
               subtitle: _video.duration.isEmpty
                   ? _video.description
                   : '${_video.description}  ·  Duración ${_video.duration}',
               icon: Icons.ondemand_video_outlined,
-              color: palette.accent,
+              color: appTheme.background,
             ),
           ),
-          const SizedBox(height: SectionMetrics.sectionGap),
+          const SizedBox(height: AppMetrics.sectionGap),
           _PlayerCard(
             key: ValueKey<String>(_video.youtubeId),
             video: _video,
@@ -305,30 +306,30 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
             onCaptionChanged: _onPlayerCaption,
             onCuesLoaded: _onCuesLoaded,
           ),
-          const SizedBox(height: SectionMetrics.sectionGap),
+          const SizedBox(height: AppMetrics.sectionGap),
           if (isWide)
             IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(flex: 3, child: _buildCaptionBox()),
-                  const SizedBox(width: SectionMetrics.gap),
+                  const SizedBox(width: AppMetrics.gap),
                   Expanded(flex: 2, child: _buildSignPanel()),
                 ],
               ),
             )
           else ...[
             _buildCaptionBox(),
-            const SizedBox(height: SectionMetrics.gap),
+            const SizedBox(height: AppMetrics.gap),
             _buildSignPanel(),
           ],
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
           _buildPracticeButton(),
-          const SizedBox(height: SectionMetrics.sectionGap),
-          _buildSourceNote(palette),
-          const SizedBox(height: SectionMetrics.sectionGap),
-          _buildFullTranscript(palette),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.sectionGap),
+          _buildSourceNote(),
+          const SizedBox(height: AppMetrics.sectionGap),
+          _buildFullTranscript(),
+          const SizedBox(height: AppMetrics.gap),
           Row(
             children: [
               Expanded(
@@ -357,7 +358,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
   }
 
   Widget _buildCaptionBox() {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final hasPhrases = _phrases.isNotEmpty;
 
     return SectionCard(
@@ -367,7 +368,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.closed_caption, size: 20, color: palette.accent),
+              Icon(Icons.closed_caption, size: 20, color: appTheme.background),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -375,7 +376,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w800,
-                    color: palette.accent,
+                    color: appTheme.background,
                   ),
                 ),
               ),
@@ -383,7 +384,6 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
                 const SectionStatusChip(
                   label: 'En vivo',
                   icon: Icons.graphic_eq,
-                  tone: SectionTone.success,
                 ),
             ],
           ),
@@ -399,7 +399,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
                 // leen los subtítulos cómodamente, igual que en televisión.
                 color: const Color(0xFF10161C),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: palette.border),
+                border: Border.all(color: appTheme.border),
               ),
               child: Text(
                 _caption.isEmpty
@@ -447,7 +447,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
-                      color: palette.textSecondary,
+                      color: appTheme.textSubtitle,
                     ),
                   ),
                 ),
@@ -483,7 +483,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
     );
   }
 
-  Widget _buildSourceNote(SectionPalette palette) {
+  Widget _buildSourceNote() {
     if (_source == _CaptionSource.player) {
       return const SectionCallout(
         title: 'Subtítulos del propio video',
@@ -491,7 +491,6 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
             'El texto del cuadro viene de los subtítulos del video y avanza '
             'con la reproducción. El panel de la derecha deletrea esa misma '
             'frase en alfabeto manual.',
-        tone: SectionTone.success,
       );
     }
 
@@ -514,7 +513,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
     );
   }
 
-  Widget _buildFullTranscript(SectionPalette palette) {
+  Widget _buildFullTranscript() {
     if (_video.transcript.isEmpty) return const SizedBox.shrink();
 
     return SectionCard(
@@ -550,7 +549,7 @@ class _VideoSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return SectionCard(
       child: Column(
@@ -574,15 +573,15 @@ class _VideoSelector extends StatelessWidget {
                 child: ExcludeSemantics(
                   child: Material(
                     color: i == currentIndex
-                        ? palette.accentSoft
-                        : palette.surfaceAlt,
+                        ? appTheme.infoBackground
+                        : appTheme.dangerText,
                     borderRadius: BorderRadius.circular(12),
                     child: InkWell(
                       onTap: () => onSelected(i),
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
                         constraints: const BoxConstraints(
-                          minHeight: SectionMetrics.minTapTarget,
+                          minHeight: AppMetrics.minTapTarget,
                         ),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -592,8 +591,8 @@ class _VideoSelector extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: i == currentIndex
-                                ? palette.accent
-                                : palette.border,
+                                ? appTheme.background
+                                : appTheme.border,
                             width: i == currentIndex ? 1.8 : 1.2,
                           ),
                         ),
@@ -605,8 +604,8 @@ class _VideoSelector extends StatelessWidget {
                                   : Icons.play_circle_outline,
                               size: 24,
                               color: i == currentIndex
-                                  ? palette.accent
-                                  : palette.textSecondary,
+                                  ? appTheme.background
+                                  : appTheme.textSubtitle,
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -618,7 +617,7 @@ class _VideoSelector extends StatelessWidget {
                                   fontWeight: i == currentIndex
                                       ? FontWeight.w800
                                       : FontWeight.w600,
-                                  color: palette.textPrimary,
+                                  color: appTheme.textTitle,
                                 ),
                               ),
                             ),
@@ -628,7 +627,7 @@ class _VideoSelector extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w700,
-                                color: palette.textSecondary,
+                                color: appTheme.textSubtitle,
                               ),
                             ),
                           ],
@@ -662,7 +661,7 @@ class _PlayerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Semantics(
       label:
@@ -677,8 +676,8 @@ class _PlayerCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: Colors.black,
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
-            border: Border.all(color: palette.border),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
+            border: Border.all(color: appTheme.border),
           ),
           child: YoutubeTranslatorPlayer(
             videoUrl: video.url,
@@ -710,7 +709,7 @@ class _CaptionControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return Semantics(
       button: true,
@@ -720,11 +719,11 @@ class _CaptionControl extends StatelessWidget {
         onPressed: onPressed,
         icon: Icon(icon, size: 24),
         tooltip: label,
-        color: palette.accent,
-        disabledColor: palette.textSecondary.withValues(alpha: 0.5),
+        color: appTheme.background,
+        disabledColor: appTheme.textSubtitle.withValues(alpha: 0.5),
         constraints: const BoxConstraints(
-          minWidth: SectionMetrics.minTapTarget,
-          minHeight: SectionMetrics.minTapTarget,
+          minWidth: AppMetrics.minTapTarget,
+          minHeight: AppMetrics.minTapTarget,
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
 import 'editor_scaffold.dart';
@@ -42,7 +43,7 @@ class _VideosEditorScreenState extends State<VideosEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
 
     return EditorScaffold(
       title: 'Videos',
@@ -74,7 +75,7 @@ class _VideosEditorScreenState extends State<VideosEditorScreen> {
                 leading: Icon(
                   Icons.play_circle_outline,
                   size: 22,
-                  color: palette.danger,
+                  color: appTheme.dangerBorder,
                 ),
                 onTap: () => _edit(i),
                 onMoveUp: i == 0
@@ -95,7 +96,7 @@ class _VideosEditorScreenState extends State<VideosEditorScreen> {
                   }
                 },
               ),
-            const SizedBox(height: SectionMetrics.gap),
+            const SizedBox(height: AppMetrics.gap),
             TeacherAddButton(label: 'Añadir video', onPressed: _add),
           ],
         ],
@@ -171,7 +172,7 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = SectionPalette.of(context);
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final detected = extractYoutubeId(_link.text);
 
     return EditorScaffold(
@@ -188,7 +189,7 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
                   controller: _title,
                   onChanged: (_) => setState(() => _error = null),
                 ),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 TeacherField(
                   label: 'Enlace de YouTube',
                   controller: _link,
@@ -198,13 +199,13 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
                       : 'Video reconocido: $detected',
                   onChanged: (_) => setState(() => _error = null),
                 ),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 TeacherField(
                   label: 'Duración',
                   controller: _duration,
                   hint: '8:24',
                 ),
-                const SizedBox(height: SectionMetrics.gap),
+                const SizedBox(height: AppMetrics.gap),
                 TeacherField(
                   label: 'Descripción',
                   controller: _description,
@@ -213,7 +214,7 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
               ],
             ),
           ),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
           TeacherCard(
             child: TeacherField(
               label: 'Transcripción',
@@ -226,12 +227,8 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
             ),
           ),
           if (_error != null) ...[
-            const SizedBox(height: SectionMetrics.gap),
-            TeacherBanner(
-              icon: Icons.error_outline,
-              text: _error!,
-              tone: palette.danger,
-            ),
+            const SizedBox(height: AppMetrics.gap),
+            TeacherBanner(icon: Icons.error_outline, text: _error!),
           ],
         ],
       ),

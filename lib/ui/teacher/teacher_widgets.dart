@@ -35,16 +35,10 @@ class EditedDot extends StatelessWidget {
 
 /// Aviso ancho, para cuando algo del entorno no va bien.
 class TeacherBanner extends StatelessWidget {
-  const TeacherBanner({
-    super.key,
-    required this.icon,
-    required this.text,
-    this.tone,
-  });
+  const TeacherBanner({super.key, required this.icon, required this.text});
 
   final IconData icon;
   final String text;
-  final Color? tone;
 
   @override
   Widget build(BuildContext context) {
@@ -321,7 +315,7 @@ class TeacherListRow extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: appTheme.surfaceAlt,
+        color: appTheme.actionBackground,
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         border: Border.all(color: appTheme.border),
       ),
@@ -398,7 +392,7 @@ class TeacherListRow extends StatelessWidget {
               _RowAction(
                 icon: Icons.delete_outline,
                 label: 'Borrar $title',
-                color: appTheme.danger,
+                color: appTheme.dangerBackground,
                 onPressed: onDelete,
               ),
             ],
@@ -424,6 +418,7 @@ class _RowAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     return IconButton(
       onPressed: onPressed,
       tooltip: label,

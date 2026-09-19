@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
 import 'package:flutter_code4all/ui/director/director_content_screen.dart';
 import 'package:flutter_code4all/ui/director/director_teachers_screen.dart';
 import 'package:flutter_code4all/ui/director/director_widgets.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 import 'package:flutter_code4all/ui/director/teacher_detail_screen.dart';
 
 /// Comprueba lo que ve la dirección.
@@ -198,9 +196,7 @@ void main() {
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(
-        wrap(
-          TeacherDetailScreen(teacher: teacher('Mateo', edits: 7)),
-        ),
+        wrap(TeacherDetailScreen(teacher: teacher('Mateo', edits: 7))),
       );
       await tester.pump();
 
@@ -226,12 +222,27 @@ void main() {
     test('las fechas se dicen en relativo, no en formato de base de datos', () {
       final now = DateTime.now();
 
-      expect(relativeDate(now.subtract(const Duration(seconds: 20))), 'ahora mismo');
-      expect(relativeDate(now.subtract(const Duration(minutes: 5))), 'hace 5 min');
-      expect(relativeDate(now.subtract(const Duration(hours: 3))), 'hace 3 horas');
+      expect(
+        relativeDate(now.subtract(const Duration(seconds: 20))),
+        'ahora mismo',
+      );
+      expect(
+        relativeDate(now.subtract(const Duration(minutes: 5))),
+        'hace 5 min',
+      );
+      expect(
+        relativeDate(now.subtract(const Duration(hours: 3))),
+        'hace 3 horas',
+      );
       expect(relativeDate(now.subtract(const Duration(days: 1))), 'ayer');
-      expect(relativeDate(now.subtract(const Duration(days: 5))), 'hace 5 días');
-      expect(relativeDate(now.subtract(const Duration(days: 70))), 'hace 2 meses');
+      expect(
+        relativeDate(now.subtract(const Duration(days: 5))),
+        'hace 5 días',
+      );
+      expect(
+        relativeDate(now.subtract(const Duration(days: 70))),
+        'hace 2 meses',
+      );
     });
 
     testWidgets('sin nota se dice "sin valorar", no cinco estrellas vacías', (
@@ -240,16 +251,7 @@ void main() {
       // Cinco estrellas vacias se leen como un cero, que es lo contrario de
       // "todavia nadie le ha dicho nada".
       await tester.pumpWidget(
-        wrap(
-          Builder(
-            builder: (context) => ScoreStars(
-              palette: Theme.of(context).brightness == Brightness.dark
-                  ? SectionPalette.dark
-                  : SectionPalette.light,
-              score: null,
-            ),
-          ),
-        ),
+        wrap(Builder(builder: (context) => ScoreStars(score: null))),
       );
       await settle(tester);
 

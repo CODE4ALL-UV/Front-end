@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 
 /// El armazón común de todos los editores del docente.
 /// Todos funcionan igual a propósito: se escribe, se pulsa «Listo» y el
@@ -48,11 +47,11 @@ class EditorScaffold extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: SectionMetrics.pagePadding(constraints.maxWidth),
+              padding: AppMetrics.pagePadding(constraints.maxWidth),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: SectionMetrics.maxContentWidth,
+                    maxWidth: AppMetrics.maxContentWidth,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -66,7 +65,7 @@ class EditorScaffold extends StatelessWidget {
                             color: courseTheme.mutedText,
                           ),
                         ),
-                        const SizedBox(height: SectionMetrics.sectionGap),
+                        const SizedBox(height: AppMetrics.sectionGap),
                       ],
                       child,
                       const SizedBox(height: 40),
@@ -108,16 +107,16 @@ class EditorEmptyState extends StatelessWidget {
     final activityColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Container(
-      padding: const EdgeInsets.all(SectionMetrics.sectionGap),
+      padding: const EdgeInsets.all(AppMetrics.sectionGap),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         border: Border.all(color: activityColors.border),
-        borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+        borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       ),
       child: Column(
         children: [
           Icon(icon, size: 40, color: courseTheme.mutedText),
-          const SizedBox(height: SectionMetrics.gap),
+          const SizedBox(height: AppMetrics.gap),
           Text(
             text,
             textAlign: TextAlign.center,
@@ -127,13 +126,13 @@ class EditorEmptyState extends StatelessWidget {
               color: courseTheme.mutedText,
             ),
           ),
-          const SizedBox(height: SectionMetrics.sectionGap),
+          const SizedBox(height: AppMetrics.sectionGap),
           FilledButton.icon(
             onPressed: onCreate,
             style: FilledButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
-              minimumSize: const Size(0, SectionMetrics.minTapTarget),
+              minimumSize: const Size(0, AppMetrics.minTapTarget),
             ),
             icon: const Icon(Icons.add),
             label: Text(buttonLabel),

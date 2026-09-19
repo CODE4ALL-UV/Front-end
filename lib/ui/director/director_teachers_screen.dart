@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
-
 import 'director_widgets.dart';
 import 'teacher_detail_screen.dart';
 
@@ -92,12 +89,12 @@ class _DirectorTeachersScreenState extends State<DirectorTeachersScreen> {
         builder: (context, constraints) {
           return ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: SectionMetrics.pagePadding(constraints.maxWidth),
+            padding: AppMetrics.pagePadding(constraints.maxWidth),
             children: [
               Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: SectionMetrics.maxContentWidth,
+                    maxWidth: AppMetrics.maxContentWidth,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -112,7 +109,7 @@ class _DirectorTeachersScreenState extends State<DirectorTeachersScreen> {
                               'Han editado el curso y todavía nadie les ha '
                               'dicho cómo lo están haciendo.',
                         ),
-                        const SizedBox(height: SectionMetrics.gap),
+                        const SizedBox(height: AppMetrics.gap),
                       ],
                       for (final teacher in teachers)
                         _TeacherCard(
@@ -161,16 +158,14 @@ class _TeacherCard extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 10),
           child: Material(
             color: appTheme.background,
-            borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             child: InkWell(
               onTap: onTap,
-              borderRadius: BorderRadius.circular(SectionMetrics.cardRadius),
+              borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                    SectionMetrics.cardRadius,
-                  ),
+                  borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                   border: Border.all(
                     color: needsFeedback
                         ? appTheme.warningBorder
@@ -265,9 +260,6 @@ class _TeacherCard extends StatelessWidget {
                               ? 'Sin editar nada'
                               : '${teacher.edits} '
                                     '${teacher.edits == 1 ? "edición" : "ediciones"}',
-                          tone: teacher.hasNotEdited
-                              ? appTheme.textSubtitle
-                              : null,
                         ),
                         if (teacher.lastEdit != null)
                           DirectorBadge(
@@ -281,7 +273,6 @@ class _TeacherCard extends StatelessWidget {
                               : '${teacher.reviews} '
                                     '${teacher.reviews == 1 ? "valoración" : "valoraciones"}'
                                     '${teacher.avgScore == null ? "" : " · media ${teacher.avgScore}"}',
-                          tone: needsFeedback ? appTheme.warningBorder : null,
                         ),
                       ],
                     ),

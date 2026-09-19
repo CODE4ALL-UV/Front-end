@@ -150,7 +150,7 @@ class _Number extends StatelessWidget {
       height: 26,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: appTheme.accentSoft,
+        color: appTheme.dangerBorder,
         shape: BoxShape.circle,
       ),
       child: Text(
@@ -158,7 +158,7 @@ class _Number extends StatelessWidget {
         style: TextStyle(
           fontSize: 12.5,
           fontWeight: FontWeight.w800,
-          color: appTheme.accent,
+          color: appTheme.dangerBorder,
         ),
       ),
     );

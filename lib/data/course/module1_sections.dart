@@ -83,7 +83,6 @@ const CourseSection _seccion1 = CourseSection(
                 'En un mundo donde la velocidad de desarrollo importa, puedes '
                 'crear prototipos rápido y llevarlos a producción sin '
                 'sacrificar calidad.',
-            tone: CalloutTone.info,
           ),
         ],
       ),
@@ -114,7 +113,6 @@ const CourseSection _seccion1 = CourseSection(
                 'Si al escribir "python" en la terminal aparece un error, casi '
                 'siempre es porque no se marcó "Add Python to PATH" durante la '
                 'instalación. Puedes reinstalar y marcar esa casilla.',
-            tone: CalloutTone.warning,
           ),
         ],
       ),
@@ -208,7 +206,6 @@ const CourseSection _seccion1 = CourseSection(
             body:
                 'Escribir código, guardar en un archivo, ejecutar. Python se '
                 'encarga del resto interpretando línea por línea.',
-            tone: CalloutTone.success,
           ),
         ],
       ),
@@ -504,7 +501,6 @@ const CourseSection _seccion2 = CourseSection(
                 'Aunque tenga las herramientas correctas, sin organización y '
                 'espacio su trabajo será lento e ineficiente. Con la '
                 'programación pasa exactamente lo mismo.',
-            tone: CalloutTone.info,
           ),
           ReadingBlock.bullets(
             title: 'Tu entorno incluye varias capas',
@@ -597,7 +593,6 @@ const CourseSection _seccion2 = CourseSection(
                 'bastante simple para aprender y lo bastante potente para '
                 'proyectos profesionales. Además su terminal está integrada, '
                 'así que ejecutas código sin salir del editor.',
-            tone: CalloutTone.success,
           ),
           ReadingBlock.steps(
             title: 'Instalar VS Code',
@@ -692,7 +687,6 @@ const CourseSection _seccion2 = CourseSection(
                 'Acabas de cruzar de ser alguien que aprende sobre programación '
                 'a ser alguien que programa. El entorno no se configura una vez '
                 'y se olvida: lo irás ajustando conforme crezcas.',
-            tone: CalloutTone.success,
           ),
         ],
       ),
@@ -1001,7 +995,6 @@ const CourseSection _seccion3 = CourseSection(
                 'Python usa solo 35 palabras clave, y no necesitas aprenderlas '
                 'todas de una vez. Las más comunes aparecerán una y otra vez en '
                 'tu código hasta volverse familiares.',
-            tone: CalloutTone.success,
           ),
         ],
       ),
@@ -1171,7 +1164,6 @@ const CourseSection _seccion3 = CourseSection(
                 'Con 15 palabras clave cubres el 95% de lo que escribirás como '
                 'principiante. No son opcionales: son el alfabeto de Python. La '
                 'barrera del idioma es real, pero se supera con práctica.',
-            tone: CalloutTone.success,
           ),
         ],
       ),

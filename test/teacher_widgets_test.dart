@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_theme.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_widgets.dart';
 
 /// Comprueba que las piezas del editor del docente se dibujan sin romperse.

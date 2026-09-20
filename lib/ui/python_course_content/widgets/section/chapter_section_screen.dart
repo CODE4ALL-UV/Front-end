@@ -90,7 +90,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
     final colorScheme = context.colorScheme;
 
     return Scaffold(
-      backgroundColor: appTheme.background,
+      backgroundColor: colorScheme.surface,
       appBar: GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
@@ -104,7 +104,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
             child: Text(
               widget.module.label,
               style: TextStyle(
-                color: appTheme.textSubtitle,
+                color: appTheme.infoText,
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.3,
@@ -184,7 +184,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
               style: TextStyle(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w700,
-                color: appTheme.textTitle,
+                color: appTheme.infoText,
               ),
             ),
             const SizedBox(height: 10),
@@ -331,7 +331,7 @@ class _ActivityTile extends StatelessWidget {
                 border: Border.all(
                   color: isCompleted
                       ? Colors.green.withValues(alpha: 0.55)
-                      : appTheme.border,
+                      : appTheme.infoBorder,
                   width: isCompleted ? 1.8 : 1.2,
                 ),
               ),
@@ -372,7 +372,7 @@ class _ActivityTile extends StatelessWidget {
                           fontSize: 15.5,
                           height: 1.35,
                           fontWeight: FontWeight.w700,
-                          color: appTheme.textTitle,
+                          color: appTheme.infoText,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -381,7 +381,7 @@ class _ActivityTile extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.5,
                           height: 1.45,
-                          color: appTheme.textSubtitle,
+                          color: appTheme.infoText,
                         ),
                       ),
                       if (detail.isNotEmpty) ...[

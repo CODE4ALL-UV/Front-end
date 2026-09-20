@@ -73,13 +73,13 @@ class SectionExampleScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionCard(
-            background: appTheme.background,
+            background: appTheme.infoBackground,
             borderColor: appTheme.infoBorder.withValues(alpha: 0.4),
             child: SectionHeading(
               title: _example.title,
               subtitle: _example.description,
               icon: Icons.code,
-              color: appTheme.actionBackground,
+              color: appTheme.infoBackground,
             ),
           ),
           const SizedBox(height: AppMetrics.sectionGap),
@@ -191,7 +191,7 @@ class _OutputBlockState extends State<_OutputBlock> {
               ],
               fontSize: 14,
               height: 1.55,
-              color: appTheme.textTitle,
+              color: appTheme.infoText,
             ),
           ),
         ),
@@ -220,7 +220,7 @@ class _StepRow extends StatelessWidget {
             height: 28,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: appTheme.background,
+              color: appTheme.infoBackground,
               shape: BoxShape.circle,
             ),
             child: Text(
@@ -247,9 +247,9 @@ class _StepRow extends StatelessWidget {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: appTheme.background,
+                        color: appTheme.infoBackground,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: appTheme.border),
+                        border: Border.all(color: appTheme.infoBorder),
                       ),
                       child: SelectableText(
                         step.code,
@@ -262,7 +262,7 @@ class _StepRow extends StatelessWidget {
                           ],
                           fontSize: 13.5,
                           height: 1.5,
-                          color: appTheme.actionText,
+                          color: appTheme.infoText,
                         ),
                       ),
                     ),
@@ -274,7 +274,7 @@ class _StepRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     height: 1.55,
-                    color: appTheme.textTitle,
+                    color: appTheme.infoText,
                   ),
                 ),
               ],

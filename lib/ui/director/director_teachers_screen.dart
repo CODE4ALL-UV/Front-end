@@ -58,11 +58,14 @@ class _DirectorTeachersScreenState extends State<DirectorTeachersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     if (_store.isLoading && !_store.isLoaded) {
       return Center(
-        child: CircularProgressIndicator(color: appTheme.actionBackground),
+        child: CircularProgressIndicator(
+          color: appSemanticColors.infoBackground,
+        ),
       );
     }
 
@@ -143,7 +146,9 @@ class _TeacherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final needsFeedback = teacher.edits > 0 && teacher.neverReviewed;
 
     return Semantics(
@@ -157,7 +162,7 @@ class _TeacherCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Material(
-            color: appTheme.background,
+            color: appColorScheme.surface,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             child: InkWell(
               onTap: onTap,
@@ -168,8 +173,8 @@ class _TeacherCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                   border: Border.all(
                     color: needsFeedback
-                        ? appTheme.warningBorder
-                        : appTheme.border,
+                        ? appSemanticColors.warningBorder
+                        : appSemanticColors.infoBorder,
                     width: needsFeedback ? 1.6 : 1,
                   ),
                 ),
@@ -180,7 +185,7 @@ class _TeacherCard extends StatelessWidget {
                       builder: (context, constraints) {
                         final avatar = CircleAvatar(
                           radius: 21,
-                          backgroundColor: appTheme.infoBackground,
+                          backgroundColor: appSemanticColors.infoBackground,
                           child: Text(
                             teacher.name.isEmpty
                                 ? '?'
@@ -188,7 +193,7 @@ class _TeacherCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w800,
-                              color: appTheme.infoText,
+                              color: appSemanticColors.infoText,
                             ),
                           ),
                         );
@@ -204,14 +209,14 @@ class _TeacherCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 15.5,
                                 fontWeight: FontWeight.w700,
-                                color: appTheme.textTitle,
+                                color: appSemanticColors.infoText,
                               ),
                             ),
                             Text(
                               teacher.email,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: appTheme.textSubtitle,
+                                color: appSemanticColors.infoText,
                               ),
                             ),
                           ],

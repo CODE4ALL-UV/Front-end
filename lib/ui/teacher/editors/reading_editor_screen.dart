@@ -257,7 +257,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
     final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final kind = await showModalBottomSheet<ReadingBlockKind>(
       context: context,
-      backgroundColor: appTheme.actionBackground,
+      backgroundColor: appTheme.infoBackground,
       builder: (context) =>
           (context).widget, //OJO REVISAR ERROR COMPARAR CON PAPACHO VERSION
     );
@@ -643,7 +643,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                       selected: _block.tone == tone,
                       onSelected: (_) =>
                           setState(() => _block = _block.copyWith()),
-                      selectedColor: appTheme.actionText,
+                      selectedColor: appTheme.infoText,
                       labelStyle: TextStyle(
                         color: _block.tone == tone
                             ? appTheme.dangerText

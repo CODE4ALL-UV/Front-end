@@ -88,11 +88,6 @@ class AppTheme {
       error: Color(0xFFD32F2F),
     ),
     activityThemeColors: const ActivityThemeColors(
-      background: Color(0xFFF8FBFF),
-      border: Color(0xFFE3ECF7),
-      iconBackground: Color(0xFFE8F1FF),
-      textTitle: Color(0xFF263238),
-      textSubtitle: Color(0xFF607D8B),
       infoBackground: Color(0xFFE3F2FD),
       infoBorder: Color(0xFF90CAF9),
       infoText: Color(0xFF1565C0),
@@ -105,9 +100,6 @@ class AppTheme {
       dangerBackground: Color(0xFFE53935),
       dangerBorder: Color(0xFFD32F2F),
       dangerText: Color(0xFFB71C1C),
-      actionBackground: Color(0xFFE3F2FD),
-      actionBorder: Color(0xFF90CAF9),
-      actionText: Color(0xFF1565C0),
     ),
   );
 
@@ -143,11 +135,6 @@ class AppTheme {
       error: Color(0xFFEF9A9A),
     ),
     activityThemeColors: const ActivityThemeColors(
-      background: Color(0xFFF8FBFF),
-      border: Color(0xFFE3ECF7),
-      iconBackground: Color(0xFFE8F1FF),
-      textTitle: Color(0xFF263238),
-      textSubtitle: Color(0xFF607D8B),
       infoBackground: Color(0xFFE3F2FD),
       infoBorder: Color(0xFF90CAF9),
       infoText: Color(0xFF1565C0),
@@ -160,9 +147,6 @@ class AppTheme {
       dangerBackground: Color(0xFFE53935),
       dangerBorder: Color(0xFFD32F2F),
       dangerText: Color(0xFFB71C1C),
-      actionBackground: Color(0xFFE3F2FD),
-      actionBorder: Color(0xFF90CAF9),
-      actionText: Color(0xFF1565C0),
     ),
   );
 
@@ -198,11 +182,6 @@ class AppTheme {
       error: Color(0xFF7F1D1D),
     ),
     activityThemeColors: const ActivityThemeColors(
-      background: Color(0xFFF8FBFF),
-      border: Color(0xFFE3ECF7),
-      iconBackground: Color(0xFFE8F1FF),
-      textTitle: Color(0xFF263238),
-      textSubtitle: Color(0xFF607D8B),
       infoBackground: Color(0xFFE3F2FD),
       infoBorder: Color(0xFF90CAF9),
       infoText: Color(0xFF1565C0),
@@ -215,9 +194,6 @@ class AppTheme {
       dangerBackground: Color(0xFFE53935),
       dangerBorder: Color(0xFFD32F2F),
       dangerText: Color(0xFFB71C1C),
-      actionBackground: Color(0xFFE3F2FD),
-      actionBorder: Color(0xFF90CAF9),
-      actionText: Color(0xFF1565C0),
     ),
   );
 
@@ -253,11 +229,6 @@ class AppTheme {
       error: Color(0xFF991B1B),
     ),
     activityThemeColors: const ActivityThemeColors(
-      background: Color(0xFFF8FBFF),
-      border: Color(0xFFE3ECF7),
-      iconBackground: Color(0xFFE8F1FF),
-      textTitle: Color(0xFF263238),
-      textSubtitle: Color(0xFF607D8B),
       infoBackground: Color(0xFFE3F2FD),
       infoBorder: Color(0xFF90CAF9),
       infoText: Color(0xFF1565C0),
@@ -270,9 +241,6 @@ class AppTheme {
       dangerBackground: Color(0xFFE53935),
       dangerBorder: Color(0xFFD32F2F),
       dangerText: Color(0xFFB71C1C),
-      actionBackground: Color(0xFFE3F2FD),
-      actionBorder: Color(0xFF90CAF9),
-      actionText: Color(0xFF1565C0),
     ),
   );
 
@@ -308,11 +276,6 @@ class AppTheme {
       error: Color(0xFF991B1B),
     ),
     activityThemeColors: const ActivityThemeColors(
-      background: Color(0xFFF8FBFF),
-      border: Color(0xFFE3ECF7),
-      iconBackground: Color(0xFFE8F1FF),
-      textTitle: Color(0xFF263238),
-      textSubtitle: Color(0xFF607D8B),
       infoBackground: Color(0xFFE3F2FD),
       infoBorder: Color(0xFF90CAF9),
       infoText: Color(0xFF1565C0),
@@ -325,9 +288,6 @@ class AppTheme {
       dangerBackground: Color(0xFFE53935),
       dangerBorder: Color(0xFFD32F2F),
       dangerText: Color(0xFFB71C1C),
-      actionBackground: Color(0xFFE3F2FD),
-      actionBorder: Color(0xFF90CAF9),
-      actionText: Color(0xFF1565C0),
     ),
   );
   // 6. TEMA ACROMATOPSIA (Escala de grises estricta / Contraste radical)
@@ -363,11 +323,6 @@ class AppTheme {
       error: Colors.white,
     ),
     activityThemeColors: const ActivityThemeColors(
-      background: Color(0xFFF8FBFF),
-      border: Color(0xFFE3ECF7),
-      iconBackground: Color(0xFFE8F1FF),
-      textTitle: Color(0xFF263238),
-      textSubtitle: Color(0xFF607D8B),
       infoBackground: Color(0xFFE3F2FD),
       infoBorder: Color(0xFF90CAF9),
       infoText: Color(0xFF1565C0),
@@ -380,9 +335,6 @@ class AppTheme {
       dangerBackground: Color(0xFFE53935),
       dangerBorder: Color(0xFFD32F2F),
       dangerText: Color(0xFFB71C1C),
-      actionBackground: Color(0xFFE3F2FD),
-      actionBorder: Color(0xFF90CAF9),
-      actionText: Color(0xFF1565C0),
     ),
   );
 
@@ -515,15 +467,9 @@ class AppTheme {
   }
 }
 
-enum AppThemeTone { info, success, warning, danger, action }
+enum AppThemeTone { info, success, warning, danger }
 
 class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
-  final Color background;
-  final Color border;
-  final Color iconBackground;
-  final Color textTitle;
-  final Color textSubtitle;
-
   final Color infoBackground;
   final Color infoBorder;
   final Color infoText;
@@ -540,17 +486,7 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
   final Color dangerBorder;
   final Color dangerText;
 
-  final Color actionBackground;
-  final Color actionBorder;
-  final Color actionText;
-
   const ActivityThemeColors({
-    required this.background,
-    required this.border,
-    required this.iconBackground,
-    required this.textTitle,
-    required this.textSubtitle,
-
     required this.infoBackground,
     required this.infoBorder,
     required this.infoText,
@@ -566,10 +502,6 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
     required this.dangerBackground,
     required this.dangerBorder,
     required this.dangerText,
-
-    required this.actionBackground,
-    required this.actionBorder,
-    required this.actionText,
   });
 
   /// Función mágica que devuelve el trío de colores perfecto según la intención,
@@ -596,21 +528,11 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
           border: dangerBorder,
           text: dangerText
       ),
-        AppThemeTone.action => (
-          background: actionBackground,
-          border: actionBorder,
-          text: actionText
-        ),
       };
 
   @override
   ActivityThemeColors copyWith({Color? background, /* ... resto de variables ... */}) {
     return ActivityThemeColors(
-      background: background ?? this.background,
-      border: border,
-      iconBackground: iconBackground,
-      textTitle: textTitle,
-      textSubtitle: textSubtitle,
       infoBackground: infoBackground,
       infoBorder: infoBorder,
       infoText: infoText,
@@ -623,9 +545,6 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
       dangerBackground: dangerBackground,
       dangerBorder: dangerBorder,
       dangerText: dangerText,
-      actionBackground: actionBackground,
-      actionBorder: actionBorder,
-      actionText: actionText,
     );
   }
 
@@ -633,11 +552,6 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
   ActivityThemeColors lerp(ThemeExtension<ActivityThemeColors>? other, double t) {
     if (other is! ActivityThemeColors) return this;
     return ActivityThemeColors(
-      background: Color.lerp(background, other.background, t)!,
-      border: Color.lerp(border, other.border, t)!,
-      iconBackground: Color.lerp(iconBackground, other.iconBackground, t)!,
-      textTitle: Color.lerp(textTitle, other.textTitle, t)!,
-      textSubtitle: Color.lerp(textSubtitle, other.textSubtitle, t)!,
       infoBackground: Color.lerp(infoBackground, other.infoBackground, t)!,
       infoBorder: Color.lerp(infoBorder, other.infoBorder, t)!,
       infoText: Color.lerp(infoText, other.infoText, t)!,
@@ -650,9 +564,6 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
       dangerBackground: Color.lerp(dangerBackground, other.dangerBackground, t)!,
       dangerBorder: Color.lerp(dangerBorder, other.dangerBorder, t)!,
       dangerText: Color.lerp(dangerText, other.dangerText, t)!,
-      actionBackground: Color.lerp(actionBackground, other.actionBackground, t)!,
-      actionBorder: Color.lerp(actionBorder, other.actionBorder, t)!,
-      actionText: Color.lerp(actionText, other.actionText, t)!,
     );
   }
 }
@@ -813,11 +724,6 @@ class ActivityColors {
   static const Color successBackground = Color(0xFFE8F5E9);
   static const Color successBorder = Color(0xFF66BB6A);
   static const Color successText = Color(0xFF2E7D32);
-
-  // Estado: Acción / Abrir (Azules)
-  static const Color actionBackground = Color(0xFFE3F2FD);
-  static const Color actionBorder = Color(0xFF90CAF9);
-  static const Color actionText = Color(0xFF1565C0);
 }
 
 /// Esta extensión te permite acceder a tus temas personalizados 

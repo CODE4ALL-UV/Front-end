@@ -307,7 +307,7 @@ class _ModuleTileState extends State<_ModuleTile> {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: _open
-                            ? appTheme.actionBackground
+                            ? appTheme.infoBackground
                             : appTheme.warningBackground,
                         borderRadius: BorderRadius.circular(9),
                       ),
@@ -417,7 +417,7 @@ class _Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: appTheme.actionBackground,
+        color: appTheme.infoBackground,
         borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
         border: Border.all(color: appTheme.border),
       ),
@@ -472,7 +472,7 @@ class _SectionRow extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
           child: Material(
             color: selected
-                ? appTheme.actionBackground
+                ? appTheme.infoBackground
                 : appTheme.warningBackground,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             child: InkWell(
@@ -486,9 +486,7 @@ class _SectionRow extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                   border: Border.all(
-                    color: selected
-                        ? appTheme.actionBackground
-                        : appTheme.border,
+                    color: selected ? appTheme.infoBackground : appTheme.border,
                     width: selected ? 1.6 : 1,
                   ),
                 ),
@@ -506,7 +504,7 @@ class _SectionRow extends StatelessWidget {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: selected
-                                ? appTheme.actionBackground
+                                ? appTheme.infoBackground
                                 : appTheme.warningBackground,
                             borderRadius: BorderRadius.circular(7),
                           ),
@@ -532,7 +530,7 @@ class _SectionRow extends StatelessWidget {
                                   ? FontWeight.w700
                                   : FontWeight.w600,
                               color: selected
-                                  ? appTheme.actionBackground
+                                  ? appTheme.infoBackground
                                   : appTheme.textTitle,
                             ),
                           ),

@@ -127,13 +127,15 @@ Future<void> showReportSheet(
   BuildContext context,
   CourseAnalyticsStore stats,
 ) async {
-  final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+  final appTheme = Theme.of(context);
+  final appColorScheme = appTheme.colorScheme;
+  final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
   final report = buildCourseReport(stats);
 
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: appTheme.actionBorder,
+    backgroundColor: appSemanticColors.infoBorder,
     builder: (context) {
       return DraggableScrollableSheet(
         expand: false,
@@ -152,7 +154,7 @@ Future<void> showReportSheet(
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: appTheme.textTitle,
+                          color: appSemanticColors.infoText,
                         ),
                       ),
                     ),
@@ -164,13 +166,13 @@ Future<void> showReportSheet(
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: const Text('Informe copiado.'),
-                            backgroundColor: appTheme.iconBackground,
+                            backgroundColor: appColorScheme.primary,
                           ),
                         );
                       },
                       style: FilledButton.styleFrom(
-                        backgroundColor: appTheme.iconBackground,
-                        foregroundColor: appTheme.dangerBorder,
+                        backgroundColor: appColorScheme.primary,
+                        foregroundColor: appSemanticColors.dangerBorder,
                         minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.copy, size: 18),
@@ -179,7 +181,7 @@ Future<void> showReportSheet(
                   ],
                 ),
               ),
-              Divider(height: 1, color: appTheme.border),
+              Divider(height: 1, color: appSemanticColors.infoBorder),
               Expanded(
                 child: SingleChildScrollView(
                   controller: controller,
@@ -190,7 +192,7 @@ Future<void> showReportSheet(
                       fontFamily: 'monospace',
                       fontSize: 12.5,
                       height: 1.5,
-                      color: appTheme.textTitle,
+                      color: appSemanticColors.infoText,
                     ),
                   ),
                 ),

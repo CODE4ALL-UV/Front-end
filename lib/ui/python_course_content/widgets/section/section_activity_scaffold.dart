@@ -91,10 +91,12 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final appTheme = context.activityColors;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Scaffold(
-      backgroundColor: appTheme.background,
+      backgroundColor: appColorScheme.surface,
       appBar: const GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
@@ -138,8 +140,10 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: appTheme.actionBackground,
-                  border: Border(top: BorderSide(color: appTheme.border)),
+                  color: appSemanticColors.infoBackground,
+                  border: Border(
+                    top: BorderSide(color: appSemanticColors.infoBorder),
+                  ),
                 ),
                 child: SafeArea(
                   top: false,
@@ -181,7 +185,9 @@ class _ActivityBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Semantics(
       header: true,
@@ -191,8 +197,10 @@ class _ActivityBanner extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
           decoration: BoxDecoration(
-            color: appTheme.actionBackground,
-            border: Border(bottom: BorderSide(color: appTheme.border)),
+            color: appSemanticColors.infoBackground,
+            border: Border(
+              bottom: BorderSide(color: appSemanticColors.infoBorder),
+            ),
           ),
           child: Center(
             child: ConstrainedBox(
@@ -206,13 +214,13 @@ class _ActivityBanner extends StatelessWidget {
                     height: 44,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: appTheme.actionBackground,
+                      color: appSemanticColors.infoBackground,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       activityIcon,
                       size: 24,
-                      color: appTheme.iconBackground,
+                      color: appColorScheme.surface,
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -226,7 +234,7 @@ class _ActivityBanner extends StatelessWidget {
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.4,
-                            color: appTheme.textSubtitle,
+                            color: appSemanticColors.infoText,
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -236,7 +244,7 @@ class _ActivityBanner extends StatelessWidget {
                             fontSize: 17,
                             height: 1.3,
                             fontWeight: FontWeight.w700,
-                            color: appTheme.textTitle,
+                            color: appSemanticColors.infoText,
                           ),
                         ),
                       ],
@@ -261,11 +269,12 @@ class _AccessibilityToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textScale = AccessibilityTextScaleScope.of(context);
-    final appTheme = context.activityColors;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Container(
       width: double.infinity,
-      color: appTheme.actionBackground,
+      color: appSemanticColors.infoBackground,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Center(
         child: ConstrainedBox(
@@ -291,8 +300,8 @@ class _AccessibilityToolbar extends StatelessWidget {
                         child: TextButton.icon(
                           onPressed: () => onToggleSpeech(),
                           style: TextButton.styleFrom(
-                            backgroundColor: appTheme.actionBackground,
-                            foregroundColor: appTheme.border,
+                            backgroundColor: appSemanticColors.infoBackground,
+                            foregroundColor: appSemanticColors.infoText,
                             minimumSize: const Size(
                               AppMetrics.minTapTarget,
                               AppMetrics.minTapTarget,
@@ -334,7 +343,7 @@ class _AccessibilityToolbar extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: appTheme.textSubtitle,
+                            color: appSemanticColors.infoText,
                           ),
                         ),
                       ),
@@ -368,7 +377,8 @@ class _TextScaleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Semantics(
       button: true,
@@ -376,7 +386,7 @@ class _TextScaleButton extends StatelessWidget {
       child: IconButton(
         onPressed: onPressed,
         icon: Icon(icon, size: 24),
-        color: appTheme.border,
+        color: appSemanticColors.infoText,
         tooltip: label,
         constraints: const BoxConstraints(
           minWidth: AppMetrics.minTapTarget,

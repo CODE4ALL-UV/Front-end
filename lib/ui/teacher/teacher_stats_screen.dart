@@ -411,7 +411,7 @@ class _SectionBar extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: stats.accuracy,
                   minHeight: 9,
-                  backgroundColor: appTheme.actionBackground,
+                  backgroundColor: appTheme.infoBackground,
                   valueColor: AlwaysStoppedAnimation<Color>(tone),
                 ),
               ),

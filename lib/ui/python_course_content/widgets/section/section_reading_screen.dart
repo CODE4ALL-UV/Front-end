@@ -82,8 +82,8 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
           children: [
             if (_pageIndex == 0) ...[
               SectionCard(
-                background: appTheme.actionBackground,
-                borderColor: appTheme.border.withValues(alpha: 0.4),
+                background: appTheme.infoBackground,
+                borderColor: appTheme.infoBorder.withValues(alpha: 0.4),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -91,7 +91,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
                       title: _reading.title,
                       subtitle: _reading.intro,
                       icon: Icons.auto_stories_outlined,
-                      color: appTheme.textTitle,
+                      color: appTheme.infoText,
                     ),
                     if (widget.section.objectives.isNotEmpty) ...[
                       const SizedBox(height: 16),
@@ -100,7 +100,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
                         style: TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
-                          color: appTheme.textTitle,
+                          color: appTheme.infoText,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -214,7 +214,7 @@ class _ReadingBlockView extends StatelessWidget {
                 fontSize: 16.5,
                 fontWeight: FontWeight.w700,
                 height: 1.35,
-                color: appTheme.textTitle,
+                color: appTheme.infoText,
               ),
             ),
           ),
@@ -260,7 +260,7 @@ class _PageDots extends StatelessWidget {
             width: isActive ? 22 : 9,
             height: 9,
             decoration: BoxDecoration(
-              color: isActive ? appTheme.actionBackground : appTheme.border,
+              color: isActive ? appTheme.infoBackground : appTheme.infoBorder,
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
           );

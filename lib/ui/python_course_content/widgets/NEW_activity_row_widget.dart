@@ -37,7 +37,9 @@ class ActivityRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activityColors = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     // Si pasamos alguna función, consideramos que tiene acción
     final hasAction = onBookTap != null || onVideoTap != null;
     final badgeText = _getBadgeText();
@@ -46,9 +48,9 @@ class ActivityRowWidget extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: activityColors.background,
+        color: appColorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: activityColors.border),
+        border: Border.all(color: appSemanticColors.infoBorder),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -57,7 +59,7 @@ class ActivityRowWidget extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: activityColors.iconBackground,
+              color: appColorScheme.surface,
               borderRadius: BorderRadius.circular(10),
             ),
             alignment: Alignment.center,
@@ -72,7 +74,7 @@ class ActivityRowWidget extends StatelessWidget {
                   item.label,
                   style: TextStyle(
                     fontSize: 14,
-                    color: activityColors.textTitle,
+                    color: appSemanticColors.infoText,
                     height: 1.35,
                     fontWeight: FontWeight.w600,
                   ),
@@ -82,7 +84,7 @@ class ActivityRowWidget extends StatelessWidget {
                   'Actividad educativa',
                   style: TextStyle(
                     fontSize: 12,
-                    color: activityColors.textSubtitle,
+                    color: appSemanticColors.infoText,
                   ),
                 ),
               ],
@@ -93,9 +95,9 @@ class ActivityRowWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
-                color: activityColors.successBackground,
+                color: appSemanticColors.successBackground,
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: activityColors.successBorder),
+                border: Border.all(color: appSemanticColors.successBorder),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -103,14 +105,14 @@ class ActivityRowWidget extends StatelessWidget {
                   Icon(
                     Icons.check_circle,
                     size: 16,
-                    color: activityColors.successText,
+                    color: appSemanticColors.successText,
                   ),
                   SizedBox(width: 6),
                   Text(
                     'Completado',
                     style: TextStyle(
                       fontSize: 12,
-                      color: activityColors.successText,
+                      color: appSemanticColors.successText,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -129,15 +131,15 @@ class ActivityRowWidget extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: activityColors.actionBackground,
+                    color: appSemanticColors.infoBackground,
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: activityColors.actionBorder),
+                    border: Border.all(color: appSemanticColors.infoBorder),
                   ),
                   child: Text(
                     badgeText,
                     style: TextStyle(
                       fontSize: 12,
-                      color: activityColors.actionText,
+                      color: appSemanticColors.infoText,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

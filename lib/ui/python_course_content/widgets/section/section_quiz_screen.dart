@@ -224,7 +224,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
-                  color: appTheme.textSubtitle,
+                  color: appTheme.infoText,
                 ),
               ),
               const SizedBox(height: 10),
@@ -236,7 +236,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                     fontSize: 18,
                     height: 1.45,
                     fontWeight: FontWeight.w700,
-                    color: appTheme.textTitle,
+                    color: appTheme.infoText,
                   ),
                 ),
               ),
@@ -289,7 +289,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
           background: _passed
               ? appTheme.successBackground
               : appTheme.warningBackground,
-          borderColor: (_passed ? appTheme.border : appTheme.warningBorder)
+          borderColor: (_passed ? appTheme.infoBorder : appTheme.warningBorder)
               .withValues(alpha: 0.5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,7 +338,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                     fontSize: 15,
                     height: 1.45,
                     fontWeight: FontWeight.w700,
-                    color: appTheme.textTitle,
+                    color: appTheme.infoText,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -357,7 +357,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                         style: TextStyle(
                           fontSize: 14.5,
                           height: 1.5,
-                          color: appTheme.textSubtitle,
+                          color: appTheme.infoText,
                         ),
                       ),
                     ),
@@ -446,9 +446,9 @@ class _OptionTile extends StatelessWidget {
       background = appTheme.dangerBackground;
       foreground = appTheme.dangerBorder;
     } else {
-      borderColor = appTheme.border;
-      background = appTheme.background;
-      foreground = appTheme.textSubtitle;
+      borderColor = appTheme.infoBorder;
+      background = appTheme.infoBackground;
+      foreground = appTheme.infoText;
     }
 
     final statusLabel = showAsCorrect
@@ -514,7 +514,7 @@ class _OptionTile extends StatelessWidget {
                             fontSize: 15.5,
                             height: 1.5,
                             fontWeight: FontWeight.w600,
-                            color: appTheme.textTitle,
+                            color: appTheme.infoText,
                           ),
                         ),
                         if (statusLabel != null) ...[

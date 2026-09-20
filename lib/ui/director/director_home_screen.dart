@@ -61,10 +61,11 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
 
     return Scaffold(
-      backgroundColor: appTheme.background,
+      backgroundColor: appColorScheme.surface,
       appBar: GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,

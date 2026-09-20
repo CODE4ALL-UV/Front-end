@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 
 /*
   APP THEME
-  ----------
   Centraliza el sistema visual de la aplicación: temas, colores, métricas,
   estilos de componentes y extensiones específicas de la aplicación.
-
-  MODOS DE TEMA
-  AppThemeMode → Define los 6 modos visuales disponibles:
-  light, dark, protanopia, deuteranopia, tritanopia y achromatopsia.
-  Acceso: AppThemeMode.light / AppThemeMode.dark / etc.
 
   GESTIÓN DEL TEMA
   ThemeManager → Mantiene y cambia el modo visual seleccionado mediante ValueNotifier.
   Acceso: ThemeManager.themeNotifier / ThemeManager.changeTheme(...).
+  ----------
+  MODOS DE TEMA
+  AppThemeMode → Define los 6 modos visuales disponibles:
+  light, dark, protanopia, deuteranopia, tritanopia y achromatopsia.
+  Acceso: AppThemeMode.light / AppThemeMode.dark
+  AppThemeMode.protanopia / AppThemeMode.deuteranopia
+  AppThemeMode.tritanopia / AppThemeMode.achromatopsia.
 
   TEMA ACTUAL
   Theme.of(context) → Obtiene el ThemeData aplicado actualmente a la aplicación.
@@ -28,23 +29,28 @@ import 'package:flutter/material.dart';
   ESTILOS DE COMPONENTES
   ThemeData → Centraliza la configuración visual de componentes como AppBar, Card,
   botones, campos de texto, diálogos, iconos, progreso, Switch, etc.
-  Acceso: Theme.of(context).appBarTheme / .cardTheme / .floatingActionButtonTheme / etc.
   Normalmente los componentes los aplican automáticamente; no es necesario
   acceder manualmente a estas propiedades salvo que se necesite consultar su configuración.
+  Acceso: Theme.of(context).appBarTheme
+          Theme.of(context).cardTheme
+          Theme.of(context).floatingActionButtonTheme / etc.
 
   EXTENSIONES PERSONALIZADAS
   CourseTheme → Colores específicos de las tarjetas y elementos de las lecciones.
-  Acceso: Theme.of(context).extension<CourseTheme>()! / context.courseTheme
+  Acceso: Theme.of(context).extension<CourseTheme>()!
+          context.courseTheme
 
   CodeConsoleTheme → Colores específicos de la consola/editor de código Python.
-  Acceso: Theme.of(context).extension<CodeConsoleTheme>()! / context.codeConsoleTheme
+  Acceso: Theme.of(context).extension<CodeConsoleTheme>()!
+          context.codeConsoleTheme
 
   ActivityThemeColors → Colores semánticos para información, éxito, advertencia,
   peligro y acciones, incluyendo fondo, borde y texto.
-  Acceso: Theme.of(context).extension<ActivityThemeColors>()! / context.activityColors
+  Acceso: Theme.of(context).extension<ActivityThemeColors>()!
+          context.activityColors
 
   TONOS SEMÁNTICOS
-  AppThemeTone → Identifica la intención visual: info, success, warning, danger o action.
+  AppThemeTone → Identifica la intención visual: info, success, warning o danger.
   Acceso: context.activityColors.tone(AppThemeTone.success)
   Luego: .background / .border / .text
 
@@ -109,16 +115,11 @@ abstract final class AppMetrics {
   static final BorderRadius defaultBorder = BorderRadius.circular(radius);
 }
 
-enum AppThemeTone { info, success, warning, danger, action }
+enum AppThemeTone { info, success, warning, danger }
 
 /// Extensión para manejar alertas y mensajes (Info, Success, Warning, Danger).
 /// Define la triada accesible: fondo suave, borde visible y texto oscuro.
 class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
-  final Color background;
-  final Color border;
-  final Color iconBackground;
-  final Color textTitle;
-  final Color textSubtitle;
   final Color infoBackground;
   final Color infoBorder;
   final Color infoText;
@@ -131,16 +132,8 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
   final Color dangerBackground;
   final Color dangerBorder;
   final Color dangerText;
-  final Color actionBackground;
-  final Color actionBorder;
-  final Color actionText;
 
   const ActivityThemeColors({
-    required this.background,
-    required this.border,
-    required this.iconBackground,
-    required this.textTitle,
-    required this.textSubtitle,
     required this.infoBackground,
     required this.infoBorder,
     required this.infoText,
@@ -153,9 +146,6 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
     required this.dangerBackground,
     required this.dangerBorder,
     required this.dangerText,
-    required this.actionBackground,
-    required this.actionBorder,
-    required this.actionText,
   });
 
   /// Devuelve la triada de colores exacta según la intención.
@@ -181,21 +171,11 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
           border: dangerBorder,
           text: dangerText,
         ),
-        AppThemeTone.action => (
-          background: actionBackground,
-          border: actionBorder,
-          text: actionText,
-        ),
       };
 
   @override
   ActivityThemeColors copyWith({Color? background}) {
     return ActivityThemeColors(
-      background: background ?? this.background,
-      border: border,
-      iconBackground: iconBackground,
-      textTitle: textTitle,
-      textSubtitle: textSubtitle,
       infoBackground: infoBackground,
       infoBorder: infoBorder,
       infoText: infoText,
@@ -208,9 +188,6 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
       dangerBackground: dangerBackground,
       dangerBorder: dangerBorder,
       dangerText: dangerText,
-      actionBackground: actionBackground,
-      actionBorder: actionBorder,
-      actionText: actionText,
     );
   }
 
@@ -221,11 +198,6 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
   ) {
     if (other is! ActivityThemeColors) return this;
     return ActivityThemeColors(
-      background: Color.lerp(background, other.background, t)!,
-      border: Color.lerp(border, other.border, t)!,
-      iconBackground: Color.lerp(iconBackground, other.iconBackground, t)!,
-      textTitle: Color.lerp(textTitle, other.textTitle, t)!,
-      textSubtitle: Color.lerp(textSubtitle, other.textSubtitle, t)!,
       infoBackground: Color.lerp(infoBackground, other.infoBackground, t)!,
       infoBorder: Color.lerp(infoBorder, other.infoBorder, t)!,
       infoText: Color.lerp(infoText, other.infoText, t)!,
@@ -250,13 +222,6 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
       )!,
       dangerBorder: Color.lerp(dangerBorder, other.dangerBorder, t)!,
       dangerText: Color.lerp(dangerText, other.dangerText, t)!,
-      actionBackground: Color.lerp(
-        actionBackground,
-        other.actionBackground,
-        t,
-      )!,
-      actionBorder: Color.lerp(actionBorder, other.actionBorder, t)!,
-      actionText: Color.lerp(actionText, other.actionText, t)!,
     );
   }
 }
@@ -366,10 +331,12 @@ class CodeConsoleTheme extends ThemeExtension<CodeConsoleTheme> {
 /// Garantiza alto contraste en textos para accesibilidad visual.
 class ModuleCardThemeColors {
   static Color getBackgroundColor(int moduleId) {
-    if (moduleId == 1 || moduleId == 2)
+    if (moduleId == 1 || moduleId == 2) {
       return const Color(0xFFE3F2FD); // Azul suave
-    if (moduleId == 3 || moduleId == 4)
+    }
+    if (moduleId == 3 || moduleId == 4) {
       return const Color(0xFFE8F5E9); // Verde suave
+    }
     if (moduleId == 5) return const Color(0xFFFFF9C4); // Amarillo suave
     if (moduleId == 6) return const Color(0xFFFFEBEE); // Rojo suave
     return const Color(0xFFF5F5F5); // Default
@@ -407,7 +374,7 @@ class AppTheme {
   /// - colorScheme → Colores generales de Material 3 y base cromática de los componentes.
   /// - courseTheme → Colores específicos de lecciones y cursos.
   /// - codeConsoleTheme → Colores específicos de la consola/editor de Python.
-  /// - activityThemeColors → Colores semánticos para info, success, warning, danger y action.
+  /// - activityThemeColors → Colores semánticos para info, success, warning y danger.
   ///
   /// Los valores recibidos se aplican a ThemeData, sus temas de componentes y
   /// sus ThemeExtension personalizadas.
@@ -579,11 +546,6 @@ class AppTheme {
       error: Color(0xFFD32F2F),
     ),
     activityThemeColors: const ActivityThemeColors(
-      background: Color(0xFFF8FBFF),
-      border: Color(0xFFE3ECF7),
-      iconBackground: Color(0xFFE8F1FF),
-      textTitle: Color(0xFF263238),
-      textSubtitle: Color(0xFF607D8B),
       infoBackground: Color(0xFFE3F2FD),
       infoBorder: Color(0xFF90CAF9),
       infoText: Color(0xFF1565C0),
@@ -598,9 +560,6 @@ class AppTheme {
       ), // Corregido: Era E53935 (texto no se leía)
       dangerBorder: Color(0xFFEF5350),
       dangerText: Color(0xFFC62828), // Corregido para contraste
-      actionBackground: Color(0xFFE3F2FD),
-      actionBorder: Color(0xFF90CAF9),
-      actionText: Color(0xFF1565C0),
     ),
   );
 

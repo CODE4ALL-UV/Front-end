@@ -283,10 +283,12 @@ class _SignCameraScreenState extends State<SignCameraScreen>
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Scaffold(
-      backgroundColor: appTheme.background,
+      backgroundColor: appColorScheme.surface,
       appBar: GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
@@ -343,8 +345,8 @@ class _SignCameraScreenState extends State<SignCameraScreen>
         _check();
       },
       style: FilledButton.styleFrom(
-        backgroundColor: appTheme.colorScheme.primary,
-        foregroundColor: appTheme.colorScheme.onPrimary,
+        backgroundColor: appSemanticColors.primary,
+        foregroundColor: appSemanticColors.onPrimary,
         minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.refresh),
@@ -374,15 +376,17 @@ class _SignCameraScreenState extends State<SignCameraScreen>
   }
 
   Widget _controls(bool running) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final buttons = <Widget>[
       FilledButton.icon(
         onPressed: running ? _stop : _start,
         style: FilledButton.styleFrom(
           backgroundColor: running
-              ? appTheme.dangerBackground
-              : appTheme.warningBackground,
-          foregroundColor: appTheme.iconBackground,
+              ? appSemanticColors.dangerBackground
+              : appSemanticColors.warningBackground,
+          foregroundColor: appSemanticColors.infoText,
           minimumSize: const Size(0, AppMetrics.minTapTarget),
         ),
         icon: Icon(running ? Icons.stop : Icons.photo_camera),
@@ -430,8 +434,8 @@ class _SignCameraScreenState extends State<SignCameraScreen>
   }
 
   ButtonStyle _outlined(ThemeData appTheme) => OutlinedButton.styleFrom(
-    foregroundColor: appTheme.colorScheme.primary,
-    side: BorderSide(color: appTheme.colorScheme.error),
+    foregroundColor: appColorScheme.primary,
+    side: BorderSide(color: appColorScheme.error),
     minimumSize: const Size(0, AppMetrics.minTapTarget),
   );
 }
@@ -444,7 +448,9 @@ class _Explanation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final text = target != null
         ? 'Coloca la mano delante de la cámara y haz la letra $target. '
               'Te iré diciendo qué te falta para conseguirla.'
@@ -454,8 +460,8 @@ class _Explanation extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppMetrics.gap),
       decoration: BoxDecoration(
-        color: appTheme.dangerText,
-        border: Border.all(color: appTheme.border),
+        color: appSemanticColors.dangerBackground,
+        border: Border.all(color: appSemanticColors.infoBorder),
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       ),
       child: Column(
@@ -466,7 +472,7 @@ class _Explanation extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               height: 1.45,
-              color: appTheme.textTitle,
+              color: appSemanticColors.infoText,
             ),
           ),
           const SizedBox(height: AppMetrics.gap),
@@ -498,12 +504,14 @@ class _Note extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: appTheme.textSubtitle),
+        Icon(icon, size: 18, color: appSemanticColors.infoText),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -511,7 +519,7 @@ class _Note extends StatelessWidget {
             style: TextStyle(
               fontSize: 13.5,
               height: 1.4,
-              color: appTheme.textSubtitle,
+              color: appSemanticColors.infoText,
             ),
           ),
         ),
@@ -529,7 +537,9 @@ class _Preview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final controller = camera;
     final ready =
         running && controller != null && controller.value.isInitialized;
@@ -547,21 +557,21 @@ class _Preview extends StatelessWidget {
             child: ready
                 ? CameraPreview(controller)
                 : Container(
-                    color: appTheme.dangerText,
+                    color: appSemanticColors.dangerBackground,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.no_photography_outlined,
                           size: 48,
-                          color: appTheme.textSubtitle,
+                          color: appSemanticColors.infoText,
                         ),
                         const SizedBox(height: AppMetrics.gap),
                         Text(
                           'La cámara está apagada',
                           style: TextStyle(
                             fontSize: 15,
-                            color: appTheme.textSubtitle,
+                            color: appSemanticColors.infoText,
                           ),
                         ),
                       ],
@@ -590,7 +600,9 @@ class _ReadingBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final letter = reading.letter;
     final holding = dictation.holding;
 
@@ -602,36 +614,36 @@ class _ReadingBox extends StatelessWidget {
       if (achieved) {
         headline = target!;
         detail = '¡Esa es la $target!';
-        tone = appTheme.successBackground;
+        tone = appSemanticColors.successBackground;
       } else if (letter == null) {
         headline = '—';
         detail = 'Todavía no veo tu mano con claridad.';
-        tone = appTheme.textSubtitle;
+        tone = appSemanticColors.infoText;
       } else {
         headline = letter;
         detail = HandLandmarkClassifier.hint(reading.observed, target!);
-        tone = appTheme.warningBackground;
+        tone = appSemanticColors.warningBackground;
       }
     } else if (reading.isAmbiguous) {
       headline = [letter!, ...reading.alternatives].join(' o ');
       detail =
           'Estas letras se hacen casi igual, así que no me atrevo a elegir. '
           'No la doy por buena.';
-      tone = appTheme.warningBackground;
+      tone = appSemanticColors.warningBackground;
     } else if (letter == null) {
       headline = '—';
       detail = holding == null
           ? 'Todavía no veo tu mano con claridad.'
           : 'Sujeta la mano un poco más quieta.';
-      tone = appTheme.textSubtitle;
+      tone = appSemanticColors.infoText;
     } else {
       headline = letter;
       detail = reading.isConfident
           ? 'Mantenla quieta para que cuente.'
           : 'Casi. Acerca un poco la mano o mejora la luz.';
       tone = reading.isConfident
-          ? appTheme.successBackground
-          : appTheme.textSubtitle;
+          ? appSemanticColors.successBackground
+          : appSemanticColors.infoText;
     }
 
     return Semantics(
@@ -641,8 +653,8 @@ class _ReadingBox extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(AppMetrics.gap),
           decoration: BoxDecoration(
-            color: appTheme.background,
-            border: Border.all(color: appTheme.border),
+            color: appColorScheme.surface,
+            border: Border.all(color: appSemanticColors.infoBorder),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
@@ -658,7 +670,7 @@ class _ReadingBox extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         height: 1.4,
-                        color: appTheme.textTitle,
+                        color: appSemanticColors.infoText,
                       ),
                     ),
                   ),
@@ -666,14 +678,14 @@ class _ReadingBox extends StatelessWidget {
               ),
               if (target == null) ...[
                 const SizedBox(height: AppMetrics.gap),
-                Divider(color: appTheme.border, height: 1),
+                Divider(color: appSemanticColors.infoBorder, height: 1),
                 const SizedBox(height: AppMetrics.gap),
                 Text(
                   'Llevas escrito',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: appTheme.textSubtitle,
+                    color: appSemanticColors.infoText,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -684,8 +696,8 @@ class _ReadingBox extends StatelessWidget {
                     letterSpacing: 2,
                     fontWeight: FontWeight.w700,
                     color: dictation.isEmpty
-                        ? appTheme.textSubtitle
-                        : appTheme.textTitle,
+                        ? appSemanticColors.infoText
+                        : appSemanticColors.infoText,
                   ),
                 ),
               ],
@@ -706,7 +718,9 @@ class _LetterBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     return SizedBox(
       width: 72,
       height: 72,
@@ -719,7 +733,7 @@ class _LetterBadge extends StatelessWidget {
             child: CircularProgressIndicator(
               value: progress == 0 ? null : progress,
               strokeWidth: 5,
-              backgroundColor: appTheme.dangerBorder,
+              backgroundColor: appSemanticColors.dangerBorder,
               valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
             ),
           ),
@@ -747,23 +761,27 @@ class _Message extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Semantics(
       liveRegion: true,
       child: Container(
         padding: const EdgeInsets.all(AppMetrics.sectionGap),
         decoration: BoxDecoration(
-          color: appTheme.dangerText,
-          border: Border.all(color: appTheme.border),
+          color: appSemanticColors.dangerText,
+          border: Border.all(color: appSemanticColors.infoBorder),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: Column(
           children: [
             if (busy)
-              CircularProgressIndicator(color: appTheme.warningBackground)
+              CircularProgressIndicator(
+                color: appSemanticColors.warningBackground,
+              )
             else if (icon != null)
-              Icon(icon, size: 40, color: appTheme.textSubtitle),
+              Icon(icon, size: 40, color: appSemanticColors.infoText),
             const SizedBox(height: AppMetrics.gap),
             Text(
               text,
@@ -771,7 +789,7 @@ class _Message extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15.5,
                 height: 1.45,
-                color: appTheme.textTitle,
+                color: appSemanticColors.infoText,
               ),
             ),
           ],

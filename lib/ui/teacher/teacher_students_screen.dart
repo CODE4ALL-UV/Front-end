@@ -55,11 +55,15 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     if (_stats.isLoading && !_stats.isLoaded) {
       return Center(
-        child: CircularProgressIndicator(color: appTheme.actionBackground),
+        child: CircularProgressIndicator(
+          color: appSemanticColors.infoBackground,
+        ),
       );
     }
 
@@ -82,7 +86,7 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
             style: TextStyle(
               fontSize: 14.5,
               height: 1.5,
-              color: appTheme.textSubtitle,
+              color: appSemanticColors.infoText,
             ),
           ),
         ),
@@ -116,7 +120,7 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
                               '${sinEmpezar > 0 ? " · $sinEmpezar sin empezar" : ""}',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: appTheme.textSubtitle,
+                                color: appSemanticColors.infoText,
                               ),
                             ),
                           ),
@@ -125,7 +129,7 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
                               () => _strugglingFirst = !_strugglingFirst,
                             ),
                             style: TextButton.styleFrom(
-                              foregroundColor: appTheme.infoText,
+                              foregroundColor: appSemanticColors.infoText,
                               minimumSize: const Size(
                                 0,
                                 AppMetrics.minTapTarget,
@@ -164,15 +168,17 @@ class _StudentRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final percent = (student.accuracy * 100).round();
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
-    // final tone = student.hasNotStarted
-    //     ? appTheme.textSubtitle
-    //     : (percent >= 70
-    //           ? appTheme.successBackground
-    //           : (percent >= 45
-    //                 ? appTheme.warningBackground
-    //                 : appTheme.dangerBackground));
+    final tone = student.hasNotStarted
+        ? appSemanticColors.infoBackground
+        : (percent >= 70
+              ? appSemanticColors.successBackground
+              : (percent >= 45
+                    ? appSemanticColors.warningBackground
+                    : appSemanticColors.dangerBackground));
 
     final initials = student.name.trim().isEmpty
         ? '?'
@@ -189,8 +195,8 @@ class _StudentRow extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: appTheme.iconBackground,
-            border: Border.all(color: appTheme.border),
+            color: appColorScheme.surface,
+            border: Border.all(color: appColorScheme.outline),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Row(
@@ -200,7 +206,7 @@ class _StudentRow extends StatelessWidget {
                 height: 38,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: appTheme.dangerBackground,
+                  color: appSemanticColors.dangerBackground,
                   shape: BoxShape.circle,
                 ),
                 child: Text(
@@ -208,7 +214,7 @@ class _StudentRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: appTheme.infoText,
+                    color: appSemanticColors.infoText,
                   ),
                 ),
               ),
@@ -223,7 +229,7 @@ class _StudentRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
-                        color: appTheme.textTitle,
+                        color: appSemanticColors.infoText,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -233,14 +239,14 @@ class _StudentRow extends StatelessWidget {
                           Icon(
                             Icons.hourglass_empty,
                             size: 13,
-                            color: appTheme.textSubtitle,
+                            color: appSemanticColors.infoText,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             'Sin empezar',
                             style: TextStyle(
                               fontSize: 12,
-                              color: appTheme.textSubtitle,
+                              color: appSemanticColors.infoText,
                             ),
                           ),
                         ],
@@ -252,7 +258,7 @@ class _StudentRow extends StatelessWidget {
                         '${student.answered == 0 ? "" : " · ${student.correct} aciertos · ${student.failed} fallos"}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: appTheme.textSubtitle,
+                          color: appSemanticColors.infoText,
                         ),
                       ),
                   ],

@@ -136,7 +136,7 @@ class TeacherField extends StatelessWidget {
               fontSize: 14,
             ),
             filled: true,
-            fillColor: themeColors.actionBackground,
+            fillColor: themeColors.infoBackground,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 12,
@@ -315,7 +315,7 @@ class TeacherListRow extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: appTheme.actionBackground,
+        color: appTheme.infoBackground,
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         border: Border.all(color: appTheme.border),
       ),

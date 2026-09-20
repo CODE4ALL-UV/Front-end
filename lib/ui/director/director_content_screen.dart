@@ -60,12 +60,12 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
 
   Future<void> _judge(CourseSection section) async {
     final verdict = _store.verdictOf(section.id);
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
 
     final saved = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: appTheme.background,
+      backgroundColor: appTheme.colorScheme.surface,
       builder: (_) => _JudgeSheet(section: section, current: verdict),
     );
 
@@ -93,10 +93,12 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
 
     if (_store.isLoading && !_store.isLoaded) {
-      return Center(child: CircularProgressIndicator(color: appTheme.infoText));
+      return Center(
+        child: CircularProgressIndicator(color: appTheme.primaryColor),
+      );
     }
 
     if (_store.problem != null) {
@@ -192,19 +194,29 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final current = verdict;
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     final (String label, IconData icon, Color tone) = current == null
-        ? ('Sin revisar', Icons.pending_outlined, appTheme.textSubtitle)
+        ? ('Sin revisar', Icons.pending_outlined, appSemanticColors.infoBorder)
         : current.outdated
         ? (
             'Revisado antes del último cambio',
             Icons.update,
-            appTheme.warningText,
+            appSemanticColors.warningText,
           )
         : current.isApproved
-        ? ('Aprobado', Icons.check_circle_outline, appTheme.successBorder)
-        : ('Con observaciones', Icons.error_outline, appTheme.dangerBorder);
+        ? (
+            'Aprobado',
+            Icons.check_circle_outline,
+            appSemanticColors.successBorder,
+          )
+        : (
+            'Con observaciones',
+            Icons.error_outline,
+            appSemanticColors.dangerBorder,
+          );
 
     return Semantics(
       label:
@@ -215,12 +227,12 @@ class _SectionCard extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: appTheme.background,
+            color: appColorScheme.surface,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             border: Border.all(
               color: current == null || current.outdated || !current.isApproved
                   ? tone.withValues(alpha: 0.45)
-                  : appTheme.border,
+                  : appSemanticColors.infoBorder,
             ),
           ),
           child: Column(
@@ -237,7 +249,7 @@ class _SectionCard extends StatelessWidget {
                           'Módulo ${section.moduleNumber} · Sección ${section.number}',
                           style: TextStyle(
                             fontSize: 11.5,
-                            color: appTheme.textSubtitle,
+                            color: appSemanticColors.infoBorder,
                           ),
                         ),
                         Text(
@@ -245,7 +257,7 @@ class _SectionCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: appTheme.textTitle,
+                            color: appSemanticColors.infoBorder,
                           ),
                         ),
                       ],
@@ -262,7 +274,7 @@ class _SectionCard extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: appTheme.iconBackground,
+                    color: appTheme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -270,7 +282,7 @@ class _SectionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.5,
                       height: 1.45,
-                      color: appTheme.textTitle,
+                      color: appSemanticColors.infoBorder,
                     ),
                   ),
                 ),
@@ -282,8 +294,8 @@ class _SectionCard extends StatelessWidget {
                     child: OutlinedButton.icon(
                       onPressed: onPreview,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: appTheme.infoBorder,
-                        side: BorderSide(color: appTheme.border),
+                        foregroundColor: appSemanticColors.infoBorder,
+                        side: BorderSide(color: appSemanticColors.infoBorder),
                         minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.visibility_outlined, size: 18),
@@ -295,8 +307,8 @@ class _SectionCard extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: onJudge,
                       style: FilledButton.styleFrom(
-                        backgroundColor: appTheme.infoBackground,
-                        foregroundColor: appTheme.infoBorder,
+                        backgroundColor: appSemanticColors.infoBackground,
+                        foregroundColor: appSemanticColors.infoBorder,
                         minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.fact_check_outlined, size: 18),
@@ -372,9 +384,11 @@ class _JudgeSheetState extends State<_JudgeSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     //final appToneSucess = appTheme.tone(AppThemeTone.success);
-    final appToneDanger = appTheme.tone(AppThemeTone.danger);
+    final appToneDanger = appSemanticColors.tone(AppThemeTone.danger);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -393,7 +407,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
-                color: appTheme.textTitle,
+                color: appSemanticColors.infoBorder,
               ),
             ),
             const SizedBox(height: AppMetrics.sectionGap),
@@ -429,7 +443,10 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               maxLines: 5,
               minLines: 3,
               onChanged: (_) => setState(() => _error = null),
-              style: TextStyle(fontSize: 14.5, color: appTheme.textTitle),
+              style: TextStyle(
+                fontSize: 14.5,
+                color: appSemanticColors.infoBorder,
+              ),
               decoration: InputDecoration(
                 labelText: _approved
                     ? 'Comentario (opcional)'
@@ -437,12 +454,12 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                 hintText: _approved
                     ? 'Puedes dejarlo vacío'
                     : 'Explica qué está mal para que pueda arreglarlo',
-                hintStyle: TextStyle(color: appTheme.textSubtitle),
+                hintStyle: TextStyle(color: appSemanticColors.infoBorder),
                 filled: true,
-                fillColor: appTheme.iconBackground,
+                fillColor: appTheme.colorScheme.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-                  borderSide: BorderSide(color: appTheme.border),
+                  borderSide: BorderSide(color: appSemanticColors.infoBorder),
                 ),
               ),
             ),
@@ -474,8 +491,8 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                   child: FilledButton(
                     onPressed: _saving ? null : _save,
                     style: FilledButton.styleFrom(
-                      backgroundColor: appTheme.background,
-                      foregroundColor: appTheme.border,
+                      backgroundColor: appSemanticColors.infoText,
+                      foregroundColor: appSemanticColors.dangerText,
                       minimumSize: const Size(0, AppMetrics.minTapTarget),
                     ),
                     child: Text(_saving ? 'Guardando…' : 'Guardar'),
@@ -505,7 +522,9 @@ class _Choice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Semantics(
       button: true,
@@ -514,8 +533,8 @@ class _Choice extends StatelessWidget {
       child: ExcludeSemantics(
         child: Material(
           color: selected
-              ? appTheme.infoText.withValues(alpha: 0.12)
-              : appTheme.iconBackground,
+              ? appSemanticColors.infoText.withValues(alpha: 0.12)
+              : appColorScheme.surface,
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           child: InkWell(
             onTap: onTap,
@@ -528,7 +547,9 @@ class _Choice extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 border: Border.all(
-                  color: selected ? appTheme.border : appTheme.border,
+                  color: selected
+                      ? appColorScheme.primary
+                      : appSemanticColors.infoBorder,
                   width: selected ? 1.8 : 1,
                 ),
               ),
@@ -538,7 +559,9 @@ class _Choice extends StatelessWidget {
                   Icon(
                     icon,
                     size: 22,
-                    color: selected ? appTheme.border : appTheme.textSubtitle,
+                    color: selected
+                        ? appColorScheme.primary
+                        : appSemanticColors.infoBorder,
                   ),
                   const SizedBox(height: 5),
                   Text(
@@ -547,7 +570,9 @@ class _Choice extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                      color: selected ? appTheme.border : appTheme.textTitle,
+                      color: selected
+                          ? appColorScheme.primary
+                          : appSemanticColors.infoBorder,
                     ),
                   ),
                 ],

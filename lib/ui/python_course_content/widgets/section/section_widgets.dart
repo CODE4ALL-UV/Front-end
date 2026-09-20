@@ -155,10 +155,10 @@ class SectionList extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: appTheme.actionText,
+                            color: appTheme.infoText,
                           ),
                         )
-                      : Icon(Icons.circle, size: 8, color: appTheme.actionText),
+                      : Icon(Icons.circle, size: 8, color: appTheme.infoText),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -259,10 +259,10 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: appTheme.actionBackground,
+              color: appTheme.infoBackground,
               borderRadius: BorderRadius.circular(10),
               border: Border(
-                left: BorderSide(color: appTheme.actionText, width: 4),
+                left: BorderSide(color: appTheme.infoBorder, width: 4),
               ),
             ),
             child: Row(
@@ -271,7 +271,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
                 Icon(
                   Icons.record_voice_over,
                   size: 18,
-                  color: appTheme.actionText,
+                  color: appTheme.infoText,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -296,19 +296,25 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
 /// Aviso destacado. El tono nunca es el único indicador: cada uno trae su
 /// propio icono y su etiqueta.
 class SectionCallout extends StatelessWidget {
-  const SectionCallout({super.key, required this.title, required this.body});
+  const SectionCallout({
+    super.key,
+    required this.title,
+    required this.body,
+    this.tone = AppThemeTone.info,
+  });
 
   final String title;
   final String body;
+  final AppThemeTone tone;
 
-  IconData get _icon => switch (AppThemeTone) {
+  IconData get _icon => switch (tone) {
     AppThemeTone.info => Icons.lightbulb_outline,
     AppThemeTone.success => Icons.check_circle_outline,
     AppThemeTone.warning => Icons.warning_amber_rounded,
     AppThemeTone.danger => Icons.dangerous_outlined,
   };
 
-  String get _prefix => switch (AppThemeTone) {
+  String get _prefix => switch (tone) {
     AppThemeTone.info => 'Idea clave',
     AppThemeTone.success => 'Bien hecho',
     AppThemeTone.warning => 'Atención',
@@ -445,9 +451,9 @@ class SectionSecondaryButton extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: onPressed,
           style: OutlinedButton.styleFrom(
-            foregroundColor: appTheme.actionText,
+            foregroundColor: appTheme.infoText,
             disabledForegroundColor: appTheme.textSubtitle,
-            side: BorderSide(color: appTheme.actionText, width: 1.6),
+            side: BorderSide(color: appTheme.infoBorder, width: 1.6),
             minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
@@ -547,7 +553,7 @@ class SectionProgressBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
-                    color: appTheme.actionText,
+                    color: appTheme.infoText,
                   ),
                 ),
               ],
@@ -559,7 +565,7 @@ class SectionProgressBar extends StatelessWidget {
                 value: value.clamp(0.0, 1.0),
                 minHeight: 10,
                 backgroundColor: appTheme.border,
-                valueColor: AlwaysStoppedAnimation<Color>(palette.accent),
+                valueColor: AlwaysStoppedAnimation<Color>(appTheme.infoBorder),
               ),
             ),
           ],
@@ -595,7 +601,7 @@ class SectionPendingContent extends StatelessWidget {
                 'Mientras tanto, estos son los objetivos previstos para esta '
                 'sección.',
             icon: Icons.hourglass_empty,
-            color: appTheme.warning,
+            color: appTheme.warningText,
           ),
           const SizedBox(height: 16),
           SectionList(items: objectives, numbered: true),

@@ -17,7 +17,9 @@ class ScoreStars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     if (score == null) {
       return Semantics(
@@ -26,7 +28,7 @@ class ScoreStars extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
             decoration: BoxDecoration(
-              color: appTheme.iconBackground,
+              color: appColorScheme.surface,
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
             child: Text(
@@ -34,7 +36,7 @@ class ScoreStars extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w700,
-                color: appTheme.textSubtitle,
+                color: appColorScheme.onSurface,
               ),
             ),
           ),
@@ -44,8 +46,10 @@ class ScoreStars extends StatelessWidget {
 
     final value = score!;
     final tone = value >= 4
-        ? appTheme.successBorder
-        : (value >= 3 ? appTheme.warningBorder : appTheme.dangerBorder);
+        ? appSemanticColors.successBorder
+        : (value >= 3
+              ? appSemanticColors.warningBorder
+              : appSemanticColors.dangerBorder);
 
     return Semantics(
       label: 'Nota $value de 5',
@@ -57,7 +61,7 @@ class ScoreStars extends StatelessWidget {
               Icon(
                 i <= value ? Icons.star_rounded : Icons.star_outline_rounded,
                 size: 15,
-                color: i <= value ? tone : appTheme.border,
+                color: i <= value ? tone : appColorScheme.outline,
               ),
             const SizedBox(width: 5),
             Text(
@@ -80,15 +84,16 @@ class DirectorBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
-    final color = appTheme.textSubtitle;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final color = appColorScheme.onSurface;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: appTheme.iconBackground,
+        color: appColorScheme.surface,
         borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
-        border: Border.all(color: appTheme.border),
+        border: Border.all(color: appColorScheme.outline),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -130,8 +135,10 @@ class DirectorNotice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
-    final color = appTheme.tone(AppThemeTone.warning);
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appWarningTone = appSemanticColors.tone(AppThemeTone.warning);
 
     return Semantics(
       liveRegion: true,
@@ -140,14 +147,16 @@ class DirectorNotice extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
-            color: appTheme.warningBackground,
+            color: appSemanticColors.warningBackground,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-            border: Border.all(color: color.border.withValues(alpha: 0.35)),
+            border: Border.all(
+              color: appWarningTone.border.withValues(alpha: 0.35),
+            ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, size: 20, color: color.background),
+              Icon(icon, size: 20, color: appColorScheme.surface),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -159,7 +168,7 @@ class DirectorNotice extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
-                        color: color.text,
+                        color: appWarningTone.text,
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -168,7 +177,7 @@ class DirectorNotice extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12.5,
                         height: 1.4,
-                        color: appTheme.textTitle,
+                        color: appSemanticColors.infoText,
                       ),
                     ),
                   ],
@@ -197,7 +206,8 @@ class DirectorEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Center(
       child: Padding(
@@ -207,7 +217,7 @@ class DirectorEmpty extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 44, color: appTheme.textSubtitle),
+              Icon(icon, size: 44, color: appSemanticColors.infoBackground),
               const SizedBox(height: AppMetrics.gap),
               Text(
                 title,
@@ -215,7 +225,7 @@ class DirectorEmpty extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  color: appTheme.textTitle,
+                  color: appSemanticColors.infoBackground,
                 ),
               ),
               const SizedBox(height: 8),
@@ -225,7 +235,7 @@ class DirectorEmpty extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.5,
-                  color: appTheme.textSubtitle,
+                  color: appSemanticColors.infoBackground,
                 ),
               ),
             ],
@@ -249,7 +259,8 @@ class DirectorProblem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Center(
       child: Padding(
@@ -257,7 +268,11 @@ class DirectorProblem extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.cloud_off, size: 40, color: appTheme.dangerBackground),
+            Icon(
+              Icons.cloud_off,
+              size: 40,
+              color: appSemanticColors.dangerBackground,
+            ),
             const SizedBox(height: AppMetrics.gap),
             Text(
               message,
@@ -265,15 +280,15 @@ class DirectorProblem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.5,
                 height: 1.45,
-                color: appTheme.textTitle,
+                color: appSemanticColors.infoText,
               ),
             ),
             const SizedBox(height: AppMetrics.sectionGap),
             FilledButton.icon(
               onPressed: onRetry,
               style: FilledButton.styleFrom(
-                backgroundColor: appTheme.infoBackground,
-                foregroundColor: appTheme.infoBorder,
+                backgroundColor: appSemanticColors.infoBackground,
+                foregroundColor: appSemanticColors.infoBorder,
                 minimumSize: const Size(0, AppMetrics.minTapTarget),
               ),
               icon: const Icon(Icons.refresh),

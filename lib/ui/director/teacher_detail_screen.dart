@@ -70,10 +70,11 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
   Widget build(BuildContext context) {
     // Usando el shortcut de tu extensión en app_theme_2.dart
     final activityColors = context.activityColors;
+    final appColorScheme = context.colorScheme;
     final teacher = widget.teacher;
 
     return Scaffold(
-      backgroundColor: activityColors.background,
+      backgroundColor: appColorScheme.surface,
       appBar: GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
@@ -126,7 +127,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           color: activityColors.infoBackground,
-          border: Border.all(color: activityColors.border),
+          border: Border.all(color: activityColors.infoBorder),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: Row(
@@ -153,7 +154,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
                     teacher.email,
                     style: TextStyle(
                       fontSize: 13,
-                      color: activityColors.textSubtitle,
+                      color: activityColors.infoText,
                     ),
                   ),
                   const SizedBox(height: 7),
@@ -222,7 +223,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
   ) => Row(
     children: [
       // Corregido: Reemplazado el inexistente appTheme.accent
-      Icon(icon, size: 19, color: activityColors.actionText),
+      Icon(icon, size: 19, color: activityColors.infoText),
       const SizedBox(width: 8),
       Expanded(
         child: Text(
@@ -230,7 +231,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w800,
-            color: activityColors.textTitle,
+            color: activityColors.infoText,
           ),
         ),
       ),
@@ -243,7 +244,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
     style: TextStyle(
       fontSize: 12.5,
       height: 1.45,
-      color: activityColors.textSubtitle,
+      color: activityColors.infoText,
     ),
   );
 }
@@ -271,7 +272,7 @@ class _EditRow extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: colorScheme.surface,
-            border: Border.all(color: appTheme.border),
+            border: Border.all(color: appTheme.infoBorder),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
@@ -284,7 +285,7 @@ class _EditRow extends StatelessWidget {
                         ? Icons.folder_outlined
                         : Icons.article_outlined,
                     size: 17,
-                    color: appTheme.textSubtitle,
+                    color: appTheme.infoText,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -293,7 +294,7 @@ class _EditRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: appTheme.textTitle,
+                        color: appTheme.infoText,
                       ),
                     ),
                   ),
@@ -302,7 +303,7 @@ class _EditRow extends StatelessWidget {
                       relativeDate(edit.updatedAt!),
                       style: TextStyle(
                         fontSize: 11.5,
-                        color: appTheme.textSubtitle,
+                        color: appTheme.infoText,
                       ),
                     ),
                 ],
@@ -335,7 +336,7 @@ class _EditRow extends StatelessWidget {
                     fontSize: 12.5,
                     height: 1.4,
                     fontStyle: FontStyle.italic,
-                    color: appTheme.textSubtitle,
+                    color: appTheme.infoText,
                   ),
                 ),
               ],
@@ -369,7 +370,7 @@ class _ReviewRow extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: colorScheme.surface,
-            border: Border.all(color: appTheme.border),
+            border: Border.all(color: appTheme.infoBorder),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
@@ -384,7 +385,7 @@ class _ReviewRow extends StatelessWidget {
                       relativeDate(review.createdAt!),
                       style: TextStyle(
                         fontSize: 11.5,
-                        color: appTheme.textSubtitle,
+                        color: appTheme.infoText,
                       ),
                     ),
                 ],
@@ -396,7 +397,7 @@ class _ReviewRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.5,
                     height: 1.45,
-                    color: appTheme.textTitle,
+                    color: appTheme.infoText,
                   ),
                 ),
               ],
@@ -496,7 +497,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
-                color: appTheme.textTitle,
+                color: appTheme.infoText,
               ),
             ),
             const SizedBox(height: AppMetrics.sectionGap),
@@ -506,7 +507,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
-                color: appTheme.textSubtitle,
+                color: appTheme.infoText,
               ),
             ),
             const SizedBox(height: 8),
@@ -531,7 +532,9 @@ class _ReviewSheetState extends State<_ReviewSheet> {
                               ? Icons.star_rounded
                               : Icons.star_outline_rounded,
                           // Colors.amber es el estándar habitual para estrellas de valoración
-                          color: i <= _score ? Colors.amber : appTheme.border,
+                          color: i <= _score
+                              ? Colors.amber
+                              : appTheme.infoBorder,
                         ),
                       ),
                     ),
@@ -544,7 +547,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
-                  color: appTheme.textTitle,
+                  color: appTheme.infoText,
                 ),
               ),
             ),
@@ -555,7 +558,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
-                color: appTheme.textSubtitle,
+                color: appTheme.infoText,
               ),
             ),
             const SizedBox(height: 6),
@@ -564,23 +567,23 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               maxLines: 5,
               minLines: 3,
               onChanged: (_) => setState(() => _error = null),
-              style: TextStyle(fontSize: 14.5, color: appTheme.textTitle),
+              style: TextStyle(fontSize: 14.5, color: appTheme.infoText),
               decoration: InputDecoration(
                 hintText: 'Qué está haciendo bien y qué puede mejorar',
-                hintStyle: TextStyle(color: appTheme.textSubtitle),
+                hintStyle: TextStyle(color: appTheme.infoText),
                 filled: true,
                 // Fondo para resaltar el input
                 fillColor: colorScheme.surfaceContainerHighest,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-                  borderSide: BorderSide(color: appTheme.border),
+                  borderSide: BorderSide(color: appTheme.infoBorder),
                 ),
               ),
             ),
             const SizedBox(height: 6),
             Text(
               'Es lo que de verdad le sirve: la nota sola no dice qué hacer distinto.',
-              style: TextStyle(fontSize: 12, color: appTheme.textSubtitle),
+              style: TextStyle(fontSize: 12, color: appTheme.infoText),
             ),
 
             if (_error != null) ...[

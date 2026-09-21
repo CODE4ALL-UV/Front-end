@@ -44,17 +44,16 @@ class LearningModuleScreen extends StatefulWidget {
 class _LearningModuleScreenState extends State<LearningModuleScreen> {
   bool _isNavigating = false;
   bool _isTeacher = false;
-  late String _moduleName = 'Módulo 1';
   late String _currentModuleId;
+  late String _moduleTitle = 'Preparación';
 
   final _authStorage = AuthStorage();
 
   @override
   void initState() {
     super.initState();
-    _moduleName = 'Módulo ${widget.moduleNumber}';
-    _currentModuleId =
-        'module-${widget.moduleNumber}'; // Generación dinámica del ID
+    _currentModuleId = widget.moduleNumber
+        .toString(); // Generación dinámica del ID
     _checkRole();
     _fetchModuleAndApply(_currentModuleId);
   }
@@ -75,8 +74,8 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
         final data = jsonDecode(res.body);
         if (!mounted) return;
         setState(() {
-          _moduleName = data['name'] ?? 'Módulo ${widget.moduleNumber}';
-          //_currentModuleId = data['id'] ?? _currentModuleId;
+          _currentModuleId = data['id'] ?? _currentModuleId;
+          _moduleTitle = data['titulo'] ?? 'Preparación';
         });
       }
     } catch (_) {}
@@ -133,7 +132,8 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
               child: Column(
                 children: [
                   ModuleHeaderWidget(
-                    moduleName: _moduleName,
+                    moduleId: _currentModuleId,
+                    moduleTitle: _moduleTitle,
                     isTeacher: _isTeacher,
                     onEditCompleted: (result) {
                       _fetchModuleAndApply(
@@ -147,8 +147,8 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                   // Fila 1 (Sección 3)
                   ModuleRowWidget(
                     moduleNumber: widget.moduleNumber,
-                    sectionNumber: 3,
-                    isCircleLeft: true,
+                    sectionNumber: 1,
+                    isCircleLeft: false,
                     icon: Icons.account_tree,
                     iconColor: colors.primary, // Azul centralizado
                     bgColor: colors.primaryContainer,
@@ -159,7 +159,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                   ModuleRowWidget(
                     moduleNumber: widget.moduleNumber,
                     sectionNumber: 2,
-                    isCircleLeft: false, // ¡Intercala la posición!
+                    isCircleLeft: true, // ¡Intercala la posición!
                     icon: Icons.manage_search,
                     iconColor: colors.secondary, // Morado centralizado
                     bgColor: colors.secondaryContainer,
@@ -168,8 +168,8 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                   // Fila 3 (Sección 1)
                   ModuleRowWidget(
                     moduleNumber: widget.moduleNumber,
-                    sectionNumber: 1,
-                    isCircleLeft: true,
+                    sectionNumber: 3,
+                    isCircleLeft: false,
                     icon: Icons.code,
                     iconColor: colors.tertiary, // Índigo centralizado
                     bgColor: colors.tertiaryContainer,

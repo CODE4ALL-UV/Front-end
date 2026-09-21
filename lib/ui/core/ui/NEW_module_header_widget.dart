@@ -1,26 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart';
 
 class ModuleHeaderWidget extends StatelessWidget {
-  final String moduleName;
+  final String moduleId;
+  final String moduleTitle;
   final bool isTeacher;
   final Function(String?) onEditCompleted;
 
   const ModuleHeaderWidget({
     super.key,
-    required this.moduleName,
+    required this.moduleId,
+    required this.moduleTitle,
     required this.isTeacher,
     required this.onEditCompleted,
   });
 
   @override
   Widget build(BuildContext context) {
+    final appModuleTheme = context.courseTheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+        gradient: LinearGradient(
+          colors: [
+            appModuleTheme.iconBackground,
+            appModuleTheme.headerBackground,
+          ],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
@@ -37,17 +44,20 @@ class ModuleHeaderWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        moduleName,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        'Módulo $moduleId',
+                        style: TextStyle(
+                          color: appModuleTheme.foregroundColor,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'Preparación',
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      Text(
+                        moduleTitle,
+                        style: TextStyle(
+                          color: appModuleTheme.foregroundColor,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -70,8 +80,6 @@ class ModuleHeaderWidget extends StatelessWidget {
               ],
             ),
           ),
-          //Row(
-          //children: [
           Container(
             width: 52,
             height: 52,
@@ -87,8 +95,6 @@ class ModuleHeaderWidget extends StatelessWidget {
               ),
             ),
           ),
-          //],
-          //),
         ],
       ),
     );

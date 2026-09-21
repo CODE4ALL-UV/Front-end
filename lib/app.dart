@@ -13,6 +13,7 @@ import 'ui/users_management/widgets/login_screen.dart';
 import 'ui/users_management/widgets/form_screen.dart';
 //import 'ui/users_management/screens/form_dark_screen.dart'; // PAPACHO - ELIMINADO USAR form_screen.dart en pro de app_theme.dart
 import 'ui/python_course_content/widgets/learning_module_screen.dart'; // MIX - PAPACHO - REFACTOR que reemplaza los otros learning_module_screen light y dark en pro de app_theme.dart
+
 //import 'ui/python_course_content/widgets/learning_module_dark_screen.dart'; // PAPACHO - ELIMINADO USAR learning_module_screen.dart en pro de app_theme.dart
 
 enum AppScreen { login, register, modulo, docente, director }
@@ -152,14 +153,14 @@ class _AppState extends State<App> {
     switch (mode) {
       case AppThemeMode.dark:
         return AppTheme.darkTheme;
-      case AppThemeMode.protanopia:
-        return AppTheme.protanopiaTheme;
-      case AppThemeMode.deuteranopia:
-        return AppTheme.deuteranopiaTheme;
-      case AppThemeMode.tritanopia:
-        return AppTheme.tritanopiaTheme;
-      case AppThemeMode.achromatopsia:
-        return AppTheme.achromatopsiaTheme;
+      //   case AppThemeMode.protanopia:
+      //     return AppTheme.protanopiaTheme;
+      //   case AppThemeMode.deuteranopia:
+      //     return AppTheme.deuteranopiaTheme;
+      //   case AppThemeMode.tritanopia:
+      //     return AppTheme.tritanopiaTheme;
+      //   case AppThemeMode.achromatopsia:
+      //     return AppTheme.achromatopsiaTheme;
       case AppThemeMode.light:
         return AppTheme.lightTheme;
     }
@@ -182,22 +183,22 @@ class _AppState extends State<App> {
                 title: const Text('Oscuro'),
                 onTap: () => Navigator.of(ctx).pop(AppThemeMode.dark),
               ),
-              ListTile(
-                title: const Text('Deuteranopia'),
-                onTap: () => Navigator.of(ctx).pop(AppThemeMode.deuteranopia),
-              ),
-              ListTile(
-                title: const Text('Protanopía'),
-                onTap: () => Navigator.of(ctx).pop(AppThemeMode.protanopia),
-              ),
-              ListTile(
-                title: const Text('Tritanopía'),
-                onTap: () => Navigator.of(ctx).pop(AppThemeMode.tritanopia),
-              ),
-              ListTile(
-                title: const Text('Acromatopsia'),
-                onTap: () => Navigator.of(ctx).pop(AppThemeMode.achromatopsia),
-              ),
+              // ListTile(
+              //   title: const Text('Deuteranopia'),
+              //   onTap: () => Navigator.of(ctx).pop(AppThemeMode.deuteranopia),
+              // ),
+              // ListTile(
+              //   title: const Text('Protanopía'),
+              //   onTap: () => Navigator.of(ctx).pop(AppThemeMode.protanopia),
+              // ),
+              // ListTile(
+              //   title: const Text('Tritanopía'),
+              //   onTap: () => Navigator.of(ctx).pop(AppThemeMode.tritanopia),
+              // ),
+              // ListTile(
+              //   title: const Text('Acromatopsia'),
+              //   onTap: () => Navigator.of(ctx).pop(AppThemeMode.achromatopsia),
+              // ),
             ],
           ),
         );

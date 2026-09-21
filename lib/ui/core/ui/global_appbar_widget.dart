@@ -70,7 +70,7 @@ class GlobalAppBarWidget extends StatelessWidget
       label: 'Encabezado de la pantalla: $title',
       child: AppBar(
         leading: buildLeading(),
-        title: Text(title, style: appBarTheme.titleTextStyle),
+        title: Text(title),
         actions:
             actions ??
             (showUserIcon

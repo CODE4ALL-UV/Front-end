@@ -69,13 +69,8 @@ class GlobalAppBarWidget extends StatelessWidget
       header: true, // Avisa al lector de pantalla que es un navbar
       label: 'Encabezado de la pantalla: $title',
       child: AppBar(
-        backgroundColor: colorScheme
-            .primary, //const Color(0xFF2A2A2A) const Color(0xFFE53935)
-        foregroundColor: colorScheme.onPrimary,
-        elevation: appBarTheme.elevation,
         leading: buildLeading(),
         title: Text(title, style: appBarTheme.titleTextStyle),
-        centerTitle: appBarTheme.centerTitle,
         actions:
             actions ??
             (showUserIcon

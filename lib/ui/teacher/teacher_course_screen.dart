@@ -64,7 +64,8 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
   }
 
   void _select(int moduleNumber, int sectionNumber, {required bool isWide}) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
     setState(() {
       _moduleNumber = moduleNumber;
       _sectionNumber = sectionNumber;
@@ -74,7 +75,7 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => Scaffold(
-            backgroundColor: appTheme.background,
+            backgroundColor: appColorScheme.surface,
             appBar: GlobalAppBarWidget(
               userName: '', //widget.userName,
               onLogout: null, //widget.onLogout,
@@ -91,9 +92,10 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
     return Scaffold(
-      backgroundColor: appTheme.background,
+      backgroundColor: appColorScheme.surface,
       appBar: GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
@@ -112,7 +114,8 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
   }
 
   Widget _buildTemario() {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
     return LayoutBuilder(
       builder: (context, constraints) {
         // 900 px es donde caben cómodos el temario y la sección a la vez.
@@ -146,7 +149,7 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(width: 300, child: tree),
-            VerticalDivider(width: 1, color: appTheme.border),
+            VerticalDivider(width: 1, color: appColorScheme.outline),
             Expanded(
               child: Column(
                 children: [
@@ -271,7 +274,9 @@ class _ModuleTileState extends State<_ModuleTile> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -298,7 +303,7 @@ class _ModuleTileState extends State<_ModuleTile> {
                     Icon(
                       _open ? Icons.expand_more : Icons.chevron_right,
                       size: 20,
-                      color: appTheme.textSubtitle,
+                      color: appColorScheme.onSurface,
                     ),
                     const SizedBox(width: 4),
                     Container(
@@ -307,16 +312,16 @@ class _ModuleTileState extends State<_ModuleTile> {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: _open
-                            ? appTheme.infoBackground
-                            : appTheme.warningBackground,
+                            ? appSemanticColors.infoBackground
+                            : appSemanticColors.warningBackground,
                         borderRadius: BorderRadius.circular(9),
                       ),
                       child: Icon(
                         _moduleIcon(widget.module.number),
                         size: 17,
                         color: _open
-                            ? appTheme.infoBackground
-                            : appTheme.textSubtitle,
+                            ? appSemanticColors.infoBackground
+                            : appSemanticColors.infoText,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -331,7 +336,7 @@ class _ModuleTileState extends State<_ModuleTile> {
                               fontSize: 10.5,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.6,
-                              color: appTheme.textSubtitle,
+                              color: appColorScheme.onSurface,
                             ),
                           ),
                           Text(
@@ -340,7 +345,7 @@ class _ModuleTileState extends State<_ModuleTile> {
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               height: 1.2,
-                              color: appTheme.textTitle,
+                              color: appSemanticColors.infoText,
                             ),
                           ),
                         ],
@@ -413,25 +418,26 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: appTheme.infoBackground,
+        color: appSemanticColors.infoBackground,
         borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
-        border: Border.all(color: appTheme.border),
+        border: Border.all(color: appSemanticColors.infoBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: appTheme.textSubtitle),
+          Icon(icon, size: 12, color: appSemanticColors.infoText),
           const SizedBox(width: 4),
           Text(
             label,
             style: TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w600,
-              color: appTheme.textSubtitle,
+              color: appSemanticColors.infoText,
             ),
           ),
         ],
@@ -456,7 +462,8 @@ class _SectionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final badges = _sectionBadges(section);
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Semantics(
       button: true,
@@ -472,8 +479,8 @@ class _SectionRow extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
           child: Material(
             color: selected
-                ? appTheme.infoBackground
-                : appTheme.warningBackground,
+                ? appSemanticColors.infoBackground
+                : appSemanticColors.warningBackground,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             child: InkWell(
               onTap: onTap,
@@ -486,7 +493,9 @@ class _SectionRow extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                   border: Border.all(
-                    color: selected ? appTheme.infoBackground : appTheme.border,
+                    color: selected
+                        ? appSemanticColors.infoBackground
+                        : appSemanticColors.infoBorder,
                     width: selected ? 1.6 : 1,
                   ),
                 ),
@@ -504,8 +513,8 @@ class _SectionRow extends StatelessWidget {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: selected
-                                ? appTheme.infoBackground
-                                : appTheme.warningBackground,
+                                ? appSemanticColors.infoBackground
+                                : appSemanticColors.warningBackground,
                             borderRadius: BorderRadius.circular(7),
                           ),
                           child: Text(
@@ -514,8 +523,8 @@ class _SectionRow extends StatelessWidget {
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                               color: selected
-                                  ? appTheme.border
-                                  : appTheme.textSubtitle,
+                                  ? appSemanticColors.infoBorder
+                                  : appSemanticColors.infoText,
                             ),
                           ),
                         ),
@@ -530,8 +539,8 @@ class _SectionRow extends StatelessWidget {
                                   ? FontWeight.w700
                                   : FontWeight.w600,
                               color: selected
-                                  ? appTheme.infoBackground
-                                  : appTheme.textTitle,
+                                  ? appSemanticColors.infoBackground
+                                  : appSemanticColors.infoText,
                             ),
                           ),
                         ),

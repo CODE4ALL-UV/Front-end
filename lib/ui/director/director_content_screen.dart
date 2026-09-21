@@ -385,7 +385,6 @@ class _JudgeSheetState extends State<_JudgeSheet> {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
     final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     //final appToneSucess = appTheme.tone(AppThemeTone.success);
     final appToneDanger = appSemanticColors.tone(AppThemeTone.danger);

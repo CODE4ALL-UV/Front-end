@@ -18,15 +18,17 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Container(
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: appTheme.background,
+        color: appColorScheme.surface,
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-        border: Border.all(color: borderColor ?? appTheme.border),
+        border: Border.all(color: borderColor ?? appSemanticColors.infoBorder),
       ),
       child: child,
     );
@@ -53,8 +55,8 @@ class SectionHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
-    final effectiveColor = appTheme.textTitle;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Semantics(
       header: true,
@@ -62,7 +64,7 @@ class SectionHeading extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 22, color: effectiveColor),
+            Icon(icon, size: 22, color: appSemanticColors.infoText),
             const SizedBox(width: 10),
           ],
           Expanded(
@@ -75,7 +77,7 @@ class SectionHeading extends StatelessWidget {
                     fontSize: 19,
                     height: 1.3,
                     fontWeight: FontWeight.w700,
-                    color: effectiveColor,
+                    color: appSemanticColors.infoText,
                   ),
                 ),
                 if (subtitle != null && subtitle!.isNotEmpty) ...[
@@ -85,7 +87,7 @@ class SectionHeading extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15,
                       height: 1.5,
-                      color: appTheme.textSubtitle,
+                      color: appSemanticColors.infoText,
                     ),
                   ),
                 ],
@@ -106,7 +108,8 @@ class SectionParagraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Text(
       text,
@@ -115,7 +118,7 @@ class SectionParagraph extends StatelessWidget {
         // 1.6 de interlineado: facilita no perder el renglón, sobre todo con
         // baja visión o dislexia.
         height: 1.6,
-        color: appTheme.textTitle,
+        color: appSemanticColors.infoText,
       ),
     );
   }
@@ -130,7 +133,8 @@ class SectionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +150,7 @@ class SectionList extends StatelessWidget {
                   height: 26,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: appTheme.border,
+                    color: appSemanticColors.infoBorder,
                     shape: BoxShape.circle,
                   ),
                   child: numbered
@@ -155,10 +159,14 @@ class SectionList extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: appTheme.infoText,
+                            color: appSemanticColors.infoText,
                           ),
                         )
-                      : Icon(Icons.circle, size: 8, color: appTheme.infoText),
+                      : Icon(
+                          Icons.circle,
+                          size: 8,
+                          color: appSemanticColors.infoText,
+                        ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -167,7 +175,7 @@ class SectionList extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15.5,
                       height: 1.55,
-                      color: appTheme.textTitle,
+                      color: appSemanticColors.infoText,
                     ),
                   ),
                 ),
@@ -210,7 +218,9 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final code = widget.code;
     final caption = widget.caption;
     final hasCaption = caption != null && caption.trim().isNotEmpty;
@@ -224,9 +234,9 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: appTheme.background,
+                color: appColorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: appTheme.border),
+                border: Border.all(color: appSemanticColors.infoBorder),
               ),
               child: Scrollbar(
                 controller: _controller,
@@ -245,7 +255,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
                       ],
                       fontSize: 14,
                       height: 1.55,
-                      color: appTheme.textTitle,
+                      color: appSemanticColors.infoText,
                     ),
                   ),
                 ),
@@ -259,10 +269,10 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: appTheme.infoBackground,
+              color: appSemanticColors.infoBackground,
               borderRadius: BorderRadius.circular(10),
               border: Border(
-                left: BorderSide(color: appTheme.infoBorder, width: 4),
+                left: BorderSide(color: appSemanticColors.infoBorder, width: 4),
               ),
             ),
             child: Row(
@@ -271,7 +281,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
                 Icon(
                   Icons.record_voice_over,
                   size: 18,
-                  color: appTheme.infoText,
+                  color: appSemanticColors.infoText,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -280,7 +290,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
                     style: TextStyle(
                       fontSize: 14.5,
                       height: 1.5,
-                      color: appTheme.textTitle,
+                      color: appSemanticColors.infoText,
                     ),
                   ),
                 ),
@@ -323,20 +333,24 @@ class SectionCallout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: appTheme.background,
+        color: appColorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: appTheme.border.withValues(alpha: 0.45)),
+        border: Border.all(
+          color: appSemanticColors.infoBorder.withValues(alpha: 0.45),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(_icon, size: 22, color: appTheme.border),
+          Icon(_icon, size: 22, color: appSemanticColors.infoBorder),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -348,7 +362,7 @@ class SectionCallout extends StatelessWidget {
                     fontSize: 15.5,
                     fontWeight: FontWeight.w700,
                     height: 1.35,
-                    color: appTheme.border,
+                    color: appSemanticColors.infoBorder,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -357,7 +371,7 @@ class SectionCallout extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     height: 1.55,
-                    color: appTheme.textTitle,
+                    color: appSemanticColors.infoText,
                   ),
                 ),
               ],
@@ -389,7 +403,8 @@ class SectionPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Semantics(
       button: true,
@@ -400,10 +415,10 @@ class SectionPrimaryButton extends StatelessWidget {
         child: ElevatedButton.icon(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: appTheme.border,
+            backgroundColor: appSemanticColors.infoBorder,
             foregroundColor: Colors.white,
-            disabledBackgroundColor: appTheme.border,
-            disabledForegroundColor: appTheme.textSubtitle,
+            disabledBackgroundColor: appSemanticColors.infoBorder,
+            disabledForegroundColor: appSemanticColors.infoText,
             minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
@@ -440,7 +455,8 @@ class SectionSecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Semantics(
       button: true,
@@ -451,9 +467,10 @@ class SectionSecondaryButton extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: onPressed,
           style: OutlinedButton.styleFrom(
-            foregroundColor: appTheme.infoText,
-            disabledForegroundColor: appTheme.textSubtitle,
-            side: BorderSide(color: appTheme.infoBorder, width: 1.6),
+            backgroundColor: appSemanticColors.infoBorder,
+            foregroundColor: appSemanticColors.infoText,
+            disabledForegroundColor: appSemanticColors.infoText,
+            side: BorderSide(color: appSemanticColors.infoBorder, width: 1.6),
             minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
@@ -480,19 +497,23 @@ class SectionStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: appTheme.background,
+        color: appColorScheme.surface,
         borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
-        border: Border.all(color: appTheme.border.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: appSemanticColors.infoBorder.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: appTheme.border),
+          Icon(icon, size: 16, color: appSemanticColors.infoBorder),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
@@ -500,7 +521,7 @@ class SectionStatusChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: appTheme.border,
+                color: appSemanticColors.infoText,
               ),
             ),
           ),
@@ -526,7 +547,8 @@ class SectionProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final percent = (value.clamp(0.0, 1.0) * 100).round();
 
     return Semantics(
@@ -544,7 +566,7 @@ class SectionProgressBar extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
-                      color: appTheme.textSubtitle,
+                      color: appSemanticColors.infoText,
                     ),
                   ),
                 ),
@@ -553,7 +575,7 @@ class SectionProgressBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
-                    color: appTheme.infoText,
+                    color: appSemanticColors.infoText,
                   ),
                 ),
               ],
@@ -564,8 +586,10 @@ class SectionProgressBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: value.clamp(0.0, 1.0),
                 minHeight: 10,
-                backgroundColor: appTheme.border,
-                valueColor: AlwaysStoppedAnimation<Color>(appTheme.infoBorder),
+                backgroundColor: appSemanticColors.infoBorder,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  appSemanticColors.infoBorder,
+                ),
               ),
             ),
           ],

@@ -256,7 +256,8 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return EditorScaffold(
       title: widget.isNew ? 'Nueva pregunta' : 'Editar pregunta',
@@ -285,7 +286,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                     'Marca el círculo de la respuesta correcta.',
                     style: TextStyle(
                       fontSize: 12.5,
-                      color: appTheme.textSubtitle,
+                      color: appSemanticColors.infoText,
                     ),
                   ),
                   const SizedBox(height: AppMetrics.gap),
@@ -300,7 +301,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                                 : 'Marcar la opción ${i + 1} como correcta',
                             child: Radio<int>(
                               value: i,
-                              activeColor: appTheme.successBackground,
+                              activeColor: appSemanticColors.successBackground,
                             ),
                           ),
                           Expanded(
@@ -309,15 +310,15 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                               onChanged: (_) => setState(() => _error = null),
                               style: TextStyle(
                                 fontSize: 14.5,
-                                color: appTheme.textTitle,
+                                color: appSemanticColors.infoText,
                               ),
                               decoration: InputDecoration(
                                 hintText: 'Opción ${i + 1}',
                                 isDense: true,
                                 filled: true,
                                 fillColor: _correct == i
-                                    ? appTheme.successBackground
-                                    : appTheme.infoBackground,
+                                    ? appSemanticColors.successBackground
+                                    : appSemanticColors.infoBackground,
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 12,
@@ -325,15 +326,15 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: appTheme.border,
+                                    color: appSemanticColors.infoBorder,
                                   ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
                                     color: _correct == i
-                                        ? appTheme.successBorder
-                                        : appTheme.border,
+                                        ? appSemanticColors.successBorder
+                                        : appSemanticColors.infoBorder,
                                   ),
                                 ),
                               ),
@@ -342,7 +343,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                           IconButton(
                             tooltip: 'Quitar la opción ${i + 1}',
                             onPressed: () => _removeOption(i),
-                            color: appTheme.textSubtitle,
+                            color: appSemanticColors.infoText,
                             constraints: const BoxConstraints(
                               minWidth: AppMetrics.minTapTarget,
                               minHeight: AppMetrics.minTapTarget,

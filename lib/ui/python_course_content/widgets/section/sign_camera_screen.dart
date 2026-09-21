@@ -285,7 +285,6 @@ class _SignCameraScreenState extends State<SignCameraScreen>
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
     final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Scaffold(
       backgroundColor: appColorScheme.surface,
@@ -345,8 +344,10 @@ class _SignCameraScreenState extends State<SignCameraScreen>
         _check();
       },
       style: FilledButton.styleFrom(
-        backgroundColor: appSemanticColors.primary,
-        foregroundColor: appSemanticColors.onPrimary,
+        backgroundColor: appTheme
+            .extension<ActivityThemeColors>()!
+            .infoBackground,
+        foregroundColor: appTheme.extension<ActivityThemeColors>()!.infoText,
         minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.refresh),
@@ -377,7 +378,6 @@ class _SignCameraScreenState extends State<SignCameraScreen>
 
   Widget _controls(bool running) {
     final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
     final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final buttons = <Widget>[
       FilledButton.icon(
@@ -434,8 +434,10 @@ class _SignCameraScreenState extends State<SignCameraScreen>
   }
 
   ButtonStyle _outlined(ThemeData appTheme) => OutlinedButton.styleFrom(
-    foregroundColor: appColorScheme.primary,
-    side: BorderSide(color: appColorScheme.error),
+    foregroundColor: appTheme.extension<ActivityThemeColors>()!.infoText,
+    side: BorderSide(
+      color: appTheme.extension<ActivityThemeColors>()!.infoBorder,
+    ),
     minimumSize: const Size(0, AppMetrics.minTapTarget),
   );
 }
@@ -449,7 +451,6 @@ class _Explanation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
     final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final text = target != null
         ? 'Coloca la mano delante de la cámara y haz la letra $target. '
@@ -505,7 +506,6 @@ class _Note extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
     final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Row(
@@ -538,7 +538,6 @@ class _Preview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
     final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final controller = camera;
     final ready =
@@ -719,7 +718,6 @@ class _LetterBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
     final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     return SizedBox(
       width: 72,
@@ -762,7 +760,6 @@ class _Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
     final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Semantics(

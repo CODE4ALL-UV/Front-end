@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
 
+/// Atajos rápidos para acceder al tema desde el BuildContext.
+extension AppThemeContext on BuildContext {
+  ColorScheme get colorScheme => Theme.of(this).colorScheme;
+  CourseTheme get courseTheme => Theme.of(this).extension<CourseTheme>()!;
+  CodeConsoleTheme get codeConsoleTheme =>
+      Theme.of(this).extension<CodeConsoleTheme>()!;
+  ActivityThemeColors get activityColors =>
+      Theme.of(this).extension<ActivityThemeColors>()!;
+}
+
 /*
   APP THEME
   Centraliza el sistema visual de la aplicación: temas, colores, métricas,
@@ -8,6 +18,10 @@ import 'package:flutter/material.dart';
   GESTIÓN DEL TEMA
   ThemeManager → Mantiene y cambia el modo visual seleccionado mediante ValueNotifier.
   Acceso: ThemeManager.themeNotifier / ThemeManager.changeTheme(...).
+
+  EQUIVALENCIAS
+  foregroundColor → color de texto/iconos
+  surface         → background
   ----------
   MODOS DE TEMA
   AppThemeMode → Define los 6 modos visuales disponibles:
@@ -16,6 +30,31 @@ import 'package:flutter/material.dart';
   AppThemeMode.protanopia / AppThemeMode.deuteranopia
   AppThemeMode.tritanopia / AppThemeMode.achromatopsia.
 
+  MÉTRICAS
+  AppMetrics → Define valores globales de espaciado, radios, tamaños táctiles y dimensiones.
+  No depende del ThemeData ni cambia entre modos de tema.
+  Acceso: AppMetrics.cardRadius / AppMetrics.paddingH
+          AppMetrics.minTapTarget / etc.
+
+  TONOS SEMÁNTICOS
+  AppThemeTone → Identifica la intención visual: info, success, warning o danger.
+  Acceso: context.activityColors.tone(AppThemeTone.success)
+  Luego: .background / .border / .text
+  ----------
+  EXTENSIONES PERSONALIZADAS
+  ActivityThemeColors → Colores semánticos para información, éxito, advertencia,
+  peligro y acciones, incluyendo fondo suave, borde visible y texto oscuro.
+  Acceso: Theme.of(context).extension<ActivityThemeColors>()!
+          context.activityColors
+  
+  CourseTheme → Colores específicos de las tarjetas y elementos de las lecciones.
+  Acceso: Theme.of(context).extension<CourseTheme>()!
+          context.courseTheme
+
+  CodeConsoleTheme → Colores específicos de la consola/editor de código Python.
+  Acceso: Theme.of(context).extension<CodeConsoleTheme>()!
+          context.codeConsoleTheme
+  ----------
   TEMA ACTUAL
   Theme.of(context) → Obtiene el ThemeData aplicado actualmente a la aplicación.
   Acceso: Theme.of(context)
@@ -34,48 +73,26 @@ import 'package:flutter/material.dart';
   Acceso: Theme.of(context).appBarTheme
           Theme.of(context).cardTheme
           Theme.of(context).floatingActionButtonTheme / etc.
-
-  EXTENSIONES PERSONALIZADAS
-  CourseTheme → Colores específicos de las tarjetas y elementos de las lecciones.
-  Acceso: Theme.of(context).extension<CourseTheme>()!
-          context.courseTheme
-
-  CodeConsoleTheme → Colores específicos de la consola/editor de código Python.
-  Acceso: Theme.of(context).extension<CodeConsoleTheme>()!
-          context.codeConsoleTheme
-
-  ActivityThemeColors → Colores semánticos para información, éxito, advertencia,
-  peligro y acciones, incluyendo fondo, borde y texto.
-  Acceso: Theme.of(context).extension<ActivityThemeColors>()!
-          context.activityColors
-
-  TONOS SEMÁNTICOS
-  AppThemeTone → Identifica la intención visual: info, success, warning o danger.
-  Acceso: context.activityColors.tone(AppThemeTone.success)
-  Luego: .background / .border / .text
-
-  MÉTRICAS
-  AppMetrics → Define valores globales de espaciado, radios, tamaños táctiles y dimensiones.
-  No depende del ThemeData ni cambia entre modos de tema.
-  Acceso: AppMetrics.cardRadius / AppMetrics.paddingH / AppMetrics.minTapTarget / etc.
-
-  COLORES DE MÓDULOS
-  ModuleCardThemeColors → Proporciona colores de fondo y texto según el módulo.
-  Acceso: ModuleCardThemeColors.getBackgroundColor(moduleId)
-  Acceso: ModuleCardThemeColors.getTextColor(moduleId)
-
+  
   SINTAXIS DE PYTHON
   pythonLightSyntax / pythonAchromatopsiaSyntax → Define estilos de texto para
   resaltado de sintaxis de Python.
   Acceso: AppTheme.pythonLightSyntax / AppTheme.pythonAchromatopsiaSyntax
+          etc....
 
   CONSTRUCCIÓN DE TEMAS
   AppTheme → Contiene la fábrica común de ThemeData y los temas concretos de la aplicación.
-  Acceso: AppTheme.lightTheme / AppTheme.darkTheme / etc.
+  Acceso: AppTheme.lightTheme / AppTheme.darkTheme
+          etc......
 */
 
-///// Define los modos visuales disponibles en la aplicación.
-/// Incluye opciones para accesibilidad visual y daltonismo.
+class ThemeManager {
+  static final ValueNotifier<AppThemeMode> themeNotifier =
+      ValueNotifier<AppThemeMode>(AppThemeMode.light);
+
+  static void changeTheme(AppThemeMode mode) => themeNotifier.value = mode;
+}
+
 enum AppThemeMode {
   light,
   dark,
@@ -85,17 +102,6 @@ enum AppThemeMode {
   achromatopsia,
 }
 
-/// Gestor global del estado del tema.
-/// Usa ValueNotifier para redibujar la UI sin dependencias externas.
-class ThemeManager {
-  static final ValueNotifier<AppThemeMode> themeNotifier =
-      ValueNotifier<AppThemeMode>(AppThemeMode.light);
-
-  static void changeTheme(AppThemeMode mode) => themeNotifier.value = mode;
-}
-
-/// Medidas estándar de la aplicación.
-/// Garantiza consistencia en radios, márgenes y tamaños táctiles (accesibilidad).
 abstract final class AppMetrics {
   static const double minTapTarget = 48;
   static const double cardRadius = 16;
@@ -117,8 +123,6 @@ abstract final class AppMetrics {
 
 enum AppThemeTone { info, success, warning, danger }
 
-/// Extensión para manejar alertas y mensajes (Info, Success, Warning, Danger).
-/// Define la triada accesible: fondo suave, borde visible y texto oscuro.
 class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
   final Color infoBackground;
   final Color infoBorder;
@@ -148,7 +152,6 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
     required this.dangerText,
   });
 
-  /// Devuelve la triada de colores exacta según la intención.
   ({Color background, Color border, Color text}) tone(AppThemeTone tone) =>
       switch (tone) {
         AppThemeTone.info => (
@@ -226,7 +229,6 @@ class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
   }
 }
 
-/// Extensión para elementos específicos de las lecciones.
 class CourseTheme extends ThemeExtension<CourseTheme> {
   final Color lessonCard;
   final Color lessonCardBorder;
@@ -234,6 +236,7 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
   final Color readingCard;
   final Color knowledgeCapsule;
   final Color progressTrack;
+  final Color text;
 
   const CourseTheme({
     required this.lessonCard,
@@ -242,18 +245,88 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
     required this.readingCard,
     required this.knowledgeCapsule,
     required this.progressTrack,
+    required this.text,
   });
 
-  @override
-  CourseTheme copyWith({Color? lessonCard, Color? lessonCardBorder}) =>
-      CourseTheme(
-        lessonCard: lessonCard ?? this.lessonCard,
-        lessonCardBorder: lessonCardBorder ?? this.lessonCardBorder,
-        mutedText: mutedText,
-        readingCard: readingCard,
-        knowledgeCapsule: knowledgeCapsule,
-        progressTrack: progressTrack,
+  factory CourseTheme.fromModule(int moduleId) {
+    if (moduleId == 1 || moduleId == 2) {
+      return const CourseTheme(
+        lessonCard: Color(0xFFE3F2FD),
+        text: Color(0xFF0D47A1),
+        lessonCardBorder: Color(0xFF90CAF9),
+        mutedText: Color(0xFF64B5F6),
+        readingCard: Color(0xFFBBDEFB),
+        knowledgeCapsule: Color(0xFF42A5F5),
+        progressTrack: Color(0xFF1976D2),
       );
+    }
+
+    if (moduleId == 3 || moduleId == 4) {
+      return const CourseTheme(
+        lessonCard: Color(0xFFE8F5E9),
+        text: Color(0xFF1B5E20),
+        lessonCardBorder: Color(0xFFA5D6A7),
+        mutedText: Color(0xFF81C784),
+        readingCard: Color(0xFFC8E6C9),
+        knowledgeCapsule: Color(0xFF66BB6A),
+        progressTrack: Color(0xFF388E3C),
+      );
+    }
+
+    if (moduleId == 5) {
+      return const CourseTheme(
+        lessonCard: Color(0xFFE8F5E9),
+        text: Color(0xFF1B5E20),
+        lessonCardBorder: Color(0xFFA5D6A7),
+        mutedText: Color(0xFF81C784),
+        readingCard: Color(0xFFC8E6C9),
+        knowledgeCapsule: Color(0xFF66BB6A),
+        progressTrack: Color(0xFF388E3C),
+      );
+    }
+
+    if (moduleId == 6) {
+      return const CourseTheme(
+        lessonCard: Color(0xFFE8F5E9),
+        text: Color(0xFF1B5E20),
+        lessonCardBorder: Color(0xFFA5D6A7),
+        mutedText: Color(0xFF81C784),
+        readingCard: Color(0xFFC8E6C9),
+        knowledgeCapsule: Color(0xFF66BB6A),
+        progressTrack: Color(0xFF388E3C),
+      );
+    }
+
+    // Default
+    return const CourseTheme(
+      lessonCard: Color(0xFFF5F5F5),
+      text: Color(0xFF424242),
+      lessonCardBorder: Color(0xFFE0E0E0),
+      mutedText: Color(0xFF9E9E9E),
+      readingCard: Color(0xFFEEEEEE),
+      knowledgeCapsule: Color(0xFFBDBDBD),
+      progressTrack: Color(0xFF757575),
+    );
+  }
+
+  @override
+  CourseTheme copyWith({
+    Color? lessonCard,
+    Color? lessonCardBorder,
+    Color? mutedText,
+    Color? readingCard,
+    Color? knowledgeCapsule,
+    Color? progressTrack,
+    Color? text,
+  }) => CourseTheme(
+    lessonCard: lessonCard ?? this.lessonCard,
+    lessonCardBorder: lessonCardBorder ?? this.lessonCardBorder,
+    mutedText: mutedText ?? this.mutedText,
+    readingCard: readingCard ?? this.readingCard,
+    knowledgeCapsule: knowledgeCapsule ?? this.knowledgeCapsule,
+    progressTrack: progressTrack ?? this.progressTrack,
+    text: text ?? this.text,
+  );
 
   @override
   CourseTheme lerp(covariant CourseTheme? other, double t) {
@@ -273,11 +346,11 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
         t,
       )!,
       progressTrack: Color.lerp(progressTrack, other.progressTrack, t)!,
+      text: Color.lerp(text, other.text, t)!,
     );
   }
 }
 
-/// Extensión para la consola interactiva de Python.
 class CodeConsoleTheme extends ThemeExtension<CodeConsoleTheme> {
   final Color background;
   final Color border;
@@ -327,44 +400,6 @@ class CodeConsoleTheme extends ThemeExtension<CodeConsoleTheme> {
   }
 }
 
-/// Generador dinámico de colores según la temática del módulo.
-/// Garantiza alto contraste en textos para accesibilidad visual.
-class ModuleCardThemeColors {
-  static Color getBackgroundColor(int moduleId) {
-    if (moduleId == 1 || moduleId == 2) {
-      return const Color(0xFFE3F2FD); // Azul suave
-    }
-    if (moduleId == 3 || moduleId == 4) {
-      return const Color(0xFFE8F5E9); // Verde suave
-    }
-    if (moduleId == 5) return const Color(0xFFFFF9C4); // Amarillo suave
-    if (moduleId == 6) return const Color(0xFFFFEBEE); // Rojo suave
-    return const Color(0xFFF5F5F5); // Default
-  }
-
-  static Color getTextColor(int moduleId) {
-    if (moduleId == 1 || moduleId == 2)
-      return const Color(0xFF0D47A1); // Azul oscuro
-    if (moduleId == 3 || moduleId == 4)
-      return const Color(0xFF1B5E20); // Verde oscuro
-    if (moduleId == 5)
-      return const Color(0xFFF57F17); // Amarillo oscuro/naranja
-    if (moduleId == 6) return const Color(0xFFB71C1C); // Rojo oscuro
-    return const Color(0xFF424242); // Default
-  }
-}
-
-/// Atajos rápidos para acceder al tema desde el BuildContext.
-extension AppThemeContext on BuildContext {
-  ColorScheme get colorScheme => Theme.of(this).colorScheme;
-  CourseTheme get courseTheme => Theme.of(this).extension<CourseTheme>()!;
-  CodeConsoleTheme get codeConsoleTheme =>
-      Theme.of(this).extension<CodeConsoleTheme>()!;
-  ActivityThemeColors get activityColors =>
-      Theme.of(this).extension<ActivityThemeColors>()!;
-}
-
-/// Fábrica principal que ensambla todos los temas de la aplicación.
 class AppTheme {
   /// Ensambla un ThemeData completo a partir de los tokens visuales del tema.
   ///
@@ -399,16 +434,35 @@ class AppTheme {
               color: colorScheme.onSurface,
               fontWeight: FontWeight.bold,
             ),
+            titleMedium: baseTextTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w600, // Ideal para subtítulos
+            ),
             bodyLarge: baseTextTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurface,
             ),
             bodyMedium: baseTextTheme.bodyMedium?.copyWith(color: mutedText),
+            bodySmall: baseTextTheme.bodySmall?.copyWith(
+              color: mutedText,
+              fontSize: 12, // Aseguramos un tamaño legible para textos de apoyo
+            ),
+            labelLarge: baseTextTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              // Los botones (Elevated, TextButton) le inyectarán
+              // su onPrimary o secondary automáticamente.
+            ),
           )
           .apply(fontFamily: 'Roboto'),
       appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         elevation: 0,
         centerTitle: true,
         actionsIconTheme: const IconThemeData(size: 28),
+        titleTextStyle: baseTextTheme.titleLarge?.copyWith(
+          color: colorScheme
+              .onPrimary, // Solo pisamos el color, hereda todo lo demás
+        ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         unselectedItemColor: mutedText,
@@ -534,6 +588,7 @@ class AppTheme {
       readingCard: Color(0xFFE3F2FD),
       knowledgeCapsule: Color(0xFFE8F5E9),
       progressTrack: Color(0xFFE0E0E0),
+      text: Color(0xFF212121),
     ),
     codeConsoleTheme: const CodeConsoleTheme(
       background: Color(0xFFF8FBFF),

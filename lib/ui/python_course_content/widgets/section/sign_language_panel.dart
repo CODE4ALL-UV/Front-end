@@ -143,7 +143,9 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final letter = _currentLetter;
     final word = _currentWord;
     final shape = signAlphabet[letter];
@@ -160,9 +162,9 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: appTheme.background,
+            color: appColorScheme.surface,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-            border: Border.all(color: appTheme.border),
+            border: Border.all(color: appSemanticColors.infoBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +175,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                   Icon(
                     Icons.sign_language,
                     size: 17,
-                    color: appTheme.infoBackground,
+                    color: appSemanticColors.infoBorder,
                   ),
                   const SizedBox(width: 7),
                   Expanded(
@@ -182,7 +184,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
-                        color: appTheme.infoBackground,
+                        color: appSemanticColors.infoBackground,
                       ),
                     ),
                   ),
@@ -235,9 +237,9 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                   child: LinearProgressIndicator(
                     value: (_index + 1) / _letters.length,
                     minHeight: 4,
-                    backgroundColor: appTheme.border,
+                    backgroundColor: appSemanticColors.infoBorder,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      appTheme.infoBackground,
+                      appSemanticColors.infoBackground,
                     ),
                   ),
                 ),
@@ -274,7 +276,8 @@ class _HalfTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -287,7 +290,7 @@ class _HalfTile extends StatelessWidget {
             fontSize: 10.5,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.3,
-            color: appTheme.textSubtitle,
+            color: appSemanticColors.infoText,
           ),
         ),
         const SizedBox(height: 6),
@@ -303,7 +306,7 @@ class _HalfTile extends StatelessWidget {
             height: 1.1,
             fontWeight: captionIsLarge ? FontWeight.w900 : FontWeight.w700,
             letterSpacing: captionIsLarge ? 0 : 0.8,
-            color: appTheme.textTitle,
+            color: appSemanticColors.infoText,
           ),
         ),
         if (footnote != null) ...[
@@ -316,7 +319,7 @@ class _HalfTile extends StatelessWidget {
             style: TextStyle(
               fontSize: 9.5,
               fontStyle: FontStyle.italic,
-              color: appTheme.textSubtitle,
+              color: appSemanticColors.infoText,
             ),
           ),
         ],
@@ -336,7 +339,9 @@ class _HandDrawing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     // SizedBox.expand es imprescindible: un CustomPaint sin hijo se queda en
     // tamaño cero cuando recibe restricciones sueltas, que es justo lo que le
     // da el Stack interno de AnimatedSwitcher. Sin esto la mano no se ve.
@@ -353,7 +358,9 @@ class _HandDrawing extends StatelessWidget {
                 )
               : shape,
           tones: idle ? _SkinTones.idle : (_SkinTones.warm),
-          background: idle ? appTheme.background : appTheme.infoBackground,
+          background: idle
+              ? appColorScheme.surface
+              : appSemanticColors.infoBackground,
         ),
       ),
     );
@@ -375,11 +382,13 @@ class _SignDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final container = BoxDecoration(
-      color: appTheme.background,
+      color: appColorScheme.surface,
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: appTheme.border),
+      border: Border.all(color: appSemanticColors.infoBorder),
     );
 
     final path = assetPath;
@@ -399,14 +408,15 @@ class _SignDisplay extends StatelessWidget {
   }
 
   Widget _fallback(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
           word.isEmpty ? Icons.hourglass_empty : Icons.spellcheck,
           size: 26,
-          color: appTheme.textSubtitle,
+          color: appSemanticColors.infoText,
         ),
         const SizedBox(height: 6),
         Padding(
@@ -419,7 +429,7 @@ class _SignDisplay extends StatelessWidget {
               fontSize: 10.5,
               height: 1.25,
               fontWeight: FontWeight.w600,
-              color: appTheme.textSubtitle,
+              color: appSemanticColors.infoText,
             ),
           ),
         ),

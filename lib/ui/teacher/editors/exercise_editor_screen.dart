@@ -79,7 +79,8 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return EditorScaffold(
       title: 'Ejercicio',
@@ -127,7 +128,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: appTheme.textTitle,
+                    color: appSemanticColors.infoText,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -137,7 +138,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
-                    color: appTheme.textSubtitle,
+                    color: appSemanticColors.infoText,
                   ),
                 ),
                 const SizedBox(height: AppMetrics.gap),
@@ -160,7 +161,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                             });
                           }
                         },
-                        color: appTheme.textSubtitle,
+                        color: appSemanticColors.infoText,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(
@@ -190,13 +191,13 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
                       Icons.quiz_outlined,
-                      color: appTheme.successBorder,
+                      color: appSemanticColors.successBorder,
                     ),
                     title: Text(
                       'Preguntas del ejercicio',
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: appTheme.textTitle,
+                        color: appSemanticColors.infoText,
                       ),
                     ),
                     subtitle: Text(
@@ -204,11 +205,11 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                           ? 'Sin preguntas'
                           : '${_questions.length} '
                                 '${_questions.length == 1 ? "pregunta" : "preguntas"}',
-                      style: TextStyle(color: appTheme.textSubtitle),
+                      style: TextStyle(color: appSemanticColors.infoText),
                     ),
                     trailing: Icon(
                       Icons.chevron_right,
-                      color: appTheme.textSubtitle,
+                      color: appSemanticColors.infoText,
                     ),
                     onTap: _editQuestions,
                   ),

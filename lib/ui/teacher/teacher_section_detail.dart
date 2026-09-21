@@ -208,7 +208,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final section = _current;
     final edited = _content.isSectionEdited(section.id);
 
@@ -236,7 +237,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
-                            color: appTheme.textTitle,
+                            color: appSemanticColors.infoText,
                           ),
                         ),
                         const SizedBox(height: AppMetrics.gap),
@@ -263,17 +264,19 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   Widget _header(bool edited) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final where = Text(
       'Módulo ${widget.moduleNumber} · Sección ${widget.sectionNumber}',
-      style: TextStyle(fontSize: 12.5, color: appTheme.textSubtitle),
+      style: TextStyle(fontSize: 12.5, color: appSemanticColors.infoText),
     );
 
     final badge = edited
         ? Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: appTheme.background,
+              color: appColorScheme.surface,
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
             child: Text(
@@ -281,7 +284,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: appTheme.background,
+                color: appColorScheme.surface,
               ),
             ),
           )
@@ -290,7 +293,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
     final preview = TextButton.icon(
       onPressed: _previewAsStudent,
       style: TextButton.styleFrom(
-        foregroundColor: appTheme.background,
+        foregroundColor: appColorScheme.surface,
         minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.visibility_outlined, size: 18),
@@ -361,11 +364,13 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   List<Widget> _activityCards(CourseSection section) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     return [
       _ActivityCard(
         icon: Icons.menu_book,
-        color: appTheme.background,
+        color: appColorScheme.surface,
         title: 'Lectura',
         detail: section.reading == null
             ? 'Sin lectura'
@@ -381,7 +386,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.lightbulb_outline,
-        color: appTheme.warningBackground,
+        color: appSemanticColors.warningBackground,
         title: 'Cápsula de conocimiento',
         detail: section.capsule == null
             ? 'Sin cápsula'
@@ -396,7 +401,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.play_circle_outline,
-        color: appTheme.dangerBackground,
+        color: appSemanticColors.dangerBackground,
         title: 'Videos',
         detail: section.videos.isEmpty
             ? 'Sin videos'
@@ -412,7 +417,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.quiz_outlined,
-        color: appTheme.successBackground,
+        color: appSemanticColors.successBackground,
         title: 'Quiz',
         detail: section.quiz.isEmpty
             ? 'Sin preguntas'
@@ -431,7 +436,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.fact_check_outlined,
-        color: appTheme.successBackground,
+        color: appSemanticColors.successBackground,
         title: 'Evaluación final',
         detail: section.finalEvaluation.isEmpty
             ? 'Sin preguntas'
@@ -449,7 +454,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.code,
-        color: appTheme.background,
+        color: appSemanticColors.infoBackground,
         title: 'Ejemplo comentado',
         detail: section.example == null
             ? 'Sin ejemplo'
@@ -464,7 +469,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.edit_note,
-        color: appTheme.warningBackground,
+        color: appSemanticColors.warningBackground,
         title: 'Ejercicio',
         detail: section.exercise == null || section.exercise!.isEmpty
             ? 'Sin ejercicio'
@@ -486,14 +491,16 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   Widget _saveBar(bool edited) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     final changed = _hasChanges;
 
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: appTheme.background,
-        border: Border(top: BorderSide(color: appTheme.border)),
+        color: appColorScheme.surface,
+        border: Border(top: BorderSide(color: appSemanticColors.infoBorder)),
       ),
       child: SafeArea(
         top: false,
@@ -513,8 +520,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                   fontSize: 13,
                   fontWeight: changed ? FontWeight.w700 : FontWeight.w400,
                   color: changed
-                      ? appTheme.warningBackground
-                      : appTheme.textSubtitle,
+                      ? appSemanticColors.warningBackground
+                      : appSemanticColors.infoText,
                 ),
               ),
             );
@@ -523,8 +530,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                 ? TextButton(
                     onPressed: _saving ? null : _revert,
                     style: TextButton.styleFrom(
-                      backgroundColor: appTheme.background,
-                      foregroundColor: appTheme.dangerBackground,
+                      backgroundColor: appSemanticColors.infoBackground,
+                      foregroundColor: appSemanticColors.dangerBackground,
                       minimumSize: const Size(0, AppMetrics.minTapTarget),
                     ),
                     child: const Text('Volver al original'),
@@ -534,8 +541,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
             final save = FilledButton.icon(
               onPressed: (_saving || !changed) ? null : _save,
               style: FilledButton.styleFrom(
-                backgroundColor: appTheme.background,
-                foregroundColor: appTheme.successBackground,
+                backgroundColor: appSemanticColors.infoBackground,
+                foregroundColor: appSemanticColors.successBackground,
                 minimumSize: const Size(0, AppMetrics.minTapTarget),
               ),
               icon: const Icon(Icons.save_outlined, size: 18),
@@ -598,7 +605,9 @@ class _ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     return Semantics(
       button: true,
       label: '$title. $detail. Toca para editar.',
@@ -606,7 +615,7 @@ class _ActivityCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: Material(
-            color: appTheme.background,
+            color: appColorScheme.surface,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             child: InkWell(
               onTap: onTap,
@@ -617,7 +626,7 @@ class _ActivityCard extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
-                  border: Border.all(color: appTheme.border),
+                  border: Border.all(color: appSemanticColors.infoBorder),
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 ),
                 child: Row(
@@ -625,7 +634,7 @@ class _ActivityCard extends StatelessWidget {
                     Icon(
                       icon,
                       size: 22,
-                      color: empty ? appTheme.textSubtitle : color,
+                      color: empty ? appSemanticColors.infoText : color,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -638,20 +647,23 @@ class _ActivityCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w700,
-                              color: appTheme.textTitle,
+                              color: appSemanticColors.infoText,
                             ),
                           ),
                           Text(
                             detail,
                             style: TextStyle(
                               fontSize: 12.5,
-                              color: appTheme.textSubtitle,
+                              color: appSemanticColors.infoText,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Icon(Icons.chevron_right, color: appTheme.textSubtitle),
+                    Icon(
+                      Icons.chevron_right,
+                      color: appSemanticColors.infoText,
+                    ),
                   ],
                 ),
               ),
@@ -672,36 +684,38 @@ class _LaboratoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     // El fondo va en el Material y no en la decoración: si no, el interruptor
     // pinta su pulsación por debajo y no se ve.
     return Material(
-      color: appTheme.background,
+      color: appColorScheme.surface,
       borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
         decoration: BoxDecoration(
-          border: Border.all(color: appTheme.border),
+          border: Border.all(color: appSemanticColors.infoBorder),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: SwitchListTile(
           value: enabled,
           onChanged: onChanged,
           contentPadding: EdgeInsets.zero,
-          activeThumbColor: appTheme.background,
+          activeThumbColor: appSemanticColors.infoBackground,
           title: Text(
             'Laboratorio',
             style: TextStyle(
               fontSize: 14.5,
               fontWeight: FontWeight.w700,
-              color: appTheme.textTitle,
+              color: appSemanticColors.infoText,
             ),
           ),
           subtitle: Text(
             enabled
                 ? 'El estudiante puede escribir y ejecutar código'
                 : 'Esta sección no ofrece laboratorio',
-            style: TextStyle(fontSize: 12.5, color: appTheme.textSubtitle),
+            style: TextStyle(fontSize: 12.5, color: appSemanticColors.infoText),
           ),
         ),
       ),

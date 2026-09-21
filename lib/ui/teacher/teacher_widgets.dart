@@ -102,7 +102,8 @@ class TeacherField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final themeColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,7 +113,7 @@ class TeacherField extends StatelessWidget {
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: appTheme.colorScheme.secondary,
+            color: appColorScheme.secondary,
           ),
         ),
         const SizedBox(height: 5),
@@ -131,23 +132,23 @@ class TeacherField extends StatelessWidget {
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(
-              color: appTheme.colorScheme.secondary,
-              fontSize: 14,
-            ),
+            hintStyle: TextStyle(color: appColorScheme.secondary, fontSize: 14),
             filled: true,
-            fillColor: themeColors.infoBackground,
+            fillColor: appSemanticColors.infoBackground,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 12,
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-              borderSide: BorderSide(color: themeColors.border),
+              borderSide: BorderSide(color: appSemanticColors.infoBorder),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-              borderSide: BorderSide(color: themeColors.infoBorder, width: 2),
+              borderSide: BorderSide(
+                color: appSemanticColors.infoBorder,
+                width: 2,
+              ),
             ),
           ),
         ),
@@ -155,7 +156,7 @@ class TeacherField extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             helper!,
-            style: TextStyle(fontSize: 12, color: themeColors.textSubtitle),
+            style: TextStyle(fontSize: 12, color: appSemanticColors.infoText),
           ),
         ],
       ],
@@ -173,18 +174,20 @@ class TeacherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColors = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appColorScheme = appTheme.colorScheme;
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     // El fondo lo pinta un Material, no la decoración del contenedor. Es lo
     // que permite meter dentro cosas que se pulsan —un ListTile, un
     // interruptor— sin que su efecto de pulsación quede tapado.
     return Material(
-      color: themeColors.background,
+      color: appColorScheme.surface,
       borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          border: Border.all(color: themeColors.border),
+          border: Border.all(color: appSemanticColors.infoBorder),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: Column(
@@ -199,7 +202,7 @@ class TeacherCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: themeColors.infoText,
+                        color: appSemanticColors.infoText,
                       ),
                     ),
                   ),
@@ -229,13 +232,14 @@ class TeacherAddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColors = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return OutlinedButton.icon(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: themeColors.infoBorder,
-        side: BorderSide(color: themeColors.border),
+        foregroundColor: appSemanticColors.infoBorder,
+        side: BorderSide(color: appSemanticColors.infoBorder),
         minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.add, size: 18),
@@ -250,19 +254,21 @@ Future<bool> confirmDelete(
   required String what,
   String? detail,
 }) async {
-  final themeColors = Theme.of(context).extension<ActivityThemeColors>()!;
+  final appTheme = Theme.of(context);
+  final appColorScheme = appTheme.colorScheme;
+  final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
   final answer = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      backgroundColor: themeColors.background,
+      backgroundColor: appColorScheme.surface,
       title: Text(
         '¿Borrar $what?',
-        style: TextStyle(color: themeColors.infoText),
+        style: TextStyle(color: appSemanticColors.infoText),
       ),
       content: Text(
         detail ?? 'Esto no se puede deshacer una vez guardes la sección.',
-        style: TextStyle(color: themeColors.infoText, height: 1.4),
+        style: TextStyle(color: appSemanticColors.infoText, height: 1.4),
       ),
       actions: [
         TextButton(
@@ -272,8 +278,8 @@ Future<bool> confirmDelete(
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: FilledButton.styleFrom(
-            backgroundColor: themeColors.dangerBackground,
-            foregroundColor: themeColors.dangerBorder,
+            backgroundColor: appSemanticColors.dangerBackground,
+            foregroundColor: appSemanticColors.dangerBorder,
           ),
           child: const Text('Borrar'),
         ),
@@ -311,13 +317,14 @@ class TeacherListRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: appTheme.infoBackground,
+        color: appSemanticColors.infoBackground,
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-        border: Border.all(color: appTheme.border),
+        border: Border.all(color: appSemanticColors.infoBorder),
       ),
       child: Column(
         children: [
@@ -349,8 +356,8 @@ class TeacherListRow extends StatelessWidget {
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: title.isEmpty
-                                    ? appTheme.textSubtitle
-                                    : appTheme.textTitle,
+                                    ? appSemanticColors.infoText
+                                    : appSemanticColors.infoText,
                               ),
                             ),
                             if (subtitle.isNotEmpty)
@@ -360,14 +367,17 @@ class TeacherListRow extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 12.5,
-                                  color: appTheme.textSubtitle,
+                                  color: appSemanticColors.infoText,
                                 ),
                               ),
                           ],
                         ),
                       ),
                       if (onTap != null)
-                        Icon(Icons.chevron_right, color: appTheme.textSubtitle),
+                        Icon(
+                          Icons.chevron_right,
+                          color: appSemanticColors.infoText,
+                        ),
                     ],
                   ),
                 ),
@@ -392,7 +402,7 @@ class TeacherListRow extends StatelessWidget {
               _RowAction(
                 icon: Icons.delete_outline,
                 label: 'Borrar $title',
-                color: appTheme.dangerBackground,
+                color: appSemanticColors.dangerBackground,
                 onPressed: onDelete,
               ),
             ],
@@ -418,12 +428,13 @@ class _RowAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
     return IconButton(
       onPressed: onPressed,
       tooltip: label,
       iconSize: 20,
-      color: color ?? appTheme.textSubtitle,
+      color: color ?? appSemanticColors.infoText,
       constraints: const BoxConstraints(
         minWidth: AppMetrics.minTapTarget,
         minHeight: AppMetrics.minTapTarget,

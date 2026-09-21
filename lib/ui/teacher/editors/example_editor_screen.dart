@@ -76,7 +76,8 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = Theme.of(context);
+    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     return EditorScaffold(
       title: 'Ejemplo comentado',
@@ -155,7 +156,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: appTheme.textTitle,
+                    color: appSemanticColors.infoText,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -165,7 +166,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
-                    color: appTheme.textSubtitle,
+                    color: appSemanticColors.infoText,
                   ),
                 ),
                 const SizedBox(height: AppMetrics.gap),
@@ -188,7 +189,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                             });
                           }
                         },
-                        color: appTheme.textSubtitle,
+                        color: appSemanticColors.infoText,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(

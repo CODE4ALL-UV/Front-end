@@ -56,7 +56,6 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
     final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
 
     if (_stats.isLoading && !_stats.isLoaded) {
@@ -269,7 +268,11 @@ class _StudentRow extends StatelessWidget {
                 student.hasNotStarted
                     ? '—'
                     : (student.answered == 0 ? '—' : '$percent %'),
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: tone,
+                ),
               ),
             ],
           ),

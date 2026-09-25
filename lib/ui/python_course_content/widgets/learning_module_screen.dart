@@ -1,9 +1,9 @@
-import 'dart:math' as math;
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart'; //MIX
 //import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart'; //PAPACHO - ELIMINADO USAR app_theme.dart
-import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart'; //REFACTOR-MULTIMODALBOTTOMAPPBARWIDGET - RENOMBRADO DE multimodal_footer_bar
+import 'package:flutter_code4all/ui/core/ui/bottomappbar_widget.dart'; //REFACTOR-MULTIMODALBOTTOMAPPBARWIDGET - RENOMBRADO DE multimodal_footer_bar
 //import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart'; //PAPACHO - MOVIDO A GlobalAppBarWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_light_screen.dart'; //PAPACHO - ELIMINADO USAR LearningModuleScreen
 import 'dart:convert';
@@ -14,27 +14,32 @@ import 'package:flutter_code4all/data/services/auth_storage.dart'; //PAPACHO
 //import 'package:flutter_code4all/data/course/python_course_catalog.dart'; //PAPACHO - MOVIDO A ModuleRowWidget
 //import 'package:flutter_code4all/data/services/course_progress_store.dart'; //PAPACHO - MOVIDO A CircleProgressWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart'; //PAPACHO - MOVIDO A CircleProgressWidget
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart'; //REFACTOR-APPBAR
+import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart'; //REFACTOR-APPBAR
 import 'package:flutter_code4all/ui/core/ui/new_module_header_widget.dart'; //REFACTOR-MODULEHEADERCARD
 import 'package:flutter_code4all/ui/python_course_content/widgets/new_chapter_detail_screen.dart'; //REFACTOR-CHAPTERDETAILSCREEN
 import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/new_detail_card_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_module_row_widget.dart'; //REFACTOR-MODULEROWWIDGET
+import 'package:flutter_code4all/ui/python_course_content/widgets/new_module_row_widget.dart';
+import '../../core/themes/module_theme.dart'; //REFACTOR-MODULEROWWIDGET
 
 class LearningModuleScreen extends StatefulWidget {
-  final int moduleNumber; // Remplaza la necesidad de tener 6 pantallas
+  final int moduleId; // Remplaza la necesidad de tener 6 pantallas
   final int totalModules;
   final String userName;
   final VoidCallback? onLogout;
   final List<String>? bottomLabels;
 
+  // NUEVO: Añadimos un callback para avisarle a app.dart que cambiamos de módulo
+  final ValueChanged<int>? onModuleChanged;
+
   const LearningModuleScreen({
     super.key,
-    this.moduleNumber = 1,
+    this.moduleId = 1,
     this.totalModules = 6, // Define tu máximo de módulos aquí
     this.userName = 'Usuario',
     this.onLogout,
     this.bottomLabels,
+    this.onModuleChanged, // NUEVO
   });
 
   @override
@@ -45,15 +50,29 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   bool _isNavigating = false;
   bool _isTeacher = false;
   late String _currentModuleId;
-  late String _moduleTitle = 'Preparación';
+  late String _moduleTitle;
 
   final _authStorage = AuthStorage();
 
   @override
   void initState() {
     super.initState();
-    _currentModuleId = widget.moduleNumber
-        .toString(); // Generación dinámica del ID
+    debugPrint('🔵 [SCREEN] initState Módulo ${widget.moduleId}');
+    _currentModuleId = widget.moduleId.toString(); // Generación dinámica del ID
+    _moduleTitle =
+        'Preparación'; // Valor por defecto hasta que se obtenga del backend
+
+    // NUEVO: Le avisamos a app.dart en qué módulo estamos para que actualice la paleta.
+    // Usamos addPostFrameCallback para evitar errores de redibujado de Flutter.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && widget.onModuleChanged != null) {
+        debugPrint(
+          '🔵 [SCREEN] Avisando a app.dart que estamos en el Módulo ${widget.moduleId}',
+        );
+        widget.onModuleChanged!(widget.moduleId);
+      }
+    });
+
     _checkRole();
     _fetchModuleAndApply(_currentModuleId);
   }
@@ -74,42 +93,63 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
         final data = jsonDecode(res.body);
         if (!mounted) return;
         setState(() {
-          _currentModuleId = data['id'] ?? _currentModuleId;
-          _moduleTitle = data['titulo'] ?? 'Preparación';
+          _currentModuleId = data['id'].toString();
+          _moduleTitle = data['name'] ?? 'Preparación';
         });
       }
     } catch (_) {}
   }
 
   void _goToNextModule() {
-    if (_isNavigating || widget.moduleNumber >= widget.totalModules) return;
+    if (_isNavigating || widget.moduleId >= widget.totalModules) return;
     _isNavigating = true;
+
+    debugPrint(
+      '⏩ [SCREEN] Navegando del Módulo ${widget.moduleId} al ${widget.moduleId + 1}',
+    );
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => LearningModuleScreen(
-          moduleNumber: widget.moduleNumber + 1,
+          moduleId: widget.moduleId + 1,
           totalModules: widget.totalModules,
           userName: widget.userName,
           onLogout: widget.onLogout,
           bottomLabels: widget.bottomLabels,
+          onModuleChanged: widget
+              .onModuleChanged, // NUEVO: Pasamos el callback a la siguiente pantalla
         ),
       ),
-    ).then((_) => _isNavigating = false);
+    ).then((_) {
+      _isNavigating = false;
+      debugPrint('⏪ [SCREEN] Regresamos (pop) al Módulo ${widget.moduleId}');
+      // NUEVO: Cuando el usuario le da "Atrás" (pop) y vuelve a este módulo,
+      // volvemos a avisarle a app.dart que recupere el color de ESTE módulo.
+      if (mounted && widget.onModuleChanged != null) {
+        widget.onModuleChanged!(widget.moduleId);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
     final bigSize = screenW * 0.40;
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final hasNextModule = widget.moduleNumber < widget.totalModules;
-    //final labels = widget.bottomLabels ?? [];
+    final hasNextModule = widget.moduleId < widget.totalModules;
+
+    final appTheme = Theme.of(context);
+    final appModuleTheme = context.courseTheme;
+    final currentThemeMode = ThemeManager.themeNotifier.value;
+
+    debugPrint(
+      '🟣 [SCREEN] Haciendo BUILD Módulo ${widget.moduleId} with AppThemeMode $currentThemeMode',
+    );
+    // debugPrint(
+    //   '🟣 [SCREEN] Colores extraídos: Header=${appModuleTheme.headerBackground}, Icono1=${appModuleTheme.chapterIconColor1}',
+    // );
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: GlobalAppBarWidget(
         userName: widget.userName,
         onLogout: widget.onLogout,
@@ -146,33 +186,36 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                   const SizedBox(height: 12),
                   // Fila 1 (Sección 3)
                   ModuleRowWidget(
-                    moduleNumber: widget.moduleNumber,
+                    moduleId: widget.moduleId,
                     sectionNumber: 1,
                     isCircleLeft: false,
                     icon: Icons.account_tree,
-                    iconColor: colors.primary, // Azul centralizado
-                    bgColor: colors.primaryContainer,
+                    iconColor:
+                        appModuleTheme.chapterIconColor1, // Azul centralizado
+                    bgColor: appModuleTheme.chapterIconBackgroundColor1,
                     bigSize: bigSize,
                   ),
                   const SizedBox(height: 12),
                   // Fila 2 (Sección 2)
                   ModuleRowWidget(
-                    moduleNumber: widget.moduleNumber,
+                    moduleId: widget.moduleId,
                     sectionNumber: 2,
                     isCircleLeft: true, // ¡Intercala la posición!
                     icon: Icons.manage_search,
-                    iconColor: colors.secondary, // Morado centralizado
-                    bgColor: colors.secondaryContainer,
+                    iconColor:
+                        appModuleTheme.chapterIconColor2, // Morado centralizado
+                    bgColor: appModuleTheme.chapterIconBackgroundColor2,
                   ),
                   const SizedBox(height: 12),
                   // Fila 3 (Sección 1)
                   ModuleRowWidget(
-                    moduleNumber: widget.moduleNumber,
+                    moduleId: widget.moduleId,
                     sectionNumber: 3,
                     isCircleLeft: false,
                     icon: Icons.code,
-                    iconColor: colors.tertiary, // Índigo centralizado
-                    bgColor: colors.tertiaryContainer,
+                    iconColor:
+                        appModuleTheme.chapterIconColor3, // Índigo centralizado
+                    bgColor: appModuleTheme.chapterIconBackgroundColor3,
                     bigSize: bigSize,
                     enableTeacherEditor: true,
                   ),
@@ -181,13 +224,16 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                   if (hasNextModule)
                     Semantics(
                       label:
-                          'Desliza hacia arriba para ir al Módulo ${widget.moduleNumber + 1}',
+                          'Desliza hacia arriba para ir al Módulo ${widget.moduleId + 1}',
                       child: Text(
-                        'Desliza hacia arriba para ir al Módulo ${widget.moduleNumber + 1}',
+                        'Desliza hacia arriba para ir al Módulo ${widget.moduleId + 1}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: colors
-                              .onSurfaceVariant, // Color semántico del tema
+                          // MODIFICADO: En lugar de Colors.black fijo, usamos el color del texto
+                          // del tema actual para que sea compatible con el Modo Oscuro
+                          color:
+                              appTheme.textTheme.bodyMedium?.color ??
+                              Colors.black87,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -200,76 +246,8 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
         ],
       ),
       bottomNavigationBar: MultimodalBottomAppBarWidget(
-        previousLabel: widget.bottomLabels?.elementAtOrNull(0),
         playLabel: widget.bottomLabels?.elementAtOrNull(1),
-        nextLabel: widget.bottomLabels?.elementAtOrNull(2),
       ),
     );
-  }
-}
-
-class _ArcPainter extends CustomPainter {
-  final double progress;
-  final double strokeWidth;
-
-  const _ArcPainter({required this.progress, required this.strokeWidth});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - strokeWidth / 2;
-
-    // Background arc with softer color
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      2 * math.pi,
-      false,
-      Paint()
-        ..color =
-            const Color(0xFF2E3A4A) // : const Color(0xFFE3F2FD)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.round,
-    );
-
-    // Progress arc with gradient effect
-    final progressSweep = 2 * math.pi * progress;
-    if (progress > 0) {
-      final rect = Rect.fromCircle(center: center, radius: radius);
-      final gradient = SweepGradient(
-        startAngle: -math.pi / 2,
-        endAngle: -math.pi / 2 + progressSweep,
-        colors:
-            // [
-            //     const Color(0xFF42A5F5),
-            //     const Color(0xFF1E88E5),
-            //     const Color(0xFF1565C0),
-            //   ]
-            [
-              const Color(0xFF64B5F6),
-              const Color(0xFF1E88E5),
-              const Color(0xFF0D47A1),
-            ],
-        transform: const GradientRotation(-math.pi / 2),
-      );
-
-      canvas.drawArc(
-        rect,
-        -math.pi / 2,
-        progressSweep,
-        false,
-        Paint()
-          ..shader = gradient.createShader(rect)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = strokeWidth
-          ..strokeCap = StrokeCap.round,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_ArcPainter oldDelegate) {
-    return oldDelegate.progress != progress;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import '../../core/themes/module_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
 import 'editor_scaffold.dart';
@@ -188,7 +189,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                             });
                           }
                         },
-                        color: courseTheme.mutedText,
+                        color: courseTheme.lessonCardBorder,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(
@@ -224,7 +225,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                         style: TextStyle(
                           fontSize: 12.5,
                           height: 1.4,
-                          color: courseTheme.mutedText,
+                          color: courseTheme.lessonCardBorder,
                         ),
                       ),
                       const SizedBox(height: AppMetrics.gap),

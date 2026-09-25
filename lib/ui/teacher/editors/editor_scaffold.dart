@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
+
+import '../../core/themes/module_theme.dart';
 
 /// El armazón común de todos los editores del docente.
 /// Todos funcionan igual a propósito: se escribe, se pulsa «Listo» y el
@@ -62,7 +64,7 @@ class EditorScaffold extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             height: 1.45,
-                            color: courseTheme.mutedText,
+                            color: courseTheme.lessonCardBorder,
                           ),
                         ),
                         const SizedBox(height: AppMetrics.sectionGap),
@@ -115,7 +117,7 @@ class EditorEmptyState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(icon, size: 40, color: courseTheme.mutedText),
+          Icon(icon, size: 40, color: courseTheme.lessonCardBorder),
           const SizedBox(height: AppMetrics.gap),
           Text(
             text,
@@ -123,7 +125,7 @@ class EditorEmptyState extends StatelessWidget {
             style: TextStyle(
               fontSize: 14.5,
               height: 1.45,
-              color: courseTheme.mutedText,
+              color: courseTheme.lessonCardBorder,
             ),
           ),
           const SizedBox(height: AppMetrics.sectionGap),

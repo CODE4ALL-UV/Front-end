@@ -8,7 +8,7 @@ import 'package:flutter_code4all/domain/models/sign_language/hand_landmark_class
 import 'package:flutter_code4all/domain/models/sign_language/sign_dictation.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 
 /// En qué punto está la pantalla.
 enum _Stage { checking, unavailable, ready, running, failed }

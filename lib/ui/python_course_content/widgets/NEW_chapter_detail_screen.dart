@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/new_python_module_model.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
-import 'package:flutter_code4all/ui/core/ui/multimodal_bottomappbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/bottomappbar_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/NEW_video_topic_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/new_detail_card_widget.dart';
@@ -399,9 +399,7 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
         ],
       ),
       bottomNavigationBar: MultimodalBottomAppBarWidget(
-        previousLabel: labels.isNotEmpty ? labels[0] : null,
         playLabel: labels.length > 1 ? labels[1] : null,
-        nextLabel: labels.length > 2 ? labels[2] : null,
       ),
       //PROBAR ESTO bottomNavigationBar: const MultimodalBottomAppBarWidget(),
     );

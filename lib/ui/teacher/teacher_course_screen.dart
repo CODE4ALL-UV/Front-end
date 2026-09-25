@@ -3,7 +3,7 @@ import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'teacher_section_detail.dart';
 import 'teacher_stats_screen.dart';
 import 'teacher_students_screen.dart';

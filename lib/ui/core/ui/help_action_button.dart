@@ -5,12 +5,6 @@ import 'package:flutter_code4all/web_player_html_2.dart'; //Daniel Pruebas
 import 'accessibility_settings_screen.dart';
 import 'accessibility_text_scale.dart';
 
-//TAREAS
-// SOLVED BUG DE PANTALLAZO ROJO AL PRESIONAR EL BOTÓN DE CONFIGURACIÓN ATTE MI PAPACHO
-// BUG DEL CAMBIO DE FONDO Y BLOQUEO DE COMPONENTE QUE NO DEJA INTERACTUAR SOLO CERRAR ATTE MI PAPACHO
-// SOLVED BUG DE AUMENTAR EL TAMAÑO DE TEXTO PARA QUE APLIQUE A LOS BOTONES DE ESTE COMPONENTE ATTE MI PAPACHO
-// BUG DEL BUG
-
 class HelpActionButton extends StatefulWidget {
   //AccessibilityMenu == HelpActionButton
   const HelpActionButton({super.key});
@@ -111,6 +105,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
   @override
   void dispose() {
+    debugPrint('🔴 [MODAL] dispose() llamado - El modal se destruyó');
     _textScaleController.removeListener(_handleTextScaleChanged);
     _controller.dispose();
     super.dispose();
@@ -171,11 +166,10 @@ class _HelpActionButtonState extends State<HelpActionButton>
             overlaySafeWidth,
           ),
         );
-        final panelHeight = (screenHeight * 0.65).clamp(280.0, 380.0);
+        final panelHeight = (overlayHeight - 24.0).clamp(280.0, 520.0);
 
-        // --- NEW BOTTOM-TO-BOTTOM ALIGNMENT ---
         // Calculate vertical alignment so the modal's TOP aligns with the vertical button's TOP
-        double? panelBottomPosition;
+        double panelBottomPosition = 62.0;
 
         if (_selectedOption != null && _activeCategory != null) {
           final options = categoryOptions[_activeCategory!] ?? [];
@@ -200,9 +194,21 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
             // 50.0 is the horizontal button height (44) + bottom padding (6)
             // This perfectly calculates where the BOTTOM of the clicked button is.
-            panelBottomPosition = optionHeight + (reversedIndex * stepHeight);
+            final calculatedPosition =
+                optionHeight + (reversedIndex * stepHeight);
+            // MAGIA AQUÍ: Limitamos la posición para que el panel NUNCA
+            // rebase la pantalla por la parte superior (dejando un margen de seguridad de 20px)
+            final maxAllowedBottom = overlayHeight - panelHeight - 20.0;
+            panelBottomPosition = calculatedPosition
+                .clamp(62.0, maxAllowedBottom > 62.0 ? maxAllowedBottom : 62.0)
+                .toDouble();
           }
         }
+
+        // Calculate the absolute position after applying the selected option's
+        // vertical offset so every modal button remains in the hit-test area.
+        final double absoluteBottom = exactBottom + panelBottomPosition;
+        final double absoluteLeft = exactLeft + overlayPanelLeft;
 
         return Stack(
           children: [
@@ -217,8 +223,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
             ),
             Positioned(
               left: exactLeft,
-              bottom:
-                  exactBottom, // Matches the bottom padding of your closed button
+              bottom: exactBottom,
               child: Material(
                 color: Colors.transparent,
                 child: SizedBox(
@@ -227,22 +232,6 @@ class _HelpActionButtonState extends State<HelpActionButton>
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      if (_selectedOption != null)
-                        Positioned(
-                          left: overlayPanelLeft,
-                          bottom:
-                              panelBottomPosition ??
-                              62.0, // Use the calculated bottom position, defaulting to 62.0 (the base height) just in case
-                          child: SizedBox(
-                            width: overlayPanelWidth,
-                            child: _OptionPanel(
-                              option: _selectedOption!,
-                              onClose: _closePanel,
-                              width: overlayPanelWidth,
-                              onRefresh: _refreshOverlay,
-                            ),
-                          ),
-                        ),
                       Positioned(
                         left: 0,
                         bottom: 0,
@@ -413,6 +402,24 @@ class _HelpActionButtonState extends State<HelpActionButton>
                 ),
               ),
             ),
+            if (_selectedOption != null)
+              Positioned(
+                left: absoluteLeft,
+                bottom: absoluteBottom,
+                child: Material(
+                  color: Colors.transparent,
+                  child: SizedBox(
+                    width: overlayPanelWidth,
+                    child: _OptionPanel(
+                      option: _selectedOption!,
+                      onClose: _closePanel,
+                      width: overlayPanelWidth,
+                      height: panelHeight,
+                      onRefresh: _refreshOverlay,
+                    ),
+                  ),
+                ),
+              ),
           ],
         );
       },
@@ -654,12 +661,14 @@ class _OptionPanel extends StatefulWidget {
   final String option;
   final VoidCallback onClose;
   final double width;
+  final double height;
   final VoidCallback onRefresh;
 
   const _OptionPanel({
     required this.option,
     required this.onClose,
     required this.width,
+    required this.height,
     required this.onRefresh,
   });
 
@@ -702,19 +711,16 @@ I assume the final parts of the file contain the small helper widgets mentioned 
   }
 
   void _applyVisualMode(AppThemeMode mode) {
-    // 1. Le decimos al manager global que cambie el tema
+    debugPrint('🔵 [MODAL] _applyVisualMode(): Cambiando modo a: $mode');
+    // The notifier rebuilds both the app theme and this panel.
     ThemeManager.changeTheme(mode);
-    // 2. Actualizamos la pantalla actual (opcional, pero buena práctica
-    // si tienes elementos locales que deban reaccionar al instante)
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: widget.width),
+    return SizedBox(
+      width: widget.width,
+      height: widget.height,
       child: Container(
         width: widget.width,
         decoration: BoxDecoration(
@@ -734,7 +740,6 @@ I assume the final parts of the file contain the small helper widgets mentioned 
           ],
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
@@ -768,9 +773,14 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: _buildOptionContent(),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
+                child: _buildOptionContent(),
+              ),
             ),
             const SizedBox(height: 16),
           ],
@@ -878,50 +888,165 @@ I assume the final parts of the file contain the small helper widgets mentioned 
           ],
         );
       case 'Modo visual':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoBanner(
-              icon: Icons.visibility,
-              title: 'Modo visual',
-              subtitle: 'Elige el contraste que prefieras para la interfaz.',
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+        return ValueListenableBuilder<AppThemeMode>(
+          valueListenable: ThemeManager.themeNotifier,
+          builder: (context, currentThemeMode, child) {
+            // Lista de opciones para iterar fácilmente
+            final daltonismOptions = [
+              {
+                'mode': AppThemeMode.protanopia,
+                'label': 'Protanopía',
+                'sub': 'Rojo-Verde',
+              },
+              {
+                'mode': AppThemeMode.deuteranopia,
+                'label': 'Deuteranopía',
+                'sub': 'Verde-Rojo',
+              },
+              {
+                'mode': AppThemeMode.tritanopia,
+                'label': 'Tritanopía',
+                'sub': 'Azul-Amarillo',
+              },
+              {
+                'mode': AppThemeMode.achromatopsia,
+                'label': 'Acromatopsia',
+                'sub': 'Sin colores',
+              },
+            ];
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _ModeButton(
-                  icon: Icons.brightness_2,
-                  label: 'Oscuro',
-                  onTap: () => _applyVisualMode(AppThemeMode.dark),
+                // _buildInfoBanner(
+                //   icon: Icons.visibility,
+                //   title: 'Modo visual',
+                //   subtitle:
+                //       'Elige el contraste que prefieras para la interfaz.',
+                // ),
+                const SizedBox(height: 10),
+                // 1. MODOS PRINCIPALES CON CHOICECHIP
+                const Text(
+                  'Apariencia',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
-                _ModeButton(
-                  icon: Icons.brightness_5,
-                  label: 'Claro',
-                  onTap: () => _applyVisualMode(AppThemeMode.light),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ChoiceChip(
+                      showCheckmark: false,
+                      avatar: const Icon(Icons.brightness_2),
+                      label: const Text('Oscuro'),
+                      selected: currentThemeMode == AppThemeMode.dark,
+                      onSelected: (_) {
+                        debugPrint('🔵 [MODAL] Cambiando modo a DARK');
+                        _applyVisualMode(AppThemeMode.dark);
+                      },
+                    ),
+                    ChoiceChip(
+                      showCheckmark: false,
+                      avatar: const Icon(Icons.brightness_5),
+                      label: const Text('Claro'),
+                      selected: currentThemeMode == AppThemeMode.light,
+                      onSelected: (_) {
+                        debugPrint('🔵 [MODAL] Cambiando modo a LIGHT');
+                        _applyVisualMode(AppThemeMode.light);
+                      },
+                    ),
+                    ChoiceChip(
+                      showCheckmark: false,
+                      avatar: const Icon(Icons.brightness_auto),
+                      label: const Text('Auto'),
+                      selected: false,
+                      onSelected: (_) {
+                        final systemBrightness =
+                            MediaQuery.platformBrightnessOf(context);
+                        final modeToApply =
+                            (systemBrightness == Brightness.dark)
+                            ? AppThemeMode.dark
+                            : AppThemeMode.light;
+                        _applyVisualMode(modeToApply);
+                      },
+                    ),
+                  ],
                 ),
-                _ModeButton(
-                  icon: Icons.brightness_auto,
-                  label: 'Auto',
-                  onTap: () {
-                    // 1. Leemos el brillo real del celular (sistema operativo)
-                    final systemBrightness = MediaQuery.platformBrightnessOf(
-                      context,
+                const SizedBox(height: 10),
+                const Divider(), // Una pequeña línea divisoria ayuda mucho a la UI
+                const SizedBox(height: 10),
+
+                // 2. NUEVA SECCIÓN: Select (Dropdown) para Daltonismo
+                const Text(
+                  'Filtro de color (Daltonismo)',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'Ajusta los colores si tienes alguna dificultad visual.',
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+                const SizedBox(height: 12),
+
+                // El "Select" estilizado en Dropdown con AppThemeMode directamente
+                // Chips de Selección Integrados (Sin riesgo de quedar debajo del modal)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: daltonismOptions.map((opt) {
+                    final mode = opt['mode'] as AppThemeMode;
+                    final label = opt['label'] as String;
+                    final sub = opt['sub'] as String;
+
+                    // Se selecciona "Sin filtro" si el tema actual no es ninguno de daltonismo
+                    final isSelected = currentThemeMode == mode;
+
+                    return ChoiceChip(
+                      label: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            label,
+                            style: TextStyle(
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              fontSize: 13,
+                            ),
+                          ),
+                          Text(
+                            sub,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: isSelected
+                                  ? Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                      selected: isSelected,
+                      showCheckmark: true,
+                      onSelected: (bool selected) {
+                        if (selected) {
+                          debugPrint(
+                            '🔵 [MODAL] Cambiando modo de daltonismo: $mode, y enviado a _applyVisualMode()',
+                          );
+                          _applyVisualMode(mode);
+                        } else {
+                          // Si el usuario vuelve a tocar el chip activo para desmarcarlo, vuelve a claro
+                          _applyVisualMode(AppThemeMode.light);
+                        }
+                      },
                     );
-
-                    // 2. Decidimos qué modo de tu enum usar basados en el sistema
-                    final modeToApply = (systemBrightness == Brightness.dark)
-                        ? AppThemeMode.dark
-                        : AppThemeMode.light;
-
-                    // 3. Aplicamos el tema
-                    _applyVisualMode(modeToApply);
-                  },
+                  }).toList(),
                 ),
               ],
-            ),
-          ],
+            );
+          },
         );
       case 'Asistencia auditiva':
         return Column(
@@ -1171,6 +1296,7 @@ Widget _buildInfoBanner({
   required String title,
   required String subtitle,
 }) {
+  debugPrint('🚨 [TEST] _buildInfoBanner: BOTONES VERTICALES DESPLEGADOS');
   return Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
@@ -1218,6 +1344,7 @@ Widget _buildInfoBanner({
 }
 
 Widget _buildSpeedPill(String label) {
+  debugPrint('🚨 [TEST] _buildSpeedPill: BOTONES VERTICALES DESPLEGADOS');
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     decoration: BoxDecoration(
@@ -1243,44 +1370,6 @@ Widget _buildSpeedPill(String label) {
   );
 }
 
-class _ModeButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _ModeButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF7E57C2), Color(0xFF5E35B1)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF7E57C2).withValues(alpha: 0.25),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Icon(icon, color: Colors.white, size: 24),
-      ),
-    );
-  }
-}
-
 class _LevelButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
@@ -1289,6 +1378,7 @@ class _LevelButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('🚨 [TEST] _LevelButton: BOTONES VERTICALES DESPLEGADOS');
     return GestureDetector(
       onTap: onTap,
       child: Container(

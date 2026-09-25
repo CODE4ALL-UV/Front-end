@@ -28,7 +28,7 @@ void main() {
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(
-        _app(const CourseChapterPage(moduleNumber: 3, sectionNumber: 2)),
+        _app(const CourseChapterPage(moduleId: 3, sectionNumber: 2)),
       );
       await tester.pump();
 
@@ -42,7 +42,7 @@ void main() {
 
       await tester.pumpWidget(
         _app(
-          const CourseChapterPage(moduleNumber: 2, sectionNumber: 3),
+          const CourseChapterPage(moduleId: 2, sectionNumber: 3),
           textScale: 2.0,
         ),
       );
@@ -57,7 +57,7 @@ void main() {
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(
-        _app(const CourseChapterPage(moduleNumber: 4, sectionNumber: 1)),
+        _app(const CourseChapterPage(moduleId: 4, sectionNumber: 1)),
       );
       await tester.pump();
 

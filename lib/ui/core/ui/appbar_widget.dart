@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 
 class GlobalAppBarWidget extends StatelessWidget
@@ -32,12 +33,10 @@ class GlobalAppBarWidget extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     // Lee directamente los colores y fuentes definidos en el AppTheme activo
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final appBarTheme = theme.appBarTheme;
+    final colorScheme = context.colorScheme;
 
     // Logo dinámico según el tema claro/oscuro
-    final logoAsset = theme.brightness == Brightness.light
+    final logoAsset = colorScheme.brightness == Brightness.light
         ? 'assets/images/logoUV_Oficial_Blanco_1.png'
         : 'assets/images/logoUV_Oficial_Rojo.png';
 

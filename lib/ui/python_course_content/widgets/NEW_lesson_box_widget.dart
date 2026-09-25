@@ -4,12 +4,22 @@ class LessonBoxWidget extends StatelessWidget {
   final int number;
   final String title;
   final VoidCallback? onTap;
+  final Color backgroundColor;
+  final Color borderColor;
+  final Color textColor;
+  final Color numberColor;
+  final Color numberBackgroundColor;
 
   const LessonBoxWidget({
     super.key,
     required this.number,
     required this.title,
     this.onTap,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.textColor,
+    required this.numberColor,
+    required this.numberBackgroundColor,
   });
 
   @override
@@ -24,9 +34,9 @@ class LessonBoxWidget extends StatelessWidget {
           width: 150,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: backgroundColor,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0xFFE3F2FD), width: 2),
+            border: Border.all(color: borderColor, width: 2),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFF1E88E5).withValues(alpha: 0.08),
@@ -42,26 +52,15 @@ class LessonBoxWidget extends StatelessWidget {
                 height: 36,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF1E88E5).withValues(alpha: 0.3),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  color: numberBackgroundColor,
                 ),
                 child: Center(
                   child: Text(
                     '$number',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: numberColor,
                     ),
                   ),
                 ),
@@ -74,9 +73,9 @@ class LessonBoxWidget extends StatelessWidget {
                   child: Text(
                     title,
                     softWrap: false,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF263238),
+                      color: textColor,
                       fontWeight: FontWeight.w600,
                       height: 1.3,
                     ),

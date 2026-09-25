@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../../data/services/api_service.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import '../../users_management/widgets/video_player_screen.dart';
 
 class QuizWithVideoScreenDark extends StatefulWidget {

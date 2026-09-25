@@ -7,7 +7,7 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart';
 import 'chapter_section_screen.dart';
 import 'section_widgets.dart';
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 
 /// Punto de entrada a un capítulo del curso.
 ///
@@ -18,12 +18,12 @@ import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
 class CourseChapterPage extends StatefulWidget {
   const CourseChapterPage({
     super.key,
-    required this.moduleNumber,
+    required this.moduleId,
     required this.sectionNumber,
     this.enableTeacherEditor = false,
   });
 
-  final int moduleNumber;
+  final int moduleId;
   final int sectionNumber;
 
   /// Muestra el lápiz de edición a quien tenga rol docente.
@@ -72,7 +72,7 @@ class _CourseChapterPageState extends State<CourseChapterPage> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => CourseChapterPage(
-          moduleNumber: widget.moduleNumber,
+          moduleId: widget.moduleId,
           sectionNumber: sectionNumber,
           enableTeacherEditor: widget.enableTeacherEditor,
         ),
@@ -82,16 +82,16 @@ class _CourseChapterPageState extends State<CourseChapterPage> {
 
   @override
   Widget build(BuildContext context) {
-    final base = PythonCourseCatalog.moduleByNumber(widget.moduleNumber);
+    final base = PythonCourseCatalog.moduleByNumber(widget.moduleId);
 
     // La sección llega ya combinada: el material de fábrica con encima lo que
     // el docente haya cambiado. Si el servidor no responde, lo que llega es el
     // material de fábrica, así que el capítulo se abre igual.
-    final section = _content.section(widget.moduleNumber, widget.sectionNumber);
+    final section = _content.section(widget.moduleId, widget.sectionNumber);
 
     if (base == null || section == null) {
       return _ChapterNotFound(
-        moduleNumber: widget.moduleNumber,
+        moduleId: widget.moduleId,
         sectionNumber: widget.sectionNumber,
       );
     }
@@ -143,12 +143,9 @@ class _CourseChapterPageState extends State<CourseChapterPage> {
 /// Preferimos una pantalla que explique qué pasó antes que una excepción o una
 /// pantalla en blanco.
 class _ChapterNotFound extends StatelessWidget {
-  const _ChapterNotFound({
-    required this.moduleNumber,
-    required this.sectionNumber,
-  });
+  const _ChapterNotFound({required this.moduleId, required this.sectionNumber});
 
-  final int moduleNumber;
+  final int moduleId;
   final int sectionNumber;
 
   @override
@@ -177,7 +174,7 @@ class _ChapterNotFound extends StatelessWidget {
                     title: 'Capítulo no disponible',
                     subtitle:
                         'No encontramos el capítulo $sectionNumber del módulo '
-                        '$moduleNumber en el catálogo del curso.',
+                        '$moduleId en el catálogo del curso.',
                     icon: Icons.search_off,
                     color: Colors.orange,
                   ),

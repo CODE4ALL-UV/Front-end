@@ -1,11 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
 import 'accessibility_announcer.dart';
-
 import 'web_speech_stub.dart'
     if (dart.library.js_interop) 'web_speech_web.dart'
     as web_speech;
@@ -89,14 +86,17 @@ class AccessibilityReadingState {
 
     try {
       await _flutterTts.setLanguage('es-ES');
-      await _flutterTts.setSpeechRate(0.5);
+      await _flutterTts.setSpeechRate(0.3); // 0.5 era la velodiad original
       await _flutterTts.setPitch(1.0);
       await _flutterTts.setVolume(1.0);
+      // Obliga a FlutterTts a esperar que termine el audio antes de resolver el Future de speak()
+      await _flutterTts.awaitSpeakCompletion(true);
       _flutterTts.setProgressHandler((text, start, end, word) {
         _syncHighlightWithSpokenWord(start);
       });
       _flutterTts.setCompletionHandler(clearHighlight);
       _flutterTts.setCancelHandler(clearHighlight);
+      _flutterTts.setErrorHandler((msg) => clearHighlight());
       _ttsInitialized = true;
     } catch (e, st) {
       debugPrint('Error inicializando TTS: $e');
@@ -130,7 +130,8 @@ class AccessibilityReadingState {
     } catch (e, st) {
       debugPrint('Error al reproducir TTS: $e');
       debugPrint(st.toString());
-      _startFallbackHighlight(content);
+      clearHighlight();
+      //_startFallbackHighlight(content);
     }
   }
 

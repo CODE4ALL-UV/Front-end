@@ -27,10 +27,17 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   AppThemeMode _themeMode = AppThemeMode.light;
-
   AppScreen _currentScreen = AppScreen.login;
   String _userName = 'Usuario';
-  List<String> _bottomLabels = ['Anterior', 'Reproducir', 'Siguiente'];
+
+  // NUEVO: Agregamos una variable para saber en qué módulo estamos globalmente.
+  // Por defecto es 1 (Azul). Cuando el usuario abra un módulo, debes actualizar esta variable.
+  int _currentModuleId = 1;
+
+  // MODIFICADO: (DUDA PAPACHO) Tienes toda la razón. Los textos de los botones
+  // no tienen nada que ver con el tema visual. Lo dejamos como una lista fija.
+  final List<String> _bottomLabels = const ['Reproducir'];
+
   final AccessibilityTextScaleController _textScaleController =
       AccessibilityTextScaleController.global;
 
@@ -76,19 +83,15 @@ class _AppState extends State<App> {
   void _onGlobalThemeChanged() {
     if (!mounted) return;
 
-    final newMode = ThemeManager.themeNotifier.value;
-
-    //DUDA PARA PAPACHO
-    //Si tus textos van a ser iguales para todos los temas ('Anterior', 'Reproducir', 'Siguiente'),
-    //puedes eliminar el switch por completo y dejar la lista estática.
-    //Ese switch solo tiene sentido si intencionalmente quieres que las
-    //palabras cambien cuando el usuario active el modo oscuro u otro modo.
-    setState(() {
-      _themeMode = newMode;
-      _bottomLabels = switch (newMode) {
-        AppThemeMode.dark => ['Volver', 'Play', 'Adelantar'],
-        _ => ['Anterior', 'Reproducir', 'Siguiente'],
-      };
+    // Wait until the selection event finishes so an open overlay is not
+    // synchronously rebuilt while it is handling the tap.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final nextThemeMode = ThemeManager.themeNotifier.value;
+      if (_themeMode == nextThemeMode) return;
+      setState(() {
+        _themeMode = nextThemeMode;
+      });
     });
   }
 
@@ -101,6 +104,19 @@ class _AppState extends State<App> {
   void _goToRegister() => setState(() => _currentScreen = AppScreen.register);
   void _goToLogin() => setState(() => _currentScreen = AppScreen.login);
   void _goToModulo() => setState(() => _currentScreen = AppScreen.modulo);
+
+  // NUEVO: Método para que cuando el usuario entre a un módulo, la app cambie de color.
+  void _updateActiveModule(int moduleId) {
+    debugPrint('🟢 [APP.DART] Petición para cambiar al módulo: $moduleId');
+    if (_currentModuleId != moduleId) {
+      setState(() => _currentModuleId = moduleId);
+      debugPrint(
+        '🟢 [APP.DART] ¡setState ejecutado! _activeModuleId ahora es: $_currentModuleId',
+      );
+    } else {
+      debugPrint('🟡 [APP.DART] Ignorado: El módulo ya era $_currentModuleId');
+    }
+  }
 
   void _applyThemeMode(AppThemeMode mode) {
     if (_themeMode == mode) return;
@@ -148,25 +164,8 @@ class _AppState extends State<App> {
     _handleUserNameChanged(name ?? 'Usuario');
   }
 
-  // Método auxiliar para obtener el ThemeData dinámicamente según la selección
-  ThemeData _getThemeData(AppThemeMode mode) {
-    switch (mode) {
-      case AppThemeMode.dark:
-        return AppTheme.darkTheme;
-      //   case AppThemeMode.protanopia:
-      //     return AppTheme.protanopiaTheme;
-      //   case AppThemeMode.deuteranopia:
-      //     return AppTheme.deuteranopiaTheme;
-      //   case AppThemeMode.tritanopia:
-      //     return AppTheme.tritanopiaTheme;
-      //   case AppThemeMode.achromatopsia:
-      //     return AppTheme.achromatopsiaTheme;
-      case AppThemeMode.light:
-        return AppTheme.lightTheme;
-    }
-  }
-
   // Mostrar selector con tres opciones y actualizar etiquetas
+  // MODIFICADO: Descomentamos las variantes de daltonismo para que puedas probarlas
   void _showThemeOptions(BuildContext context) async {
     final choice = await showModalBottomSheet<AppThemeMode>(
       context: context,
@@ -176,29 +175,36 @@ class _AppState extends State<App> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
+                leading: const Icon(Icons.light_mode),
                 title: const Text('Claro'),
                 onTap: () => Navigator.of(ctx).pop(AppThemeMode.light),
               ),
               ListTile(
+                leading: const Icon(Icons.dark_mode),
                 title: const Text('Oscuro'),
                 onTap: () => Navigator.of(ctx).pop(AppThemeMode.dark),
               ),
-              // ListTile(
-              //   title: const Text('Deuteranopia'),
-              //   onTap: () => Navigator.of(ctx).pop(AppThemeMode.deuteranopia),
-              // ),
-              // ListTile(
-              //   title: const Text('Protanopía'),
-              //   onTap: () => Navigator.of(ctx).pop(AppThemeMode.protanopia),
-              // ),
-              // ListTile(
-              //   title: const Text('Tritanopía'),
-              //   onTap: () => Navigator.of(ctx).pop(AppThemeMode.tritanopia),
-              // ),
-              // ListTile(
-              //   title: const Text('Acromatopsia'),
-              //   onTap: () => Navigator.of(ctx).pop(AppThemeMode.achromatopsia),
-              // ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.visibility),
+                title: const Text('Deuteranopia (No distintición del Verde)'),
+                onTap: () => Navigator.of(ctx).pop(AppThemeMode.deuteranopia),
+              ),
+              ListTile(
+                leading: const Icon(Icons.visibility),
+                title: const Text('Protanopía (No distintición del Rojo)'),
+                onTap: () => Navigator.of(ctx).pop(AppThemeMode.protanopia),
+              ),
+              ListTile(
+                leading: const Icon(Icons.visibility),
+                title: const Text('Tritanopía (No distintición del Azul)'),
+                onTap: () => Navigator.of(ctx).pop(AppThemeMode.tritanopia),
+              ),
+              ListTile(
+                leading: const Icon(Icons.visibility),
+                title: const Text('Acromatopsia (Monocromático)'),
+                onTap: () => Navigator.of(ctx).pop(AppThemeMode.achromatopsia),
+              ),
             ],
           ),
         );
@@ -206,7 +212,6 @@ class _AppState extends State<App> {
     );
 
     if (choice == null) return;
-
     _applyThemeMode(choice);
   }
 
@@ -219,6 +224,8 @@ class _AppState extends State<App> {
           userName: _userName,
           onLogout: _goToLogin,
           bottomLabels: _bottomLabels,
+          // ESTO ES LO QUE LOS CONECTA:
+          onModuleChanged: _updateActiveModule,
         );
       case AppScreen.docente:
         return TeacherCourseScreen(userName: _userName, onLogout: _goToLogin);
@@ -239,7 +246,14 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    final activeTheme = _getThemeData(_themeMode);
+    debugPrint(
+      '🏗️ [APP.DART] Haciendo BUILD principal. Módulo activo actual: $_currentModuleId | Filtro daltónico: $_themeMode',
+    );
+    debugPrint('🟡 [MAIN/APP] Reconstruyendo MaterialApp / Root Widget');
+    final activeTheme = AppTheme.getTheme(
+      mode: _themeMode,
+      moduleId: _currentModuleId,
+    );
     final currentPage = _buildCurrentPage();
 
     return AccessibilityTextScaleScope(
@@ -248,8 +262,7 @@ class _AppState extends State<App> {
         title: 'Code4All',
         debugShowCheckedModeBanner: false,
         theme: activeTheme,
-        // ThemeMode solo entiende claro, oscuro o sistema. La paleta
-        // concreta ya fue seleccionada arriba mediante _themeMode.
+        darkTheme: activeTheme,
         themeMode: ThemeMode.light,
         builder: (context, child) {
           final mediaQuery = MediaQuery.of(context);
@@ -286,7 +299,7 @@ class _AppState extends State<App> {
                   hint: 'Cambia el tema de la aplicación',
                   child: FloatingActionButton(
                     heroTag: 'theme-toggle',
-                    backgroundColor: const Color(0xFF5C6BC0),
+                    backgroundColor: activeTheme.colorScheme.primary,
                     onPressed: () => _showThemeOptions(context),
                     child: const Icon(Icons.palette, color: Colors.white),
                   ),

@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart';
@@ -9,9 +8,11 @@ class CircleProgressWidget extends StatelessWidget {
   final Color iconColor;
   final Color bgColor;
   final double size;
-  final int moduleNumber;
+  final int moduleId;
   final int sectionNumber;
   final VoidCallback? onTap;
+  final Color progressTrackRemaining;
+  final Color progressTrackFilled;
 
   const CircleProgressWidget({
     super.key,
@@ -19,8 +20,10 @@ class CircleProgressWidget extends StatelessWidget {
     required this.iconColor,
     required this.bgColor,
     required this.size,
-    required this.moduleNumber,
+    required this.moduleId,
     required this.sectionNumber,
+    required this.progressTrackRemaining,
+    required this.progressTrackFilled,
     this.onTap,
   });
 
@@ -36,11 +39,11 @@ class CircleProgressWidget extends StatelessWidget {
   }
 
   Widget _buildCircle(BuildContext context) {
-    final progress = sectionProgress(moduleNumber, sectionNumber);
+    final progress = sectionProgress(moduleId, sectionNumber);
     final percentage = (progress * 100).round();
     return Semantics(
       button: true,
-      label: sectionProgressLabel(moduleNumber, sectionNumber),
+      label: sectionProgressLabel(moduleId, sectionNumber),
       hint: 'Toca para abrir la lección',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -57,6 +60,8 @@ class CircleProgressWidget extends StatelessWidget {
                   progress: progress,
                   strokeWidth: size * 0.08,
                   isDark: false,
+                  progressTrackRemaining: progressTrackRemaining,
+                  progressTrackFilled: progressTrackFilled,
                 ),
               ),
               Container(
@@ -102,11 +107,15 @@ class _ArcPainter extends CustomPainter {
   final double progress;
   final double strokeWidth;
   final bool isDark;
+  final Color progressTrackRemaining;
+  final Color progressTrackFilled;
 
   const _ArcPainter({
     required this.progress,
     required this.strokeWidth,
     this.isDark = false,
+    required this.progressTrackRemaining,
+    required this.progressTrackFilled,
   });
 
   @override
@@ -121,7 +130,7 @@ class _ArcPainter extends CustomPainter {
       2 * math.pi,
       false,
       Paint()
-        ..color = isDark ? const Color(0xFF2E3A4A) : const Color(0xFFE3F2FD)
+        ..color = isDark ? const Color(0xFF2E3A4A) : progressTrackRemaining
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round,
@@ -134,17 +143,7 @@ class _ArcPainter extends CustomPainter {
       final gradient = SweepGradient(
         startAngle: -math.pi / 2,
         endAngle: -math.pi / 2 + progressSweep,
-        colors: isDark
-            ? [
-                const Color(0xFF42A5F5),
-                const Color(0xFF1E88E5),
-                const Color(0xFF1565C0),
-              ]
-            : [
-                const Color(0xFF64B5F6),
-                const Color(0xFF1E88E5),
-                const Color(0xFF0D47A1),
-              ],
+        colors: [progressTrackFilled, progressTrackFilled],
         transform: const GradientRotation(-math.pi / 2),
       );
 

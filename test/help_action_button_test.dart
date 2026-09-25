@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -38,5 +39,36 @@ void main() {
 
     expect(find.byIcon(Icons.question_mark), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing);
+  });
+
+  testWidgets('las opciones de daltonismo permanecen interactivas', (
+    tester,
+  ) async {
+    ThemeManager.changeTheme(AppThemeMode.light);
+    addTearDown(() => ThemeManager.changeTheme(AppThemeMode.light));
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.bottomLeft,
+            child: HelpActionButton(),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.question_mark));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.help));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.brightness_4));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Protanopía'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Protanopía'));
+    await tester.pumpAndSettle();
+
+    expect(ThemeManager.themeNotifier.value, AppThemeMode.protanopia);
   });
 }

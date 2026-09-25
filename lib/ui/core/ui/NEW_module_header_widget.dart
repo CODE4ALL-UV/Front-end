@@ -19,13 +19,37 @@ class ModuleHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appModuleTheme = context.courseTheme;
+
+    IconData iconHeader;
+    switch (moduleId) {
+      case '1':
+        iconHeader = Icons.menu_book_rounded;
+        break;
+      case '2':
+        iconHeader = Icons.foundation_rounded;
+        break;
+      case '3':
+        iconHeader = Icons.hardware_rounded;
+        break;
+      case '4':
+        iconHeader = Icons.more_time_rounded;
+        break;
+      case '5':
+        iconHeader = Icons.show_chart_rounded;
+        break;
+      case '6':
+        iconHeader = Icons.business_rounded;
+        break;
+      default:
+        iconHeader = Icons.pending_rounded;
+    }
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            appModuleTheme.iconBackground,
+            appModuleTheme.headerBackground.withValues(alpha: 0.7),
             appModuleTheme.headerBackground,
           ],
           begin: Alignment.centerLeft,
@@ -46,7 +70,7 @@ class ModuleHeaderWidget extends StatelessWidget {
                       Text(
                         'Módulo $moduleId',
                         style: TextStyle(
-                          color: appModuleTheme.foregroundColor,
+                          color: appModuleTheme.headerForegroundColor,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -55,7 +79,7 @@ class ModuleHeaderWidget extends StatelessWidget {
                       Text(
                         moduleTitle,
                         style: TextStyle(
-                          color: appModuleTheme.foregroundColor,
+                          color: appModuleTheme.headerForegroundColor,
                           fontSize: 14,
                         ),
                       ),
@@ -89,10 +113,7 @@ class ModuleHeaderWidget extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.all(6.0),
-              child: Image.asset(
-                'assets/images/logoUV_Oficial_Blanco_1.png',
-                fit: BoxFit.contain,
-              ),
+              child: Icon(iconHeader, color: Colors.white, size: 32),
             ),
           ),
         ],

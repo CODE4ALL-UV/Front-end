@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';

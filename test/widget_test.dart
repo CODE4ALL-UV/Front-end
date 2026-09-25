@@ -14,9 +14,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: CourseChapterPage(moduleNumber: 2, sectionNumber: 1),
-      ),
+      const MaterialApp(home: CourseChapterPage(moduleId: 2, sectionNumber: 1)),
     );
     await tester.pump();
 
@@ -37,9 +35,7 @@ void main() {
   ) async {
     // Módulo 6: todavía sin contenido cargado.
     await tester.pumpWidget(
-      const MaterialApp(
-        home: CourseChapterPage(moduleNumber: 6, sectionNumber: 1),
-      ),
+      const MaterialApp(home: CourseChapterPage(moduleId: 6, sectionNumber: 1)),
     );
     await tester.pump();
 
@@ -51,7 +47,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: CourseChapterPage(moduleNumber: 99, sectionNumber: 1),
+        home: CourseChapterPage(moduleId: 99, sectionNumber: 1),
       ),
     );
     await tester.pump();

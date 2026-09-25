@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_code4all/ui/core/ui/global_appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 
 class TeacherModuleEditor extends StatefulWidget {
   final String? moduleId;
@@ -13,7 +13,8 @@ class TeacherModuleEditor extends StatefulWidget {
 }
 
 class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
-  static const String _defaultModuleId = 'default-module';
+  static const String _defaultModuleId =
+      '1'; // ID del módulo por defecto si no se proporciona uno
 
   final _nameCtrl = TextEditingController();
   final List<TextEditingController> _topicCtrls = [];

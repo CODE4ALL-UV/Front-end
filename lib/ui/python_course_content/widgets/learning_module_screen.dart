@@ -1,4 +1,5 @@
-import 'package:flutter_code4all/data/services/api_service.dart';
+import 'package:flutter_code4all/data/course/course_content_store.dart';
+import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button.dart'; //MIX
@@ -6,8 +7,6 @@ import 'package:flutter_code4all/ui/core/ui/help_action_button.dart'; //MIX
 import 'package:flutter_code4all/ui/core/ui/bottomappbar_widget.dart'; //REFACTOR-MULTIMODALBOTTOMAPPBARWIDGET - RENOMBRADO DE multimodal_footer_bar
 //import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart'; //PAPACHO - MOVIDO A GlobalAppBarWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_light_screen.dart'; //PAPACHO - ELIMINADO USAR LearningModuleScreen
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter_code4all/data/services/auth_storage.dart'; //PAPACHO
 //import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart'; //PAPACHO - MOVIDO A ModuleHeaderWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_screen.dart'; //PAPACHO - MOVIDO A ModuleRowWidget
@@ -50,18 +49,37 @@ class LearningModuleScreen extends StatefulWidget {
 class _LearningModuleScreenState extends State<LearningModuleScreen> {
   bool _isNavigating = false;
   bool _isTeacher = false;
-  late String _currentModuleId;
-  late String _moduleTitle;
 
   final _authStorage = AuthStorage();
+  final CourseContentStore _content = CourseContentStore.instance;
+
+  String get _currentModuleId => widget.moduleId.toString();
+
+  /// El nombre del módulo: el del temario, con el cambio del docente encima.
+  ///
+  /// Antes se pedía a `/api/modules/{id}` y, mientras llegaba —o si no
+  /// llegaba—, se mostraba 'Preparación'. Como ese es justo el título del
+  /// módulo 1, los seis módulos acababan llamándose igual. Ahora el nombre
+  /// sale del temario que la aplicación ya lleva dentro, así que es el
+  /// correcto desde el primer fotograma y sin depender de la red; lo que
+  /// haya editado el docente se aplica encima en cuanto llega.
+  String get _moduleTitle {
+    final base = PythonCourseCatalog.moduleByNumber(widget.moduleId);
+    return _content.moduleTitle(
+      widget.moduleId,
+      base?.title ?? 'Módulo ${widget.moduleId}',
+    );
+  }
 
   @override
   void initState() {
     super.initState();
     debugPrint('🔵 [SCREEN] initState Módulo ${widget.moduleId}');
-    _currentModuleId = widget.moduleId.toString(); // Generación dinámica del ID
-    _moduleTitle =
-        'Preparación'; // Valor por defecto hasta que se obtenga del backend
+
+    // Lo que el docente haya editado del temario. Si el servidor no responde
+    // no pasa nada: se sigue viendo el módulo de fábrica.
+    _content.addListener(_onContentChanged);
+    _content.refresh();
 
     // NUEVO: Le avisamos a app.dart en qué módulo estamos para que actualice la paleta.
     // Usamos addPostFrameCallback para evitar errores de redibujado de Flutter.
@@ -75,7 +93,16 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     });
 
     _checkRole();
-    _fetchModuleAndApply(_currentModuleId);
+  }
+
+  @override
+  void dispose() {
+    _content.removeListener(_onContentChanged);
+    super.dispose();
+  }
+
+  void _onContentChanged() {
+    if (mounted) setState(() {});
   }
 
   void _checkRole() async {
@@ -86,19 +113,12 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     });
   }
 
-  Future<void> _fetchModuleAndApply(String moduleId) async {
-    final backend = ApiService().baseUrl;
-    try {
-      final res = await http.get(Uri.parse('$backend/api/modules/$moduleId'));
-      if (res.statusCode == 200) {
-        final data = jsonDecode(res.body);
-        if (!mounted) return;
-        setState(() {
-          _currentModuleId = data['id'].toString();
-          _moduleTitle = data['name'] ?? 'Preparación';
-        });
-      }
-    } catch (_) {}
+  /// Tras volver del editor del docente, vuelve a pedir lo editado.
+  ///
+  /// El editor ya guardó en el servidor; esto es solo para que el cambio se
+  /// vea al instante en esta pantalla sin tener que salir y entrar.
+  void _reloadEditedContent() {
+    _content.refresh();
   }
 
   Widget _responsiveContent(Widget content) {
@@ -247,13 +267,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                             moduleId: _currentModuleId,
                             moduleTitle: _moduleTitle,
                             isTeacher: _isTeacher,
-                            onEditCompleted: (result) {
-                              _fetchModuleAndApply(
-                                (result != null && result.isNotEmpty)
-                                    ? result
-                                    : _currentModuleId,
-                              );
-                            },
+                            onEditCompleted: (_) => _reloadEditedContent(),
                           ),
                           SizedBox(height: verticalGap),
                           // Fila 1 (Sección 3)

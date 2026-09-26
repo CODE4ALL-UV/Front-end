@@ -92,7 +92,8 @@ class ModuleHeaderWidget extends StatelessWidget {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const TeacherModuleEditor(),
+                          builder: (_) =>
+                              TeacherModuleEditor(moduleId: moduleId),
                         ),
                       );
                       onEditCompleted(result as String?);

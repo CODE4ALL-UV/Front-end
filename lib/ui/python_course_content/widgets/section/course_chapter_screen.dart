@@ -124,9 +124,16 @@ class _CourseChapterPageState extends State<CourseChapterPage> {
       button: true,
       label: 'Editar el contenido de este capítulo',
       child: IconButton(
-        onPressed: () => Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => const TeacherModuleEditor())),
+        onPressed: () async {
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) =>
+                  TeacherModuleEditor(moduleId: widget.moduleId.toString()),
+            ),
+          );
+          // Al volver, que el cambio se vea sin salir y entrar del capítulo.
+          await _content.refresh();
+        },
         icon: const Icon(Icons.edit_outlined),
         tooltip: 'Editar capítulo',
         constraints: const BoxConstraints(

@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
+import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
@@ -22,6 +24,14 @@ class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
   String? _moduleId;
 
   String get backendUrl => ApiService().baseUrl;
+
+  /// El nombre de fábrica de este módulo, el que ve el estudiante si nadie
+  /// lo ha cambiado.
+  String _catalogTitle() {
+    final number = int.tryParse(_moduleId ?? '');
+    if (number == null) return '';
+    return PythonCourseCatalog.moduleByNumber(number)?.title ?? '';
+  }
 
   @override
   void initState() {
@@ -66,6 +76,11 @@ class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
         for (final t in topics) {
           _addTopic(t);
         }
+      } else if (res.statusCode == 404) {
+        // Este módulo no se ha editado nunca: es el estado normal la primera
+        // vez, no un fallo. Se parte del nombre del temario para que el
+        // docente corrija en lugar de escribirlo desde cero.
+        _nameCtrl.text = _catalogTitle();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('No se pudo cargar el módulo')),
@@ -97,6 +112,21 @@ class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
     }
     setState(() => _loading = true);
     try {
+      // El servidor comprueba por su cuenta que quien guarda sea docente: no
+      // se fía del rol que diga la aplicación, porque el dispositivo podría
+      // mentir. Sin este token la respuesta es un 401.
+      final token = await AuthStorage().getToken();
+      if (!mounted) return;
+      if (token == null || token.isEmpty) {
+        setState(() => _loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tu sesión no está iniciada. Vuelve a entrar.'),
+          ),
+        );
+        return;
+      }
+
       final payload = {
         'module_id': _moduleId ?? _defaultModuleId,
         'name': name,
@@ -104,11 +134,24 @@ class _TeacherModuleEditorState extends State<TeacherModuleEditor> {
       };
       final res = await http.post(
         Uri.parse('$backendUrl/api/modules/'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
         body: jsonEncode(payload),
       );
       if (!mounted) return;
-      if (res.statusCode == 201) {
+      if (res.statusCode == 401) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tu sesión caducó. Vuelve a entrar.')),
+        );
+      } else if (res.statusCode == 403) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tu cuenta no puede editar el contenido del curso.'),
+          ),
+        );
+      } else if (res.statusCode == 201) {
         final data = jsonDecode(res.body);
         final savedId = (data['id'] ?? _moduleId ?? _defaultModuleId)
             .toString();

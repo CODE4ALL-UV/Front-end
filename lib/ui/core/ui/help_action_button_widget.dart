@@ -5,6 +5,7 @@ import 'package:flutter_code4all/web_player_html_2.dart'; //Daniel Pruebas
 import 'accessibility_settings_screen.dart';
 import 'accessibility_announcer_widget.dart';
 import 'accessibility_text_scale_widget.dart';
+import 'centered_toast.dart';
 import 'learning_preferences.dart';
 
 class HelpActionButton extends StatefulWidget {
@@ -714,9 +715,10 @@ class _OptionPanelState extends State<_OptionPanel> {
     if (!mounted) return;
 
     announceForAccessibility(context, message);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    // Centrado y no abajo: el SnackBar sale justo donde estan los botones de
+    // este menu, asi que el aviso quedaba tapado y parecia que el toque no
+    // habia hecho nada.
+    CenteredToast.show(context, message);
   }
 
   /*
@@ -1129,8 +1131,11 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                     onChanged: (value) => _apply(
                       () => _prefs.setClearSpeech(value),
                       value
-                          ? 'La voz irá más pausada.'
-                          : 'La voz vuelve a su ritmo normal.',
+                          ? 'Voz más pausada activada.\n'
+                                'Se nota al pulsar «Escuchar» en cualquier '
+                                'pantalla del curso.'
+                          : 'Voz más pausada desactivada.\n'
+                                'La voz vuelve a su ritmo normal.',
                     ),
                     activeThumbColor: const Color(0xFF9575CD),
                     activeTrackColor: const Color(0xFFD8C8F5),
@@ -1151,7 +1156,9 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                     selected: _prefs.pace == pace,
                     onTap: () => _apply(
                       () => _prefs.setPace(pace),
-                      'Velocidad de la voz: ${pace.label.toLowerCase()}.',
+                      'Velocidad de la voz: ${pace.label.toLowerCase()}.\n'
+                      'Se nota al pulsar «Escuchar», arriba en cada '
+                      'pantalla.',
                     ),
                   ),
               ],
@@ -1192,9 +1199,21 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                     selected: _prefs.signSupport == level,
                     onTap: () => _apply(
                       () => _prefs.setSignSupport(level),
-                      level == SignSupportLevel.off
-                          ? 'Apoyo en señas desactivado.'
-                          : 'Apoyo en señas: ${level.label.toLowerCase()}.',
+                      switch (level) {
+                        SignSupportLevel.off =>
+                          'Apoyo en señas desactivado.\n'
+                              'El panel de señas deja de aparecer en los '
+                              'videos.',
+                        SignSupportLevel.basic =>
+                          'Apoyo en señas: básico.\n'
+                              'En las actividades de video verás un panel que '
+                              'deletrea con el alfabeto manual lo que se está '
+                              'diciendo.',
+                        SignSupportLevel.advanced =>
+                          'Apoyo en señas: avanzado.\n'
+                              'Además del deletreo, verás la seña de la '
+                              'palabra completa cuando exista grabada.',
+                      },
                     ),
                   ),
               ],
@@ -1236,9 +1255,24 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                     selected: _prefs.contentPreference == preference,
                     onTap: () => _apply(
                       () => _prefs.setContentPreference(preference),
-                      preference == ContentPreference.none
-                          ? 'Sin preferencia: las actividades van en su orden.'
-                          : '${preference.label} primero en cada sección.',
+                      switch (preference) {
+                        ContentPreference.none =>
+                          'Sin preferencia.\n'
+                              'En cada capítulo, la ruta de actividades vuelve '
+                              'a su orden normal.',
+                        ContentPreference.readings =>
+                          'Lecturas primero.\n'
+                              'En cada capítulo, la ruta de actividades '
+                              'empezará por la lectura.',
+                        ContentPreference.videos =>
+                          'Videos primero.\n'
+                              'En cada capítulo, la ruta de actividades '
+                              'empezará por el video.',
+                        ContentPreference.audios =>
+                          'Audios.\n'
+                              'Al abrir una actividad, la lectura en voz alta '
+                              'empezará sola.',
+                      },
                     ),
                   ),
               ],
@@ -1279,9 +1313,20 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                     selected: _prefs.level == level,
                     onTap: () => _apply(
                       () => _prefs.setLevel(level),
-                      level == LearningLevel.basic
-                          ? 'Nivel básico: verás los objetivos y la explicación de cada respuesta.'
-                          : 'Nivel ${level.label.toLowerCase()}.',
+                      switch (level) {
+                        LearningLevel.basic =>
+                          'Nivel básico.\n'
+                              'En cada capítulo verás desplegados los '
+                              'objetivos de la sección.',
+                        LearningLevel.medium =>
+                          'Nivel medio.\n'
+                              'El apoyo de siempre: los objetivos siguen a la '
+                              'vista en cada capítulo.',
+                        LearningLevel.advanced =>
+                          'Nivel avanzado.\n'
+                              'Se retiran los objetivos de cada capítulo para '
+                              'dejar sitio a la ruta de actividades.',
+                      },
                     ),
                   ),
               ],
@@ -1369,8 +1414,11 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                   onTap: () => _apply(
                     () => _prefs.setManualEnabled(!_prefs.manualEnabled),
                     _prefs.manualEnabled
-                        ? 'Manual interactivo desactivado.'
-                        : 'Manual interactivo activado: verás la guía al abrir una actividad.',
+                        ? 'Manual interactivo desactivado.\n'
+                              'Deja de salir la guía al abrir una actividad.'
+                        : 'Manual interactivo activado.\n'
+                              'Al abrir una actividad verás una guía de esa '
+                              'pantalla concreta y sus controles.',
                   ),
                 ),
               ],

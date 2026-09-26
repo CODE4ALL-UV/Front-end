@@ -8,6 +8,7 @@ import 'package:flutter_code4all/domain/models/sign_language/hand_landmark_class
 import 'package:flutter_code4all/domain/models/sign_language/sign_dictation.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 
 /// En qué punto está la pantalla.
@@ -293,23 +294,33 @@ class _SignCameraScreenState extends State<SignCameraScreen>
         onLogout: null, //widget.onLogout,
       ),
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: AppMetrics.pagePadding(constraints.maxWidth),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: AppMetrics.maxContentWidth,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: _body(),
-                  ),
-                ),
+        child: Column(
+          children: [
+            // Aquí el tamaño del texto importa especialmente: las
+            // instrucciones se leen con la mano ya levantada frente a la
+            // cámara, a la distancia que exige el encuadre.
+            const AccessibilityToolbar(),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: AppMetrics.pagePadding(constraints.maxWidth),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: AppMetrics.maxContentWidth,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: _body(),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );

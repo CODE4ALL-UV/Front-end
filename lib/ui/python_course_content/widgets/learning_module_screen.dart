@@ -5,7 +5,7 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart'; //MIX
 //import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart'; //PAPACHO - ELIMINADO USAR app_theme.dart
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.dart';
-import 'package:flutter_code4all/ui/core/ui/bottomappbar_widget.dart'; //REFACTOR-MULTIMODALBOTTOMAPPBARWIDGET - RENOMBRADO DE multimodal_footer_bar
+import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 //import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart'; //PAPACHO - MOVIDO A GlobalAppBarWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_light_screen.dart'; //PAPACHO - ELIMINADO USAR LearningModuleScreen
 import 'package:flutter_code4all/data/services/auth_storage.dart'; //PAPACHO
@@ -239,153 +239,171 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
         userName: widget.userName,
         onLogout: widget.onLogout,
       ),
-      body: Stack(
+      body: Column(
         children: [
-          NotificationListener<OverscrollNotification>(
-            onNotification: (notification) {
-              if (notification.overscroll < -10 &&
-                  notification.metrics.pixels <=
-                      notification.metrics.minScrollExtent) {
-                _goToPreviousModule();
-                return true;
-              }
-              if (notification.overscroll > 10 &&
-                  notification.metrics.pixels >=
-                      notification.metrics.maxScrollExtent - 1) {
-                _goToNextModule();
-                return true;
-              }
-              return false;
-            },
-            child: _responsiveContent(
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      20,
-                      horizontalPadding,
-                      24,
-                    ),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ModuleHeaderWidget(
-                            moduleId: _currentModuleId,
-                            moduleTitle: _moduleTitle,
-                            isTeacher: _isTeacher,
-                            onEditCompleted: (_) => _reloadEditedContent(),
+          // La barra de escuchar y tamano de texto va fija arriba: si se
+          // fuera con el scroll, quien necesita agrandar la letra tendria
+          // que buscarla primero.
+          const AccessibilityToolbar(),
+          Expanded(
+            child: Stack(
+              children: [
+                NotificationListener<OverscrollNotification>(
+                  onNotification: (notification) {
+                    if (notification.overscroll < -10 &&
+                        notification.metrics.pixels <=
+                            notification.metrics.minScrollExtent) {
+                      _goToPreviousModule();
+                      return true;
+                    }
+                    if (notification.overscroll > 10 &&
+                        notification.metrics.pixels >=
+                            notification.metrics.maxScrollExtent - 1) {
+                      _goToNextModule();
+                      return true;
+                    }
+                    return false;
+                  },
+                  child: _responsiveContent(
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.fromLTRB(
+                            horizontalPadding,
+                            20,
+                            horizontalPadding,
+                            24,
                           ),
-                          SizedBox(height: verticalGap),
-                          // Fila 1 (Sección 3)
-                          ModuleRowWidget(
-                            moduleId: widget.moduleId,
-                            sectionNumber: 1,
-                            isCircleLeft: false,
-                            icon: Icons.account_tree,
-                            iconColor: appModuleTheme
-                                .chapterIconColor1, // Azul centralizado
-                            bgColor: appModuleTheme.chapterIconBackgroundColor1,
-                            bigSize: bigSize,
-                          ),
-                          SizedBox(height: verticalGap),
-                          // Fila 2 (Sección 2)
-                          ModuleRowWidget(
-                            moduleId: widget.moduleId,
-                            sectionNumber: 2,
-                            isCircleLeft: true, // ¡Intercala la posición!
-                            icon: Icons.manage_search,
-                            iconColor: appModuleTheme
-                                .chapterIconColor2, // Morado centralizado
-                            bgColor: appModuleTheme.chapterIconBackgroundColor2,
-                            bigSize: bigSize,
-                          ),
-                          SizedBox(height: verticalGap),
-                          // Fila 3 (Sección 1)
-                          ModuleRowWidget(
-                            moduleId: widget.moduleId,
-                            sectionNumber: 3,
-                            isCircleLeft: false,
-                            icon: Icons.code,
-                            iconColor: appModuleTheme
-                                .chapterIconColor3, // Índigo centralizado
-                            bgColor: appModuleTheme.chapterIconBackgroundColor3,
-                            bigSize: bigSize,
-                            enableTeacherEditor: true,
-                          ),
-                          const SizedBox(height: 12),
-                          // Indicador dinámico de siguiente módulo
-                          if (hasNextModule)
-                            Semantics(
-                              label:
-                                  'Desliza hacia arriba para ir al Módulo ${widget.moduleId + 1}',
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.keyboard_arrow_up, size: 20),
-                                  Text(
-                                    'Desliza hacia arriba para ir al Módulo ${widget.moduleId + 1}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color:
-                                          appTheme
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.color ??
-                                          Colors.black87,
-                                      fontWeight: FontWeight.w600,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                ModuleHeaderWidget(
+                                  moduleId: _currentModuleId,
+                                  moduleTitle: _moduleTitle,
+                                  isTeacher: _isTeacher,
+                                  onEditCompleted: (_) =>
+                                      _reloadEditedContent(),
+                                ),
+                                SizedBox(height: verticalGap),
+                                // Fila 1 (Sección 3)
+                                ModuleRowWidget(
+                                  moduleId: widget.moduleId,
+                                  sectionNumber: 1,
+                                  isCircleLeft: false,
+                                  icon: Icons.account_tree,
+                                  iconColor: appModuleTheme
+                                      .chapterIconColor1, // Azul centralizado
+                                  bgColor: appModuleTheme
+                                      .chapterIconBackgroundColor1,
+                                  bigSize: bigSize,
+                                ),
+                                SizedBox(height: verticalGap),
+                                // Fila 2 (Sección 2)
+                                ModuleRowWidget(
+                                  moduleId: widget.moduleId,
+                                  sectionNumber: 2,
+                                  isCircleLeft: true, // ¡Intercala la posición!
+                                  icon: Icons.manage_search,
+                                  iconColor: appModuleTheme
+                                      .chapterIconColor2, // Morado centralizado
+                                  bgColor: appModuleTheme
+                                      .chapterIconBackgroundColor2,
+                                  bigSize: bigSize,
+                                ),
+                                SizedBox(height: verticalGap),
+                                // Fila 3 (Sección 1)
+                                ModuleRowWidget(
+                                  moduleId: widget.moduleId,
+                                  sectionNumber: 3,
+                                  isCircleLeft: false,
+                                  icon: Icons.code,
+                                  iconColor: appModuleTheme
+                                      .chapterIconColor3, // Índigo centralizado
+                                  bgColor: appModuleTheme
+                                      .chapterIconBackgroundColor3,
+                                  bigSize: bigSize,
+                                  enableTeacherEditor: true,
+                                ),
+                                const SizedBox(height: 12),
+                                // Indicador dinámico de siguiente módulo
+                                if (hasNextModule)
+                                  Semantics(
+                                    label:
+                                        'Desliza hacia arriba para ir al Módulo ${widget.moduleId + 1}',
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.keyboard_arrow_up,
+                                          size: 20,
+                                        ),
+                                        Text(
+                                          'Desliza hacia arriba para ir al Módulo ${widget.moduleId + 1}',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color:
+                                                appTheme
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color ??
+                                                Colors.black87,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                if (hasPreviousModule) ...[
+                                  const SizedBox(height: 6),
+                                  Semantics(
+                                    label:
+                                        'Desliza hacia abajo para volver al Módulo ${widget.moduleId - 1}',
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.keyboard_arrow_down,
+                                          size: 20,
+                                        ),
+                                        Text(
+                                          'Desliza hacia abajo para volver al Módulo ${widget.moduleId - 1}',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color:
+                                                appTheme
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color ??
+                                                Colors.black87,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
-                              ),
+                              ],
                             ),
-                          if (hasPreviousModule) ...[
-                            const SizedBox(height: 6),
-                            Semantics(
-                              label:
-                                  'Desliza hacia abajo para volver al Módulo ${widget.moduleId - 1}',
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.keyboard_arrow_down,
-                                    size: 20,
-                                  ),
-                                  Text(
-                                    'Desliza hacia abajo para volver al Módulo ${widget.moduleId - 1}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color:
-                                          appTheme
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.color ??
-                                          Colors.black87,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
+                  ),
+                ),
+                Positioned(
+                  left: 12,
+                  bottom: 8,
+                  child: const HelpActionButton(),
+                ),
+              ],
             ),
           ),
-          Positioned(left: 12, bottom: 8, child: const HelpActionButton()),
         ],
-      ),
-      bottomNavigationBar: MultimodalBottomAppBarWidget(
-        playLabel: widget.bottomLabels?.elementAtOrNull(1),
       ),
     );
   }

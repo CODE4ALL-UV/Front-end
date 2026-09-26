@@ -4,7 +4,6 @@ import 'package:flutter_code4all/domain/models/python_course_content/new_python_
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart';
-import 'package:flutter_code4all/ui/core/ui/bottomappbar_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/unused_new_video_topic_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/unused_knowledge_nugget_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/activity_row_widget.dart';
@@ -297,10 +296,6 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
     final chapter = widget.chapter; // Referencia rápida
     final screenW = MediaQuery.sizeOf(context).width;
     final horizontalPadding = screenW < 360 ? 10.0 : 16.0;
-    final labels =
-        widget.bottomLabels ??
-        []; //NO DEBERIA IR AQUI SINO EN MODULOAPRENDIZAJE TAL VEZ
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: GlobalAppBarWidget(
@@ -401,9 +396,6 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: MultimodalBottomAppBarWidget(
-        playLabel: labels.length > 1 ? labels[1] : null,
       ),
       //PROBAR ESTO bottomNavigationBar: const MultimodalBottomAppBarWidget(),
     );

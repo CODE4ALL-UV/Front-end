@@ -92,6 +92,20 @@ class _LoginScreenState extends State<LoginScreen> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  /// El inicio con Facebook todavía no existe: ni hay SDK, ni ruta en el
+  /// servidor.
+  ///
+  /// El botón se queda a la vista, pero diciéndolo. Antes tenía el callback
+  /// vacío: se pulsaba y no ocurría nada, sin explicación. Para quien usa
+  /// lector de pantalla eso es peor todavía, porque no hay forma de saber si
+  /// el toque se registró.
+  void _handleFacebookSignIn() {
+    _showMessage(
+      'El inicio de sesión con Facebook todavía no está disponible. '
+      'Entra con Google o con tu correo y contraseña.',
+    );
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -182,9 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onGoogleTap: () {
                       _handleGoogleSignIn();
                     },
-                    onFacebookTap: () {
-                      // TODO: Conectar con authViewModel.signInWithFacebook()
-                    },
+                    onFacebookTap: _handleFacebookSignIn,
                   ),
                   const SizedBox(height: 20),
                   SizedBox(

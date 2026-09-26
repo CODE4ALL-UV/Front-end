@@ -72,16 +72,25 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
   }
 
   Future<void> _toggleSpeech() async {
-    if (accessibilityReadingState.isHighlighting.value) {
-      await accessibilityReadingState.stop();
-      if (!mounted) return;
-      _announce('Lectura en voz alta detenida');
-      return;
-    }
+    switch (accessibilityReadingState.status.value) {
+      case ReadingStatus.speaking:
+        await accessibilityReadingState.pause();
+        if (!mounted) return;
+        _announce('Lectura pausada. Se reanudará donde se quedó.');
+        return;
 
-    final text =
-        '${widget.activityLabel}. ${widget.sectionTitle}. ${widget.spokenText}';
-    await accessibilityReadingState.read(text, context);
+      case ReadingStatus.paused:
+        await accessibilityReadingState.resume();
+        if (!mounted) return;
+        _announce('Lectura reanudada');
+        return;
+
+      case ReadingStatus.idle:
+        final text =
+            '${widget.activityLabel}. ${widget.sectionTitle}. '
+            '${widget.spokenText}';
+        await accessibilityReadingState.read(text, context);
+    }
   }
 
   void _announce(String message) {
@@ -282,19 +291,25 @@ class _AccessibilityToolbar extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: accessibilityReadingState.isHighlighting,
-                  builder: (context, isReading, _) {
+                child: ValueListenableBuilder<ReadingStatus>(
+                  valueListenable: accessibilityReadingState.status,
+                  builder: (context, status, _) {
+                    final isSpeaking = status == ReadingStatus.speaking;
+                    final isPaused = status == ReadingStatus.paused;
                     return Align(
                       alignment: Alignment.centerLeft,
                       child: Semantics(
                         button: true,
-                        label: isReading
-                            ? 'Detener la lectura en voz alta'
+                        label: isSpeaking
+                            ? 'Pausar la lectura en voz alta'
+                            : isPaused
+                            ? 'Reanudar la lectura en voz alta'
                             : 'Escuchar esta pantalla en voz alta',
-                        hint: isReading
-                            ? null
-                            : 'También verás el texto resaltado abajo mientras se lee',
+                        hint: isSpeaking
+                            ? 'La lectura se guardará donde vaya'
+                            : isPaused
+                            ? 'Seguirá desde donde se quedó'
+                            : null,
                         child: TextButton.icon(
                           onPressed: () => onToggleSpeech(),
                           style: TextButton.styleFrom(
@@ -311,10 +326,20 @@ class _AccessibilityToolbar extends StatelessWidget {
                             ),
                           ),
                           icon: Icon(
-                            isReading ? Icons.stop_circle : Icons.volume_up,
+                            isSpeaking
+                                ? Icons.pause_circle
+                                : isPaused
+                                ? Icons.play_circle
+                                : Icons.volume_up,
                             size: 22,
                           ),
-                          label: Text(isReading ? 'Detener' : 'Escuchar'),
+                          label: Text(
+                            isSpeaking
+                                ? 'Pausar'
+                                : isPaused
+                                ? 'Reanudar'
+                                : 'Escuchar',
+                          ),
                         ),
                       ),
                     );

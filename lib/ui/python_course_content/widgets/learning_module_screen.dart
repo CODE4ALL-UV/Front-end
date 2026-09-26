@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart'; //MIX
 //import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart'; //PAPACHO - ELIMINADO USAR app_theme.dart
+import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/bottomappbar_widget.dart'; //REFACTOR-MULTIMODALBOTTOMAPPBARWIDGET - RENOMBRADO DE multimodal_footer_bar
 //import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart'; //PAPACHO - MOVIDO A GlobalAppBarWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_light_screen.dart'; //PAPACHO - ELIMINADO USAR LearningModuleScreen
@@ -94,7 +95,20 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   @override
   void dispose() {
     _content.removeListener(_onContentChanged);
+    // Si se sale a mitad de la lectura, la voz no debe seguir sonando sobre
+    // la pantalla siguiente.
+    accessibilityReadingState.stop();
     super.dispose();
+  }
+
+  /// Corta la lectura antes de cambiar de módulo.
+  ///
+  /// El asistente de voz es único para toda la aplicación, así que una pausa
+  /// sobrevive al cambio de pantalla. Sin esto, pausar en el módulo 1 y pasar
+  /// al 2 dejaría el botón ofreciendo «reanudar» y, al pulsarlo, se oiría el
+  /// texto del módulo anterior encima del nuevo.
+  void _stopSpeechBeforeLeaving() {
+    accessibilityReadingState.stop();
   }
 
   void _onContentChanged() {
@@ -138,6 +152,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   void _goToNextModule() {
     if (_isNavigating || widget.moduleId >= widget.totalModules) return;
     _isNavigating = true;
+    _stopSpeechBeforeLeaving();
 
     debugPrint(
       '⏩ [SCREEN] Navegando del Módulo ${widget.moduleId} al ${widget.moduleId + 1}',
@@ -170,6 +185,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   void _goToPreviousModule() {
     if (_isNavigating || widget.moduleId <= 1) return;
     _isNavigating = true;
+    _stopSpeechBeforeLeaving();
 
     debugPrint(
       '⏪ [SCREEN] Navegando del Módulo ${widget.moduleId} al ${widget.moduleId - 1}',

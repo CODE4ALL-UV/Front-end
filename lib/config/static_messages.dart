@@ -35,6 +35,16 @@ class StaticMessages {
       'Doble toque para iniciar o pausar el audio explicativo';
   static const String navStopHint = 'Detener la lectura de la pantalla';
 
+  // Pausar guarda el punto donde va la voz; reanudar sigue desde ahí. Se
+  // dicen por separado para que quien escucha sepa que no va a volver a
+  // empezar desde el principio.
+  static const String navPauseLabel = 'Pausar asistente';
+  static const String navPauseHint =
+      'Doble toque para pausar la lectura donde va';
+  static const String navResumeLabel = 'Reanudar asistente';
+  static const String navResumeHint =
+      'Doble toque para seguir leyendo desde donde se pausó';
+
   static const String navNextLabel = 'Ir a la siguiente lección';
   static const String navNextHint = 'Doble toque para avanzar';
 }

@@ -67,23 +67,75 @@ class ScreenContentExtractor {
   }
 }
 
+/// En qué punto está la lectura en voz alta.
+enum ReadingStatus {
+  /// Ni leyendo ni a medias: el botón ofrece «escuchar».
+  idle,
+
+  /// Hablando ahora mismo.
+  speaking,
+
+  /// A medias y esperando: `resume()` sigue por donde iba.
+  paused,
+}
+
 /// Controla la lectura en voz alta de una pantalla.
 ///
 /// Antes esto acompañaba la voz con una franja inferior amarilla que iba
 /// resaltando la palabra hablada. Esa franja se retiró a petición expresa, así
 /// que aquí ya solo queda la voz.
+///
+/// Pausar y reanudar se resuelve distinto en cada sitio, y conviene saberlo:
+///
+/// - En web el navegador pausa y reanuda por su cuenta, y recuerda él por
+///   dónde iba. No hay que llevar ninguna cuenta.
+/// - En móvil no existe «reanudar»: el motor solo sabe empezar a hablar. Lo
+///   que se hace es apuntar por qué carácter va la voz —el motor lo va
+///   diciendo— y, al reanudar, mandarle a leer el texto desde ahí. El efecto
+///   para quien escucha es el mismo.
 class AccessibilityReadingState {
   final ValueNotifier<String?> currentText = ValueNotifier<String?>(null);
 
-  /// Si ahora mismo se está leyendo en voz alta.
+  /// En qué punto está la lectura. Es lo que miran los botones para saber si
+  /// ofrecer «escuchar», «pausar» o «reanudar».
+  final ValueNotifier<ReadingStatus> status = ValueNotifier<ReadingStatus>(
+    ReadingStatus.idle,
+  );
+
+  /// Si hay una lectura en marcha o a medias.
   ///
-  /// Conserva el nombre de cuando además resaltaba texto: es lo que mira la
-  /// barra inferior para ofrecer «parar» en lugar de «escuchar».
+  /// Conserva el nombre de cuando además resaltaba texto. Se mantiene porque
+  /// hay pantallas que solo necesitan saber «hay algo sonando o no»; quien
+  /// necesite distinguir pausa de parada mira [status].
   final ValueNotifier<bool> isHighlighting = ValueNotifier<bool>(false);
 
   final FlutterTts _flutterTts = FlutterTts();
   bool _ttsInitialized = false;
   Timer? _fallbackTimer;
+
+  /// Por qué carácter del texto va la voz, según lo que informa el motor.
+  ///
+  /// Es lo que permite reanudar en móvil: al volver, se lee desde aquí.
+  int _spokenUpTo = 0;
+
+  /// Desde qué carácter se mandó a leer la vez actual.
+  ///
+  /// El motor cuenta los caracteres del trozo que le diste, no del texto
+  /// entero. Al reanudar se le manda un trozo, así que sin sumar esto el
+  /// segundo pausado volvería al principio de ese trozo.
+  int _offsetBase = 0;
+
+  /// Que el `stop()` de una pausa no se confunda con el de una parada.
+  ///
+  /// Pausar en móvil obliga a callar el motor, y callarlo dispara el mismo
+  /// aviso que una cancelación. Sin esta marca, pausar se contaría como
+  /// terminar y se perdería el punto donde iba.
+  bool _pausing = false;
+
+  /// Cuándo empezó a sonar el trozo actual y cuánto se calcula que dura.
+  /// Solo para web, donde hay que estimar el final. Ver [_scheduleWebReadingEnd].
+  DateTime? _webChunkStartedAt;
+  Duration _webRemaining = Duration.zero;
 
   Future<void> initialize() async {
     if (_ttsInitialized || kIsWeb) return;
@@ -95,9 +147,16 @@ class AccessibilityReadingState {
       await _flutterTts.setVolume(1.0);
       // Obliga a FlutterTts a esperar que termine el audio antes de resolver el Future de speak()
       await _flutterTts.awaitSpeakCompletion(true);
-      _flutterTts.setCompletionHandler(clearHighlight);
-      _flutterTts.setCancelHandler(clearHighlight);
-      _flutterTts.setErrorHandler((msg) => clearHighlight());
+
+      // Por dónde va la voz. Es lo único que permite reanudar en móvil: al
+      // volver de una pausa se le manda a leer el texto desde este carácter.
+      _flutterTts.setProgressHandler((text, start, end, word) {
+        _spokenUpTo = _offsetBase + start;
+      });
+
+      _flutterTts.setCompletionHandler(_onSpeechFinished);
+      _flutterTts.setCancelHandler(_onSpeechCancelled);
+      _flutterTts.setErrorHandler((msg) => _onSpeechFinished());
       _ttsInitialized = true;
     } catch (e, st) {
       debugPrint('Error inicializando TTS: $e');
@@ -112,21 +171,98 @@ class AccessibilityReadingState {
     await stop();
 
     currentText.value = content;
-    isHighlighting.value = true;
+    _spokenUpTo = 0;
+    _setStatus(ReadingStatus.speaking);
 
     if (context.mounted) {
       announceForAccessibility(context, content);
     }
 
+    await _speakFrom(0);
+  }
+
+  /// Pausa la voz sin perder por dónde iba.
+  ///
+  /// Sin texto empezado no hace nada: pausar lo que no suena no significa
+  /// nada, y dejar el botón en «reanudar» sin nada que reanudar confundiría.
+  Future<void> pause() async {
+    if (status.value != ReadingStatus.speaking) return;
+
     if (kIsWeb) {
-      web_speech.speakWithBrowserVoice(content);
-      _scheduleWebReadingEnd(content);
+      _pauseWebCountdown();
+      web_speech.pauseBrowserVoice();
+    } else {
+      // Callar el motor es la única forma de pausar en móvil. La marca evita
+      // que ese silencio se cuente como final de la lectura.
+      _pausing = true;
+      try {
+        await _flutterTts.stop();
+      } catch (e) {
+        debugPrint('Error pausando TTS: $e');
+      }
+      _pausing = false;
+    }
+
+    _setStatus(ReadingStatus.paused);
+  }
+
+  /// Sigue leyendo desde donde se pausó.
+  Future<void> resume() async {
+    if (status.value != ReadingStatus.paused) return;
+
+    final content = currentText.value;
+    if (content == null || content.isEmpty) {
+      await stop();
+      return;
+    }
+
+    _setStatus(ReadingStatus.speaking);
+
+    if (kIsWeb) {
+      // El navegador guarda él por dónde iba, así que basta con soltarlo.
+      web_speech.resumeBrowserVoice();
+      _resumeWebCountdown();
+      return;
+    }
+
+    await _speakFrom(_spokenUpTo);
+  }
+
+  /// Pausa o reanuda, según toque. Es lo que usan los botones.
+  Future<void> togglePause() async {
+    switch (status.value) {
+      case ReadingStatus.speaking:
+        await pause();
+      case ReadingStatus.paused:
+        await resume();
+      case ReadingStatus.idle:
+        break;
+    }
+  }
+
+  Future<void> _speakFrom(int offset) async {
+    final content = currentText.value;
+    if (content == null || content.isEmpty) return;
+
+    final safeOffset = offset.clamp(0, content.length);
+    if (safeOffset >= content.length) {
+      _onSpeechFinished();
+      return;
+    }
+
+    final pending = content.substring(safeOffset);
+    _offsetBase = safeOffset;
+    _spokenUpTo = safeOffset;
+
+    if (kIsWeb) {
+      web_speech.speakWithBrowserVoice(pending);
+      _scheduleWebReadingEnd(pending);
       return;
     }
 
     try {
       await initialize();
-      await _flutterTts.speak(content);
+      await _flutterTts.speak(pending);
     } catch (e, st) {
       debugPrint('Error al reproducir TTS: $e');
       debugPrint(st.toString());
@@ -151,27 +287,77 @@ class AccessibilityReadingState {
     clearHighlight();
   }
 
+  /// La lectura llegó al final por su cuenta.
+  void _onSpeechFinished() {
+    _spokenUpTo = 0;
+    _offsetBase = 0;
+    clearHighlight();
+  }
+
+  /// El motor se calló. Si fue por una pausa, no se toca nada: el punto donde
+  /// iba es justo lo que hay que conservar.
+  void _onSpeechCancelled() {
+    if (_pausing) return;
+    _onSpeechFinished();
+  }
+
+  void _setStatus(ReadingStatus value) {
+    status.value = value;
+    isHighlighting.value = value != ReadingStatus.idle;
+  }
+
   void clearHighlight() {
     _fallbackTimer?.cancel();
     _fallbackTimer = null;
-    isHighlighting.value = false;
+    _webChunkStartedAt = null;
+    _webRemaining = Duration.zero;
+    _pausing = false;
+    _setStatus(ReadingStatus.idle);
   }
 
   /// Da por terminada la lectura en web pasado el tiempo que se estima que
   /// dura el texto.
   ///
   /// El navegador no avisa de que ha acabado de hablar, así que sin esto la
-  /// barra inferior se quedaría ofreciendo «parar» para siempre. Se calcula a
+  /// barra inferior se quedaría ofreciendo «pausar» para siempre. Se calcula a
   /// partir del número de palabras, al mismo ritmo que ya se usaba.
   void _scheduleWebReadingEnd(String content) {
     final words = _splitWords(content);
     if (words.isEmpty) return;
 
+    _startWebCountdown(Duration(milliseconds: 380 * words.length));
+  }
+
+  void _startWebCountdown(Duration remaining) {
     _fallbackTimer?.cancel();
-    _fallbackTimer = Timer(
-      Duration(milliseconds: 380 * words.length),
-      clearHighlight,
-    );
+    _webRemaining = remaining;
+    _webChunkStartedAt = DateTime.now();
+    _fallbackTimer = Timer(remaining, _onSpeechFinished);
+  }
+
+  /// Congela la cuenta atrás mientras la voz está pausada.
+  ///
+  /// Sin esto el reloj seguiría corriendo con la voz callada y, al volver, la
+  /// pantalla daría la lectura por terminada aunque quedara medio texto.
+  void _pauseWebCountdown() {
+    final startedAt = _webChunkStartedAt;
+    _fallbackTimer?.cancel();
+    _fallbackTimer = null;
+
+    if (startedAt == null) return;
+
+    final elapsed = DateTime.now().difference(startedAt);
+    final left = _webRemaining - elapsed;
+    _webRemaining = left.isNegative ? Duration.zero : left;
+    _webChunkStartedAt = null;
+  }
+
+  void _resumeWebCountdown() {
+    if (_webRemaining <= Duration.zero) {
+      _onSpeechFinished();
+      return;
+    }
+    _startWebCountdown(_webRemaining);
   }
 
   static List<String> _splitWords(String content) =>
@@ -181,5 +367,6 @@ class AccessibilityReadingState {
     _fallbackTimer?.cancel();
     currentText.dispose();
     isHighlighting.dispose();
+    status.dispose();
   }
 }

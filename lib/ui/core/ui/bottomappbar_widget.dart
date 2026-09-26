@@ -15,19 +15,28 @@ class MultimodalBottomAppBarWidget extends StatelessWidget {
     this.stopLabel,
   });
 
-  void _onPlayStopPressed(BuildContext context, bool isCurrentlyReading) {
-    if (isCurrentlyReading) {
-      accessibilityReadingState.stop();
-    } else {
-      final explicitText = announcementText?.trim();
-      final extractedText = ScreenContentExtractor.extractFromContext(context);
-      final text =
-          (explicitText?.isNotEmpty == true ? explicitText! : extractedText)
-              .trim();
+  /// Un solo botón para las tres situaciones, como un reproductor.
+  ///
+  /// Parado arranca la lectura, leyendo la pausa, y pausado sigue por donde
+  /// iba. Lo importante es que pausar no tira el texto: al volver no se
+  /// empieza otra vez desde arriba, que es lo que hacía antes.
+  void _onPlayPausePressed(BuildContext context, ReadingStatus status) {
+    switch (status) {
+      case ReadingStatus.speaking:
+      case ReadingStatus.paused:
+        accessibilityReadingState.togglePause();
+      case ReadingStatus.idle:
+        final explicitText = announcementText?.trim();
+        final extractedText = ScreenContentExtractor.extractFromContext(
+          context,
+        );
+        final text =
+            (explicitText?.isNotEmpty == true ? explicitText! : extractedText)
+                .trim();
 
-      if (text.isNotEmpty) {
-        accessibilityReadingState.read(text, context);
-      }
+        if (text.isNotEmpty) {
+          accessibilityReadingState.read(text, context);
+        }
     }
   }
 
@@ -37,14 +46,21 @@ class MultimodalBottomAppBarWidget extends StatelessWidget {
 
     return BottomAppBar(
       child: SafeArea(
-        child: ValueListenableBuilder<bool>(
-          valueListenable: accessibilityReadingState.isHighlighting,
-          builder: (context, isReading, child) {
-            final currentLabel = isReading
-                ? (stopLabel ?? StaticMessages.navStopLabel)
+        child: ValueListenableBuilder<ReadingStatus>(
+          valueListenable: accessibilityReadingState.status,
+          builder: (context, status, child) {
+            final isSpeaking = status == ReadingStatus.speaking;
+            final isPaused = status == ReadingStatus.paused;
+
+            final currentLabel = isSpeaking
+                ? (stopLabel ?? StaticMessages.navPauseLabel)
+                : isPaused
+                ? StaticMessages.navResumeLabel
                 : (playLabel ?? StaticMessages.navPlayLabel);
-            final currentHint = isReading
-                ? StaticMessages.navStopHint
+            final currentHint = isSpeaking
+                ? StaticMessages.navPauseHint
+                : isPaused
+                ? StaticMessages.navResumeHint
                 : StaticMessages.navPlayHint;
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -56,10 +72,12 @@ class MultimodalBottomAppBarWidget extends StatelessWidget {
                   hint: currentHint,
                   liveRegion: true, // Notifica cambios de estado a TalkBack
                   child: IconButton(
-                    icon: Icon(isReading ? Icons.stop : Icons.play_arrow),
+                    icon: Icon(
+                      isSpeaking ? Icons.pause : Icons.play_arrow,
+                    ),
                     iconSize: 44,
                     color: colorScheme.onPrimary,
-                    onPressed: () => _onPlayStopPressed(context, isReading),
+                    onPressed: () => _onPlayPausePressed(context, status),
                     tooltip: currentLabel,
                   ),
                 ),

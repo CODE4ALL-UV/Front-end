@@ -21,6 +21,8 @@ class SpeechSynthesis {}
 extension SpeechSynthesisExtension on SpeechSynthesis {
   external void cancel();
   external void speak(SpeechSynthesisUtterance utterance);
+  external void pause();
+  external void resume();
 }
 
 @JS('window.speechSynthesis')
@@ -51,5 +53,26 @@ void cancelBrowserVoice() {
     speechSynthesis?.cancel();
   } catch (e) {
     debugPrint('Error cancelando SpeechSynthesis: $e');
+  }
+}
+
+/// Deja la voz a mitad, sin perder lo que queda por decir.
+///
+/// El navegador guarda por su cuenta por dónde iba, así que aquí no hay que
+/// llevar la cuenta: `resume()` sigue en la misma palabra. Es la diferencia
+/// con `cancel()`, que tira el texto pendiente.
+void pauseBrowserVoice() {
+  try {
+    speechSynthesis?.pause();
+  } catch (e) {
+    debugPrint('Error pausando SpeechSynthesis: $e');
+  }
+}
+
+void resumeBrowserVoice() {
+  try {
+    speechSynthesis?.resume();
+  } catch (e) {
+    debugPrint('Error reanudando SpeechSynthesis: $e');
   }
 }

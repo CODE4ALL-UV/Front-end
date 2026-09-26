@@ -7,4 +7,8 @@ void speakWithBrowserVoice(String text, {String language = 'es-ES'}) {}
 
 void cancelBrowserVoice() {}
 
+void pauseBrowserVoice() {}
+
+void resumeBrowserVoice() {}
+
 bool get isBrowserVoiceAvailable => false;

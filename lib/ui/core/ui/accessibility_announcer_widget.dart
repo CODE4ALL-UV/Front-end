@@ -14,10 +14,20 @@ void announceForAccessibility(BuildContext context, String message) {
   final text = message.trim();
   if (text.isEmpty) return;
 
-  SemanticsBinding.instance.ensureSemantics();
-  SemanticsService.sendAnnouncement(
-    View.of(context),
-    text,
-    Directionality.of(context),
-  );
+  // ensureSemantics() entrega un permiso que hay que devolver. Antes se
+  // descartaba, así que cada anuncio dejaba el árbol de semántica encendido
+  // para siempre; y esta aplicación anuncia en cada respuesta acertada, cada
+  // cambio de página y cada lectura en voz alta. El mensaje ya sale hacia el
+  // sistema en sendAnnouncement, de modo que el permiso se puede devolver
+  // acto seguido.
+  final semantics = SemanticsBinding.instance.ensureSemantics();
+  try {
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      text,
+      Directionality.of(context),
+    );
+  } finally {
+    semantics.dispose();
+  }
 }

@@ -52,11 +52,25 @@ class ModuleRowWidget extends StatelessWidget {
         final availableWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : bigSize + 150;
-        final halfRowWidth = (availableWidth - 24) / 2;
-        final componentSize = math.min(
-          320.0,
-          math.max(140.0, math.min(halfRowWidth, math.max(bigSize, 140.0))),
-        );
+
+        // El tamaño sale del sitio que hay, a lo ancho y a lo alto.
+        //
+        // Antes era `(anchoPantalla * 0.32).clamp(140, 320)`, y en cualquier
+        // teléfono ese 32 % se queda por debajo de 140 —en uno de 430 px da
+        // 137,6—, así que el suelo del clamp lo dejaba clavado en 140 de 320
+        // a 430 px. El círculo no crecía nunca: lo único que crecía era el
+        // hueco del medio, y la fila se veía cada vez más vacía.
+        //
+        // Pero sólo con el ancho tampoco vale: en un teléfono de 390 px la
+        // mitad da 167, y tres filas de 167 no caben de alto, así que había
+        // que desplazarse para ver la ruta entera. `bigSize` trae el tope que
+        // calcula la pantalla con el alto que le queda, y manda el menor de
+        // los dos.
+        const gapBetween = 24.0;
+        final widthBudget = (availableWidth - gapBetween) / 2;
+        final componentSize = math
+            .min(widthBudget, bigSize)
+            .clamp(110.0, 260.0);
         final lessonScale = (componentSize / 150).clamp(0.95, 2.0).toDouble();
 
         final circleWidget = CircleProgressWidget(

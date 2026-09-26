@@ -44,6 +44,14 @@ class LearningModuleScreen extends StatefulWidget {
 }
 
 class _LearningModuleScreenState extends State<LearningModuleScreen> {
+  /// Lo que ocupa de alto la cabecera del módulo, medido a tamaño de letra
+  /// normal. Sirve para saber cuánto sitio queda para la ruta de secciones.
+  ///
+  /// Es una estimación, y por eso no pasa nada si se queda corta: con la
+  /// letra agrandada la cabecera crece, las filas no caben, y entonces el
+  /// contenido se desplaza como siempre.
+  static const double _moduleHeaderHeight = 84;
+
   bool _isNavigating = false;
   bool _isTeacher = false;
 
@@ -114,7 +122,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   Widget _buildModuleNavigation(BuildContext context) {
     final hasNext = widget.moduleId < widget.totalModules;
     final hasPrevious = widget.moduleId > 1;
-    if (!hasNext && !hasPrevious) return const SizedBox.shrink();
 
     final appSemanticColors = Theme.of(
       context,
@@ -130,29 +137,41 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
         top: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          // Uno debajo del otro y con el mensaje entero, como estaban. Dos
-          // frases completas no caben lado a lado en un teléfono, y menos con
-          // la letra agrandada.
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          child: Row(
             children: [
-              if (hasNext)
-                _ModuleNavigationHint(
-                  icon: Icons.keyboard_arrow_up,
-                  message:
-                      'Desliza hacia arriba para ir al Módulo '
-                      '${widget.moduleId + 1}',
-                  onPressed: _goToNextModule,
+              // El botón de ayuda vive aquí y no flotando sobre el contenido.
+              // Flotando tapaba siempre lo que quedara abajo del todo —en la
+              // ruta de secciones, la última tarjeta— y ningún margen lo
+              // arregla, porque se queda fijo aunque el contenido se desplace.
+              const HelpActionButton(),
+              const SizedBox(width: 8),
+              // Los avisos, uno debajo del otro y con el mensaje entero. Dos
+              // frases completas no caben lado a lado en un teléfono, y menos
+              // con la letra agrandada.
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (hasNext)
+                      _ModuleNavigationHint(
+                        icon: Icons.keyboard_arrow_up,
+                        message:
+                            'Desliza hacia arriba para ir al Módulo '
+                            '${widget.moduleId + 1}',
+                        onPressed: _goToNextModule,
+                      ),
+                    if (hasNext && hasPrevious) const SizedBox(height: 6),
+                    if (hasPrevious)
+                      _ModuleNavigationHint(
+                        icon: Icons.keyboard_arrow_down,
+                        message:
+                            'Desliza hacia abajo para volver al Módulo '
+                            '${widget.moduleId - 1}',
+                        onPressed: _goToPreviousModule,
+                      ),
+                  ],
                 ),
-              if (hasNext && hasPrevious) const SizedBox(height: 6),
-              if (hasPrevious)
-                _ModuleNavigationHint(
-                  icon: Icons.keyboard_arrow_down,
-                  message:
-                      'Desliza hacia abajo para volver al Módulo '
-                      '${widget.moduleId - 1}',
-                  onPressed: _goToPreviousModule,
-                ),
+              ),
             ],
           ),
         ),
@@ -274,7 +293,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   @override
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
-    final bigSize = (screenW * 0.32).clamp(140.0, 320.0).toDouble();
     final horizontalPadding = screenW >= AppBreakpoints.tablet ? 28.0 : 16.0;
     final verticalGap = (MediaQuery.of(context).size.height * 0.025)
         .clamp(12.0, 28.0)
@@ -322,6 +340,21 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                   child: _responsiveContent(
                     LayoutBuilder(
                       builder: (context, constraints) {
+                        // Cuánto puede medir cada fila para que las tres
+                        // quepan sin tener que desplazarse.
+                        //
+                        // Se reparte el alto que queda tras descontar lo que
+                        // ocupa todo lo demás: los márgenes de arriba y abajo,
+                        // la cabecera del módulo y los tres huecos. Si aun así
+                        // no cabe —con la letra muy grande la cabecera crece—
+                        // el scroll sigue ahí, que para eso está.
+                        final rowsBudget =
+                            constraints.maxHeight -
+                            44 -
+                            _moduleHeaderHeight -
+                            verticalGap * 3;
+                        final bigSize = rowsBudget / 3;
+
                         return SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.fromLTRB(
@@ -331,8 +364,13 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                             24,
                           ),
                           child: ConstrainedBox(
+                            // El alto del viewport menos el margen de arriba
+                            // y abajo. Sin restarlo, el contenido medía
+                            // siempre 44 px más que la ventana y quedaban
+                            // esos 44 px de desplazamiento aunque no hiciera
+                            // falta.
                             constraints: BoxConstraints(
-                              minHeight: constraints.maxHeight,
+                              minHeight: constraints.maxHeight - 44,
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -391,11 +429,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                       },
                     ),
                   ),
-                ),
-                Positioned(
-                  left: 12,
-                  bottom: 8,
-                  child: const HelpActionButton(),
                 ),
               ],
             ),

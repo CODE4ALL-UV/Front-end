@@ -48,12 +48,12 @@ class _SignKeyboardScopeState extends State<SignKeyboardScope> {
     // Al apagarlo se cierra lo que hubiera abierto: dejarlo puesto sería
     // ignorar lo que la persona acaba de pedir.
     setState(() {
-      if (!_settings.isEnabled) _active = null;
+      if (!_settings.isActive) _active = null;
     });
   }
 
   void _open(TextEditingController controller) {
-    if (!_settings.isEnabled) return;
+    if (!_settings.isActive) return;
     setState(() => _active = controller);
   }
 
@@ -150,7 +150,7 @@ class _SignKeyboardFieldState extends State<SignKeyboardField> {
   }
 
   void _onFocusChanged() {
-    if (!_settings.isEnabled) return;
+    if (!_settings.isActive) return;
     if (_focusNode.hasFocus) {
       SignKeyboardScope._of(context)?._open(widget.controller);
     }
@@ -158,7 +158,7 @@ class _SignKeyboardFieldState extends State<SignKeyboardField> {
 
   @override
   Widget build(BuildContext context) {
-    final enabled = _settings.isEnabled;
+    final enabled = _settings.isActive;
 
     return GestureDetector(
       // Con el campo en sólo lectura hay teclados y navegadores que no dan

@@ -22,7 +22,9 @@ void main() {
   const storageChannel = MethodChannel(
     'plugins.it_nomads.com/flutter_secure_storage',
   );
-  final stored = <String, String>{};
+  // 'auth_role' con estudiante: el teclado exige sesion de estudiante, asi
+  // que sin esto ninguna prueba podria activarlo.
+  final stored = <String, String>{'auth_role': 'estudiante'};
 
   setUpAll(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -69,6 +71,11 @@ void main() {
       ),
     ),
   );
+
+  setUp(() async {
+    stored['auth_role'] = 'estudiante';
+    await SignKeyboardSettings.instance.refreshSession();
+  });
 
   tearDown(() async {
     // El ajuste es global: si una prueba lo deja encendido, envenena la
@@ -175,5 +182,45 @@ void main() {
 
     expect(find.byType(SignKeyboard), findsNothing);
     expect(controller.text, 'A');
+  });
+
+  testWidgets('sin sesión de estudiante no se activa, aunque esté encendido', (
+    tester,
+  ) async {
+    // Es el caso del login: ahí todavía no se sabe quién entra. Si se
+    // activara, el campo pasaría a sólo lectura y no se podría teclear ni el
+    // correo para entrar y volver a apagarlo.
+    await SignKeyboardSettings.instance.setEnabled(true);
+    stored.remove('auth_role');
+    await SignKeyboardSettings.instance.refreshSession();
+
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(host(controller: controller));
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).readOnly,
+      isFalse,
+      reason: 'sin sesión hay que poder escribir con el teclado del sistema',
+    );
+    expect(find.byType(SignKeyboard), findsNothing);
+  });
+
+  testWidgets('una sesión que no es de estudiante tampoco lo activa', (
+    tester,
+  ) async {
+    await SignKeyboardSettings.instance.setEnabled(true);
+    stored['auth_role'] = 'docente';
+    await SignKeyboardSettings.instance.refreshSession();
+
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(host(controller: controller));
+
+    expect(tester.widget<TextField>(find.byType(TextField)).readOnly, isFalse);
   });
 }

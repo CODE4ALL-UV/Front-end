@@ -5,6 +5,7 @@ import 'data/services/course_progress_store.dart';
 import 'data/services/session_controller.dart';
 import 'data/services/learning_analytics_service.dart';
 //import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart'; //PAPACHO - ELIMINADO USAR app_theme.dart
+import 'ui/core/ui/sign_keyboard_settings.dart';
 import 'ui/director/director_home_screen.dart';
 import 'ui/teacher/teacher_course_screen.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
@@ -132,6 +133,11 @@ class _AppState extends State<App> {
   }
 
   void _handleSuccessfulLogin(String role) {
+    // El teclado de dactilología es sólo del estudiante y el ajuste vive en
+    // el dispositivo, así que hay que volver a mirar quién entró: sin esto,
+    // una sesión de docente heredaría el teclado del estudiante anterior.
+    SignKeyboardSettings.instance.refreshSession();
+
     final r = role.toLowerCase();
     if (r == 'estudiante') {
       _goToModulo();

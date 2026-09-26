@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import 'package:flutter_code4all/data/services/auth_storage.dart';
+
 /// Si el estudiante quiere escribir con el teclado de dactilología.
 ///
 /// Se guarda en el dispositivo porque es una preferencia de accesibilidad:
@@ -31,9 +33,19 @@ class SignKeyboardSettings extends ChangeNotifier {
   bool _enabled = false;
   bool _loaded = false;
   bool _persist = true;
+  bool _hasStudentSession = false;
 
-  /// Si está activado ahora mismo.
+  /// Si el estudiante lo dejó activado.
   bool get isEnabled => _enabled;
+
+  /// Si de verdad hay que usarlo ahora mismo.
+  ///
+  /// Además de estar activado exige sesión iniciada de estudiante. El motivo
+  /// es concreto: para escribir con este teclado el campo tiene que estar en
+  /// sólo lectura, y en el login eso deja a la persona sin poder teclear su
+  /// correo —ni siquiera para entrar y volver a apagarlo—. Antes de entrar no
+  /// se sabe el rol, así que la respuesta correcta es no activarlo.
+  bool get isActive => _enabled && _hasStudentSession;
 
   /// Si ya se leyó lo guardado al menos una vez.
   bool get isLoaded => _loaded;
@@ -45,6 +57,7 @@ class SignKeyboardSettings extends ChangeNotifier {
     try {
       final stored = await _storage.read(key: _key);
       _enabled = stored == 'true';
+      await refreshSession();
     } catch (e) {
       // Que no se pueda leer no puede dejar a nadie sin aplicación: se
       // arranca con el teclado normal, que es el comportamiento de siempre.
@@ -73,6 +86,23 @@ class SignKeyboardSettings extends ChangeNotifier {
       // acaba de pedir.
       debugPrint('No se pudo guardar la preferencia del teclado de señas: $e');
     }
+  }
+
+  /// Vuelve a mirar quién tiene la sesión abierta.
+  ///
+  /// Hay que llamarlo al entrar y al salir: el ajuste es del dispositivo y
+  /// sobrevive al cambio de cuenta, así que sin refrescarlo una sesión de
+  /// docente heredaría el teclado del estudiante anterior.
+  Future<void> refreshSession() async {
+    final before = _hasStudentSession;
+    try {
+      final role = await AuthStorage().getRole();
+      _hasStudentSession = (role ?? '').trim().toLowerCase() == 'estudiante';
+    } catch (e) {
+      debugPrint('No se pudo leer el rol para el teclado de señas: $e');
+      _hasStudentSession = false;
+    }
+    if (before != _hasStudentSession) notifyListeners();
   }
 
   Future<void> toggle() => setEnabled(!_enabled);

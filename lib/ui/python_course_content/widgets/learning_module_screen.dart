@@ -1,6 +1,7 @@
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart'; //MIX
 //import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart'; //PAPACHO - ELIMINADO USAR app_theme.dart
@@ -190,7 +191,22 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   }
 
   void _onContentChanged() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+
+    // El almacén avisa cuando le contesta el servidor, y eso puede caer justo
+    // mientras el framework está construyendo: por ejemplo al cerrar sesión,
+    // que cierra de golpe todas las pantallas de módulo apiladas. Pedir el
+    // redibujado en ese momento es un error de Flutter, así que se aplaza al
+    // siguiente fotograma.
+    final phase = SchedulerBinding.instance.schedulerPhase;
+    if (phase == SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
+      });
+      return;
+    }
+
+    setState(() {});
   }
 
   void _checkRole() async {

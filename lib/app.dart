@@ -28,6 +28,10 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   AppThemeMode _themeMode = AppThemeMode.light;
+
+  /// Para poder vaciar lo que haya apilado al cerrar sesión.
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
   AppScreen _currentScreen = AppScreen.login;
   String _userName = 'Usuario';
 
@@ -51,7 +55,10 @@ class _AppState extends State<App> {
     // sin tocar ninguna pantalla: lecturas, videos, capsulas, ejemplos,
     // ejercicios, quiz, evaluaciones y laboratorio.
     // Cualquier pantalla puede ofrecer cerrar sesion sin recibir nada.
-    SessionController.instance.registerLogout(_goToLogin);
+    SessionController.instance.registerLogout(
+      _goToLogin,
+      navigatorKey: _navigatorKey,
+    );
 
     CourseProgressStore.instance.reportCompletionsTo(
       (sectionId, kind) => LearningAnalyticsService.instance.recordCompletion(
@@ -265,6 +272,7 @@ class _AppState extends State<App> {
     return AccessibilityTextScaleScope(
       controller: _textScaleController,
       child: MaterialApp(
+        navigatorKey: _navigatorKey,
         title: 'Code4All',
         debugShowCheckedModeBanner: false,
         theme: activeTheme,

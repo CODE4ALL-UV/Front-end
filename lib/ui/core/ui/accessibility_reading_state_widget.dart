@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'accessibility_announcer.dart';
-import 'web_speech_stub.dart'
-    if (dart.library.js_interop) 'web_speech_web.dart'
+import 'accessibility_announcer_widget.dart';
+import 'web_speech_stub_widget.dart'
+    if (dart.library.js_interop) 'web_speech_web_widget.dart'
     as web_speech;
 
 final accessibilityReadingState = AccessibilityReadingState();

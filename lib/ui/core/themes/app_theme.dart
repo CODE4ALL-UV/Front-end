@@ -10,12 +10,12 @@ class AppBreakpoints {
 
 /// Atajos rápidos para acceder al tema desde el BuildContext.
 /// Acceso: context.colorScheme
-///         context.courseTheme
+///         context.moduleTheme
 ///         context.codeConsoleTheme
 ///         context.activityColors
 extension AppThemeContext on BuildContext {
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
-  CourseTheme get courseTheme => Theme.of(this).extension<CourseTheme>()!;
+  ModuleTheme get moduleTheme => Theme.of(this).extension<ModuleTheme>()!;
   CodeConsoleTheme get codeConsoleTheme =>
       Theme.of(this).extension<CodeConsoleTheme>()!;
   ActivityThemeColors get activityColors =>
@@ -59,9 +59,9 @@ extension AppThemeContext on BuildContext {
   Acceso: Theme.of(context).extension<ActivityThemeColors>()!
           context.activityColors
   
-  CourseTheme → Colores específicos de las tarjetas y elementos de las lecciones.
-  Acceso: Theme.of(context).extension<CourseTheme>()!
-          context.courseTheme
+  ModuleTheme → Colores específicos de las tarjetas y elementos de las lecciones.
+  Acceso: Theme.of(context).extension<ModuleTheme>()!
+          context.moduleTheme
 
   CodeConsoleTheme → Colores específicos de la consola/editor de código Python.
   Acceso: Theme.of(context).extension<CodeConsoleTheme>()!
@@ -248,7 +248,7 @@ class AppTheme {
   /// - brightness → Define la luminosidad base: Brightness.light o Brightness.dark.
   /// - scaffoldBackgroundColor → Color de fondo general de las pantallas.
   /// - colorScheme → Colores generales de Material 3 y base cromática de los componentes.
-  /// - courseTheme → Colores específicos de lecciones y cursos.
+  /// - moduleTheme → Colores específicos de lecciones y cursos.
   /// - codeConsoleTheme → Colores específicos de la consola/editor de Python.
   /// - activityThemeColors → Colores semánticos para info, success, warning y danger.
   ///
@@ -258,7 +258,7 @@ class AppTheme {
     required Brightness brightness,
     required Color scaffoldBackgroundColor,
     required ColorScheme colorScheme,
-    required CourseTheme courseTheme,
+    required ModuleTheme moduleTheme,
     required CodeConsoleTheme codeConsoleTheme,
     required ActivityThemeColors activityThemeColors,
     required AppThemeMode themeMode,
@@ -266,9 +266,8 @@ class AppTheme {
   }) {
     final baseTheme = ThemeData(useMaterial3: true, brightness: brightness);
     final baseTextTheme = baseTheme.textTheme;
-
-    // Generación dinámica de CourseTheme pasando el módulo y el modo activo
-    final courseTheme = CourseTheme.fromModule(currentModuleId, themeMode);
+    // Generación dinámica de ModuleTheme pasando el módulo y el modo activo
+    final moduleTheme = ModuleTheme.fromModule(currentModuleId, themeMode);
 
     return baseTheme.copyWith(
       colorScheme: colorScheme,
@@ -359,7 +358,7 @@ class AppTheme {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: courseTheme.lessonCardBorder),
+          borderSide: BorderSide(color: moduleTheme.lessonCardBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -413,7 +412,7 @@ class AppTheme {
               : null,
         ),
       ),
-      extensions: [courseTheme, codeConsoleTheme, activityThemeColors],
+      extensions: [moduleTheme, codeConsoleTheme, activityThemeColors],
     );
   }
 
@@ -435,7 +434,7 @@ class AppTheme {
             error: Color(0xFFD32F2F),
             onError: Colors.white,
           ),
-          courseTheme: const CourseTheme(
+          moduleTheme: const ModuleTheme(
             headerBackground: Color(0xFF1565C0),
             headerIconBackground: Color(0xFF1E88E5),
             headerForegroundColor: Color(0xFFF3E5F5),
@@ -495,7 +494,7 @@ class AppTheme {
             error: Color(0xFFEF9A9A),
             onError: Color(0xFF601410),
           ),
-          courseTheme: const CourseTheme(
+          moduleTheme: const ModuleTheme(
             headerBackground: Color(0xFF0D47A1), // Azul más profundo
             headerIconBackground: Color(0xFF1976D2),
             headerForegroundColor: Color(0xFFFFFFFF),
@@ -559,7 +558,7 @@ class AppTheme {
             error: Color(0xFF000000),
             onError: Colors.white,
           ),
-          courseTheme: const CourseTheme(
+          moduleTheme: const ModuleTheme(
             headerBackground: Color(0xFF212121), // Gris casi negro
             headerIconBackground: Color(0xFF424242), // Gris medio
             headerForegroundColor: Color(0xFFFFFFFF),
@@ -623,7 +622,7 @@ class AppTheme {
             error: Color(0xFFB71C1C),
             onError: Colors.white,
           ),
-          courseTheme: const CourseTheme(
+          moduleTheme: const ModuleTheme(
             headerBackground: Color(0xFF0D47A1), // Azul profundo
             headerIconBackground: Color(0xFF1976D2),
             headerForegroundColor: Color(0xFFFFFFFF),
@@ -689,7 +688,7 @@ class AppTheme {
             error: Color(0xFF8D021F),
             onError: Colors.white,
           ),
-          courseTheme: const CourseTheme(
+          moduleTheme: const ModuleTheme(
             // La paleta azul se mantiene idéntica al Light Theme, ya que el azul es seguro
             headerBackground: Color(0xFF1565C0),
             headerIconBackground: Color(0xFF1E88E5),
@@ -754,7 +753,7 @@ class AppTheme {
             error: Color(0xFFC62828),
             onError: Colors.white,
           ),
-          courseTheme: const CourseTheme(
+          moduleTheme: const ModuleTheme(
             headerBackground: Color(0xFF00695C), // Azul -> Teal/Cian oscuro
             headerIconBackground: Color(0xFF00897B),
             headerForegroundColor: Color(0xFFFFFFFF),

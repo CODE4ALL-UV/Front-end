@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
-import 'accessibility_text_scale.dart';
+import 'accessibility_text_scale_widget.dart';
 
 class AccessibilitySettingsScreen extends StatefulWidget {
   const AccessibilitySettingsScreen({super.key});

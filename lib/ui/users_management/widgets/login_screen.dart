@@ -7,17 +7,17 @@ import 'package:flutter_code4all/ui/core/ui/bottomappbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/social_auth_block.dart';
 import 'package:flutter_code4all/data/services/google_auth_service.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
   final VoidCallback? onRegister;
   final void Function(String role)? onSuccess;
 
-  const LoginPage({super.key, this.onRegister, this.onSuccess});
+  const LoginScreen({super.key, this.onRegister, this.onSuccess});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _apiService = ApiService();

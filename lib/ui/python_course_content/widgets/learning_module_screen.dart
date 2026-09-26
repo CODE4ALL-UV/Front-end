@@ -1,7 +1,7 @@
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/core/ui/help_action_button.dart'; //MIX
+import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart'; //MIX
 //import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart'; //PAPACHO - ELIMINADO USAR app_theme.dart
 import 'package:flutter_code4all/ui/core/ui/bottomappbar_widget.dart'; //REFACTOR-MULTIMODALBOTTOMAPPBARWIDGET - RENOMBRADO DE multimodal_footer_bar
 //import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart'; //PAPACHO - MOVIDO A GlobalAppBarWidget
@@ -15,12 +15,12 @@ import 'package:flutter_code4all/data/services/auth_storage.dart'; //PAPACHO
 //import 'package:flutter_code4all/data/services/course_progress_store.dart'; //PAPACHO - MOVIDO A CircleProgressWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart'; //PAPACHO - MOVIDO A CircleProgressWidget
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart'; //REFACTOR-APPBAR
-import 'package:flutter_code4all/ui/core/ui/responsive_layout.dart';
-import 'package:flutter_code4all/ui/core/ui/new_module_header_widget.dart'; //REFACTOR-MODULEHEADERCARD
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_chapter_detail_screen.dart'; //REFACTOR-CHAPTERDETAILSCREEN
-import 'package:flutter_code4all/ui/core/ui/stored_user_avatar.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_detail_card_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_module_row_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/responsive_layout_screen.dart';
+import 'package:flutter_code4all/ui/core/ui/module_header_widget.dart'; //REFACTOR-MODULEHEADERCARD
+import 'package:flutter_code4all/ui/python_course_content/widgets/unused_new_chapter_detail_screen.dart'; //REFACTOR-CHAPTERDETAILSCREEN
+import 'package:flutter_code4all/ui/core/ui/unused_stored_user_avatar.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/unused_detail_card_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/module_row_widget.dart';
 import '../../core/themes/module_theme.dart'; //REFACTOR-MODULEROWWIDGET
 
 class LearningModuleScreen extends StatefulWidget {
@@ -192,7 +192,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     final hasPreviousModule = widget.moduleId > 1;
 
     final appTheme = Theme.of(context);
-    final appModuleTheme = context.courseTheme;
+    final appModuleTheme = context.moduleTheme;
     final currentThemeMode = ThemeManager.themeNotifier.value;
 
     debugPrint(

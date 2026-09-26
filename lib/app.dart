@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'ui/core/themes/app_theme.dart';
-import 'ui/core/ui/accessibility_text_scale.dart';
+import 'ui/core/ui/accessibility_text_scale_widget.dart';
 import 'data/services/course_progress_store.dart';
 import 'data/services/session_controller.dart';
 import 'data/services/learning_analytics_service.dart';
@@ -232,7 +232,7 @@ class _AppState extends State<App> {
       case AppScreen.director:
         return DirectorHomeScreen(userName: _userName, onLogout: _goToLogin);
       case AppScreen.login:
-        return LoginPage(
+        return LoginScreen(
           onRegister: _goToRegister,
           onSuccess: (role) {
             _handleSuccessfulLogin(role);

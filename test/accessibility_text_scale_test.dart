@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_code4all/ui/core/ui/accessibility_text_scale.dart';
+import 'package:flutter_code4all/ui/core/ui/accessibility_text_scale_widget.dart';
 
 void main() {
   test('increase and decrease change the text scale step by step', () {

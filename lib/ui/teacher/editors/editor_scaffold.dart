@@ -37,7 +37,7 @@ class EditorScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final courseTheme = appTheme.extension<CourseTheme>()!;
+    final moduleTheme = appTheme.extension<ModuleTheme>()!;
 
     return Scaffold(
       backgroundColor: appTheme.scaffoldBackgroundColor,
@@ -64,7 +64,7 @@ class EditorScaffold extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             height: 1.45,
-                            color: courseTheme.lessonCardBorder,
+                            color: moduleTheme.lessonCardBorder,
                           ),
                         ),
                         const SizedBox(height: AppMetrics.sectionGap),
@@ -105,7 +105,7 @@ class EditorEmptyState extends StatelessWidget {
     // 1. Extraemos los colores del contexto
     final appTheme = Theme.of(context);
     final colorScheme = appTheme.colorScheme;
-    final courseTheme = appTheme.extension<CourseTheme>()!;
+    final moduleTheme = appTheme.extension<ModuleTheme>()!;
     final activityColors = appTheme.extension<ActivityThemeColors>()!;
 
     return Container(
@@ -117,7 +117,7 @@ class EditorEmptyState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(icon, size: 40, color: courseTheme.lessonCardBorder),
+          Icon(icon, size: 40, color: moduleTheme.lessonCardBorder),
           const SizedBox(height: AppMetrics.gap),
           Text(
             text,
@@ -125,7 +125,7 @@ class EditorEmptyState extends StatelessWidget {
             style: TextStyle(
               fontSize: 14.5,
               height: 1.45,
-              color: courseTheme.lessonCardBorder,
+              color: moduleTheme.lessonCardBorder,
             ),
           ),
           const SizedBox(height: AppMetrics.sectionGap),

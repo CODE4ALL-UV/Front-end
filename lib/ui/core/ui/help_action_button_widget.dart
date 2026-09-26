@@ -212,13 +212,28 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
         return Stack(
           children: [
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: _hideOverlay,
-              child: Container(
-                width: overlayWidth,
-                height: overlayHeight,
-                color: Colors.transparent,
+            // Fondo atenuado mientras el menú está abierto.
+            //
+            // Antes era transparente del todo, así que los botones parecían
+            // sueltos encima de la pantalla en lugar de una capa, y se
+            // confundían con el contenido que tenían detrás. Atenuar separa
+            // una cosa de la otra y, de paso, sube el contraste de los
+            // botones sobre lo que haya debajo.
+            //
+            // Se anuncia como botón de cerrar: tocar fuera ya cerraba el
+            // menú, pero quien usa lector de pantalla no tenía forma de
+            // saberlo porque no había nada que anunciar.
+            Semantics(
+              button: true,
+              label: 'Cerrar el menú de accesibilidad',
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _hideOverlay,
+                child: Container(
+                  width: overlayWidth,
+                  height: overlayHeight,
+                  color: Colors.black.withValues(alpha: 0.45),
+                ),
               ),
             ),
             Positioned(

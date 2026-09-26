@@ -16,11 +16,7 @@ import 'package:flutter_code4all/data/services/auth_storage.dart'; //PAPACHO
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart'; //REFACTOR-APPBAR
 import 'package:flutter_code4all/ui/core/ui/responsive_layout_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/module_header_widget.dart'; //REFACTOR-MODULEHEADERCARD
-import 'package:flutter_code4all/ui/python_course_content/widgets/unused_new_chapter_detail_screen.dart'; //REFACTOR-CHAPTERDETAILSCREEN
-import 'package:flutter_code4all/ui/core/ui/unused_stored_user_avatar.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/unused_detail_card_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/module_row_widget.dart';
-import '../../core/themes/module_theme.dart'; //REFACTOR-MODULEROWWIDGET
 
 class LearningModuleScreen extends StatefulWidget {
   final int moduleId; // Remplaza la necesidad de tener 6 pantallas

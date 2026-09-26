@@ -259,8 +259,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
     final kind = await showModalBottomSheet<ReadingBlockKind>(
       context: context,
       backgroundColor: appTheme.infoBackground,
-      builder: (context) =>
-          (context).widget, //OJO REVISAR ERROR COMPARAR CON PAPACHO VERSION
+      builder: (context) => const _BlockKindSheet(),
     );
     if (kind == null || !mounted) return;
 
@@ -390,6 +389,8 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
 
 /// Elegir qué tipo de bloque añadir.
 class _BlockKindSheet extends StatelessWidget {
+  const _BlockKindSheet();
+
   static const Map<ReadingBlockKind, String> _what = {
     ReadingBlockKind.paragraph: 'Texto corrido para explicar una idea',
     ReadingBlockKind.bullets: 'Puntos sueltos, sin orden concreto',

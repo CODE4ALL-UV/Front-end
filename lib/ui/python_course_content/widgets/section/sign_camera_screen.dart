@@ -613,7 +613,7 @@ class _ReadingBox extends StatelessWidget {
       if (achieved) {
         headline = target!;
         detail = '¡Esa es la $target!';
-        tone = appSemanticColors.successBackground;
+        tone = appSemanticColors.successText;
       } else if (letter == null) {
         headline = '—';
         detail = 'Todavía no veo tu mano con claridad.';
@@ -621,14 +621,14 @@ class _ReadingBox extends StatelessWidget {
       } else {
         headline = letter;
         detail = HandLandmarkClassifier.hint(reading.observed, target!);
-        tone = appSemanticColors.warningBackground;
+        tone = appSemanticColors.warningText;
       }
     } else if (reading.isAmbiguous) {
       headline = [letter!, ...reading.alternatives].join(' o ');
       detail =
           'Estas letras se hacen casi igual, así que no me atrevo a elegir. '
           'No la doy por buena.';
-      tone = appSemanticColors.warningBackground;
+      tone = appSemanticColors.warningText;
     } else if (letter == null) {
       headline = '—';
       detail = holding == null
@@ -641,7 +641,7 @@ class _ReadingBox extends StatelessWidget {
           ? 'Mantenla quieta para que cuente.'
           : 'Casi. Acerca un poco la mano o mejora la luz.';
       tone = reading.isConfident
-          ? appSemanticColors.successBackground
+          ? appSemanticColors.successText
           : appSemanticColors.infoText;
     }
 
@@ -661,7 +661,11 @@ class _ReadingBox extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _LetterBadge(letter: headline, progress: dictation.progress),
+                  _LetterBadge(
+                    letter: headline,
+                    progress: dictation.progress,
+                    tone: tone,
+                  ),
                   const SizedBox(width: AppMetrics.gap),
                   Expanded(
                     child: Text(
@@ -710,10 +714,19 @@ class _ReadingBox extends StatelessWidget {
 
 /// La letra grande, con un aro que se llena mientras se sostiene.
 class _LetterBadge extends StatelessWidget {
-  const _LetterBadge({required this.letter, required this.progress});
+  const _LetterBadge({
+    required this.letter,
+    required this.progress,
+    required this.tone,
+  });
 
   final String letter;
   final double progress;
+
+  /// El color que dice cómo va la seña: verde si cuenta, ámbar si falla,
+  /// neutro mientras no se sepa. Acompaña al texto, que dice lo mismo con
+  /// palabras; el color solo no debe cargar con el mensaje.
+  final Color tone;
 
   @override
   Widget build(BuildContext context) {
@@ -731,8 +744,8 @@ class _LetterBadge extends StatelessWidget {
             child: CircularProgressIndicator(
               value: progress == 0 ? null : progress,
               strokeWidth: 5,
-              backgroundColor: appSemanticColors.dangerBorder,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
+              backgroundColor: appSemanticColors.infoBorder,
+              valueColor: AlwaysStoppedAnimation<Color>(tone),
             ),
           ),
           Text(
@@ -741,6 +754,7 @@ class _LetterBadge extends StatelessWidget {
             style: TextStyle(
               fontSize: letter.length > 3 ? 15 : 30,
               fontWeight: FontWeight.w800,
+              color: tone,
             ),
           ),
         ],

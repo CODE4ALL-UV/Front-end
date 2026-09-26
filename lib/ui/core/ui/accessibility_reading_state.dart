@@ -67,15 +67,19 @@ class ScreenContentExtractor {
   }
 }
 
-/// Controla la lectura en voz alta de una pantalla y el resaltado palabra por
-/// palabra que acompaña a la voz.
+/// Controla la lectura en voz alta de una pantalla.
 ///
-/// Está pensado para dos públicos a la vez: quien no ve la pantalla escucha el
-/// texto, y quien no oye lee la transcripción resaltada en la franja inferior.
+/// Antes esto acompañaba la voz con una franja inferior amarilla que iba
+/// resaltando la palabra hablada. Esa franja se retiró a petición expresa, así
+/// que aquí ya solo queda la voz.
 class AccessibilityReadingState {
   final ValueNotifier<String?> currentText = ValueNotifier<String?>(null);
+
+  /// Si ahora mismo se está leyendo en voz alta.
+  ///
+  /// Conserva el nombre de cuando además resaltaba texto: es lo que mira la
+  /// barra inferior para ofrecer «parar» en lugar de «escuchar».
   final ValueNotifier<bool> isHighlighting = ValueNotifier<bool>(false);
-  final ValueNotifier<int> currentWordIndex = ValueNotifier<int>(0);
 
   final FlutterTts _flutterTts = FlutterTts();
   bool _ttsInitialized = false;
@@ -91,9 +95,6 @@ class AccessibilityReadingState {
       await _flutterTts.setVolume(1.0);
       // Obliga a FlutterTts a esperar que termine el audio antes de resolver el Future de speak()
       await _flutterTts.awaitSpeakCompletion(true);
-      _flutterTts.setProgressHandler((text, start, end, word) {
-        _syncHighlightWithSpokenWord(start);
-      });
       _flutterTts.setCompletionHandler(clearHighlight);
       _flutterTts.setCancelHandler(clearHighlight);
       _flutterTts.setErrorHandler((msg) => clearHighlight());
@@ -111,7 +112,6 @@ class AccessibilityReadingState {
     await stop();
 
     currentText.value = content;
-    currentWordIndex.value = 0;
     isHighlighting.value = true;
 
     if (context.mounted) {
@@ -120,7 +120,7 @@ class AccessibilityReadingState {
 
     if (kIsWeb) {
       web_speech.speakWithBrowserVoice(content);
-      _startFallbackHighlight(content);
+      _scheduleWebReadingEnd(content);
       return;
     }
 
@@ -131,7 +131,6 @@ class AccessibilityReadingState {
       debugPrint('Error al reproducir TTS: $e');
       debugPrint(st.toString());
       clearHighlight();
-      //_startFallbackHighlight(content);
     }
   }
 
@@ -156,44 +155,23 @@ class AccessibilityReadingState {
     _fallbackTimer?.cancel();
     _fallbackTimer = null;
     isHighlighting.value = false;
-    currentWordIndex.value = 0;
   }
 
-  /// Traduce el offset de caracteres que reporta el motor de voz al índice de
-  /// palabra que debe resaltarse en la transcripción.
-  void _syncHighlightWithSpokenWord(int startOffset) {
-    final content = currentText.value;
-    if (content == null || content.isEmpty) return;
-
-    final safeOffset = startOffset.clamp(0, content.length);
-    final wordsBefore = content
-        .substring(0, safeOffset)
-        .split(RegExp(r'\s+'))
-        .where((word) => word.isNotEmpty)
-        .length;
-
-    currentWordIndex.value = wordsBefore;
-  }
-
-  /// Resaltado aproximado para plataformas sin callbacks de progreso (web).
+  /// Da por terminada la lectura en web pasado el tiempo que se estima que
+  /// dura el texto.
   ///
-  /// Avanza al ritmo estimado de lectura en voz alta en español y se detiene
-  /// solo cuando termina el texto, no con un tiempo fijo.
-  void _startFallbackHighlight(String content) {
+  /// El navegador no avisa de que ha acabado de hablar, así que sin esto la
+  /// barra inferior se quedaría ofreciendo «parar» para siempre. Se calcula a
+  /// partir del número de palabras, al mismo ritmo que ya se usaba.
+  void _scheduleWebReadingEnd(String content) {
     final words = _splitWords(content);
     if (words.isEmpty) return;
 
-    var index = 0;
     _fallbackTimer?.cancel();
-    _fallbackTimer = Timer.periodic(const Duration(milliseconds: 380), (timer) {
-      if (!isHighlighting.value || index >= words.length) {
-        timer.cancel();
-        clearHighlight();
-        return;
-      }
-      currentWordIndex.value = index;
-      index++;
-    });
+    _fallbackTimer = Timer(
+      Duration(milliseconds: 380 * words.length),
+      clearHighlight,
+    );
   }
 
   static List<String> _splitWords(String content) =>
@@ -203,89 +181,5 @@ class AccessibilityReadingState {
     _fallbackTimer?.cancel();
     currentText.dispose();
     isHighlighting.dispose();
-    currentWordIndex.dispose();
-  }
-}
-
-/// Envuelve una pantalla y muestra, mientras se lee en voz alta, una franja
-/// inferior con la transcripción y la palabra actual resaltada.
-class ReadableScreenHighlight extends StatelessWidget {
-  const ReadableScreenHighlight({super.key, required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: accessibilityReadingState.isHighlighting,
-      builder: (context, isActive, _) {
-        final text = accessibilityReadingState.currentText.value;
-        if (!isActive || text == null || text.trim().isEmpty) {
-          return child;
-        }
-
-        final words = AccessibilityReadingState._splitWords(text);
-
-        return Column(
-          children: [
-            Expanded(child: child),
-            ValueListenableBuilder<int>(
-              valueListenable: accessibilityReadingState.currentWordIndex,
-              builder: (context, index, _) {
-                return Semantics(
-                  liveRegion: true,
-                  label: 'Transcripción de la lectura en voz alta',
-                  child: Container(
-                    width: double.infinity,
-                    constraints: const BoxConstraints(maxHeight: 140),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.yellow.shade100,
-                      border: Border(
-                        top: BorderSide(
-                          color: Colors.orange.shade800,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                    child: SingleChildScrollView(
-                      child: RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15,
-                            height: 1.5,
-                          ),
-                          children: List.generate(words.length, (i) {
-                            final isCurrent = i == index;
-                            return TextSpan(
-                              text: '${words[i]} ',
-                              style: TextStyle(
-                                fontWeight: isCurrent
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                backgroundColor: isCurrent
-                                    ? Colors.yellow.shade600
-                                    : null,
-                                decoration: isCurrent
-                                    ? TextDecoration.underline
-                                    : null,
-                              ),
-                            );
-                          }),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 }

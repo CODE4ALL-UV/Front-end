@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/models/auth_models.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
-import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 
 class FormScreen extends StatefulWidget {
@@ -99,8 +98,7 @@ class _FormScreenState extends State<FormScreen> {
     final logoSize = screenWidth < 360 ? 140.0 : 180.0;
     final horizontalPadding = screenWidth < 480 ? 20.0 : 32.0;
 
-    return ReadableScreenHighlight(
-      child: Scaffold(
+    return Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,
         appBar: GlobalAppBarWidget(
@@ -342,8 +340,7 @@ class _FormScreenState extends State<FormScreen> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   InputDecoration _inputDecoration() => InputDecoration(

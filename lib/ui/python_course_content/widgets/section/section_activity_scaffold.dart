@@ -101,8 +101,7 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,
       ),
-      body: ReadableScreenHighlight(
-        child: Column(
+      body: Column(
           children: [
             _ActivityBanner(
               moduleLabel: widget.moduleLabel,
@@ -165,7 +164,6 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
               ),
           ],
         ),
-      ),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
@@ -45,44 +47,57 @@ class ModuleRowWidget extends StatelessWidget {
       );
     }
 
-    // 2. Instanciar los componentes (Asumiendo que ya los extrajiste a sus propios archivos)
-    final circleWidget = CircleProgressWidget(
-      icon: icon,
-      iconColor: iconColor,
-      bgColor: bgColor,
-      size: bigSize,
-      moduleId: moduleId,
-      sectionNumber: sectionNumber,
-      onTap: navigateToSection,
-      progressTrackRemaining: appModuleTheme.progressTrackRemaining,
-      progressTrackFilled: appModuleTheme.progressTrackFilled,
-    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : bigSize + 150;
+        final halfRowWidth = (availableWidth - 24) / 2;
+        final componentSize = math.min(
+          320.0,
+          math.max(140.0, math.min(halfRowWidth, math.max(bigSize, 140.0))),
+        );
+        final lessonScale = (componentSize / 150).clamp(0.95, 2.0).toDouble();
 
-    final boxWidget = LessonBoxWidget(
-      number: sectionNumber,
-      title:
-          PythonCourseCatalog.section(moduleId, sectionNumber)?.boxTitle ??
-          'Sección $sectionNumber',
-      onTap: navigateToSection,
-      backgroundColor: appModuleTheme.lessonCardBackground,
-      borderColor: appModuleTheme.lessonCardBorder,
-      textColor: appModuleTheme.lessonCardText,
-      numberColor: appModuleTheme.lessonCardNumber,
-      numberBackgroundColor: appModuleTheme.lessonCardNumberBackground,
-    );
+        final circleWidget = CircleProgressWidget(
+          icon: icon,
+          iconColor: iconColor,
+          bgColor: bgColor,
+          size: componentSize,
+          moduleId: moduleId,
+          sectionNumber: sectionNumber,
+          onTap: navigateToSection,
+          progressTrackRemaining: appModuleTheme.progressTrackRemaining,
+          progressTrackFilled: appModuleTheme.progressTrackFilled,
+        );
 
-    // 3. Retornar el Row envuelto en Semantics para accesibilidad
-    return Semantics(
-      button: true,
-      label: 'Acceder a la sección $sectionNumber del módulo $moduleId',
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        // Aquí ocurre la magia de la intercalación:
-        children: isCircleLeft
-            ? [circleWidget, boxWidget]
-            : [boxWidget, circleWidget],
-      ),
+        final boxWidget = LessonBoxWidget(
+          number: sectionNumber,
+          title:
+              PythonCourseCatalog.section(moduleId, sectionNumber)?.boxTitle ??
+              'Sección $sectionNumber',
+          onTap: navigateToSection,
+          backgroundColor: appModuleTheme.lessonCardBackground,
+          borderColor: appModuleTheme.lessonCardBorder,
+          textColor: appModuleTheme.lessonCardText,
+          numberColor: appModuleTheme.lessonCardNumber,
+          numberBackgroundColor: appModuleTheme.lessonCardNumberBackground,
+          width: componentSize,
+          scale: lessonScale,
+        );
+
+        return Semantics(
+          button: true,
+          label: 'Acceder a la sección $sectionNumber del módulo $moduleId',
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: isCircleLeft
+                ? [circleWidget, boxWidget]
+                : [boxWidget, circleWidget],
+          ),
+        );
+      },
     );
   }
 }

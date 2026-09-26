@@ -9,6 +9,8 @@ class LessonBoxWidget extends StatelessWidget {
   final Color textColor;
   final Color numberColor;
   final Color numberBackgroundColor;
+  final double width;
+  final double scale;
 
   const LessonBoxWidget({
     super.key,
@@ -20,6 +22,8 @@ class LessonBoxWidget extends StatelessWidget {
     required this.textColor,
     required this.numberColor,
     required this.numberBackgroundColor,
+    this.width = 150,
+    this.scale = 1.0,
   });
 
   @override
@@ -31,8 +35,12 @@ class LessonBoxWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          width: 150,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          width: width,
+          constraints: BoxConstraints(minHeight: 60 * scale),
+          padding: EdgeInsets.symmetric(
+            horizontal: 14 * scale,
+            vertical: 12 * scale,
+          ),
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(14),
@@ -48,8 +56,8 @@ class LessonBoxWidget extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 36 * scale,
+                height: 36 * scale,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: numberBackgroundColor,
@@ -58,14 +66,14 @@ class LessonBoxWidget extends StatelessWidget {
                   child: Text(
                     '$number',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 16 * scale,
                       fontWeight: FontWeight.bold,
                       color: numberColor,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10 * scale),
               Expanded(
                 child: FittedBox(
                   alignment: Alignment.centerLeft,
@@ -74,7 +82,7 @@ class LessonBoxWidget extends StatelessWidget {
                     title,
                     softWrap: false,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 14 * scale,
                       color: textColor,
                       fontWeight: FontWeight.w600,
                       height: 1.3,

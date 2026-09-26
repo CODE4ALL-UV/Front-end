@@ -183,7 +183,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   @override
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
-    final bigSize = (screenW * 0.32).clamp(112.0, 260.0).toDouble();
+    final bigSize = (screenW * 0.32).clamp(140.0, 320.0).toDouble();
     final horizontalPadding = screenW >= AppBreakpoints.tablet ? 28.0 : 16.0;
     final verticalGap = (MediaQuery.of(context).size.height * 0.025)
         .clamp(12.0, 28.0)

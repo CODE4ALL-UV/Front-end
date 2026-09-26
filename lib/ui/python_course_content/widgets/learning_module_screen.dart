@@ -101,6 +101,77 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     super.dispose();
   }
 
+  /// El pie con la forma de ir al módulo anterior y al siguiente.
+  ///
+  /// Va fuera del scroll a propósito. Antes vivía al final del contenido, así
+  /// que para enterarse de que se podía pasar al módulo siguiente había que
+  /// bajar hasta abajo del todo; y con la letra agrandada, más todavía. El
+  /// aviso de cómo salir de una pantalla es lo último que debe esconderse.
+  ///
+  /// Se acompaña de botones porque deslizar no le sirve a todo el mundo: con
+  /// lector de pantalla el gesto lo consume el propio lector, y hay quien
+  /// maneja el teléfono con un conmutador o un teclado y no puede deslizar.
+  Widget _buildModuleNavigation(BuildContext context) {
+    final hasNext = widget.moduleId < widget.totalModules;
+    final hasPrevious = widget.moduleId > 1;
+    if (!hasNext && !hasPrevious) return const SizedBox.shrink();
+
+    final appSemanticColors = Theme.of(
+      context,
+    ).extension<ActivityThemeColors>()!;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: appSemanticColors.infoBackground,
+        border: Border(top: BorderSide(color: appSemanticColors.infoBorder)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          // Cada botón ocupa la mitad y su texto se recorta antes que
+          // desbordar: en un teléfono de 320 px con la letra agrandada, dos
+          // etiquetas completas no caben en una fila.
+          child: Row(
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: hasPrevious
+                      ? _ModuleNavigationButton(
+                          icon: Icons.keyboard_arrow_down,
+                          label: 'Módulo ${widget.moduleId - 1}',
+                          semanticLabel:
+                              'Volver al Módulo ${widget.moduleId - 1}. '
+                              'También puedes deslizar hacia abajo.',
+                          onPressed: _goToPreviousModule,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: hasNext
+                      ? _ModuleNavigationButton(
+                          icon: Icons.keyboard_arrow_up,
+                          label: 'Módulo ${widget.moduleId + 1}',
+                          semanticLabel:
+                              'Ir al Módulo ${widget.moduleId + 1}. '
+                              'También puedes deslizar hacia arriba.',
+                          onPressed: _goToNextModule,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   /// Corta la lectura antes de cambiar de módulo.
   ///
   /// El asistente de voz es único para toda la aplicación, así que una pausa
@@ -220,10 +291,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     final verticalGap = (MediaQuery.of(context).size.height * 0.025)
         .clamp(12.0, 28.0)
         .toDouble();
-    final hasNextModule = widget.moduleId < widget.totalModules;
-    final hasPreviousModule = widget.moduleId > 1;
-
-    final appTheme = Theme.of(context);
     final appModuleTheme = context.moduleTheme;
     final currentThemeMode = ThemeManager.themeNotifier.value;
 
@@ -329,64 +396,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                                   bigSize: bigSize,
                                   enableTeacherEditor: true,
                                 ),
-                                const SizedBox(height: 12),
-                                // Indicador dinámico de siguiente módulo
-                                if (hasNextModule)
-                                  Semantics(
-                                    label:
-                                        'Desliza hacia arriba para ir al Módulo ${widget.moduleId + 1}',
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(
-                                          Icons.keyboard_arrow_up,
-                                          size: 20,
-                                        ),
-                                        Text(
-                                          'Desliza hacia arriba para ir al Módulo ${widget.moduleId + 1}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color:
-                                                appTheme
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.color ??
-                                                Colors.black87,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                if (hasPreviousModule) ...[
-                                  const SizedBox(height: 6),
-                                  Semantics(
-                                    label:
-                                        'Desliza hacia abajo para volver al Módulo ${widget.moduleId - 1}',
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(
-                                          Icons.keyboard_arrow_down,
-                                          size: 20,
-                                        ),
-                                        Text(
-                                          'Desliza hacia abajo para volver al Módulo ${widget.moduleId - 1}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color:
-                                                appTheme
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.color ??
-                                                Colors.black87,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
                               ],
                             ),
                           ),
@@ -403,7 +412,58 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
               ],
             ),
           ),
+          _buildModuleNavigation(context),
         ],
+      ),
+    );
+  }
+}
+
+/// Botón para saltar de módulo desde el pie.
+///
+/// Es un botón de verdad y no solo un texto que describe un gesto: deslizar
+/// no está al alcance de todo el mundo, y quien usa lector de pantalla ni
+/// siquiera recibe el gesto, porque lo consume el propio lector.
+class _ModuleNavigationButton extends StatelessWidget {
+  const _ModuleNavigationButton({
+    required this.icon,
+    required this.label,
+    required this.semanticLabel,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String label;
+  final String semanticLabel;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final appSemanticColors = Theme.of(
+      context,
+    ).extension<ActivityThemeColors>()!;
+
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: ExcludeSemantics(
+        child: TextButton.icon(
+          onPressed: onPressed,
+          icon: Icon(icon, size: 20),
+          label: Text(label, overflow: TextOverflow.ellipsis, softWrap: false),
+          style: TextButton.styleFrom(
+            foregroundColor: appSemanticColors.infoText,
+            minimumSize: const Size(
+              AppMetrics.minTapTarget,
+              AppMetrics.minTapTarget,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            textStyle: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
       ),
     );
   }

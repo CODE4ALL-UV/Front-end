@@ -137,8 +137,6 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
                         else
                           _buildActivityRoute(),
                         const SizedBox(height: AppMetrics.sectionGap),
-                        _buildChapterNav(),
-                        const SizedBox(height: 12),
                         const Align(
                           alignment: Alignment.centerLeft,
                           child: HelpActionButton(),
@@ -151,6 +149,11 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
               ),
             ),
           ),
+          // Ir al capítulo anterior o siguiente va fuera del scroll: si queda
+          // al final del contenido, hay que recorrer toda la ruta de
+          // actividades para descubrir que se puede avanzar. Con la letra
+          // agrandada, más todavía.
+          _buildChapterNav(),
         ],
       ),
     );
@@ -258,30 +261,52 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
 
     if (!hasPrevious && !hasNext) return const SizedBox.shrink();
 
-    return Row(
-      children: [
-        Expanded(
-          child: SectionSecondaryButton(
-            label: 'Anterior',
-            icon: Icons.skip_previous,
-            semanticHint: hasPrevious
-                ? 'Ir al capítulo anterior del módulo'
-                : 'Este es el primer capítulo del módulo',
-            onPressed: widget.onPreviousChapter,
+    final appTheme = context.activityColors;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: appTheme.infoBackground,
+        border: Border(top: BorderSide(color: appTheme.infoBorder)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppMetrics.maxContentWidth,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SectionSecondaryButton(
+                      label: 'Anterior',
+                      icon: Icons.skip_previous,
+                      semanticHint: hasPrevious
+                          ? 'Ir al capítulo anterior del módulo'
+                          : 'Este es el primer capítulo del módulo',
+                      onPressed: widget.onPreviousChapter,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SectionPrimaryButton(
+                      label: 'Siguiente',
+                      icon: Icons.skip_next,
+                      semanticHint: hasNext
+                          ? 'Ir al capítulo siguiente del módulo'
+                          : 'Este es el último capítulo del módulo',
+                      onPressed: widget.onNextChapter,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: SectionPrimaryButton(
-            label: 'Siguiente',
-            icon: Icons.skip_next,
-            semanticHint: hasNext
-                ? 'Ir al capítulo siguiente del módulo'
-                : 'Este es el último capítulo del módulo',
-            onPressed: widget.onNextChapter,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

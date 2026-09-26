@@ -130,41 +130,29 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
         top: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          // Cada botón ocupa la mitad y su texto se recorta antes que
-          // desbordar: en un teléfono de 320 px con la letra agrandada, dos
-          // etiquetas completas no caben en una fila.
-          child: Row(
+          // Uno debajo del otro y con el mensaje entero, como estaban. Dos
+          // frases completas no caben lado a lado en un teléfono, y menos con
+          // la letra agrandada.
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: hasPrevious
-                      ? _ModuleNavigationButton(
-                          icon: Icons.keyboard_arrow_down,
-                          label: 'Módulo ${widget.moduleId - 1}',
-                          semanticLabel:
-                              'Volver al Módulo ${widget.moduleId - 1}. '
-                              'También puedes deslizar hacia abajo.',
-                          onPressed: _goToPreviousModule,
-                        )
-                      : const SizedBox.shrink(),
+              if (hasNext)
+                _ModuleNavigationHint(
+                  icon: Icons.keyboard_arrow_up,
+                  message:
+                      'Desliza hacia arriba para ir al Módulo '
+                      '${widget.moduleId + 1}',
+                  onPressed: _goToNextModule,
                 ),
-              ),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: hasNext
-                      ? _ModuleNavigationButton(
-                          icon: Icons.keyboard_arrow_up,
-                          label: 'Módulo ${widget.moduleId + 1}',
-                          semanticLabel:
-                              'Ir al Módulo ${widget.moduleId + 1}. '
-                              'También puedes deslizar hacia arriba.',
-                          onPressed: _goToNextModule,
-                        )
-                      : const SizedBox.shrink(),
+              if (hasNext && hasPrevious) const SizedBox(height: 6),
+              if (hasPrevious)
+                _ModuleNavigationHint(
+                  icon: Icons.keyboard_arrow_down,
+                  message:
+                      'Desliza hacia abajo para volver al Módulo '
+                      '${widget.moduleId - 1}',
+                  onPressed: _goToPreviousModule,
                 ),
-              ),
             ],
           ),
         ),
@@ -419,22 +407,21 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   }
 }
 
-/// Botón para saltar de módulo desde el pie.
+/// El aviso de cómo pasar de módulo.
 ///
-/// Es un botón de verdad y no solo un texto que describe un gesto: deslizar
-/// no está al alcance de todo el mundo, y quien usa lector de pantalla ni
-/// siquiera recibe el gesto, porque lo consume el propio lector.
-class _ModuleNavigationButton extends StatelessWidget {
-  const _ModuleNavigationButton({
+/// Dice lo mismo de siempre —que se desliza— pero además se puede tocar.
+/// Deslizar no le sirve a todo el mundo: con lector de pantalla el gesto lo
+/// consume el propio lector, y quien maneja el teléfono con un conmutador o
+/// un teclado no puede deslizar. Al tocarlo hace lo mismo que el gesto.
+class _ModuleNavigationHint extends StatelessWidget {
+  const _ModuleNavigationHint({
     required this.icon,
-    required this.label,
-    required this.semanticLabel,
+    required this.message,
     required this.onPressed,
   });
 
   final IconData icon;
-  final String label;
-  final String semanticLabel;
+  final String message;
   final VoidCallback onPressed;
 
   @override
@@ -445,22 +432,31 @@ class _ModuleNavigationButton extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: semanticLabel,
+      label: message,
       child: ExcludeSemantics(
-        child: TextButton.icon(
-          onPressed: onPressed,
-          icon: Icon(icon, size: 20),
-          label: Text(label, overflow: TextOverflow.ellipsis, softWrap: false),
-          style: TextButton.styleFrom(
-            foregroundColor: appSemanticColors.infoText,
-            minimumSize: const Size(
-              AppMetrics.minTapTarget,
-              AppMetrics.minTapTarget,
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            textStyle: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 20, color: appSemanticColors.infoText),
+                const SizedBox(width: 4),
+                // Flexible para que con la letra agrandada parta el renglón
+                // en lugar de desbordar por el lado.
+                Flexible(
+                  child: Text(
+                    message,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: appSemanticColors.infoText,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

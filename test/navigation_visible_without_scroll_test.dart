@@ -46,7 +46,7 @@ void main() {
       await tester.pumpWidget(host(const LearningModuleScreen(moduleId: 1)));
       await tester.pump();
 
-      final boton = find.widgetWithText(TextButton, 'Módulo 2');
+      final boton = find.textContaining('ir al Módulo 2');
       expect(boton, findsOneWidget);
       expect(
         isOnScreen(tester, boton),
@@ -63,7 +63,7 @@ void main() {
       );
       await tester.pump();
 
-      final boton = find.widgetWithText(TextButton, 'Módulo 2');
+      final boton = find.textContaining('ir al Módulo 2');
       expect(boton, findsOneWidget);
       expect(
         isOnScreen(tester, boton),
@@ -80,8 +80,14 @@ void main() {
       await tester.pump();
 
       // En el módulo 3 se puede ir en las dos direcciones.
-      expect(isOnScreen(tester, find.widgetWithText(TextButton, 'Módulo 4')), isTrue);
-      expect(isOnScreen(tester, find.widgetWithText(TextButton, 'Módulo 2')), isTrue);
+      expect(
+        isOnScreen(tester, find.textContaining('ir al Módulo 4')),
+        isTrue,
+      );
+      expect(
+        isOnScreen(tester, find.textContaining('volver al Módulo 2')),
+        isTrue,
+      );
     });
   });
 

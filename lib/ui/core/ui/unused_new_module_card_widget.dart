@@ -14,7 +14,7 @@ class ModuleCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // LLAMAMOS A NUESTRA NUEVA CLASE DESDE APP_THEME
-    final appModuleTheme = context.courseTheme;
+    final appModuleTheme = context.moduleTheme;
 
     // Obtenemos el tamaño/fuente del tema global
     final textStyle = Theme.of(context).textTheme.titleSmall;

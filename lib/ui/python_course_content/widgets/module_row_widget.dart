@@ -3,8 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/python_course_content/unused_circle_progress_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_lesson_box_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/circle_progress_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/lesson_box_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_screen.dart';
 
 /// Componente modularizado que maneja la intercalación y semántica de las filas
@@ -32,7 +32,7 @@ class ModuleRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appModuleTheme = context.courseTheme;
+    final appModuleTheme = context.moduleTheme;
     // 1. Definir la acción de navegación común para la sección
     void navigateToSection() {
       Navigator.push(

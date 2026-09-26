@@ -103,7 +103,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
   Widget build(BuildContext context) {
     // 1. Extraemos el tema global y tu extensión
     final appTheme = Theme.of(context);
-    final courseTheme = appTheme.extension<CourseTheme>()!;
+    final moduleTheme = appTheme.extension<ModuleTheme>()!;
 
     return EditorScaffold(
       title: 'Cápsula de conocimiento',
@@ -189,7 +189,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                             });
                           }
                         },
-                        color: courseTheme.lessonCardBorder,
+                        color: moduleTheme.lessonCardBorder,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(
@@ -225,7 +225,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                         style: TextStyle(
                           fontSize: 12.5,
                           height: 1.4,
-                          color: courseTheme.lessonCardBorder,
+                          color: moduleTheme.lessonCardBorder,
                         ),
                       ),
                       const SizedBox(height: AppMetrics.gap),

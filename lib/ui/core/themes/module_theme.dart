@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
-class CourseTheme extends ThemeExtension<CourseTheme> {
+class ModuleTheme extends ThemeExtension<ModuleTheme> {
   final Color headerBackground;
   final Color headerIconBackground;
   final Color headerForegroundColor;
@@ -19,7 +19,7 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
   final Color progressTrackRemaining;
   final Color progressTrackFilled;
 
-  const CourseTheme({
+  const ModuleTheme({
     required this.headerBackground,
     required this.headerIconBackground,
     required this.headerForegroundColor,
@@ -38,7 +38,7 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
     required this.progressTrackFilled,
   });
 
-  factory CourseTheme.fromModule(int moduleId, AppThemeMode themeMode) {
+  factory ModuleTheme.fromModule(int moduleId, AppThemeMode themeMode) {
     final bool isDark = themeMode == AppThemeMode.dark;
 
     // 1. Determinar Paleta Base o ADN según el Grupo de Módulos
@@ -118,7 +118,7 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
         : const Color(0xFF1976D2);
 
     // 4. Estructura del MOLDE FINAL (Combinando ADN y Constantes)
-    return CourseTheme(
+    return ModuleTheme(
       // Dinámicos (Usan el ADN del módulo + el truco de withValues para ajustar la opacidad)
       headerBackground: primaryColor,
       headerIconBackground: isDark
@@ -150,7 +150,7 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
   }
 
   @override
-  CourseTheme copyWith({
+  ModuleTheme copyWith({
     Color? headerBackground,
     Color? headerIconBackground,
     Color? headerForegroundColor,
@@ -167,7 +167,7 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
     Color? lessonCardNumberBackground,
     Color? progressTrackRemaining,
     Color? progressTrackFilled,
-  }) => CourseTheme(
+  }) => ModuleTheme(
     headerBackground: headerBackground ?? this.headerBackground,
     headerIconBackground: headerIconBackground ?? this.headerIconBackground,
     headerForegroundColor: headerForegroundColor ?? this.headerForegroundColor,
@@ -192,9 +192,9 @@ class CourseTheme extends ThemeExtension<CourseTheme> {
   );
 
   @override
-  CourseTheme lerp(covariant CourseTheme? other, double t) {
-    if (other is! CourseTheme) return this;
-    return CourseTheme(
+  ModuleTheme lerp(covariant ModuleTheme? other, double t) {
+    if (other is! ModuleTheme) return this;
+    return ModuleTheme(
       headerBackground: Color.lerp(
         headerBackground,
         other.headerBackground,

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/core/ui/accessibility_announcer.dart';
+import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'dart:async';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/data/services/learning_analytics_service.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
+import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.dart';
 import 'section_activity_scaffold.dart';
 import 'section_widgets.dart';
 

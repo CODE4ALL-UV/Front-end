@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/users_management/widgets/live_translation_box.dart';
+import 'package:flutter_code4all/ui/users_management/widgets/unused_live_translation_box.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/config/static_messages.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state.dart';
+import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.dart';
 
 class MultimodalBottomAppBarWidget extends StatelessWidget {
   final String? announcementText;

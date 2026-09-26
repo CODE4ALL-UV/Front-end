@@ -3,7 +3,7 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/web_player_html.dart'; //Daniel Pruebas
 import 'package:flutter_code4all/web_player_html_2.dart'; //Daniel Pruebas
 import 'accessibility_settings_screen.dart';
-import 'accessibility_text_scale.dart';
+import 'accessibility_text_scale_widget.dart';
 
 class HelpActionButton extends StatefulWidget {
   //AccessibilityMenu == HelpActionButton

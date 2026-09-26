@@ -3,22 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/new_python_module_model.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
-import 'package:flutter_code4all/ui/core/ui/help_action_button.dart';
+import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/bottomappbar_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_video_topic_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/unused_new_video_topic_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/unused_knowledge_nugget_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_activity_row_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/activity_row_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/chapter_summary_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_example_code_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/unused_new_example_code_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/final_evaluation_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_interactive_example.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/unused_new_interactive_example.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_detail_card_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/unused_detail_card_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_with_video_screen.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/quiz_with_video_screen_dark.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/new_reading_topic_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/unused_quiz_with_video_screen_dark.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/unused_new_reading_topic_screen.dart';
 
 class ChapterDetailScreen extends StatefulWidget {
   final String userName; // NO EN EL ORIGINAL, VA EN MODULOAPRENDIZAJE

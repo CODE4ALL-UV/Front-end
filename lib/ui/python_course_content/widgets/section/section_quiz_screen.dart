@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'dart:async';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/data/services/learning_analytics_service.dart';
@@ -44,6 +45,23 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
   int _index = 0;
   int? _selected;
   bool _answered = false;
+
+  /// Si ya se pidió la pista de la pregunta actual.
+  bool _hintShown = false;
+
+  final LearningPreferences _prefs = LearningPreferences.instance;
+
+  /// Si hay pista que ofrecer: que el estudiante las haya activado y que esta
+  /// pregunta traiga explicación. Sin explicación no hay nada que enseñar, y
+  /// un botón que abre un hueco vacío es peor que no tenerlo.
+  bool get _hintAvailable =>
+      _prefs.hintsEnabled && _question.explanation.trim().isNotEmpty;
+
+  void _showHint() {
+    setState(() => _hintShown = true);
+    announceForAccessibility(context, 'Pista: ${_question.explanation}');
+  }
+
   int _correctCount = 0;
   bool _finished = false;
 
@@ -102,6 +120,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
         _index++;
         _selected = null;
         _answered = false;
+        _hintShown = false;
         _shownAt = DateTime.now();
       });
       announceForAccessibility(
@@ -148,6 +167,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
       _index = 0;
       _selected = null;
       _answered = false;
+      _hintShown = false;
       _correctCount = 0;
       _finished = false;
       // Un intento nuevo empieza de cero: si no, arrastraria los aciertos del
@@ -244,6 +264,31 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
           ),
         ),
         const SizedBox(height: AppMetrics.sectionGap),
+        // La pista, si el estudiante la activó en «Apoyo».
+        //
+        // Se ofrece pedirla, no se suelta sola: darla antes de que la persona
+        // lo intente convierte el quiz en copiar la respuesta. Se usa la
+        // explicación que ya trae la pregunta, que es la misma que se muestra
+        // al responder, y por eso no hay texto que inventar ni mantener.
+        if (!_answered && _hintAvailable) ...[
+          if (_hintShown)
+            SectionCallout(
+              tone: AppThemeTone.info,
+              title: 'Pista',
+              body: _question.explanation,
+            )
+          else
+            Align(
+              alignment: Alignment.centerLeft,
+              child: SectionSecondaryButton(
+                label: 'Ver una pista',
+                icon: Icons.lightbulb_outline,
+                semanticHint: 'Muestra una ayuda para esta pregunta',
+                onPressed: _showHint,
+              ),
+            ),
+          const SizedBox(height: AppMetrics.sectionGap),
+        ],
         for (var i = 0; i < _question.options.length; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),

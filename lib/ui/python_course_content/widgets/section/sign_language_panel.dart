@@ -47,6 +47,7 @@ class SignLanguagePanel extends StatefulWidget {
     super.key,
     required this.text,
     this.isPlaying = true,
+    this.showWordSigns = true,
   });
 
   /// Texto que se está mostrando en el cuadro de subtítulos.
@@ -54,6 +55,13 @@ class SignLanguagePanel extends StatefulWidget {
 
   /// Si está en falso, la animación se detiene en la letra actual.
   final bool isPlaying;
+
+  /// Si se muestra también la mitad de la seña de la palabra completa.
+  ///
+  /// En el nivel «Básico» de «Lengua de señas» sólo se deletrea, que es lo que
+  /// de verdad hay dibujado. La mitad de la palabra queda para «Avanzado»,
+  /// donde tiene sentido enseñar además qué material falta por grabar.
+  final bool showWordSigns;
 
   @override
   State<SignLanguagePanel> createState() => _SignLanguagePanelState();
@@ -220,14 +228,18 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                                   )),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: _HalfTile(
-                      label: 'Lengua de señas',
-                      caption: word.isEmpty ? '—' : word,
-                      child: _SignDisplay(word: word, assetPath: wordAsset),
+                  // La seña de la palabra sólo en «Avanzado»: en «Básico» se
+                  // deletrea y ya, que es lo que de verdad hay dibujado.
+                  if (widget.showWordSigns) ...[
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _HalfTile(
+                        label: 'Lengua de señas',
+                        caption: word.isEmpty ? '—' : word,
+                        child: _SignDisplay(word: word, assetPath: wordAsset),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
               if (_letters.isNotEmpty) ...[

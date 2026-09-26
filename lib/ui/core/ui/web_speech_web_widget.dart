@@ -30,14 +30,18 @@ external SpeechSynthesis? get speechSynthesis;
 
 bool get isBrowserVoiceAvailable => speechSynthesis != null;
 
-void speakWithBrowserVoice(String text, {String language = 'es-ES'}) {
+void speakWithBrowserVoice(
+  String text, {
+  String language = 'es-ES',
+  double rate = 0.95,
+}) {
   try {
     final speech = speechSynthesis;
     if (speech == null) return;
 
     final utterance = SpeechSynthesisUtterance(text);
     utterance.lang = language;
-    utterance.rate = 0.95;
+    utterance.rate = rate;
     utterance.pitch = 1.0;
 
     speech.cancel();

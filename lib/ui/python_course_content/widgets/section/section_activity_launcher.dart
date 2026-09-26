@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/laboratory_console_screen.dart';
 import 'section_capsule_screen.dart';
 import 'section_example_screen.dart';
@@ -45,11 +46,29 @@ abstract final class SectionActivityLauncher {
   ];
 
   /// Las actividades disponibles de la sección, en orden.
+  ///
+  /// Si el estudiante dijo en «Preferencias de aprendizaje» qué tipo de
+  /// contenido prefiere, ese tipo se adelanta al principio. No se quita nada
+  /// ni se salta nada: la ruta sigue entera y en su orden pedagógico, solo
+  /// que empieza por donde a esa persona le entra mejor.
+  ///
+  /// «Audios» no reordena, porque no hay una actividad de audio: lo que hace
+  /// es que la lectura en voz alta empiece sola. Ver [LearningPreferences].
   static List<CourseActivityKind> activitiesFor(CourseSection section) {
-    return [
+    final available = [
       for (final kind in _order)
         if (_isAvailable(section, kind)) kind,
     ];
+
+    final preferred = switch (LearningPreferences.instance.contentPreference) {
+      ContentPreference.readings => CourseActivityKind.lectura,
+      ContentPreference.videos => CourseActivityKind.video,
+      ContentPreference.none || ContentPreference.audios => null,
+    };
+
+    if (preferred == null || !available.contains(preferred)) return available;
+
+    return [preferred, ...available.where((kind) => kind != preferred)];
   }
 
   static bool _isAvailable(CourseSection section, CourseActivityKind kind) =>

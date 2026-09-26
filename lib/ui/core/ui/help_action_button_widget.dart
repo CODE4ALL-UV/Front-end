@@ -3,7 +3,9 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/web_player_html.dart'; //Daniel Pruebas
 import 'package:flutter_code4all/web_player_html_2.dart'; //Daniel Pruebas
 import 'accessibility_settings_screen.dart';
+import 'accessibility_announcer_widget.dart';
 import 'accessibility_text_scale_widget.dart';
+import 'learning_preferences.dart';
 
 class HelpActionButton extends StatefulWidget {
   //AccessibilityMenu == HelpActionButton
@@ -101,6 +103,7 @@ class _HelpActionButtonState extends State<HelpActionButton>
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _textScaleController = AccessibilityTextScaleController.global;
     _textScaleController.addListener(_handleTextScaleChanged);
+    LearningPreferences.instance.ensureLoaded();
   }
 
   @override
@@ -692,6 +695,30 @@ class _OptionPanel extends StatefulWidget {
 }
 
 class _OptionPanelState extends State<_OptionPanel> {
+  /// Los ajustes de aprendizaje, de verdad.
+  ///
+  /// Estos paneles estaban dibujados pero vacíos: los botones tenían
+  /// `onTap: () {}` y el interruptor de la voz estaba fijo en `true`. Ahora
+  /// cada uno escribe aquí y lo que se elige se guarda y se nota.
+  final LearningPreferences _prefs = LearningPreferences.instance;
+
+  /// Aplica un ajuste y dice en qué quedó, por pantalla y en voz alta.
+  ///
+  /// El aviso no es un adorno: el panel se queda abierto y varios de estos
+  /// ajustes sólo se notan en otra pantalla, así que sin decirlo no habría
+  /// forma de saber si el toque hizo algo.
+  void _apply(Future<void> Function() change, String message) {
+    change();
+    setState(() {});
+    widget.onRefresh();
+    if (!mounted) return;
+
+    announceForAccessibility(context, message);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   /*
   This _OptionPanelState is the core brain of the white modal card. Your classmate used a very clean switch(widget.option) statement to dynamically render different UI layouts (the font size slider, the visual mode toggles, the sign language buttons) depending on which vertical button was tapped. It also properly connects to the AccessibilityTextScaleScope and app_theme.dart to actually apply the changes to the app.
 
@@ -1098,8 +1125,13 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                     ),
                   ),
                   Switch(
-                    value: true,
-                    onChanged: (value) {},
+                    value: _prefs.clearSpeech,
+                    onChanged: (value) => _apply(
+                      () => _prefs.setClearSpeech(value),
+                      value
+                          ? 'La voz irá más pausada.'
+                          : 'La voz vuelve a su ritmo normal.',
+                    ),
                     activeThumbColor: const Color(0xFF9575CD),
                     activeTrackColor: const Color(0xFFD8C8F5),
                     inactiveThumbColor: const Color(0xFFBDBDBD),
@@ -1113,9 +1145,15 @@ I assume the final parts of the file contain the small helper widgets mentioned 
               spacing: 8,
               runSpacing: 8,
               children: [
-                _buildSpeedPill('Lenta'),
-                _buildSpeedPill('Media'),
-                _buildSpeedPill('Rápida'),
+                for (final pace in SpeechPace.values)
+                  _buildSpeedPill(
+                    pace.label,
+                    selected: _prefs.pace == pace,
+                    onTap: () => _apply(
+                      () => _prefs.setPace(pace),
+                      'Velocidad de la voz: ${pace.label.toLowerCase()}.',
+                    ),
+                  ),
               ],
             ),
           ],
@@ -1148,8 +1186,17 @@ I assume the final parts of the file contain the small helper widgets mentioned 
               spacing: 8,
               runSpacing: 8,
               children: [
-                _LevelButton(label: 'Básico', onTap: () {}),
-                _LevelButton(label: 'Avanzado', onTap: () {}),
+                for (final level in SignSupportLevel.values)
+                  _LevelButton(
+                    label: level.label,
+                    selected: _prefs.signSupport == level,
+                    onTap: () => _apply(
+                      () => _prefs.setSignSupport(level),
+                      level == SignSupportLevel.off
+                          ? 'Apoyo en señas desactivado.'
+                          : 'Apoyo en señas: ${level.label.toLowerCase()}.',
+                    ),
+                  ),
               ],
             ),
           ],
@@ -1183,9 +1230,17 @@ I assume the final parts of the file contain the small helper widgets mentioned 
               spacing: 8,
               runSpacing: 8,
               children: [
-                _LevelButton(label: 'Lecturas', onTap: () {}),
-                _LevelButton(label: 'Videos', onTap: () {}),
-                _LevelButton(label: 'Audios', onTap: () {}),
+                for (final preference in ContentPreference.values)
+                  _LevelButton(
+                    label: preference.label,
+                    selected: _prefs.contentPreference == preference,
+                    onTap: () => _apply(
+                      () => _prefs.setContentPreference(preference),
+                      preference == ContentPreference.none
+                          ? 'Sin preferencia: las actividades van en su orden.'
+                          : '${preference.label} primero en cada sección.',
+                    ),
+                  ),
               ],
             ),
           ],
@@ -1218,9 +1273,17 @@ I assume the final parts of the file contain the small helper widgets mentioned 
               spacing: 8,
               runSpacing: 8,
               children: [
-                _LevelButton(label: 'Básico', onTap: () {}),
-                _LevelButton(label: 'Medio', onTap: () {}),
-                _LevelButton(label: 'Avanzado', onTap: () {}),
+                for (final level in LearningLevel.values)
+                  _LevelButton(
+                    label: level.label,
+                    selected: _prefs.level == level,
+                    onTap: () => _apply(
+                      () => _prefs.setLevel(level),
+                      level == LearningLevel.basic
+                          ? 'Nivel básico: verás los objetivos y la explicación de cada respuesta.'
+                          : 'Nivel ${level.label.toLowerCase()}.',
+                    ),
+                  ),
               ],
             ),
           ],
@@ -1253,7 +1316,20 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: [_LevelButton(label: 'Activar pista', onTap: () {})],
+              children: [
+                _LevelButton(
+                  label: _prefs.hintsEnabled
+                      ? 'Desactivar pistas'
+                      : 'Activar pistas',
+                  selected: _prefs.hintsEnabled,
+                  onTap: () => _apply(
+                    () => _prefs.setHintsEnabled(!_prefs.hintsEnabled),
+                    _prefs.hintsEnabled
+                        ? 'Pistas desactivadas.'
+                        : 'Pistas activadas: aparecerán en los quiz.',
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -1285,7 +1361,18 @@ I assume the final parts of the file contain the small helper widgets mentioned 
               spacing: 8,
               runSpacing: 8,
               children: [
-                _LevelButton(label: 'Activar manual interactivo', onTap: () {}),
+                _LevelButton(
+                  label: _prefs.manualEnabled
+                      ? 'Desactivar manual interactivo'
+                      : 'Activar manual interactivo',
+                  selected: _prefs.manualEnabled,
+                  onTap: () => _apply(
+                    () => _prefs.setManualEnabled(!_prefs.manualEnabled),
+                    _prefs.manualEnabled
+                        ? 'Manual interactivo desactivado.'
+                        : 'Manual interactivo activado: verás la guía al abrir una actividad.',
+                  ),
+                ),
               ],
             ),
           ],
@@ -1358,28 +1445,54 @@ Widget _buildInfoBanner({
   );
 }
 
-Widget _buildSpeedPill(String label) {
-  debugPrint('🚨 [TEST] _buildSpeedPill: BOTONES VERTICALES DESPLEGADOS');
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(999),
-      border: Border.all(color: const Color(0xFFD8C8F5)),
-      boxShadow: [
-        BoxShadow(
-          color: const Color(0xFF9575CD).withValues(alpha: 0.1),
-          blurRadius: 6,
-          offset: const Offset(0, 2),
+/// Una de las velocidades de la voz.
+///
+/// [selected] marca la que está puesta ahora. Sin eso se elegía a ciegas: el
+/// botón no cambiaba y no había forma de saber cuál estaba activa.
+Widget _buildSpeedPill(
+  String label, {
+  required bool selected,
+  required VoidCallback onTap,
+}) {
+  return Semantics(
+    button: true,
+    selected: selected,
+    label: 'Velocidad de la voz: $label',
+    child: ExcludeSemantics(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: AppMetrics.minTapTarget),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFF7E57C2) : Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: selected
+                  ? const Color(0xFF5B3E8A)
+                  : const Color(0xFFD8C8F5),
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (selected) ...[
+                const Icon(Icons.check, size: 14, color: Colors.white),
+                const SizedBox(width: 4),
+              ],
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: selected ? Colors.white : const Color(0xFF5B3E8A),
+                ),
+              ),
+            ],
+          ),
         ),
-      ],
-    ),
-    child: Text(
-      label,
-      style: const TextStyle(
-        fontSize: 12.5,
-        fontWeight: FontWeight.w600,
-        color: Color(0xFF5B3E8A),
       ),
     ),
   );
@@ -1389,33 +1502,62 @@ class _LevelButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _LevelButton({required this.label, required this.onTap});
+  /// Si es la opcion puesta ahora mismo.
+  ///
+  /// Antes no existia: se tocaba un boton y no cambiaba nada en pantalla, asi
+  /// que no habia forma de saber que se habia elegido ni que estaba activo.
+  final bool selected;
+
+  const _LevelButton({
+    required this.label,
+    required this.onTap,
+    this.selected = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('🚨 [TEST] _LevelButton: BOTONES VERTICALES DESPLEGADOS');
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFD4C4F2), width: 1.2),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF9575CD).withValues(alpha: 0.12),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: ExcludeSemantics(
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            constraints: const BoxConstraints(
+              minHeight: AppMetrics.minTapTarget,
             ),
-          ],
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF424242),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected ? const Color(0xFF7E57C2) : Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: selected
+                    ? const Color(0xFF5B3E8A)
+                    : const Color(0xFFD4C4F2),
+                width: selected ? 2 : 1.2,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (selected) ...[
+                  const Icon(Icons.check, size: 15, color: Colors.white),
+                  const SizedBox(width: 5),
+                ],
+                Flexible(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: selected ? Colors.white : const Color(0xFF424242),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

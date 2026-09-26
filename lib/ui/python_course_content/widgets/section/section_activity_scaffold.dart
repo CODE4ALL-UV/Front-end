@@ -3,6 +3,7 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'section_widgets.dart';
 
 /// Estructura común de todas las pantallas de actividad de la ruta.
@@ -61,6 +62,52 @@ class SectionActivityScaffold extends StatefulWidget {
 class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
   final ScrollController _scrollController = ScrollController();
 
+  final LearningPreferences _prefs = LearningPreferences.instance;
+
+  /// Si ya se mostró la guía en esta pantalla.
+  bool _manualShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _prefs.ensureLoaded().then((_) {
+      if (!mounted) return;
+      setState(() {});
+      _startAutoReadIfAsked();
+      _showManualIfAsked();
+    });
+  }
+
+  /// Empieza a leer en voz alta sola, si el estudiante prefirió «Audios».
+  ///
+  /// De poco sirve decir que se prefiere el audio si luego hay que pedirlo a
+  /// mano en cada pantalla.
+  void _startAutoReadIfAsked() {
+    if (!_prefs.autoReadAloud) return;
+    if (!mounted) return;
+    accessibilityReadingState.read(_spokenScript, context);
+  }
+
+  /// Muestra la guía de la pantalla, si el manual interactivo está activo.
+  ///
+  /// Se explica lo que hay en esta pantalla concreta y cómo usarlo, una vez
+  /// por visita. Repetirlo en cada redibujado lo convertiría en un estorbo.
+  void _showManualIfAsked() {
+    if (!_prefs.manualEnabled || _manualShown || !mounted) return;
+    _manualShown = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        builder: (context) => _ManualDialog(
+          activityLabel: widget.activityLabel,
+          sectionTitle: widget.sectionTitle,
+        ),
+      );
+    });
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -88,68 +135,68 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
         onLogout: null, //widget.onLogout,
       ),
       body: Column(
-          children: [
-            _ActivityBanner(
-              moduleLabel: widget.moduleLabel,
-              sectionTitle: widget.sectionTitle,
-              activityLabel: widget.activityLabel,
-              activityIcon: widget.activityIcon,
+        children: [
+          _ActivityBanner(
+            moduleLabel: widget.moduleLabel,
+            sectionTitle: widget.sectionTitle,
+            activityLabel: widget.activityLabel,
+            activityIcon: widget.activityIcon,
+          ),
+          AccessibilityToolbar(spokenText: _spokenScript),
+          if (widget.progress != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+              child: SectionProgressBar(
+                value: widget.progress!,
+                label: widget.progressLabel ?? 'Avance de la actividad',
+              ),
             ),
-            AccessibilityToolbar(spokenText: _spokenScript),
-            if (widget.progress != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
-                child: SectionProgressBar(
-                  value: widget.progress!,
-                  label: widget.progressLabel ?? 'Avance de la actividad',
+          Expanded(
+            child: Scrollbar(
+              controller: _scrollController,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                padding: AppMetrics.pagePadding(width),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: AppMetrics.maxContentWidth,
+                    ),
+                    child: widget.child,
+                  ),
                 ),
               ),
-            Expanded(
-              child: Scrollbar(
-                controller: _scrollController,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  padding: AppMetrics.pagePadding(width),
+            ),
+          ),
+          if (widget.bottomBar != null)
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: appSemanticColors.infoBackground,
+                border: Border(
+                  top: BorderSide(color: appSemanticColors.infoBorder),
+                ),
+              ),
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width < 380 ? 14 : 20,
+                    vertical: 12,
+                  ),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(
                         maxWidth: AppMetrics.maxContentWidth,
                       ),
-                      child: widget.child,
+                      child: widget.bottomBar!,
                     ),
                   ),
                 ),
               ),
             ),
-            if (widget.bottomBar != null)
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: appSemanticColors.infoBackground,
-                  border: Border(
-                    top: BorderSide(color: appSemanticColors.infoBorder),
-                  ),
-                ),
-                child: SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: width < 380 ? 14 : 20,
-                      vertical: 12,
-                    ),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          maxWidth: AppMetrics.maxContentWidth,
-                        ),
-                        child: widget.bottomBar!,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
+        ],
+      ),
     );
   }
 }
@@ -245,3 +292,132 @@ class _ActivityBanner extends StatelessWidget {
 }
 
 /// Barra con los controles de accesibilidad de la pantalla.
+
+/// La guía que aparece al abrir una actividad con el manual interactivo
+/// activo.
+///
+/// Explica qué hay en **esta** pantalla y cómo usarlo, no una ayuda genérica.
+/// Se escribe aquí y no en el catálogo del curso porque habla de los controles
+/// de la aplicación, que son los mismos para todos los módulos: si estuviera
+/// en el temario, habría que repetirla en cada una de las secciones.
+class _ManualDialog extends StatelessWidget {
+  const _ManualDialog({
+    required this.activityLabel,
+    required this.sectionTitle,
+  });
+
+  final String activityLabel;
+  final String sectionTitle;
+
+  /// Los pasos de cada tipo de actividad.
+  ///
+  /// Si aparece una actividad nueva y nadie escribe su guía, cae en la lista
+  /// general, que habla de los controles que están en todas las pantallas. Se
+  /// prefiere eso a no decir nada.
+  static const Map<String, List<String>> _steps = {
+    'Lectura': [
+      'El contenido va por páginas: avanza con el botón de abajo.',
+      'El botón «Escuchar» de la barra superior lee la página en voz alta, y '
+          'puedes pausarla donde quieras.',
+      'Con A− y A+ cambias el tamaño de la letra en toda la aplicación.',
+    ],
+    'Quiz': [
+      'Elige una opción para responder. Al hacerlo verás si acertaste y por qué.',
+      'Si activaste las pistas en el menú de ayuda, antes de responder aparece '
+          'el botón «Ver una pista».',
+      'Se aprueba con el 60 % de aciertos, y puedes repetir el intento.',
+    ],
+    'Evaluación': [
+      'Funciona como el quiz, pero cuenta para cerrar la sección.',
+      'Responde con calma: se guarda cuánto tardas, y sirve para que el docente '
+          'sepa qué pregunta está costando.',
+      'Puedes repetirla si no la apruebas.',
+    ],
+    'Ejemplo': [
+      'El código viene explicado línea por línea.',
+      'Debajo verás qué imprime al ejecutarse.',
+      'El botón «Escuchar» lee la explicación completa.',
+    ],
+    'Video': [
+      'El video tiene transcripción escrita: todo lo que se dice está también '
+          'en texto.',
+      'Si activaste «Lengua de señas» en el menú de ayuda, verás el panel que '
+          'deletrea lo que se está diciendo.',
+    ],
+    'Cápsula': [
+      'Son consejos cortos sobre el tema de la sección.',
+      'Léelos antes de pasar al ejercicio: resuelven los errores más comunes.',
+    ],
+  };
+
+  static const List<String> _general = [
+    'El botón «Escuchar» de la barra superior lee esta pantalla en voz alta.',
+    'Con A− y A+ cambias el tamaño de la letra en toda la aplicación.',
+    'El botón morado de ayuda abre los ajustes de aprendizaje y accesibilidad.',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final appSemanticColors = Theme.of(
+      context,
+    ).extension<ActivityThemeColors>()!;
+    final steps = _steps[activityLabel] ?? _general;
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      title: Row(
+        children: [
+          Icon(Icons.menu_book, color: appSemanticColors.infoText),
+          const SizedBox(width: 10),
+          Expanded(child: Text('Cómo usar esta pantalla')),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$activityLabel · $sectionTitle',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: appSemanticColors.infoText,
+            ),
+          ),
+          const SizedBox(height: 12),
+          for (var i = 0; i < steps.length; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 11,
+                    backgroundColor: appSemanticColors.infoBackground,
+                    child: Text(
+                      '${i + 1}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: appSemanticColors.infoText,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(steps[i], style: const TextStyle(fontSize: 13)),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Entendido'),
+        ),
+      ],
+    );
+  }
+}

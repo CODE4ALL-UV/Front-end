@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
 import 'package:flutter_code4all/youtube_translator_player.dart';
@@ -485,10 +486,20 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
     );
   }
 
+  /// El apoyo en senas, si el estudiante lo pidio en «Lengua de senas».
+  ///
+  /// Apagado no se muestra: para quien no lo necesita es media pantalla
+  /// ocupada por algo que no lee. En «Basico» se deletrea lo que se esta
+  /// diciendo; en «Avanzado» se anade la sena de la palabra cuando existe
+  /// grabada.
   Widget _buildSignPanel() {
+    final support = LearningPreferences.instance.signSupport;
+    if (support == SignSupportLevel.off) return const SizedBox.shrink();
+
     return SignLanguagePanel(
       text: _caption,
       isPlaying: _source == _CaptionSource.player || _isPlayingTranscript,
+      showWordSigns: support == SignSupportLevel.advanced,
     );
   }
 

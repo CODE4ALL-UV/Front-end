@@ -3,6 +3,7 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart';
@@ -182,7 +183,11 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
               ],
             ],
           ),
-          if (widget.section.objectives.isNotEmpty) ...[
+          // En «Avanzado» los objetivos se retiran para dejar sitio a la
+          // ruta de actividades. En básico y medio se ven, y medio es el nivel
+          // de partida: un ajuste que nadie ha tocado no cambia lo que se ve.
+          if (widget.section.objectives.isNotEmpty &&
+              !LearningPreferences.instance.hidesScaffolding) ...[
             const SizedBox(height: 18),
             Text(
               'Objetivos de la sección',

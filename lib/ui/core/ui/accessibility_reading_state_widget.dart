@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'accessibility_announcer_widget.dart';
+import 'learning_preferences.dart';
 import 'web_speech_stub_widget.dart'
     if (dart.library.js_interop) 'web_speech_web_widget.dart'
     as web_speech;
@@ -142,7 +143,11 @@ class AccessibilityReadingState {
 
     try {
       await _flutterTts.setLanguage('es-ES');
-      await _flutterTts.setSpeechRate(0.3); // 0.5 era la velodiad original
+      // La velocidad la elige el estudiante en «Asistencia auditiva». Antes
+      // estaba fija en 0.3, así que ese panel no servía para nada.
+      await _flutterTts.setSpeechRate(
+        LearningPreferences.instance.effectiveSpeechRate,
+      );
       await _flutterTts.setPitch(1.0);
       await _flutterTts.setVolume(1.0);
       // Obliga a FlutterTts a esperar que termine el audio antes de resolver el Future de speak()
@@ -254,14 +259,24 @@ class AccessibilityReadingState {
     _offsetBase = safeOffset;
     _spokenUpTo = safeOffset;
 
+    final prefs = LearningPreferences.instance;
+
     if (kIsWeb) {
-      web_speech.speakWithBrowserVoice(pending);
+      // En el navegador 1.0 es la velocidad normal; en móvil lo normal ronda
+      // 0.5. Se traduce para que «Media» suene igual en los dos sitios.
+      web_speech.speakWithBrowserVoice(
+        pending,
+        rate: (prefs.effectiveSpeechRate * 2).clamp(0.5, 2.0),
+      );
       _scheduleWebReadingEnd(pending);
       return;
     }
 
     try {
       await initialize();
+      // Se pide en cada lectura, no solo al arrancar: si se pidiera una vez,
+      // cambiar la velocidad en el panel no se notaría hasta reiniciar.
+      await _flutterTts.setSpeechRate(prefs.effectiveSpeechRate);
       await _flutterTts.speak(pending);
     } catch (e, st) {
       debugPrint('Error al reproducir TTS: $e');

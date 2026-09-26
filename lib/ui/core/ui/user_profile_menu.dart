@@ -135,6 +135,19 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
 
     if (!mounted) return;
 
+    // Vaciar lo que haya apilado encima, antes de nada.
+    //
+    // Los modulos siguientes, los capitulos y las actividades se abren con
+    // `Navigator.push`, asi que quedan encima de la pagina de inicio. Quien
+    // cierra sesion desde ahi solo cambia esa pagina de abajo, y el login se
+    // dibuja escondido debajo de donde estaba: en pantalla no pasa nada.
+    //
+    // Va aqui y no dentro de `SessionController` porque cuando la pantalla
+    // recibe su propio `onLogout` —que es el caso de los modulos— ese camino
+    // ni siquiera llega al controlador.
+    final navigator = Navigator.of(context);
+    navigator.popUntil((route) => route.isFirst);
+
     setState(() {
       _userName = '';
       _userPhotoUrl = null;

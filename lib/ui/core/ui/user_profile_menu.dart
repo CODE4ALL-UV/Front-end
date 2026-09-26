@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/data/services/session_controller.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
+import 'package:flutter_code4all/ui/core/ui/sign_keyboard_settings.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
@@ -40,6 +41,8 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
   String? _userEmail;
   String? _userRole;
 
+  final SignKeyboardSettings _signKeyboard = SignKeyboardSettings.instance;
+
   @override
   void initState() {
     super.initState();
@@ -48,6 +51,39 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
         : '';
     _userPhotoUrl = widget.userPhotoUrl;
     _loadProfile();
+
+    _signKeyboard.addListener(_onSignKeyboardChanged);
+    _signKeyboard.ensureLoaded();
+  }
+
+  void _onSignKeyboardChanged() {
+    if (mounted) setState(() {});
+  }
+
+  /// Enciende o apaga el teclado de dactilología.
+  ///
+  /// Se avisa por pantalla de en qué queda porque el menú se cierra al
+  /// elegir, así que sin el aviso no habría forma de saber si se activó o se
+  /// desactivó hasta ir a escribir a algún sitio.
+  Future<void> _toggleSignKeyboard() async {
+    await _signKeyboard.toggle();
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          _signKeyboard.isEnabled
+              ? 'Teclado con dactilología activado. Aparecerá al escribir.'
+              : 'Teclado con dactilología desactivado.',
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _signKeyboard.removeListener(_onSignKeyboardChanged);
+    super.dispose();
   }
 
   @override
@@ -354,6 +390,8 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
           _showProfileDialog();
         } else if (value == 'logout') {
           _handleLogout();
+        } else if (value == 'sign_keyboard') {
+          _toggleSignKeyboard();
         }
       },
       // El color va explicito. Sin el, los iconos heredan el blanco de la
@@ -361,8 +399,33 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
       // el texto pero no el icono.
       itemBuilder: (context) {
         final onMenu = theme.colorScheme.onSurface;
+        final isStudent = (_userRole ?? '').trim().toLowerCase() == 'estudiante';
 
         return [
+          // Sólo para el estudiante: es quien está aprendiendo el alfabeto
+          // manual, y para el docente o la dirección sería un teclado más
+          // lento sin nada a cambio.
+          if (isStudent)
+            PopupMenuItem<String>(
+              value: 'sign_keyboard',
+              child: Row(
+                children: [
+                  Icon(
+                    _signKeyboard.isEnabled
+                        ? Icons.check_box
+                        : Icons.check_box_outline_blank,
+                    color: onMenu,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'Teclado con dactilología',
+                      style: TextStyle(color: onMenu),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           PopupMenuItem<String>(
             value: 'profile',
             child: Row(

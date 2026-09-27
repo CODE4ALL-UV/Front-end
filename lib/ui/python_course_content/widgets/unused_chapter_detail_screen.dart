@@ -1,6 +1,7 @@
 //REFACTOR-APROVED - COLOR TEST REMAINING - DONT TESTED IN UI
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/new_python_module_model.dart';
+import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart';

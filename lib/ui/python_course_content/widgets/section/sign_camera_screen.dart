@@ -6,6 +6,7 @@ import 'package:flutter_code4all/data/services/sign_recognition_service.dart';
 import 'package:flutter_code4all/domain/models/sign_language/hand_alphabet.dart';
 import 'package:flutter_code4all/domain/models/sign_language/hand_landmark_classifier.dart';
 import 'package:flutter_code4all/domain/models/sign_language/sign_dictation.dart';
+import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';

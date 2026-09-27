@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/course_analytics_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
+import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'teacher_report.dart';
 import 'teacher_widgets.dart';

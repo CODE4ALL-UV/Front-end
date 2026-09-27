@@ -37,7 +37,7 @@ class _AppState extends State<App> {
 
   // NUEVO: Agregamos una variable para saber en qué módulo estamos globalmente.
   // Por defecto es 1 (Azul). Cuando el usuario abra un módulo, debes actualizar esta variable.
-  int _currentModuleId = 1;
+  int _currentModuleId = 6;
 
   // MODIFICADO: (DUDA PAPACHO) Tienes toda la razón. Los textos de los botones
   // no tienen nada que ver con el tema visual. Lo dejamos como una lista fija.

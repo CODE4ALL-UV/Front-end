@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-
 import 'accessibility_announcer_widget.dart';
 import 'accessibility_reading_state_widget.dart';
 import 'accessibility_text_scale_widget.dart';
@@ -60,12 +58,11 @@ class AccessibilityToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textScale = AccessibilityTextScaleScope.of(context);
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appModuleTheme = context.moduleTheme;
 
     return Container(
       width: double.infinity,
-      color: appSemanticColors.infoBackground,
+      color: appModuleTheme.headerBackground.withValues(alpha: 0.4),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Center(
         child: ConstrainedBox(
@@ -98,8 +95,10 @@ class AccessibilityToolbar extends StatelessWidget {
                         child: TextButton.icon(
                           onPressed: () => _toggleSpeech(context),
                           style: TextButton.styleFrom(
-                            backgroundColor: appSemanticColors.infoBackground,
-                            foregroundColor: appSemanticColors.infoText,
+                            backgroundColor: appModuleTheme.headerBackground
+                                .withValues(alpha: 0.3),
+                            foregroundColor:
+                                appModuleTheme.headerForegroundColor,
                             minimumSize: const Size(
                               AppMetrics.minTapTarget,
                               AppMetrics.minTapTarget,
@@ -151,7 +150,7 @@ class AccessibilityToolbar extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: appSemanticColors.infoText,
+                            color: appModuleTheme.headerForegroundColor,
                           ),
                         ),
                       ),
@@ -185,8 +184,7 @@ class _TextScaleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appModuleTheme = context.moduleTheme;
 
     return Semantics(
       button: true,
@@ -194,7 +192,7 @@ class _TextScaleButton extends StatelessWidget {
       child: IconButton(
         onPressed: onPressed,
         icon: Icon(icon, size: 24),
-        color: appSemanticColors.infoText,
+        color: appModuleTheme.headerForegroundColor,
         tooltip: label,
         constraints: const BoxConstraints(
           minWidth: AppMetrics.minTapTarget,

@@ -312,14 +312,14 @@ class AppTheme {
               .onPrimary, // Solo pisamos el color, hereda todo lo demás
         ),
       ),
-      bottomAppBarTheme: BottomAppBarThemeData(
-        color: colorScheme.primary,
-        elevation: 8.0,
-        height: 56.0,
-        padding: const EdgeInsets.symmetric(vertical: 1.0),
-        shadowColor: const Color(0x14000000),
-        surfaceTintColor: colorScheme.onPrimary,
-      ),
+      // bottomAppBarTheme: BottomAppBarThemeData(
+      //   color: colorScheme.primary,
+      //   elevation: 8.0,
+      //   height: 56.0,
+      //   padding: const EdgeInsets.symmetric(vertical: 1.0),
+      //   shadowColor: const Color(0x14000000),
+      //   surfaceTintColor: colorScheme.onPrimary,
+      // ),
       cardTheme: CardThemeData(
         color: colorScheme.surface,
         elevation: 2,
@@ -416,7 +416,7 @@ class AppTheme {
     );
   }
 
-  static ThemeData getTheme({required AppThemeMode mode, int moduleId = 1}) {
+  static ThemeData getTheme({required AppThemeMode mode, int moduleId = 6}) {
     switch (mode) {
       case AppThemeMode.light:
         return _buildTheme(

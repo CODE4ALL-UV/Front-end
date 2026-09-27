@@ -88,8 +88,8 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final appTheme = context.activityColors;
     final colorScheme = context.colorScheme;
+    final appModuleTheme = context.moduleTheme;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -101,12 +101,12 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
         children: [
           Container(
             width: double.infinity,
-            color: colorScheme.surfaceContainerHighest,
+            color: appModuleTheme.headerBackground.withValues(alpha: 0.6),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Text(
               widget.module.label,
               style: TextStyle(
-                color: appTheme.infoText,
+                color: appModuleTheme.headerForegroundColor,
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.3,
@@ -161,7 +161,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
   }
 
   Widget _buildSummaryCard() {
-    final appTheme = context.activityColors;
+    final colorScheme = context.colorScheme;
 
     return SectionCard(
       child: Column(
@@ -194,7 +194,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
               style: TextStyle(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w700,
-                color: appTheme.infoText,
+                color: colorScheme.onTertiary,
               ),
             ),
             const SizedBox(height: 10),

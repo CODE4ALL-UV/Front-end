@@ -123,7 +123,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   Widget _buildModuleNavigation(BuildContext context) {
     final hasNext = widget.moduleId < widget.totalModules;
     final hasPrevious = widget.moduleId > 1;
-
+    final colorScheme = context.colorScheme;
     final appSemanticColors = Theme.of(
       context,
     ).extension<ActivityThemeColors>()!;
@@ -131,7 +131,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: appSemanticColors.infoBackground,
+        color: colorScheme.onPrimary.withValues(alpha: 0.4),
         border: Border(top: BorderSide(color: appSemanticColors.infoBorder)),
       ),
       child: SafeArea(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/ide_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/module_theme.dart';
 
@@ -131,114 +132,6 @@ enum AppThemeMode {
   deuteranopia, // Deficiencia Rojo-Verde (Énfasis en Azules y Amarillos)
   protanopia, // Insensibilidad al Rojo (Azul profundo y Dorado)
   tritanopia, // Deficiencia Azul-Amarillo (Rojo/Rosa y Cian/Verde)
-}
-
-enum AppThemeTone { info, success, warning, danger }
-
-class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
-  final Color infoBackground;
-  final Color infoBorder;
-  final Color infoText;
-  final Color successBackground;
-  final Color successBorder;
-  final Color successText;
-  final Color warningBackground;
-  final Color warningBorder;
-  final Color warningText;
-  final Color dangerBackground;
-  final Color dangerBorder;
-  final Color dangerText;
-
-  const ActivityThemeColors({
-    required this.infoBackground,
-    required this.infoBorder,
-    required this.infoText,
-    required this.successBackground,
-    required this.successBorder,
-    required this.successText,
-    required this.warningBackground,
-    required this.warningBorder,
-    required this.warningText,
-    required this.dangerBackground,
-    required this.dangerBorder,
-    required this.dangerText,
-  });
-
-  ({Color background, Color border, Color text}) tone(AppThemeTone tone) =>
-      switch (tone) {
-        AppThemeTone.info => (
-          background: infoBackground,
-          border: infoBorder,
-          text: infoText,
-        ),
-        AppThemeTone.success => (
-          background: successBackground,
-          border: successBorder,
-          text: successText,
-        ),
-        AppThemeTone.warning => (
-          background: warningBackground,
-          border: warningBorder,
-          text: warningText,
-        ),
-        AppThemeTone.danger => (
-          background: dangerBackground,
-          border: dangerBorder,
-          text: dangerText,
-        ),
-      };
-
-  @override
-  ActivityThemeColors copyWith({Color? background}) {
-    return ActivityThemeColors(
-      infoBackground: infoBackground,
-      infoBorder: infoBorder,
-      infoText: infoText,
-      successBackground: successBackground,
-      successBorder: successBorder,
-      successText: successText,
-      warningBackground: warningBackground,
-      warningBorder: warningBorder,
-      warningText: warningText,
-      dangerBackground: dangerBackground,
-      dangerBorder: dangerBorder,
-      dangerText: dangerText,
-    );
-  }
-
-  @override
-  ActivityThemeColors lerp(
-    ThemeExtension<ActivityThemeColors>? other,
-    double t,
-  ) {
-    if (other is! ActivityThemeColors) return this;
-    return ActivityThemeColors(
-      infoBackground: Color.lerp(infoBackground, other.infoBackground, t)!,
-      infoBorder: Color.lerp(infoBorder, other.infoBorder, t)!,
-      infoText: Color.lerp(infoText, other.infoText, t)!,
-      successBackground: Color.lerp(
-        successBackground,
-        other.successBackground,
-        t,
-      )!,
-      successBorder: Color.lerp(successBorder, other.successBorder, t)!,
-      successText: Color.lerp(successText, other.successText, t)!,
-      warningBackground: Color.lerp(
-        warningBackground,
-        other.warningBackground,
-        t,
-      )!,
-      warningBorder: Color.lerp(warningBorder, other.warningBorder, t)!,
-      warningText: Color.lerp(warningText, other.warningText, t)!,
-      dangerBackground: Color.lerp(
-        dangerBackground,
-        other.dangerBackground,
-        t,
-      )!,
-      dangerBorder: Color.lerp(dangerBorder, other.dangerBorder, t)!,
-      dangerText: Color.lerp(dangerText, other.dangerText, t)!,
-    );
-  }
 }
 
 class AppTheme {

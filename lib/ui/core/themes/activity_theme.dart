@@ -13,123 +13,227 @@ import 'package:flutter/material.dart';
 // laboratorio: azul verde OK
 // evaluacion final: rojo naranja OK
 // Omitidos: Glosario, Diccionario de LSC, Diagramas de flujo, Glosario interactivo, Califiaciones
-enum AppThemeTone { info, success, warning, danger }
+enum ActivityThemeTone {
+  reading,
+  nugget,
+  example,
+  exercise,
+  video,
+  quiz,
+  lab,
+  finalEvaluation,
+}
 
-class ActivityThemeColors extends ThemeExtension<ActivityThemeColors> {
-  final Color infoBackground;
-  final Color infoBorder;
-  final Color infoText;
-  final Color successBackground;
-  final Color successBorder;
-  final Color successText;
-  final Color warningBackground;
-  final Color warningBorder;
-  final Color warningText;
-  final Color dangerBackground;
-  final Color dangerBorder;
-  final Color dangerText;
+class ActivityTheme extends ThemeExtension<ActivityTheme> {
+  final Color readingBackground;
+  final Color readingBorder;
+  final Color readingText;
+  final Color nuggetBackground;
+  final Color nuggetBorder;
+  final Color nuggetText;
+  final Color exampleBackground;
+  final Color exampleBorder;
+  final Color exampleText;
+  final Color exerciseBackground;
+  final Color exerciseBorder;
+  final Color exerciseText;
+  final Color videoBackground;
+  final Color videoBorder;
+  final Color videoText;
+  final Color quizBackground;
+  final Color quizBorder;
+  final Color quizText;
+  final Color labBackground;
+  final Color labBorder;
+  final Color labText;
+  final Color finalEvaluationBackground;
+  final Color finalEvaluationBorder;
+  final Color finalEvaluationText;
 
-  const ActivityThemeColors({
-    required this.infoBackground,
-    required this.infoBorder,
-    required this.infoText,
-    required this.successBackground,
-    required this.successBorder,
-    required this.successText,
-    required this.warningBackground,
-    required this.warningBorder,
-    required this.warningText,
-    required this.dangerBackground,
-    required this.dangerBorder,
-    required this.dangerText,
+  const ActivityTheme({
+    required this.readingBackground,
+    required this.readingBorder,
+    required this.readingText,
+    required this.nuggetBackground,
+    required this.nuggetBorder,
+    required this.nuggetText,
+    required this.exampleBackground,
+    required this.exampleBorder,
+    required this.exampleText,
+    required this.exerciseBackground,
+    required this.exerciseBorder,
+    required this.exerciseText,
+    required this.videoBackground,
+    required this.videoBorder,
+    required this.videoText,
+    required this.quizBackground,
+    required this.quizBorder,
+    required this.quizText,
+    required this.labBackground,
+    required this.labBorder,
+    required this.labText,
+    required this.finalEvaluationBackground,
+    required this.finalEvaluationBorder,
+    required this.finalEvaluationText,
   });
 
-  ({Color background, Color border, Color text}) tone(AppThemeTone tone) =>
+  ({Color background, Color border, Color text}) tone(ActivityThemeTone tone) =>
       switch (tone) {
-        AppThemeTone.info => (
-          background: infoBackground,
-          border: infoBorder,
-          text: infoText,
+        ActivityThemeTone.reading => (
+          background: readingBackground,
+          border: readingBorder,
+          text: readingText,
         ),
-        AppThemeTone.success => (
-          background: successBackground,
-          border: successBorder,
-          text: successText,
+        ActivityThemeTone.nugget => (
+          background: nuggetBackground,
+          border: nuggetBorder,
+          text: nuggetText,
         ),
-        AppThemeTone.warning => (
-          background: warningBackground,
-          border: warningBorder,
-          text: warningText,
+        ActivityThemeTone.example => (
+          background: exampleBackground,
+          border: exampleBorder,
+          text: exampleText,
         ),
-        AppThemeTone.danger => (
-          background: dangerBackground,
-          border: dangerBorder,
-          text: dangerText,
+        ActivityThemeTone.exercise => (
+          background: exerciseBackground,
+          border: exerciseBorder,
+          text: exerciseText,
+        ),
+        ActivityThemeTone.video => (
+          background: videoBackground,
+          border: videoBorder,
+          text: videoText,
+        ),
+        ActivityThemeTone.quiz => (
+          background: quizBackground,
+          border: quizBorder,
+          text: quizText,
+        ),
+        ActivityThemeTone.lab => (
+          background: labBackground,
+          border: labBorder,
+          text: labText,
+        ),
+        ActivityThemeTone.finalEvaluation => (
+          background: finalEvaluationBackground,
+          border: finalEvaluationBorder,
+          text: finalEvaluationText,
         ),
       };
 
   @override
-  ActivityThemeColors copyWith({
-    Color? infoBackground,
-    Color? infoBorder,
-    Color? infoText,
-    Color? successBackground,
-    Color? successBorder,
-    Color? successText,
-    Color? warningBackground,
-    Color? warningBorder,
-    Color? warningText,
-    Color? dangerBackground,
-    Color? dangerBorder,
-    Color? dangerText,
+  ActivityTheme copyWith({
+    Color? readingBackground,
+    Color? readingBorder,
+    Color? readingText,
+    Color? nuggetBackground,
+    Color? nuggetBorder,
+    Color? nuggetText,
+    Color? exampleBackground,
+    Color? exampleBorder,
+    Color? exampleText,
+    Color? exerciseBackground,
+    Color? exerciseBorder,
+    Color? exerciseText,
+    Color? videoBackground,
+    Color? videoBorder,
+    Color? videoText,
+    Color? quizBackground,
+    Color? quizBorder,
+    Color? quizText,
+    Color? labBackground,
+    Color? labBorder,
+    Color? labText,
+    Color? finalEvaluationBackground,
+    Color? finalEvaluationBorder,
+    Color? finalEvaluationText,
   }) {
-    return ActivityThemeColors(
-      infoBackground: infoBackground ?? this.infoBackground,
-      infoBorder: infoBorder ?? this.infoBorder,
-      infoText: infoText ?? this.infoText,
-      successBackground: successBackground ?? this.successBackground,
-      successBorder: successBorder ?? this.successBorder,
-      successText: successText ?? this.successText,
-      warningBackground: warningBackground ?? this.warningBackground,
-      warningBorder: warningBorder ?? this.warningBorder,
-      warningText: warningText ?? this.warningText,
-      dangerBackground: dangerBackground ?? this.dangerBackground,
-      dangerBorder: dangerBorder ?? this.dangerBorder,
-      dangerText: dangerText ?? this.dangerText,
+    return ActivityTheme(
+      readingBackground: readingBackground ?? this.readingBackground,
+      readingBorder: readingBorder ?? this.readingBorder,
+      readingText: readingText ?? this.readingText,
+      nuggetBackground: nuggetBackground ?? this.nuggetBackground,
+      nuggetBorder: nuggetBorder ?? this.nuggetBorder,
+      nuggetText: nuggetText ?? this.nuggetText,
+      exampleBackground: exampleBackground ?? this.exampleBackground,
+      exampleBorder: exampleBorder ?? this.exampleBorder,
+      exampleText: exampleText ?? this.exampleText,
+      exerciseBackground: exerciseBackground ?? this.exerciseBackground,
+      exerciseBorder: exerciseBorder ?? this.exerciseBorder,
+      exerciseText: exerciseText ?? this.exerciseText,
+      videoBackground: videoBackground ?? this.videoBackground,
+      videoBorder: videoBorder ?? this.videoBorder,
+      videoText: videoText ?? this.videoText,
+      quizBackground: quizBackground ?? this.quizBackground,
+      quizBorder: quizBorder ?? this.quizBorder,
+      quizText: quizText ?? this.quizText,
+      labBackground: labBackground ?? this.labBackground,
+      labBorder: labBorder ?? this.labBorder,
+      labText: labText ?? this.labText,
+      finalEvaluationBackground:
+          finalEvaluationBackground ?? this.finalEvaluationBackground,
+      finalEvaluationBorder:
+          finalEvaluationBorder ?? this.finalEvaluationBorder,
+      finalEvaluationText: finalEvaluationText ?? this.finalEvaluationText,
     );
   }
 
   @override
-  ActivityThemeColors lerp(
-    ThemeExtension<ActivityThemeColors>? other,
-    double t,
-  ) {
-    if (other is! ActivityThemeColors) return this;
-    return ActivityThemeColors(
-      infoBackground: Color.lerp(infoBackground, other.infoBackground, t)!,
-      infoBorder: Color.lerp(infoBorder, other.infoBorder, t)!,
-      infoText: Color.lerp(infoText, other.infoText, t)!,
-      successBackground: Color.lerp(
-        successBackground,
-        other.successBackground,
+  ActivityTheme lerp(ThemeExtension<ActivityTheme>? other, double t) {
+    if (other is! ActivityTheme) return this;
+    return ActivityTheme(
+      readingBackground: Color.lerp(
+        readingBackground,
+        other.readingBackground,
         t,
       )!,
-      successBorder: Color.lerp(successBorder, other.successBorder, t)!,
-      successText: Color.lerp(successText, other.successText, t)!,
-      warningBackground: Color.lerp(
-        warningBackground,
-        other.warningBackground,
+      readingBorder: Color.lerp(readingBorder, other.readingBorder, t)!,
+      readingText: Color.lerp(readingText, other.readingText, t)!,
+      nuggetBackground: Color.lerp(
+        nuggetBackground,
+        other.nuggetBackground,
         t,
       )!,
-      warningBorder: Color.lerp(warningBorder, other.warningBorder, t)!,
-      warningText: Color.lerp(warningText, other.warningText, t)!,
-      dangerBackground: Color.lerp(
-        dangerBackground,
-        other.dangerBackground,
+      nuggetBorder: Color.lerp(nuggetBorder, other.nuggetBorder, t)!,
+      nuggetText: Color.lerp(nuggetText, other.nuggetText, t)!,
+      exampleBackground: Color.lerp(
+        exampleBackground,
+        other.exampleBackground,
         t,
       )!,
-      dangerBorder: Color.lerp(dangerBorder, other.dangerBorder, t)!,
-      dangerText: Color.lerp(dangerText, other.dangerText, t)!,
+      exampleBorder: Color.lerp(exampleBorder, other.exampleBorder, t)!,
+      exampleText: Color.lerp(exampleText, other.exampleText, t)!,
+      exerciseBackground: Color.lerp(
+        exerciseBackground,
+        other.exerciseBackground,
+        t,
+      )!,
+      exerciseBorder: Color.lerp(exerciseBorder, other.exerciseBorder, t)!,
+      exerciseText: Color.lerp(exerciseText, other.exerciseText, t)!,
+      videoBackground: Color.lerp(videoBackground, other.videoBackground, t)!,
+      videoBorder: Color.lerp(videoBorder, other.videoBorder, t)!,
+      videoText: Color.lerp(videoText, other.videoText, t)!,
+      quizBackground: Color.lerp(quizBackground, other.quizBackground, t)!,
+      quizBorder: Color.lerp(quizBorder, other.quizBorder, t)!,
+      quizText: Color.lerp(quizText, other.quizText, t)!,
+      labBackground: Color.lerp(labBackground, other.labBackground, t)!,
+      labBorder: Color.lerp(labBorder, other.labBorder, t)!,
+      labText: Color.lerp(labText, other.labText, t)!,
+      finalEvaluationBackground: Color.lerp(
+        finalEvaluationBackground,
+        other.finalEvaluationBackground,
+        t,
+      )!,
+      finalEvaluationBorder: Color.lerp(
+        finalEvaluationBorder,
+        other.finalEvaluationBorder,
+        t,
+      )!,
+      finalEvaluationText: Color.lerp(
+        finalEvaluationText,
+        other.finalEvaluationText,
+        t,
+      )!,
     );
   }
 }

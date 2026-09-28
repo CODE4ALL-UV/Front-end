@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
-
 import 'director_widgets.dart';
 
 /// Todo sobre un docente: lo que ha hecho y cómo se le ha valorado.
@@ -70,7 +68,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
   @override
   Widget build(BuildContext context) {
     // Usando el shortcut de tu extensión en app_theme_2.dart
-    final activityColors = context.activityColors;
+    final activityColors = context.messageColors;
     final appColorScheme = context.colorScheme;
     final teacher = widget.teacher;
 
@@ -115,10 +113,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
     );
   }
 
-  List<Widget> _body(
-    ActivityThemeColors activityColors,
-    TeacherSummary teacher,
-  ) {
+  List<Widget> _body(MessageTheme activityColors, TeacherSummary teacher) {
     final edits = _edits;
     final reviews = _reviews;
 
@@ -216,12 +211,8 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
     ];
   }
 
-  // Corregido: Se pasa ActivityThemeColors en lugar de AppTheme
-  Widget _title(
-    ActivityThemeColors activityColors,
-    String text,
-    IconData icon,
-  ) => Row(
+  // Corregido: Se pasa MessageTheme en lugar de AppTheme
+  Widget _title(MessageTheme activityColors, String text, IconData icon) => Row(
     children: [
       // Corregido: Reemplazado el inexistente appTheme.accent
       Icon(icon, size: 19, color: activityColors.infoText),
@@ -239,8 +230,8 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
     ],
   );
 
-  // Corregido: Se pasa ActivityThemeColors en lugar de AppTheme
-  Widget _note(ActivityThemeColors activityColors, String text) => Text(
+  // Corregido: Se pasa MessageTheme en lugar de AppTheme
+  Widget _note(MessageTheme activityColors, String text) => Text(
     text,
     style: TextStyle(
       fontSize: 12.5,
@@ -258,7 +249,7 @@ class _EditRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
     final colorScheme = context.colorScheme;
     final status = edit.reviewStatus;
 
@@ -357,7 +348,7 @@ class _ReviewRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
     final colorScheme = context.colorScheme;
 
     return Semantics(
@@ -476,7 +467,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
   @override
   Widget build(BuildContext context) {
     // Referencias a tu nueva arquitectura de temas
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
     final colorScheme = context.colorScheme;
 
     return Padding(

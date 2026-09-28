@@ -89,7 +89,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final colorScheme = context.colorScheme;
-    final appModuleTheme = context.moduleTheme;
+    final appModuleTheme = context.moduleColors;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -266,13 +266,13 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
 
     if (!hasPrevious && !hasNext) return const SizedBox.shrink();
 
-    final appTheme = context.activityColors;
+    final messageTheme = context.messageColors;
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: appTheme.infoBackground,
-        border: Border(top: BorderSide(color: appTheme.infoBorder)),
+        color: messageTheme.infoBackground,
+        border: Border(top: BorderSide(color: messageTheme.infoBorder)),
       ),
       child: SafeArea(
         top: false,
@@ -335,7 +335,7 @@ class _ActivityTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activityColors = SectionActivityLauncher.colorsFor(context, kind);
-    final appTheme = context.activityColors;
+    final messageTheme = context.messageColors;
     final colorScheme = context.colorScheme;
 
     return Semantics(
@@ -363,7 +363,7 @@ class _ActivityTile extends StatelessWidget {
                 border: Border.all(
                   color: isCompleted
                       ? Colors.green.withValues(alpha: 0.55)
-                      : appTheme.infoBorder,
+                      : messageTheme.infoBorder,
                   width: isCompleted ? 1.8 : 1.2,
                 ),
               ),
@@ -404,7 +404,7 @@ class _ActivityTile extends StatelessWidget {
                           fontSize: 15.5,
                           height: 1.35,
                           fontWeight: FontWeight.w700,
-                          color: appTheme.infoText,
+                          color: messageTheme.infoText,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -413,7 +413,7 @@ class _ActivityTile extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.5,
                           height: 1.45,
-                          color: appTheme.infoText,
+                          color: messageTheme.infoText,
                         ),
                       ),
                       if (detail.isNotEmpty) ...[

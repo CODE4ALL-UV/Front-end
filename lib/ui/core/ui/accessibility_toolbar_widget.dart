@@ -58,7 +58,7 @@ class AccessibilityToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textScale = AccessibilityTextScaleScope.of(context);
-    final appModuleTheme = context.moduleTheme;
+    final appModuleTheme = context.moduleColors;
 
     return Container(
       width: double.infinity,
@@ -184,7 +184,7 @@ class _TextScaleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appModuleTheme = context.moduleTheme;
+    final appModuleTheme = context.moduleColors;
 
     return Semantics(
       button: true,

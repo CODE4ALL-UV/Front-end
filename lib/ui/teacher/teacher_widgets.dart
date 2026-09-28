@@ -4,7 +4,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
 /// Señal de que algo tiene cambios del docente.
@@ -18,7 +17,7 @@ class EditedDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 1. El widget extrae sus propios colores aquí adentro:
-    final activityColors = Theme.of(context).extension<ActivityThemeColors>()!;
+    final activityColors = context.messageColors;
     return Semantics(
       label: label,
       child: Container(
@@ -43,7 +42,7 @@ class TeacherBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColors = Theme.of(context).extension<ActivityThemeColors>()!;
+    final themeColors = context.messageColors;
 
     return Semantics(
       liveRegion: true,
@@ -102,9 +101,8 @@ class TeacherField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final colorsTheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +112,7 @@ class TeacherField extends StatelessWidget {
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: appColorScheme.secondary,
+            color: colorsTheme.secondary,
           ),
         ),
         const SizedBox(height: 5),
@@ -128,12 +126,12 @@ class TeacherField extends StatelessWidget {
           style: TextStyle(
             fontSize: 14.5,
             height: 1.45,
-            color: appTheme.colorScheme.primary,
+            color: colorsTheme.primary,
             fontFamily: monospace ? 'monospace' : null,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: appColorScheme.secondary, fontSize: 14),
+            hintStyle: TextStyle(color: colorsTheme.secondary, fontSize: 14),
             filled: true,
             fillColor: appSemanticColors.infoBackground,
             contentPadding: const EdgeInsets.symmetric(
@@ -175,9 +173,8 @@ class TeacherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
 
     // El fondo lo pinta un Material, no la decoración del contenedor. Es lo
     // que permite meter dentro cosas que se pulsan —un ListTile, un
@@ -233,8 +230,7 @@ class TeacherAddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return OutlinedButton.icon(
       onPressed: onPressed,
@@ -255,9 +251,8 @@ Future<bool> confirmDelete(
   required String what,
   String? detail,
 }) async {
-  final appTheme = Theme.of(context);
-  final appColorScheme = appTheme.colorScheme;
-  final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+  final appColorScheme = context.colorScheme;
+  final appSemanticColors = context.messageColors;
 
   final answer = await showDialog<bool>(
     context: context,
@@ -318,8 +313,7 @@ class TeacherListRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -429,8 +423,7 @@ class _RowAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     return IconButton(
       onPressed: onPressed,
       tooltip: label,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/course_analytics_store.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'teacher_widgets.dart';
 
@@ -56,8 +55,7 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     if (_stats.isLoading && !_stats.isLoaded) {
       return Center(
@@ -168,9 +166,8 @@ class _StudentRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final percent = (student.accuracy * 100).round();
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
 
     final tone = student.hasNotStarted
         ? appSemanticColors.infoBackground

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/utils/external_url_opener.dart';
@@ -185,7 +185,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
   }
 
   Future<void> _openInBrowser() async {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
     if (_opening) return;
     setState(() => _opening = true);
 
@@ -199,18 +199,18 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
           ? 'Video abierto en tu navegador'
           : 'No se pudo abrir el video. Copia el enlace y ábrelo manualmente.',
       opened
-          ? appTheme.tone(AppThemeTone.success).background
-          : appTheme.tone(AppThemeTone.danger).background,
+          ? appTheme.tone(MessageThemeTone.success).background
+          : appTheme.tone(MessageThemeTone.danger).background,
     );
   }
 
   Future<void> _copyLink() async {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
     await Clipboard.setData(ClipboardData(text: _video.url));
     if (!mounted) return;
     _showMessage(
       'Enlace copiado al portapapeles',
-      appTheme.tone(AppThemeTone.info).background,
+      appTheme.tone(MessageThemeTone.info).background,
     );
   }
 
@@ -266,7 +266,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
     final width = MediaQuery.sizeOf(context).width;
     final isWide = width >= 640;
 
@@ -365,7 +365,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
   }
 
   Widget _buildCaptionBox() {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
     final hasPhrases = _phrases.isNotEmpty;
 
     return SectionCard(
@@ -570,7 +570,7 @@ class _VideoSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
 
     return SectionCard(
       child: Column(
@@ -682,7 +682,7 @@ class _PlayerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
 
     return Semantics(
       label:
@@ -730,7 +730,7 @@ class _CaptionControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
 
     return Semantics(
       button: true,

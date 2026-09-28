@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/chapter_section_screen.dart';
 import 'director_widgets.dart';
@@ -197,7 +196,7 @@ class _SectionCard extends StatelessWidget {
     final current = verdict;
     final appTheme = Theme.of(context);
     final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = appTheme.extension<MessageTheme>()!;
 
     final (String label, IconData icon, Color tone) = current == null
         ? ('Sin revisar', Icons.pending_outlined, appSemanticColors.infoBorder)
@@ -386,9 +385,9 @@ class _JudgeSheetState extends State<_JudgeSheet> {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     //final appToneSucess = appTheme.tone(AppThemeTone.success);
-    final appToneDanger = appSemanticColors.tone(AppThemeTone.danger);
+    final appToneDanger = appSemanticColors.tone(MessageThemeTone.danger);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -522,9 +521,8 @@ class _Choice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
 
     return Semantics(
       button: true,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/ide_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/module_theme.dart';
 
 class AppBreakpoints {
@@ -16,11 +17,12 @@ class AppBreakpoints {
 ///         context.activityColors
 extension AppThemeContext on BuildContext {
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
-  ModuleTheme get moduleTheme => Theme.of(this).extension<ModuleTheme>()!;
+  ModuleTheme get moduleColors => Theme.of(this).extension<ModuleTheme>()!;
   CodeConsoleTheme get codeConsoleTheme =>
       Theme.of(this).extension<CodeConsoleTheme>()!;
-  ActivityThemeColors get activityColors =>
-      Theme.of(this).extension<ActivityThemeColors>()!;
+  ActivityTheme get activityColors =>
+      Theme.of(this).extension<ActivityTheme>()!;
+  MessageTheme get messageColors => Theme.of(this).extension<MessageTheme>()!;
 }
 
 /*
@@ -55,9 +57,9 @@ extension AppThemeContext on BuildContext {
   Luego: .background / .border / .text
   ----------
   EXTENSIONES PERSONALIZADAS
-  ActivityThemeColors → Colores semánticos para información, éxito, advertencia,
+  ActivityTheme → Colores semánticos para información, éxito, advertencia,
   peligro y acciones, incluyendo fondo suave, borde visible y texto oscuro.
-  Acceso: Theme.of(context).extension<ActivityThemeColors>()!
+  Acceso: Theme.of(context).extension<ActivityTheme>()!
           context.activityColors
   
   ModuleTheme → Colores específicos de las tarjetas y elementos de las lecciones.
@@ -143,7 +145,7 @@ class AppTheme {
   /// - colorScheme → Colores generales de Material 3 y base cromática de los componentes.
   /// - moduleTheme → Colores específicos de lecciones y cursos.
   /// - codeConsoleTheme → Colores específicos de la consola/editor de Python.
-  /// - activityThemeColors → Colores semánticos para info, success, warning y danger.
+  /// - activityTheme → Colores semánticos para info, success, warning y danger.
   ///
   /// Los valores recibidos se aplican a ThemeData, sus temas de componentes y
   /// sus ThemeExtension personalizadas.
@@ -153,7 +155,8 @@ class AppTheme {
     required ColorScheme colorScheme,
     required ModuleTheme moduleTheme,
     required CodeConsoleTheme codeConsoleTheme,
-    required ActivityThemeColors activityThemeColors,
+    required ActivityTheme activityTheme,
+    required MessageTheme messageTheme,
     required AppThemeMode themeMode,
     required int currentModuleId,
   }) {
@@ -305,7 +308,7 @@ class AppTheme {
               : null,
         ),
       ),
-      extensions: [moduleTheme, codeConsoleTheme, activityThemeColors],
+      extensions: [moduleTheme, codeConsoleTheme, activityTheme, messageTheme],
     );
   }
 
@@ -355,7 +358,7 @@ class AppTheme {
             comment: Color(0xFF6A737D),
             error: Color(0xFFD32F2F),
           ),
-          activityThemeColors: const ActivityThemeColors(
+          messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE3F2FD),
             infoBorder: Color(0xFF90CAF9),
             infoText: Color(0xFF1565C0),
@@ -368,6 +371,32 @@ class AppTheme {
             dangerBackground: Color(0xFFFFEBEE),
             dangerBorder: Color(0xFFEF5350),
             dangerText: Color(0xFFC62828),
+          ),
+          activityTheme: const ActivityTheme(
+            readingBackground: Color(0xFFE3F2FD),
+            readingBorder: Color(0xFF90CAF9),
+            readingText: Color(0xFF1565C0),
+            nuggetBackground: Color(0xFFFFFDE7),
+            nuggetBorder: Color(0xFFFFF176),
+            nuggetText: Color(0xFFF57F17),
+            exampleBackground: Color(0xFFE1F5FE),
+            exampleBorder: Color(0xFF81D4FA),
+            exampleText: Color(0xFF0277BD),
+            exerciseBackground: Color(0xFFF3E5F5),
+            exerciseBorder: Color(0xFFBA68C8),
+            exerciseText: Color(0xFF6A1B9A),
+            videoBackground: Color(0xFFE3F2FD),
+            videoBorder: Color(0xFF90CAF9),
+            videoText: Color(0xFF1565C0),
+            quizBackground: Color(0xFFFFF3E0),
+            quizBorder: Color(0xFFFFB74D),
+            quizText: Color(0xFFE65100),
+            labBackground: Color(0xFFE8F5E9),
+            labBorder: Color(0xFFA5D6A7),
+            labText: Color(0xFF1B5E20),
+            finalEvaluationBackground: Color(0xFFFFEBEE),
+            finalEvaluationBorder: Color(0xFFEF5350),
+            finalEvaluationText: Color(0xFFC62828),
           ),
           themeMode: mode,
           currentModuleId: moduleId,
@@ -419,7 +448,7 @@ class AppTheme {
             comment: Color(0xFF78909C),
             error: Color(0xFFEF5350),
           ),
-          activityThemeColors: const ActivityThemeColors(
+          messageTheme: const MessageTheme(
             infoBackground: Color(0xFF0D2840),
             infoBorder: Color(0xFF1976D2),
             infoText: Color(0xFF64B5F6),
@@ -432,6 +461,32 @@ class AppTheme {
             dangerBackground: Color(0xFF3B1314),
             dangerBorder: Color(0xFFD32F2F),
             dangerText: Color(0xFFE57373),
+          ),
+          activityTheme: const ActivityTheme(
+            readingBackground: Color(0xFFE3F2FD),
+            readingBorder: Color(0xFF90CAF9),
+            readingText: Color(0xFF1565C0),
+            nuggetBackground: Color(0xFFFFFDE7),
+            nuggetBorder: Color(0xFFFFF176),
+            nuggetText: Color(0xFFF57F17),
+            exampleBackground: Color(0xFFE1F5FE),
+            exampleBorder: Color(0xFF81D4FA),
+            exampleText: Color(0xFF0277BD),
+            exerciseBackground: Color(0xFFF3E5F5),
+            exerciseBorder: Color(0xFFBA68C8),
+            exerciseText: Color(0xFF6A1B9A),
+            videoBackground: Color(0xFFE3F2FD),
+            videoBorder: Color(0xFF90CAF9),
+            videoText: Color(0xFF1565C0),
+            quizBackground: Color(0xFFFFF3E0),
+            quizBorder: Color(0xFFFFB74D),
+            quizText: Color(0xFFE65100),
+            labBackground: Color(0xFFE8F5E9),
+            labBorder: Color(0xFFA5D6A7),
+            labText: Color(0xFF1B5E20),
+            finalEvaluationBackground: Color(0xFFFFEBEE),
+            finalEvaluationBorder: Color(0xFFEF5350),
+            finalEvaluationText: Color(0xFFC62828),
           ),
           themeMode: mode,
           currentModuleId: moduleId,
@@ -481,7 +536,7 @@ class AppTheme {
               0xFF000000,
             ), // En escala de grises, el error es negro puro
           ),
-          activityThemeColors: const ActivityThemeColors(
+          messageTheme: const MessageTheme(
             infoBackground: Color(0xFFF5F5F5),
             infoBorder: Color(0xFF9E9E9E),
             infoText: Color(0xFF424242),
@@ -496,6 +551,32 @@ class AppTheme {
             ), // Fondo más oscuro para alerta máxima
             dangerBorder: Color(0xFF424242),
             dangerText: Color(0xFF000000),
+          ),
+          activityTheme: const ActivityTheme(
+            readingBackground: Color(0xFFE3F2FD),
+            readingBorder: Color(0xFF90CAF9),
+            readingText: Color(0xFF1565C0),
+            nuggetBackground: Color(0xFFFFFDE7),
+            nuggetBorder: Color(0xFFFFF176),
+            nuggetText: Color(0xFFF57F17),
+            exampleBackground: Color(0xFFE1F5FE),
+            exampleBorder: Color(0xFF81D4FA),
+            exampleText: Color(0xFF0277BD),
+            exerciseBackground: Color(0xFFF3E5F5),
+            exerciseBorder: Color(0xFFBA68C8),
+            exerciseText: Color(0xFF6A1B9A),
+            videoBackground: Color(0xFFE3F2FD),
+            videoBorder: Color(0xFF90CAF9),
+            videoText: Color(0xFF1565C0),
+            quizBackground: Color(0xFFFFF3E0),
+            quizBorder: Color(0xFFFFB74D),
+            quizText: Color(0xFFE65100),
+            labBackground: Color(0xFFE8F5E9),
+            labBorder: Color(0xFFA5D6A7),
+            labText: Color(0xFF1B5E20),
+            finalEvaluationBackground: Color(0xFFFFEBEE),
+            finalEvaluationBorder: Color(0xFFEF5350),
+            finalEvaluationText: Color(0xFFC62828),
           ),
           themeMode: mode,
           currentModuleId: moduleId,
@@ -547,7 +628,7 @@ class AppTheme {
             comment: Color(0xFF6A737D),
             error: Color(0xFFE65100), // Rojo -> Naranja quemado muy oscuro
           ),
-          activityThemeColors: const ActivityThemeColors(
+          messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE3F2FD),
             infoBorder: Color(0xFF90CAF9),
             infoText: Color(0xFF1565C0),
@@ -559,9 +640,33 @@ class AppTheme {
             warningText: Color(0xFFF57F17), // Amarillo fuerte
             dangerBackground: Color(0xFFFFEDE1),
             dangerBorder: Color(0xFFFF9800),
-            dangerText: Color(
-              0xFFE65100,
-            ), // Naranja profundo (sustituto del rojo)
+            dangerText: Color(0xFFE65100),
+          ),
+          activityTheme: const ActivityTheme(
+            readingBackground: Color(0xFFE3F2FD),
+            readingBorder: Color(0xFF90CAF9),
+            readingText: Color(0xFF1565C0),
+            nuggetBackground: Color(0xFFFFFDE7),
+            nuggetBorder: Color(0xFFFFF176),
+            nuggetText: Color(0xFFF57F17),
+            exampleBackground: Color(0xFFE1F5FE),
+            exampleBorder: Color(0xFF81D4FA),
+            exampleText: Color(0xFF0277BD),
+            exerciseBackground: Color(0xFFF3E5F5),
+            exerciseBorder: Color(0xFFBA68C8),
+            exerciseText: Color(0xFF6A1B9A),
+            videoBackground: Color(0xFFE3F2FD),
+            videoBorder: Color(0xFF90CAF9),
+            videoText: Color(0xFF1565C0),
+            quizBackground: Color(0xFFFFF3E0),
+            quizBorder: Color(0xFFFFB74D),
+            quizText: Color(0xFFE65100),
+            labBackground: Color(0xFFE8F5E9),
+            labBorder: Color(0xFFA5D6A7),
+            labText: Color(0xFF1B5E20),
+            finalEvaluationBackground: Color(0xFFFFEBEE),
+            finalEvaluationBorder: Color(0xFFEF5350),
+            finalEvaluationText: Color(0xFFC62828),
           ),
           themeMode: mode,
           currentModuleId: moduleId,
@@ -612,7 +717,7 @@ class AppTheme {
             comment: Color(0xFF6A737D),
             error: Color(0xFF8E24AA), // Rojo oscuro -> Púrpura/Magenta fuerte
           ),
-          activityThemeColors: const ActivityThemeColors(
+          messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE3F2FD),
             infoBorder: Color(0xFF90CAF9),
             infoText: Color(0xFF1565C0),
@@ -626,7 +731,33 @@ class AppTheme {
             warningText: Color(0xFFF57C00),
             dangerBackground: Color(0xFFF3E5F5), // Rojo -> Púrpura claro
             dangerBorder: Color(0xFFBA68C8),
-            dangerText: Color(0xFF7B1FA2), // Rojo -> Púrpura fuerte
+            dangerText: Color(0xFF7B1FA2),
+          ),
+          activityTheme: const ActivityTheme(
+            readingBackground: Color(0xFFE3F2FD),
+            readingBorder: Color(0xFF90CAF9),
+            readingText: Color(0xFF1565C0),
+            nuggetBackground: Color(0xFFFFFDE7),
+            nuggetBorder: Color(0xFFFFF176),
+            nuggetText: Color(0xFFF57F17),
+            exampleBackground: Color(0xFFE1F5FE),
+            exampleBorder: Color(0xFF81D4FA),
+            exampleText: Color(0xFF0277BD),
+            exerciseBackground: Color(0xFFF3E5F5),
+            exerciseBorder: Color(0xFFBA68C8),
+            exerciseText: Color(0xFF6A1B9A),
+            videoBackground: Color(0xFFE3F2FD),
+            videoBorder: Color(0xFF90CAF9),
+            videoText: Color(0xFF1565C0),
+            quizBackground: Color(0xFFFFF3E0),
+            quizBorder: Color(0xFFFFB74D),
+            quizText: Color(0xFFE65100),
+            labBackground: Color(0xFFE8F5E9),
+            labBorder: Color(0xFFA5D6A7),
+            labText: Color(0xFF1B5E20),
+            finalEvaluationBackground: Color(0xFFFFEBEE),
+            finalEvaluationBorder: Color(0xFFEF5350),
+            finalEvaluationText: Color(0xFFC62828),
           ),
           themeMode: mode,
           currentModuleId: moduleId,
@@ -674,7 +805,7 @@ class AppTheme {
             comment: Color(0xFF9E9E9E),
             error: Color(0xFFB71C1C), // Rojo muy oscuro
           ),
-          activityThemeColors: const ActivityThemeColors(
+          messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE0F2F1), // Azul -> Teal claro
             infoBorder: Color(0xFF4DB6AC),
             infoText: Color(0xFF00695C),
@@ -690,7 +821,33 @@ class AppTheme {
             warningText: Color(0xFFC2185B), // Rosa fuerte
             dangerBackground: Color(0xFFFFEBEE),
             dangerBorder: Color(0xFFE57373),
-            dangerText: Color(0xFFC62828), // Rojo
+            dangerText: Color(0xFFC62828),
+          ),
+          activityTheme: const ActivityTheme(
+            readingBackground: Color(0xFFE3F2FD),
+            readingBorder: Color(0xFF90CAF9),
+            readingText: Color(0xFF1565C0),
+            nuggetBackground: Color(0xFFFFFDE7),
+            nuggetBorder: Color(0xFFFFF176),
+            nuggetText: Color(0xFFF57F17),
+            exampleBackground: Color(0xFFE1F5FE),
+            exampleBorder: Color(0xFF81D4FA),
+            exampleText: Color(0xFF0277BD),
+            exerciseBackground: Color(0xFFF3E5F5),
+            exerciseBorder: Color(0xFFBA68C8),
+            exerciseText: Color(0xFF6A1B9A),
+            videoBackground: Color(0xFFE3F2FD),
+            videoBorder: Color(0xFF90CAF9),
+            videoText: Color(0xFF1565C0),
+            quizBackground: Color(0xFFFFF3E0),
+            quizBorder: Color(0xFFFFB74D),
+            quizText: Color(0xFFE65100),
+            labBackground: Color(0xFFE8F5E9),
+            labBorder: Color(0xFFA5D6A7),
+            labText: Color(0xFF1B5E20),
+            finalEvaluationBackground: Color(0xFFFFEBEE),
+            finalEvaluationBorder: Color(0xFFEF5350),
+            finalEvaluationText: Color(0xFFC62828),
           ),
           themeMode: mode,
           currentModuleId: moduleId,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/course_analytics_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'teacher_report.dart';
 import 'teacher_widgets.dart';
@@ -46,7 +45,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
 
     if (_stats.isLoading && !_stats.isLoaded) {
       return Center(
@@ -79,9 +78,8 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
   }
 
   List<Widget> _body() {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     if (_stats.problem != null) {
       return [
         TeacherBanner(icon: Icons.cloud_off, text: _stats.problem!),
@@ -256,8 +254,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
   }
 
   Widget _sectionTitle(String text, IconData icon) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     return Row(
       children: [
         Icon(icon, size: 19, color: appSemanticColors.infoText),
@@ -281,7 +278,6 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
   /// Se ordenan por el temario y no por cantidad: el docente quiere ver el
   /// recorrido del curso, que es donde se nota el abandono.
   List<(String, Map<String, int>)> _sectionsWithCompletions() {
-    //final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final ids = <String>{for (final item in _stats.completions) item.sectionId};
 
     final out = <(String, Map<String, int>)>[];
@@ -310,9 +306,8 @@ class _Metric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     return Semantics(
       label: '$label: $value',
       child: ExcludeSemantics(
@@ -368,8 +363,7 @@ class _SectionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     final percent = (stats.accuracy * 100).round();
 
     // El color acompaña, pero el número y el texto van siempre: un estado que
@@ -463,9 +457,8 @@ class _QuestionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     final percent = (stats.accuracy * 100).round();
     final tone = percent >= 70
         ? appSemanticColors.successBackground
@@ -568,9 +561,8 @@ class _CompletionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     final parts = [
       for (final item in _order)
         if (done[item.$1] != null) (item, done[item.$1]!),

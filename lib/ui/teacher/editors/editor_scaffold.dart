@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
-
-import '../../core/themes/module_theme.dart';
 
 /// El armazón común de todos los editores del docente.
 /// Todos funcionan igual a propósito: se escribe, se pulsa «Listo» y el
@@ -38,7 +35,7 @@ class EditorScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final moduleTheme = appTheme.extension<ModuleTheme>()!;
+    final moduleTheme = context.moduleColors;
 
     return Scaffold(
       backgroundColor: appTheme.scaffoldBackgroundColor,
@@ -103,11 +100,9 @@ class EditorEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Extraemos los colores del contexto
-    final appTheme = Theme.of(context);
-    final colorScheme = appTheme.colorScheme;
-    final moduleTheme = appTheme.extension<ModuleTheme>()!;
-    final activityColors = appTheme.extension<ActivityThemeColors>()!;
+    final colorScheme = context.colorScheme;
+    final moduleTheme = context.moduleColors;
+    final activityColors = context.messageColors;
 
     return Container(
       padding: const EdgeInsets.all(AppMetrics.sectionGap),

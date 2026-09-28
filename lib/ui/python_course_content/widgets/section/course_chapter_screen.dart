@@ -157,10 +157,10 @@ class _ChapterNotFound extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final messageTheme = context.messageColors;
 
     return Scaffold(
-      backgroundColor: appTheme.infoBackground,
+      backgroundColor: messageTheme.infoBackground,
       appBar: const GlobalAppBarWidget(
         userName: '', //widget.userName,
         onLogout: null, //widget.onLogout,

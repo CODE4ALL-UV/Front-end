@@ -51,7 +51,7 @@ class SectionCapsuleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
 
     return SectionActivityScaffold(
       moduleLabel: module.label,
@@ -113,7 +113,7 @@ class _TipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
 
     return SectionCard(
       child: Row(

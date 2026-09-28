@@ -1,7 +1,6 @@
 //REFACTOR-APROVED - COLOR TEST REMAINING - DONT TESTED IN UI
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/new_python_module_model.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart';
@@ -274,9 +273,8 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
     String nextModuleName,
   ) {
     // Reutilizamos la paleta de textos sutiles de nuestro ThemeExtension
-    final colors = Theme.of(context).extension<ActivityThemeColors>();
-    final textColor =
-        colors?.infoText ?? const Color(0xFF607D8B); // Fallback de seguridad
+    final colors = context.messageColors;
+    final textColor = colors.infoText; // Fallback de seguridad
 
     return Text(
       'Desliza hacia arriba para abrir $nextModuleName',

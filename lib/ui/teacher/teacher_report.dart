@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_code4all/data/course/course_analytics_store.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
 /// Arma un informe del curso en texto plano.
@@ -128,9 +127,8 @@ Future<void> showReportSheet(
   BuildContext context,
   CourseAnalyticsStore stats,
 ) async {
-  final appTheme = Theme.of(context);
-  final appColorScheme = appTheme.colorScheme;
-  final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+  final appColorScheme = context.colorScheme;
+  final appSemanticColors = context.messageColors;
   final report = buildCourseReport(stats);
 
   await showModalBottomSheet<void>(

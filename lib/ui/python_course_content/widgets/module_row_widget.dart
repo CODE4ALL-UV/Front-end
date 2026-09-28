@@ -32,7 +32,7 @@ class ModuleRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appModuleTheme = context.moduleTheme;
+    final appModuleTheme = context.moduleColors;
     // 1. Definir la acción de navegación común para la sección
     void navigateToSection() {
       Navigator.push(

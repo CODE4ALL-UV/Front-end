@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
@@ -58,8 +57,6 @@ class _QuizEditorScreenState extends State<QuizEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
-
     return EditorScaffold(
       title: widget.title,
       hint:
@@ -141,7 +138,7 @@ class _Number extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
 
     return Container(
       width: 26,
@@ -257,8 +254,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return EditorScaffold(
       title: widget.isNew ? 'Nueva pregunta' : 'Editar pregunta',

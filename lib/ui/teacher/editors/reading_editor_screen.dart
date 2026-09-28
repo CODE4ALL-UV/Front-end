@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
@@ -101,8 +100,7 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     final reading = _reading;
 
     return EditorScaffold(
@@ -256,10 +254,10 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
   }
 
   Future<void> _addBlock() async {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     final kind = await showModalBottomSheet<ReadingBlockKind>(
       context: context,
-      backgroundColor: appTheme.infoBackground,
+      backgroundColor: appSemanticColors.infoBackground,
       builder: (context) => const _BlockKindSheet(),
     );
     if (kind == null || !mounted) return;
@@ -281,8 +279,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return EditorScaffold(
       title: 'Página ${widget.position}',
@@ -402,8 +399,7 @@ class _BlockKindSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     return SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -505,8 +501,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     final kind = _block.kind;
     final isList =
         kind == ReadingBlockKind.bullets || kind == ReadingBlockKind.steps;
@@ -674,8 +669,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
   }
 
   Widget _kindPicker() {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

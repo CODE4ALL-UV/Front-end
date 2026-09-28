@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'teacher_section_detail.dart';
@@ -65,8 +64,7 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
   }
 
   void _select(int moduleNumber, int sectionNumber, {required bool isWide}) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
+    final appColorScheme = context.colorScheme;
     setState(() {
       _moduleNumber = moduleNumber;
       _sectionNumber = sectionNumber;
@@ -93,8 +91,7 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
+    final appColorScheme = context.colorScheme;
     return Scaffold(
       backgroundColor: appColorScheme.surface,
       appBar: GlobalAppBarWidget(
@@ -115,8 +112,7 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
   }
 
   Widget _buildTemario() {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
+    final appColorScheme = context.colorScheme;
     return LayoutBuilder(
       builder: (context, constraints) {
         // 900 px es donde caben cómodos el temario y la sección a la vez.
@@ -275,9 +271,8 @@ class _ModuleTileState extends State<_ModuleTile> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -419,8 +414,7 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
@@ -463,8 +457,7 @@ class _SectionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final badges = _sectionBadges(section);
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return Semantics(
       button: true,

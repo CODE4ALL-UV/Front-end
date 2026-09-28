@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
@@ -44,7 +43,7 @@ class _VideosEditorScreenState extends State<VideosEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
 
     return EditorScaffold(
       title: 'Videos',
@@ -173,7 +172,6 @@ class _VideoEditorScreenState extends State<_VideoEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
     final detected = extractYoutubeId(_link.text);
 
     return EditorScaffold(

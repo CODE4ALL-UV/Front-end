@@ -2,7 +2,6 @@ import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart'; //MIX
 //import 'package:flutter_code4all/ui/core/ui/visual_theme_controller.dart'; //PAPACHO - ELIMINADO USAR app_theme.dart
@@ -125,9 +124,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     final hasNext = widget.moduleId < widget.totalModules;
     final hasPrevious = widget.moduleId > 1;
     final colorScheme = context.colorScheme;
-    final appSemanticColors = Theme.of(
-      context,
-    ).extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return Container(
       width: double.infinity,
@@ -314,7 +311,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     final verticalGap = (MediaQuery.of(context).size.height * 0.025)
         .clamp(12.0, 28.0)
         .toDouble();
-    final appModuleTheme = context.moduleTheme;
+    final appModuleTheme = context.moduleColors;
     final currentThemeMode = ThemeManager.themeNotifier.value;
 
     debugPrint(
@@ -476,9 +473,7 @@ class _ModuleNavigationHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = Theme.of(
-      context,
-    ).extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return Semantics(
       button: true,

@@ -63,7 +63,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
 
     return SectionActivityScaffold(
       moduleLabel: widget.module.label,
@@ -196,7 +196,7 @@ class _ReadingBlockView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
 
     if (block.kind == ReadingBlockKind.callout) {
       return SectionCallout(title: block.title, body: block.body);
@@ -247,7 +247,7 @@ class _PageDots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
 
     return ExcludeSemantics(
       child: Row(

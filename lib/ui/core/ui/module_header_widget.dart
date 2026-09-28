@@ -18,7 +18,7 @@ class ModuleHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appModuleTheme = context.moduleTheme;
+    final appModuleTheme = context.moduleColors;
 
     IconData iconHeader;
     switch (moduleId) {

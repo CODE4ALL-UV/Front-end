@@ -2,8 +2,8 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 
 /// Una nota de 1 a 5, en estrellas y también en número.
 ///
@@ -18,9 +18,8 @@ class ScoreStars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
 
     if (score == null) {
       return Semantics(
@@ -85,9 +84,7 @@ class DirectorBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final color = appColorScheme.onSurface;
+    final appColorScheme = context.colorScheme;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -99,7 +96,7 @@ class DirectorBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: color),
+          Icon(icon, size: 13, color: appColorScheme.onSurface),
           const SizedBox(width: 5),
           // Flexible para que un texto largo se recorte en vez de desbordarse:
           // dentro de un Wrap nadie encoge a un hijo que no quepa, y con el
@@ -111,7 +108,7 @@ class DirectorBadge extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w600,
-                color: color,
+                color: appColorScheme.onSurface,
               ),
             ),
           ),
@@ -136,10 +133,9 @@ class DirectorNotice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
-    final appWarningTone = appSemanticColors.tone(AppThemeTone.warning);
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
+    final appWarningTone = appSemanticColors.tone(MessageThemeTone.warning);
 
     return Semantics(
       liveRegion: true,
@@ -207,8 +203,7 @@ class DirectorEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return Center(
       child: Padding(
@@ -260,8 +255,7 @@ class DirectorProblem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return Center(
       child: Padding(

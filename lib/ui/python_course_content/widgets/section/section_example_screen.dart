@@ -55,7 +55,7 @@ class SectionExampleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
 
     return SectionActivityScaffold(
       moduleLabel: module.label,
@@ -165,7 +165,7 @@ class _OutputBlockState extends State<_OutputBlock> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
 
     return Container(
       width: double.infinity,
@@ -208,7 +208,7 @@ class _StepRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
 
     return Padding(
       padding: const EdgeInsets.only(top: 14),

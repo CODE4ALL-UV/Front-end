@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
 class AvatarWidget extends StatelessWidget {
   final String? photoUrl;
@@ -38,7 +39,7 @@ class AvatarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final appColorTheme = context.colorScheme;
     final displayName = name?.trim().isNotEmpty == true ? name! : 'Usuario';
     final initials = displayName.isNotEmpty
         ? displayName[0].toUpperCase()
@@ -54,7 +55,7 @@ class AvatarWidget extends StatelessWidget {
     final avatar = hasValidPhoto
         ? CircleAvatar(
             radius: radius,
-            backgroundColor: theme.colorScheme.primaryContainer,
+            backgroundColor: appColorTheme.primaryContainer,
             child: ClipOval(
               child: Image.network(
                 resolved,
@@ -72,11 +73,11 @@ class AvatarWidget extends StatelessWidget {
           )
         : CircleAvatar(
             radius: radius,
-            backgroundColor: theme.colorScheme.primary,
+            backgroundColor: appColorTheme.primary,
             child: Text(
               initials,
               style: TextStyle(
-                color: theme.colorScheme.onPrimary,
+                color: appColorTheme.onPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),

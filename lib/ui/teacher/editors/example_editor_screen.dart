@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
@@ -77,8 +76,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return EditorScaffold(
       title: 'Ejemplo comentado',

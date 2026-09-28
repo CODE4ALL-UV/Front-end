@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 
 class ChapterSummaryWidget extends StatelessWidget {
@@ -45,11 +44,11 @@ class ChapterSummaryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Obtenemos los colores de tu extensión de tema (la que creamos antes)
-    final colors = Theme.of(context).extension<ActivityThemeColors>();
+    final colors = context.messageColors;
 
     // Fallbacks por si acaso el tema falla
-    final titleColor = colors?.infoText ?? const Color(0xFF263238);
-    final bodyColor = colors?.infoText ?? Colors.black87;
+    final titleColor = colors.infoText;
+    final bodyColor = colors.infoText;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

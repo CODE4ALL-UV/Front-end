@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import '../../core/themes/module_theme.dart';
 import '../course_section_edits.dart';
 import '../teacher_widgets.dart';
 import 'editor_scaffold.dart';
@@ -101,9 +100,8 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Extraemos el tema global y tu extensión
-    final appTheme = Theme.of(context);
-    final moduleTheme = appTheme.extension<ModuleTheme>()!;
+    final appColorsTheme = context.colorScheme;
+    final moduleTheme = context.moduleColors;
 
     return EditorScaffold(
       title: 'Cápsula de conocimiento',
@@ -166,7 +164,7 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: appTheme.colorScheme.onSurface,
+                    color: appColorsTheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: AppMetrics.gap),

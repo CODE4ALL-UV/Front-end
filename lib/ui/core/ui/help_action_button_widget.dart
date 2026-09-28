@@ -1064,9 +1064,7 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                             style: TextStyle(
                               fontSize: 10,
                               color: isSelected
-                                  ? Theme.of(
-                                      context,
-                                    ).colorScheme.onPrimaryContainer
+                                  ? context.colorScheme.onPrimaryContainer
                                   : Colors.grey[600],
                             ),
                           ),

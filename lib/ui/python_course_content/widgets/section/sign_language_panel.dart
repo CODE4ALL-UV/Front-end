@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/domain/models/sign_language/hand_alphabet.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/hand_sign_painter_widget.dart';
 import 'sign_asset_index.dart';
@@ -152,9 +151,8 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     final letter = _currentLetter;
     final word = _currentWord;
     final shape = signAlphabet[letter];
@@ -289,8 +287,7 @@ class _HalfTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -352,9 +349,8 @@ class _HandDrawing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     // SizedBox.expand es imprescindible: un CustomPaint sin hijo se queda en
     // tamaño cero cuando recibe restricciones sueltas, que es justo lo que le
     // da el Stack interno de AnimatedSwitcher. Sin esto la mano no se ve.
@@ -395,9 +391,8 @@ class _SignDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     final container = BoxDecoration(
       color: appColorScheme.surface,
       borderRadius: BorderRadius.circular(12),
@@ -421,8 +416,7 @@ class _SignDisplay extends StatelessWidget {
   }
 
   Widget _fallback(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

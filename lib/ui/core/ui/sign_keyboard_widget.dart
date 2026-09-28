@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_code4all/domain/models/sign_language/hand_alphabet.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-
 import 'accessibility_announcer_widget.dart';
 import 'sign_letter_icon_widget.dart';
 
@@ -91,8 +88,7 @@ class SignKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return Container(
       width: double.infinity,
@@ -189,9 +185,8 @@ class _LetterKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
 
     return Semantics(
       button: true,
@@ -264,9 +259,7 @@ class _ActionKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = Theme.of(
-      context,
-    ).extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
 
     return Semantics(
       button: true,

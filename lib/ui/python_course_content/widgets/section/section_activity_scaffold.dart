@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.dart';
@@ -125,9 +124,8 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
 
     return Scaffold(
       backgroundColor: appColorScheme.surface,
@@ -217,9 +215,8 @@ class _ActivityBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
 
     return Semantics(
       header: true,
@@ -359,9 +356,7 @@ class _ManualDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = Theme.of(
-      context,
-    ).extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     final steps = _steps[activityLabel] ?? _general;
 
     return AlertDialog(

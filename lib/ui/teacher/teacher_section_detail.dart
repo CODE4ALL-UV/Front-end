@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/chapter_section_screen.dart';
@@ -174,7 +173,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   void _toast(String message, {bool ok = false}) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -209,8 +208,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appSemanticColors = context.messageColors;
     final section = _current;
     final edited = _content.isSectionEdited(section.id);
 
@@ -265,9 +263,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   Widget _header(bool edited) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     final where = Text(
       'Módulo ${widget.moduleNumber} · Sección ${widget.sectionNumber}',
       style: TextStyle(fontSize: 12.5, color: appSemanticColors.infoText),
@@ -365,9 +362,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   List<Widget> _activityCards(CourseSection section) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     return [
       _ActivityCard(
         icon: Icons.menu_book,
@@ -492,9 +488,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   Widget _saveBar(bool edited) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     final changed = _hasChanges;
 
     return Container(
@@ -606,9 +601,8 @@ class _ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     return Semantics(
       button: true,
       label: '$title. $detail. Toca para editar.',
@@ -685,9 +679,8 @@ class _LaboratoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-    final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<ActivityThemeColors>()!;
+    final appColorScheme = context.colorScheme;
+    final appSemanticColors = context.messageColors;
     // El fondo va en el Material y no en la decoración: si no, el interruptor
     // pinta su pulsación por debajo y no se ve.
     return Material(

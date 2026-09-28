@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'dart:async';
@@ -218,7 +218,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
   }
 
   Widget _buildQuestion() {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
     final hasIntro =
         _index == 0 &&
         widget.introBody != null &&
@@ -274,7 +274,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
         if (!_answered && _hintAvailable) ...[
           if (_hintShown)
             SectionCallout(
-              tone: AppThemeTone.info,
+              tone: MessageThemeTone.info,
               title: 'Pista',
               body: _question.explanation,
             )
@@ -324,7 +324,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
   }
 
   Widget _buildResult() {
-    final appTheme = context.activityColors;
+    final appTheme = context.messageColors;
     final total = _questions.length;
     final percent = ((_correctCount / total) * 100).round();
 
@@ -475,7 +475,7 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<ActivityThemeColors>()!;
+    final appTheme = context.messageColors;
     final showAsCorrect = revealed && isCorrect;
     final showAsWrong = revealed && isSelected && !isCorrect;
 

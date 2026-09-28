@@ -63,6 +63,7 @@ class SectionExampleScreen extends StatelessWidget {
       activityLabel: 'Ejemplo',
       activityIcon: Icons.terminal_outlined,
       spokenText: _spokenText,
+      signText: _spokenText,
       bottomBar: SectionPrimaryButton(
         label: 'Marcar ejemplo como revisado',
         icon: Icons.check_circle_outline,

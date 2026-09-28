@@ -71,6 +71,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
       activityLabel: 'Lectura',
       activityIcon: Icons.menu_book_outlined,
       spokenText: _currentPage.spokenText,
+      signText: _currentPage.spokenText,
       progress: (_pageIndex + 1) / _pages.length,
       progressLabel: 'Página ${_pageIndex + 1} de ${_pages.length}',
       bottomBar: _buildBottomBar(),

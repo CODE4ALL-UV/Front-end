@@ -5,6 +5,7 @@ import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.d
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'section_widgets.dart';
+import 'sign_language_panel.dart';
 
 /// Estructura común de todas las pantallas de actividad de la ruta.
 ///
@@ -26,6 +27,7 @@ class SectionActivityScaffold extends StatefulWidget {
     required this.activityIcon,
     required this.spokenText,
     required this.child,
+    this.signText,
     this.bottomBar,
     this.progress,
     this.progressLabel,
@@ -44,6 +46,10 @@ class SectionActivityScaffold extends StatefulWidget {
 
   /// Texto completo de la pantalla, en el orden en que debe escucharse.
   final String spokenText;
+
+  /// Text to spell with dactylology below the activity content.
+  /// When null, the activity provides its own sign-language placement.
+  final String? signText;
 
   final Widget child;
   final Widget? bottomBar;
@@ -161,7 +167,22 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
                     constraints: const BoxConstraints(
                       maxWidth: AppMetrics.maxContentWidth,
                     ),
-                    child: widget.child,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        widget.child,
+                        if (widget.signText != null &&
+                            widget.signText!.trim().isNotEmpty &&
+                            _prefs.signSupport != SignSupportLevel.off) ...[
+                          const SizedBox(height: AppMetrics.sectionGap),
+                          SignLanguagePanel(
+                            text: widget.signText!,
+                            showWordSigns:
+                                _prefs.signSupport == SignSupportLevel.advanced,
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -206,6 +206,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
       activityLabel: widget.activityLabel,
       activityIcon: widget.activityIcon,
       spokenText: _spokenText,
+      signText: _spokenText,
       progress: _finished
           ? 1
           : (_index + (_answered ? 1 : 0)) / _questions.length,

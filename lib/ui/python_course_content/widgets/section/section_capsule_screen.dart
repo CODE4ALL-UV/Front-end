@@ -59,6 +59,7 @@ class SectionCapsuleScreen extends StatelessWidget {
       activityLabel: 'Cápsula de conocimiento',
       activityIcon: Icons.tips_and_updates_outlined,
       spokenText: _spokenText,
+      signText: _spokenText,
       bottomBar: SectionPrimaryButton(
         label: 'Entendido, marcar como vista',
         icon: Icons.check_circle_outline,

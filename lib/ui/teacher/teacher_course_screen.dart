@@ -317,7 +317,7 @@ class _ModuleTileState extends State<_ModuleTile> {
                         size: 17,
                         color: _open
                             ? appSemanticColors.infoBackground
-                            : appSemanticColors.infoText,
+                            : appSemanticColors.infoForeground,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -341,7 +341,7 @@ class _ModuleTileState extends State<_ModuleTile> {
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               height: 1.2,
-                              color: appSemanticColors.infoText,
+                              color: appSemanticColors.infoForeground,
                             ),
                           ),
                         ],
@@ -420,19 +420,19 @@ class _Badge extends StatelessWidget {
       decoration: BoxDecoration(
         color: appSemanticColors.infoBackground,
         borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
-        border: Border.all(color: appSemanticColors.infoBorder),
+        border: Border.all(color: appSemanticColors.infoForeground),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: appSemanticColors.infoText),
+          Icon(icon, size: 12, color: appSemanticColors.infoForeground),
           const SizedBox(width: 4),
           Text(
             label,
             style: TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w600,
-              color: appSemanticColors.infoText,
+              color: appSemanticColors.infoForeground,
             ),
           ),
         ],
@@ -489,7 +489,7 @@ class _SectionRow extends StatelessWidget {
                   border: Border.all(
                     color: selected
                         ? appSemanticColors.infoBackground
-                        : appSemanticColors.infoBorder,
+                        : appSemanticColors.infoForeground,
                     width: selected ? 1.6 : 1,
                   ),
                 ),
@@ -517,8 +517,8 @@ class _SectionRow extends StatelessWidget {
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                               color: selected
-                                  ? appSemanticColors.infoBorder
-                                  : appSemanticColors.infoText,
+                                  ? appSemanticColors.infoForeground
+                                  : appSemanticColors.infoForeground,
                             ),
                           ),
                         ),
@@ -534,7 +534,7 @@ class _SectionRow extends StatelessWidget {
                                   : FontWeight.w600,
                               color: selected
                                   ? appSemanticColors.infoBackground
-                                  : appSemanticColors.infoText,
+                                  : appSemanticColors.infoForeground,
                             ),
                           ),
                         ),

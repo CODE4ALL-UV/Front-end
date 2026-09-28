@@ -199,23 +199,27 @@ class _SectionCard extends StatelessWidget {
     final appSemanticColors = appTheme.extension<MessageTheme>()!;
 
     final (String label, IconData icon, Color tone) = current == null
-        ? ('Sin revisar', Icons.pending_outlined, appSemanticColors.infoBorder)
+        ? (
+            'Sin revisar',
+            Icons.pending_outlined,
+            appSemanticColors.infoForeground,
+          )
         : current.outdated
         ? (
             'Revisado antes del último cambio',
             Icons.update,
-            appSemanticColors.warningText,
+            appSemanticColors.warningForeground,
           )
         : current.isApproved
         ? (
             'Aprobado',
             Icons.check_circle_outline,
-            appSemanticColors.successBorder,
+            appSemanticColors.successForeground,
           )
         : (
             'Con observaciones',
             Icons.error_outline,
-            appSemanticColors.dangerBorder,
+            appSemanticColors.dangerForeground,
           );
 
     return Semantics(
@@ -232,7 +236,7 @@ class _SectionCard extends StatelessWidget {
             border: Border.all(
               color: current == null || current.outdated || !current.isApproved
                   ? tone.withValues(alpha: 0.45)
-                  : appSemanticColors.infoBorder,
+                  : appSemanticColors.infoForeground,
             ),
           ),
           child: Column(
@@ -249,7 +253,7 @@ class _SectionCard extends StatelessWidget {
                           'Módulo ${section.moduleNumber} · Sección ${section.number}',
                           style: TextStyle(
                             fontSize: 11.5,
-                            color: appSemanticColors.infoBorder,
+                            color: appSemanticColors.infoForeground,
                           ),
                         ),
                         Text(
@@ -257,7 +261,7 @@ class _SectionCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: appSemanticColors.infoBorder,
+                            color: appSemanticColors.infoForeground,
                           ),
                         ),
                       ],
@@ -282,7 +286,7 @@ class _SectionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.5,
                       height: 1.45,
-                      color: appSemanticColors.infoBorder,
+                      color: appSemanticColors.infoForeground,
                     ),
                   ),
                 ),
@@ -294,8 +298,10 @@ class _SectionCard extends StatelessWidget {
                     child: OutlinedButton.icon(
                       onPressed: onPreview,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: appSemanticColors.infoBorder,
-                        side: BorderSide(color: appSemanticColors.infoBorder),
+                        foregroundColor: appSemanticColors.infoForeground,
+                        side: BorderSide(
+                          color: appSemanticColors.infoForeground,
+                        ),
                         minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.visibility_outlined, size: 18),
@@ -308,7 +314,7 @@ class _SectionCard extends StatelessWidget {
                       onPressed: onJudge,
                       style: FilledButton.styleFrom(
                         backgroundColor: appSemanticColors.infoBackground,
-                        foregroundColor: appSemanticColors.infoBorder,
+                        foregroundColor: appSemanticColors.infoForeground,
                         minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.fact_check_outlined, size: 18),
@@ -406,7 +412,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
-                color: appSemanticColors.infoBorder,
+                color: appSemanticColors.infoForeground,
               ),
             ),
             const SizedBox(height: AppMetrics.sectionGap),
@@ -444,7 +450,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               onChanged: (_) => setState(() => _error = null),
               style: TextStyle(
                 fontSize: 14.5,
-                color: appSemanticColors.infoBorder,
+                color: appSemanticColors.infoForeground,
               ),
               decoration: InputDecoration(
                 labelText: _approved
@@ -453,12 +459,14 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                 hintText: _approved
                     ? 'Puedes dejarlo vacío'
                     : 'Explica qué está mal para que pueda arreglarlo',
-                hintStyle: TextStyle(color: appSemanticColors.infoBorder),
+                hintStyle: TextStyle(color: appSemanticColors.infoForeground),
                 filled: true,
                 fillColor: appTheme.colorScheme.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-                  borderSide: BorderSide(color: appSemanticColors.infoBorder),
+                  borderSide: BorderSide(
+                    color: appSemanticColors.infoForeground,
+                  ),
                 ),
               ),
             ),
@@ -467,7 +475,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               const SizedBox(height: AppMetrics.gap),
               Text(
                 _error!,
-                style: TextStyle(fontSize: 13, color: appToneDanger.text),
+                style: TextStyle(fontSize: 13, color: appToneDanger.foreground),
               ),
             ],
 
@@ -490,8 +498,8 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                   child: FilledButton(
                     onPressed: _saving ? null : _save,
                     style: FilledButton.styleFrom(
-                      backgroundColor: appSemanticColors.infoText,
-                      foregroundColor: appSemanticColors.dangerText,
+                      backgroundColor: appSemanticColors.infoForeground,
+                      foregroundColor: appSemanticColors.dangerForeground,
                       minimumSize: const Size(0, AppMetrics.minTapTarget),
                     ),
                     child: Text(_saving ? 'Guardando…' : 'Guardar'),
@@ -531,7 +539,7 @@ class _Choice extends StatelessWidget {
       child: ExcludeSemantics(
         child: Material(
           color: selected
-              ? appSemanticColors.infoText.withValues(alpha: 0.12)
+              ? appSemanticColors.infoForeground.withValues(alpha: 0.12)
               : appColorScheme.surface,
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           child: InkWell(
@@ -547,7 +555,7 @@ class _Choice extends StatelessWidget {
                 border: Border.all(
                   color: selected
                       ? appColorScheme.primary
-                      : appSemanticColors.infoBorder,
+                      : appSemanticColors.infoForeground,
                   width: selected ? 1.8 : 1,
                 ),
               ),
@@ -559,7 +567,7 @@ class _Choice extends StatelessWidget {
                     size: 22,
                     color: selected
                         ? appColorScheme.primary
-                        : appSemanticColors.infoBorder,
+                        : appSemanticColors.infoForeground,
                   ),
                   const SizedBox(height: 5),
                   Text(
@@ -570,7 +578,7 @@ class _Choice extends StatelessWidget {
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
                       color: selected
                           ? appColorScheme.primary
-                          : appSemanticColors.infoBorder,
+                          : appSemanticColors.infoForeground,
                     ),
                   ),
                 ],

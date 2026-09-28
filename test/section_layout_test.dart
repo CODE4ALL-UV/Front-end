@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/module_chapters_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/sign_asset_index.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/sign_language_panel.dart';
 
@@ -28,7 +28,7 @@ void main() {
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(
-        _app(const CourseChapterPage(moduleId: 3, sectionNumber: 2)),
+        _app(const ModuleChaptersScreen(moduleId: 3, sectionNumber: 2)),
       );
       await tester.pump();
 
@@ -42,7 +42,7 @@ void main() {
 
       await tester.pumpWidget(
         _app(
-          const CourseChapterPage(moduleId: 2, sectionNumber: 3),
+          const ModuleChaptersScreen(moduleId: 2, sectionNumber: 3),
           textScale: 2.0,
         ),
       );
@@ -57,7 +57,7 @@ void main() {
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(
-        _app(const CourseChapterPage(moduleId: 4, sectionNumber: 1)),
+        _app(const ModuleChaptersScreen(moduleId: 4, sectionNumber: 1)),
       );
       await tester.pump();
 

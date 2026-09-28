@@ -75,7 +75,7 @@ class _VideosEditorScreenState extends State<VideosEditorScreen> {
                 leading: Icon(
                   Icons.play_circle_outline,
                   size: 22,
-                  color: appTheme.dangerBorder,
+                  color: appTheme.dangerForeground,
                 ),
                 onTap: () => _edit(i),
                 onMoveUp: i == 0

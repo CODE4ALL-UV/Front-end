@@ -89,7 +89,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
             onPressed: _stats.refresh,
             style: FilledButton.styleFrom(
               backgroundColor: appColorScheme.surface,
-              foregroundColor: appSemanticColors.infoBorder,
+              foregroundColor: appSemanticColors.infoForeground,
               minimumSize: const Size(0, AppMetrics.minTapTarget),
             ),
             icon: const Icon(Icons.refresh),
@@ -104,20 +104,24 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
         Container(
           padding: const EdgeInsets.all(AppMetrics.sectionGap),
           decoration: BoxDecoration(
-            color: appSemanticColors.dangerBorder,
-            border: Border.all(color: appSemanticColors.infoBorder),
+            color: appSemanticColors.dangerForeground,
+            border: Border.all(color: appSemanticColors.infoForeground),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
             children: [
-              Icon(Icons.insights, size: 44, color: appSemanticColors.infoText),
+              Icon(
+                Icons.insights,
+                size: 44,
+                color: appSemanticColors.infoForeground,
+              ),
               const SizedBox(height: AppMetrics.gap),
               Text(
                 'Todavía no hay actividad',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  color: appSemanticColors.infoText,
+                  color: appSemanticColors.infoForeground,
                 ),
               ),
               const SizedBox(height: 8),
@@ -130,7 +134,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.5,
-                  color: appSemanticColors.infoText,
+                  color: appSemanticColors.infoForeground,
                 ),
               ),
             ],
@@ -210,8 +214,8 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
           onPressed: () => showReportSheet(context, _stats),
           style: OutlinedButton.styleFrom(
             backgroundColor: appColorScheme.surface,
-            foregroundColor: appSemanticColors.infoText,
-            side: BorderSide(color: appSemanticColors.infoBorder),
+            foregroundColor: appSemanticColors.infoForeground,
+            side: BorderSide(color: appSemanticColors.infoForeground),
             minimumSize: const Size(0, AppMetrics.minTapTarget),
           ),
           icon: const Icon(Icons.description_outlined),
@@ -257,7 +261,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
     final appSemanticColors = context.messageColors;
     return Row(
       children: [
-        Icon(icon, size: 19, color: appSemanticColors.infoText),
+        Icon(icon, size: 19, color: appSemanticColors.infoForeground),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -265,7 +269,7 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: appSemanticColors.infoText,
+              color: appSemanticColors.infoForeground,
             ),
           ),
         ),
@@ -316,7 +320,7 @@ class _Metric extends StatelessWidget {
           padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
             color: appColorScheme.surface,
-            border: Border.all(color: appSemanticColors.infoBorder),
+            border: Border.all(color: appSemanticColors.infoForeground),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
@@ -325,14 +329,14 @@ class _Metric extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(icon, size: 16, color: appSemanticColors.infoText),
+                  Icon(icon, size: 16, color: appSemanticColors.infoForeground),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       label,
                       style: TextStyle(
                         fontSize: 12,
-                        color: appSemanticColors.infoText,
+                        color: appSemanticColors.infoForeground,
                       ),
                     ),
                   ),
@@ -344,7 +348,7 @@ class _Metric extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: appSemanticColors.infoText,
+                  color: appSemanticColors.infoForeground,
                 ),
               ),
             ],
@@ -393,7 +397,7 @@ class _SectionBar extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
-                        color: appSemanticColors.infoText,
+                        color: appSemanticColors.infoForeground,
                       ),
                     ),
                   ),
@@ -425,7 +429,7 @@ class _SectionBar extends StatelessWidget {
                 '${stats.avgSeconds == null ? "" : " · ${formatSeconds(stats.avgSeconds!)} de media"}',
                 style: TextStyle(
                   fontSize: 11.5,
-                  color: appSemanticColors.infoText,
+                  color: appSemanticColors.infoForeground,
                 ),
               ),
             ],
@@ -477,7 +481,7 @@ class _QuestionRow extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: appColorScheme.surface,
-            border: Border.all(color: appSemanticColors.infoBorder),
+            border: Border.all(color: appSemanticColors.infoForeground),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
@@ -516,7 +520,7 @@ class _QuestionRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13.5,
                         height: 1.35,
-                        color: appSemanticColors.infoText,
+                        color: appSemanticColors.infoForeground,
                       ),
                     ),
                   ),
@@ -529,7 +533,7 @@ class _QuestionRow extends StatelessWidget {
                 '${showTime ? "" : (stats.avgSeconds == null ? "" : " · ${formatSeconds(stats.avgSeconds!)}")}',
                 style: TextStyle(
                   fontSize: 11.5,
-                  color: appSemanticColors.infoText,
+                  color: appSemanticColors.infoForeground,
                 ),
               ),
             ],
@@ -581,7 +585,7 @@ class _CompletionRow extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: appColorScheme.surface,
-            border: Border.all(color: appSemanticColors.infoBorder),
+            border: Border.all(color: appSemanticColors.infoForeground),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
@@ -592,7 +596,7 @@ class _CompletionRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
-                  color: appSemanticColors.infoText,
+                  color: appSemanticColors.infoForeground,
                 ),
               ),
               const SizedBox(height: 8),
@@ -612,8 +616,8 @@ class _CompletionRow extends StatelessWidget {
                             // Se apaga cuando mucha menos gente llega hasta
                             // aqui que al principio de la seccion.
                             color: part.$2 >= most
-                                ? appSemanticColors.infoText
-                                : appSemanticColors.infoText,
+                                ? appSemanticColors.infoForeground
+                                : appSemanticColors.infoForeground,
                           ),
                           const SizedBox(height: 3),
                           Text(
@@ -621,14 +625,14 @@ class _CompletionRow extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w800,
-                              color: appSemanticColors.infoText,
+                              color: appSemanticColors.infoForeground,
                             ),
                           ),
                           Text(
                             part.$1.$2,
                             style: TextStyle(
                               fontSize: 10,
-                              color: appSemanticColors.infoText,
+                              color: appSemanticColors.infoForeground,
                             ),
                           ),
                         ],

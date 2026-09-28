@@ -25,7 +25,7 @@ class EditedDot extends StatelessWidget {
         height: 9,
         margin: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
-          color: activityColors.infoBorder,
+          color: activityColors.infoForeground,
           shape: BoxShape.circle,
         ),
       ),
@@ -53,7 +53,7 @@ class TeacherBanner extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 18, color: themeColors.warningBorder),
+            Icon(icon, size: 18, color: themeColors.warningForeground),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -61,7 +61,7 @@ class TeacherBanner extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.4,
-                  color: themeColors.warningBorder,
+                  color: themeColors.warningForeground,
                 ),
               ),
             ),
@@ -140,12 +140,12 @@ class TeacherField extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-              borderSide: BorderSide(color: appSemanticColors.infoBorder),
+              borderSide: BorderSide(color: appSemanticColors.infoForeground),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
               borderSide: BorderSide(
-                color: appSemanticColors.infoBorder,
+                color: appSemanticColors.infoForeground,
                 width: 2,
               ),
             ),
@@ -155,7 +155,10 @@ class TeacherField extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             helper!,
-            style: TextStyle(fontSize: 12, color: appSemanticColors.infoText),
+            style: TextStyle(
+              fontSize: 12,
+              color: appSemanticColors.infoForeground,
+            ),
           ),
         ],
       ],
@@ -185,7 +188,7 @@ class TeacherCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          border: Border.all(color: appSemanticColors.infoBorder),
+          border: Border.all(color: appSemanticColors.infoForeground),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: Column(
@@ -200,7 +203,7 @@ class TeacherCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: appSemanticColors.infoText,
+                        color: appSemanticColors.infoForeground,
                       ),
                     ),
                   ),
@@ -235,8 +238,8 @@ class TeacherAddButton extends StatelessWidget {
     return OutlinedButton.icon(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: appSemanticColors.infoBorder,
-        side: BorderSide(color: appSemanticColors.infoBorder),
+        foregroundColor: appSemanticColors.infoForeground,
+        side: BorderSide(color: appSemanticColors.infoForeground),
         minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.add, size: 18),
@@ -260,11 +263,11 @@ Future<bool> confirmDelete(
       backgroundColor: appColorScheme.surface,
       title: Text(
         '¿Borrar $what?',
-        style: TextStyle(color: appSemanticColors.infoText),
+        style: TextStyle(color: appSemanticColors.infoForeground),
       ),
       content: Text(
         detail ?? 'Esto no se puede deshacer una vez guardes la sección.',
-        style: TextStyle(color: appSemanticColors.infoText, height: 1.4),
+        style: TextStyle(color: appSemanticColors.infoForeground, height: 1.4),
       ),
       actions: [
         TextButton(
@@ -275,7 +278,7 @@ Future<bool> confirmDelete(
           onPressed: () => Navigator.of(context).pop(true),
           style: FilledButton.styleFrom(
             backgroundColor: appSemanticColors.dangerBackground,
-            foregroundColor: appSemanticColors.dangerBorder,
+            foregroundColor: appSemanticColors.dangerForeground,
           ),
           child: const Text('Borrar'),
         ),
@@ -319,7 +322,7 @@ class TeacherListRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: appSemanticColors.infoBackground,
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-        border: Border.all(color: appSemanticColors.infoBorder),
+        border: Border.all(color: appSemanticColors.infoForeground),
       ),
       child: Column(
         children: [
@@ -351,8 +354,8 @@ class TeacherListRow extends StatelessWidget {
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: title.isEmpty
-                                    ? appSemanticColors.infoText
-                                    : appSemanticColors.infoText,
+                                    ? appSemanticColors.infoForeground
+                                    : appSemanticColors.infoForeground,
                               ),
                             ),
                             if (subtitle.isNotEmpty)
@@ -362,7 +365,7 @@ class TeacherListRow extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 12.5,
-                                  color: appSemanticColors.infoText,
+                                  color: appSemanticColors.infoForeground,
                                 ),
                               ),
                           ],
@@ -371,7 +374,7 @@ class TeacherListRow extends StatelessWidget {
                       if (onTap != null)
                         Icon(
                           Icons.chevron_right,
-                          color: appSemanticColors.infoText,
+                          color: appSemanticColors.infoForeground,
                         ),
                     ],
                   ),
@@ -428,7 +431,7 @@ class _RowAction extends StatelessWidget {
       onPressed: onPressed,
       tooltip: label,
       iconSize: 20,
-      color: color ?? appSemanticColors.infoText,
+      color: color ?? appSemanticColors.infoForeground,
       constraints: const BoxConstraints(
         minWidth: AppMetrics.minTapTarget,
         minHeight: AppMetrics.minTapTarget,

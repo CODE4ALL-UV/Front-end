@@ -49,7 +49,7 @@ class ActivityRowWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: appColorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: appSemanticColors.infoBorder),
+        border: Border.all(color: appSemanticColors.infoForeground),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -73,7 +73,7 @@ class ActivityRowWidget extends StatelessWidget {
                   item.label,
                   style: TextStyle(
                     fontSize: 14,
-                    color: appSemanticColors.infoText,
+                    color: appSemanticColors.infoForeground,
                     height: 1.35,
                     fontWeight: FontWeight.w600,
                   ),
@@ -83,7 +83,7 @@ class ActivityRowWidget extends StatelessWidget {
                   'Actividad educativa',
                   style: TextStyle(
                     fontSize: 12,
-                    color: appSemanticColors.infoText,
+                    color: appSemanticColors.infoForeground,
                   ),
                 ),
               ],
@@ -96,7 +96,7 @@ class ActivityRowWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 color: appSemanticColors.successBackground,
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: appSemanticColors.successBorder),
+                border: Border.all(color: appSemanticColors.successForeground),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -104,14 +104,14 @@ class ActivityRowWidget extends StatelessWidget {
                   Icon(
                     Icons.check_circle,
                     size: 16,
-                    color: appSemanticColors.successText,
+                    color: appSemanticColors.successForeground,
                   ),
                   SizedBox(width: 6),
                   Text(
                     'Completado',
                     style: TextStyle(
                       fontSize: 12,
-                      color: appSemanticColors.successText,
+                      color: appSemanticColors.successForeground,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -132,13 +132,13 @@ class ActivityRowWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: appSemanticColors.infoBackground,
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: appSemanticColors.infoBorder),
+                    border: Border.all(color: appSemanticColors.infoForeground),
                   ),
                   child: Text(
                     badgeText,
                     style: TextStyle(
                       fontSize: 12,
-                      color: appSemanticColors.infoText,
+                      color: appSemanticColors.infoForeground,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

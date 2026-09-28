@@ -171,8 +171,8 @@ class _TeacherCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                   border: Border.all(
                     color: needsFeedback
-                        ? appSemanticColors.warningBorder
-                        : appSemanticColors.infoBorder,
+                        ? appSemanticColors.warningForeground
+                        : appSemanticColors.infoForeground,
                     width: needsFeedback ? 1.6 : 1,
                   ),
                 ),
@@ -191,7 +191,7 @@ class _TeacherCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w800,
-                              color: appSemanticColors.infoText,
+                              color: appSemanticColors.infoForeground,
                             ),
                           ),
                         );
@@ -207,14 +207,14 @@ class _TeacherCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 15.5,
                                 fontWeight: FontWeight.w700,
-                                color: appSemanticColors.infoText,
+                                color: appSemanticColors.infoForeground,
                               ),
                             ),
                             Text(
                               teacher.email,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: appSemanticColors.infoText,
+                                color: appSemanticColors.infoForeground,
                               ),
                             ),
                           ],

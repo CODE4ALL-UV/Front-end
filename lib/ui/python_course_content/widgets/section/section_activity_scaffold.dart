@@ -173,7 +173,7 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
               decoration: BoxDecoration(
                 color: appSemanticColors.infoBackground,
                 border: Border(
-                  top: BorderSide(color: appSemanticColors.infoBorder),
+                  top: BorderSide(color: appSemanticColors.infoForeground),
                 ),
               ),
               child: SafeArea(
@@ -228,7 +228,7 @@ class _ActivityBanner extends StatelessWidget {
           decoration: BoxDecoration(
             color: appSemanticColors.infoBackground,
             border: Border(
-              bottom: BorderSide(color: appSemanticColors.infoBorder),
+              bottom: BorderSide(color: appSemanticColors.infoForeground),
             ),
           ),
           child: Center(
@@ -263,7 +263,7 @@ class _ActivityBanner extends StatelessWidget {
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.4,
-                            color: appSemanticColors.infoText,
+                            color: appSemanticColors.infoForeground,
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -273,7 +273,7 @@ class _ActivityBanner extends StatelessWidget {
                             fontSize: 17,
                             height: 1.3,
                             fontWeight: FontWeight.w700,
-                            color: appSemanticColors.infoText,
+                            color: appSemanticColors.infoForeground,
                           ),
                         ),
                       ],
@@ -363,7 +363,7 @@ class _ManualDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       title: Row(
         children: [
-          Icon(Icons.menu_book, color: appSemanticColors.infoText),
+          Icon(Icons.menu_book, color: appSemanticColors.infoForeground),
           const SizedBox(width: 10),
           Expanded(child: Text('Cómo usar esta pantalla')),
         ],
@@ -377,7 +377,7 @@ class _ManualDialog extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: appSemanticColors.infoText,
+              color: appSemanticColors.infoForeground,
             ),
           ),
           const SizedBox(height: 12),
@@ -395,7 +395,7 @@ class _ManualDialog extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
-                        color: appSemanticColors.infoText,
+                        color: appSemanticColors.infoForeground,
                       ),
                     ),
                   ),

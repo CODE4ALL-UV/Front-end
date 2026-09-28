@@ -130,7 +130,9 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: colorScheme.onPrimary.withValues(alpha: 0.4),
-        border: Border(top: BorderSide(color: appSemanticColors.infoBorder)),
+        border: Border(
+          top: BorderSide(color: appSemanticColors.infoForeground, width: 0.5),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -487,7 +489,7 @@ class _ModuleNavigationHint extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, size: 20, color: appSemanticColors.infoText),
+                Icon(icon, size: 20, color: appSemanticColors.infoForeground),
                 const SizedBox(width: 4),
                 // Flexible para que con la letra agrandada parta el renglón
                 // en lugar de desbordar por el lado.
@@ -496,7 +498,7 @@ class _ModuleNavigationHint extends StatelessWidget {
                     message,
                     style: TextStyle(
                       fontSize: 12,
-                      color: appSemanticColors.infoText,
+                      color: appSemanticColors.infoForeground,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

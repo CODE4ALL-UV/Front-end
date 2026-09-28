@@ -155,7 +155,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: appSemanticColors.infoText,
+                    color: appSemanticColors.infoForeground,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -165,7 +165,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
-                    color: appSemanticColors.infoText,
+                    color: appSemanticColors.infoForeground,
                   ),
                 ),
                 const SizedBox(height: AppMetrics.gap),
@@ -188,7 +188,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                             });
                           }
                         },
-                        color: appSemanticColors.infoText,
+                        color: appSemanticColors.infoForeground,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(

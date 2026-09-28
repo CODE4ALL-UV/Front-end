@@ -70,7 +70,7 @@ class SectionCapsuleScreen extends StatelessWidget {
         children: [
           SectionCard(
             background: appTheme.infoBackground,
-            borderColor: appTheme.infoBorder.withValues(alpha: 0.4),
+            borderColor: appTheme.infoForeground.withValues(alpha: 0.4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -82,7 +82,7 @@ class SectionCapsuleScreen extends StatelessWidget {
                 SectionHeading(
                   title: _capsule.headline,
                   subtitle: _capsule.intro,
-                  color: appTheme.infoText,
+                  color: appTheme.infoForeground,
                 ),
               ],
             ),
@@ -132,7 +132,7 @@ class _TipCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
-                color: appTheme.infoText,
+                color: appTheme.infoForeground,
               ),
             ),
           ),
@@ -149,7 +149,7 @@ class _TipCard extends StatelessWidget {
                       fontSize: 16.5,
                       height: 1.35,
                       fontWeight: FontWeight.w700,
-                      color: appTheme.infoText,
+                      color: appTheme.infoForeground,
                     ),
                   ),
                 ),

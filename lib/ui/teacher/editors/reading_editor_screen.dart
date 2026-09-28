@@ -161,7 +161,7 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: appSemanticColors.infoText,
+                    color: appSemanticColors.infoForeground,
                   ),
                 ),
                 const SizedBox(height: AppMetrics.gap),
@@ -312,7 +312,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: appSemanticColors.infoText,
+              color: appSemanticColors.infoForeground,
             ),
           ),
           const SizedBox(height: AppMetrics.gap),
@@ -337,7 +337,7 @@ class _PageEditorScreenState extends State<_PageEditorScreen> {
                 leading: Icon(
                   _iconFor(_page.blocks[i].kind),
                   size: 20,
-                  color: appSemanticColors.infoText,
+                  color: appSemanticColors.infoForeground,
                 ),
                 onTap: () => _editBlock(i),
                 onMoveUp: i == 0
@@ -411,7 +411,7 @@ class _BlockKindSheet extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
-                color: appSemanticColors.infoText,
+                color: appSemanticColors.infoForeground,
               ),
             ),
           ),
@@ -420,14 +420,14 @@ class _BlockKindSheet extends StatelessWidget {
               title: Text(
                 kind.label,
                 style: TextStyle(
-                  color: appSemanticColors.infoText,
+                  color: appSemanticColors.infoForeground,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               subtitle: Text(
                 _what[kind]!,
                 style: TextStyle(
-                  color: appSemanticColors.infoText,
+                  color: appSemanticColors.infoForeground,
                   fontSize: 12.5,
                 ),
               ),
@@ -553,7 +553,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                                   : '•',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                color: appSemanticColors.infoText,
+                                color: appSemanticColors.infoForeground,
                               ),
                             ),
                           ),
@@ -561,12 +561,12 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                             child: TextField(
                               controller: _items[i],
                               style: TextStyle(
-                                color: appSemanticColors.infoText,
+                                color: appSemanticColors.infoForeground,
                               ),
                               decoration: InputDecoration(
                                 isDense: true,
                                 filled: true,
-                                fillColor: appSemanticColors.dangerBorder,
+                                fillColor: appSemanticColors.dangerForeground,
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 12,
@@ -574,7 +574,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: appSemanticColors.infoBorder,
+                                    color: appSemanticColors.infoForeground,
                                   ),
                                 ),
                               ),
@@ -586,7 +586,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                               _items.removeAt(i).dispose();
                               _items = [..._items];
                             }),
-                            color: appSemanticColors.infoText,
+                            color: appSemanticColors.infoForeground,
                             constraints: const BoxConstraints(
                               minWidth: AppMetrics.minTapTarget,
                               minHeight: AppMetrics.minTapTarget,
@@ -649,11 +649,11 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                       selected: _block.tone == tone,
                       onSelected: (_) =>
                           setState(() => _block = _block.copyWith()),
-                      selectedColor: appSemanticColors.infoText,
+                      selectedColor: appSemanticColors.infoForeground,
                       labelStyle: TextStyle(
                         color: _block.tone == tone
-                            ? appSemanticColors.dangerText
-                            : appSemanticColors.infoText,
+                            ? appSemanticColors.dangerForeground
+                            : appSemanticColors.infoForeground,
                         fontWeight: _block.tone == tone
                             ? FontWeight.w700
                             : FontWeight.w400,
@@ -678,7 +678,7 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: appSemanticColors.infoText,
+            color: appSemanticColors.infoForeground,
           ),
         ),
         const SizedBox(height: 6),
@@ -693,11 +693,11 @@ class _BlockEditorScreenState extends State<_BlockEditorScreen> {
                 // Cambiar de tipo conserva lo que quepa en el nuevo: el
                 // título y el texto no se pierden al pasar de párrafo a lista.
                 onSelected: (_) => setState(() => _block = _block.asKind(kind)),
-                selectedColor: appSemanticColors.dangerText,
+                selectedColor: appSemanticColors.dangerForeground,
                 labelStyle: TextStyle(
                   color: _block.kind == kind
-                      ? appSemanticColors.dangerBorder
-                      : appSemanticColors.infoText,
+                      ? appSemanticColors.dangerForeground
+                      : appSemanticColors.infoForeground,
                   fontWeight: _block.kind == kind
                       ? FontWeight.w700
                       : FontWeight.w400,

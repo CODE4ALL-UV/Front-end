@@ -94,7 +94,9 @@ class SignKeyboard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: appSemanticColors.infoBackground,
-        border: Border(top: BorderSide(color: appSemanticColors.infoBorder)),
+        border: Border(
+          top: BorderSide(color: appSemanticColors.infoForeground),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -208,7 +210,7 @@ class _LetterKey extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 4),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: appSemanticColors.infoBorder),
+                border: Border.all(color: appSemanticColors.infoForeground),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -222,7 +224,7 @@ class _LetterKey extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          color: appSemanticColors.infoText,
+                          color: appSemanticColors.infoForeground,
                         ),
                       ),
                       if (hasMotion) ...[
@@ -230,7 +232,7 @@ class _LetterKey extends StatelessWidget {
                         Icon(
                           Icons.animation,
                           size: 11,
-                          color: appSemanticColors.warningText,
+                          color: appSemanticColors.warningForeground,
                         ),
                       ],
                     ],
@@ -271,7 +273,7 @@ class _ActionKey extends StatelessWidget {
           label: Text(label, overflow: TextOverflow.ellipsis),
           style: FilledButton.styleFrom(
             minimumSize: const Size(0, AppMetrics.minTapTarget),
-            foregroundColor: appSemanticColors.infoText,
+            foregroundColor: appSemanticColors.infoForeground,
           ),
         ),
       ),

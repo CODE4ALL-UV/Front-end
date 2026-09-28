@@ -127,7 +127,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: appSemanticColors.infoText,
+                    color: appSemanticColors.infoForeground,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -137,7 +137,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
-                    color: appSemanticColors.infoText,
+                    color: appSemanticColors.infoForeground,
                   ),
                 ),
                 const SizedBox(height: AppMetrics.gap),
@@ -160,7 +160,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                             });
                           }
                         },
-                        color: appSemanticColors.infoText,
+                        color: appSemanticColors.infoForeground,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(
@@ -190,13 +190,13 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
                       Icons.quiz_outlined,
-                      color: appSemanticColors.successBorder,
+                      color: appSemanticColors.successForeground,
                     ),
                     title: Text(
                       'Preguntas del ejercicio',
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: appSemanticColors.infoText,
+                        color: appSemanticColors.infoForeground,
                       ),
                     ),
                     subtitle: Text(
@@ -204,11 +204,11 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                           ? 'Sin preguntas'
                           : '${_questions.length} '
                                 '${_questions.length == 1 ? "pregunta" : "preguntas"}',
-                      style: TextStyle(color: appSemanticColors.infoText),
+                      style: TextStyle(color: appSemanticColors.infoForeground),
                     ),
                     trailing: Icon(
                       Icons.chevron_right,
-                      color: appSemanticColors.infoText,
+                      color: appSemanticColors.infoForeground,
                     ),
                     onTap: _editQuestions,
                   ),

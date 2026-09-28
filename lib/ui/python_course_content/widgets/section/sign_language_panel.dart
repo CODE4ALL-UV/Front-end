@@ -171,7 +171,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
           decoration: BoxDecoration(
             color: appColorScheme.surface,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-            border: Border.all(color: appSemanticColors.infoBorder),
+            border: Border.all(color: appSemanticColors.infoForeground),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +182,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                   Icon(
                     Icons.sign_language,
                     size: 17,
-                    color: appSemanticColors.infoBorder,
+                    color: appSemanticColors.infoForeground,
                   ),
                   const SizedBox(width: 7),
                   Expanded(
@@ -248,7 +248,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                   child: LinearProgressIndicator(
                     value: (_index + 1) / _letters.length,
                     minHeight: 4,
-                    backgroundColor: appSemanticColors.infoBorder,
+                    backgroundColor: appSemanticColors.infoForeground,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       appSemanticColors.infoBackground,
                     ),
@@ -300,7 +300,7 @@ class _HalfTile extends StatelessWidget {
             fontSize: 10.5,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.3,
-            color: appSemanticColors.infoText,
+            color: appSemanticColors.infoForeground,
           ),
         ),
         const SizedBox(height: 6),
@@ -316,7 +316,7 @@ class _HalfTile extends StatelessWidget {
             height: 1.1,
             fontWeight: captionIsLarge ? FontWeight.w900 : FontWeight.w700,
             letterSpacing: captionIsLarge ? 0 : 0.8,
-            color: appSemanticColors.infoText,
+            color: appSemanticColors.infoForeground,
           ),
         ),
         if (footnote != null) ...[
@@ -329,7 +329,7 @@ class _HalfTile extends StatelessWidget {
             style: TextStyle(
               fontSize: 9.5,
               fontStyle: FontStyle.italic,
-              color: appSemanticColors.infoText,
+              color: appSemanticColors.infoForeground,
             ),
           ),
         ],
@@ -396,7 +396,7 @@ class _SignDisplay extends StatelessWidget {
     final container = BoxDecoration(
       color: appColorScheme.surface,
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: appSemanticColors.infoBorder),
+      border: Border.all(color: appSemanticColors.infoForeground),
     );
 
     final path = assetPath;
@@ -423,7 +423,7 @@ class _SignDisplay extends StatelessWidget {
         Icon(
           word.isEmpty ? Icons.hourglass_empty : Icons.spellcheck,
           size: 26,
-          color: appSemanticColors.infoText,
+          color: appSemanticColors.infoForeground,
         ),
         const SizedBox(height: 6),
         Padding(
@@ -436,7 +436,7 @@ class _SignDisplay extends StatelessWidget {
               fontSize: 10.5,
               height: 1.25,
               fontWeight: FontWeight.w600,
-              color: appSemanticColors.infoText,
+              color: appSemanticColors.infoForeground,
             ),
           ),
         ),

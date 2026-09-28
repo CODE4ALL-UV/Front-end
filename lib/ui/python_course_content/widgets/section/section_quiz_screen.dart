@@ -245,7 +245,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
-                  color: appTheme.infoText,
+                  color: appTheme.infoForeground,
                 ),
               ),
               const SizedBox(height: 10),
@@ -257,7 +257,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                     fontSize: 18,
                     height: 1.45,
                     fontWeight: FontWeight.w700,
-                    color: appTheme.infoText,
+                    color: appTheme.infoForeground,
                   ),
                 ),
               ),
@@ -335,8 +335,9 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
           background: _passed
               ? appTheme.successBackground
               : appTheme.warningBackground,
-          borderColor: (_passed ? appTheme.infoBorder : appTheme.warningBorder)
-              .withValues(alpha: 0.5),
+          borderColor:
+              (_passed ? appTheme.infoForeground : appTheme.warningForeground)
+                  .withValues(alpha: 0.5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -384,7 +385,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                     fontSize: 15,
                     height: 1.45,
                     fontWeight: FontWeight.w700,
-                    color: appTheme.infoText,
+                    color: appTheme.infoForeground,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -394,7 +395,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                     Icon(
                       Icons.check_circle_outline,
                       size: 18,
-                      color: appTheme.successBorder,
+                      color: appTheme.successForeground,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -403,7 +404,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                         style: TextStyle(
                           fontSize: 14.5,
                           height: 1.5,
-                          color: appTheme.infoText,
+                          color: appTheme.infoForeground,
                         ),
                       ),
                     ),
@@ -484,17 +485,17 @@ class _OptionTile extends StatelessWidget {
     final Color foreground;
 
     if (showAsCorrect) {
-      borderColor = appTheme.successBorder;
+      borderColor = appTheme.successForeground;
       background = appTheme.successBackground;
-      foreground = appTheme.successBorder;
+      foreground = appTheme.successForeground;
     } else if (showAsWrong) {
-      borderColor = appTheme.dangerBorder;
+      borderColor = appTheme.dangerForeground;
       background = appTheme.dangerBackground;
-      foreground = appTheme.dangerBorder;
+      foreground = appTheme.dangerForeground;
     } else {
-      borderColor = appTheme.infoBorder;
+      borderColor = appTheme.infoForeground;
       background = appTheme.infoBackground;
-      foreground = appTheme.infoText;
+      foreground = appTheme.infoForeground;
     }
 
     final statusLabel = showAsCorrect
@@ -560,7 +561,7 @@ class _OptionTile extends StatelessWidget {
                             fontSize: 15.5,
                             height: 1.5,
                             fontWeight: FontWeight.w600,
-                            color: appTheme.infoText,
+                            color: appTheme.infoForeground,
                           ),
                         ),
                         if (statusLabel != null) ...[

@@ -5,7 +5,7 @@ import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/circle_progress_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/lesson_box_widget.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/module_chapters_screen.dart';
 
 /// Componente modularizado que maneja la intercalación y semántica de las filas
 class ModuleRowWidget extends StatelessWidget {
@@ -38,7 +38,7 @@ class ModuleRowWidget extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => CourseChapterPage(
+          builder: (_) => ModuleChaptersScreen(
             moduleId: moduleId,
             sectionNumber: sectionNumber,
             enableTeacherEditor: enableTeacherEditor,

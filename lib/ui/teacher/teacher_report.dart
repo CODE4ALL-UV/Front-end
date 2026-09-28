@@ -134,7 +134,7 @@ Future<void> showReportSheet(
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: appSemanticColors.infoBorder,
+    backgroundColor: appSemanticColors.infoForeground,
     builder: (context) {
       return DraggableScrollableSheet(
         expand: false,
@@ -153,7 +153,7 @@ Future<void> showReportSheet(
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: appSemanticColors.infoText,
+                          color: appSemanticColors.infoForeground,
                         ),
                       ),
                     ),
@@ -171,7 +171,7 @@ Future<void> showReportSheet(
                       },
                       style: FilledButton.styleFrom(
                         backgroundColor: appColorScheme.primary,
-                        foregroundColor: appSemanticColors.dangerBorder,
+                        foregroundColor: appSemanticColors.dangerForeground,
                         minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.copy, size: 18),
@@ -180,7 +180,7 @@ Future<void> showReportSheet(
                   ],
                 ),
               ),
-              Divider(height: 1, color: appSemanticColors.infoBorder),
+              Divider(height: 1, color: appSemanticColors.infoForeground),
               Expanded(
                 child: SingleChildScrollView(
                   controller: controller,
@@ -191,7 +191,7 @@ Future<void> showReportSheet(
                       fontFamily: 'monospace',
                       fontSize: 12.5,
                       height: 1.5,
-                      color: appSemanticColors.infoText,
+                      color: appSemanticColors.infoForeground,
                     ),
                   ),
                 ),

@@ -28,7 +28,9 @@ class SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appColorScheme.surface,
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-        border: Border.all(color: borderColor ?? appSemanticColors.infoBorder),
+        border: Border.all(
+          color: borderColor ?? appSemanticColors.infoForeground,
+        ),
       ),
       child: child,
     );
@@ -116,7 +118,7 @@ class SectionParagraph extends StatelessWidget {
         // 1.6 de interlineado: facilita no perder el renglón, sobre todo con
         // baja visión o dislexia.
         height: 1.6,
-        color: appSemanticColors.infoText,
+        color: appSemanticColors.infoForeground,
       ),
     );
   }
@@ -148,7 +150,7 @@ class SectionList extends StatelessWidget {
                   height: 26,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: messageTheme.infoBorder,
+                    color: messageTheme.infoForeground,
                     shape: BoxShape.circle,
                   ),
                   child: numbered
@@ -233,7 +235,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
               decoration: BoxDecoration(
                 color: appColorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: messageTheme.infoBorder),
+                border: Border.all(color: messageTheme.infoForeground),
               ),
               child: Scrollbar(
                 controller: _controller,
@@ -252,7 +254,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
                       ],
                       fontSize: 14,
                       height: 1.55,
-                      color: messageTheme.infoText,
+                      color: messageTheme.infoForeground,
                     ),
                   ),
                 ),
@@ -269,7 +271,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
               color: messageTheme.infoBackground,
               borderRadius: BorderRadius.circular(10),
               border: Border(
-                left: BorderSide(color: messageTheme.infoBorder, width: 4),
+                left: BorderSide(color: messageTheme.infoForeground, width: 4),
               ),
             ),
             child: Row(
@@ -278,7 +280,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
                 Icon(
                   Icons.record_voice_over,
                   size: 18,
-                  color: messageTheme.infoText,
+                  color: messageTheme.infoForeground,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -287,7 +289,7 @@ class _SectionCodeBlockState extends State<SectionCodeBlock> {
                     style: TextStyle(
                       fontSize: 14.5,
                       height: 1.5,
-                      color: messageTheme.infoText,
+                      color: messageTheme.infoForeground,
                     ),
                   ),
                 ),
@@ -340,13 +342,13 @@ class SectionCallout extends StatelessWidget {
         color: appColorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: messageTheme.infoBorder.withValues(alpha: 0.45),
+          color: messageTheme.infoForeground.withValues(alpha: 0.45),
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(_icon, size: 22, color: messageTheme.infoBorder),
+          Icon(_icon, size: 22, color: messageTheme.infoForeground),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -358,7 +360,7 @@ class SectionCallout extends StatelessWidget {
                     fontSize: 15.5,
                     fontWeight: FontWeight.w700,
                     height: 1.35,
-                    color: messageTheme.infoBorder,
+                    color: messageTheme.infoForeground,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -367,7 +369,7 @@ class SectionCallout extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     height: 1.55,
-                    color: messageTheme.infoText,
+                    color: messageTheme.infoForeground,
                   ),
                 ),
               ],
@@ -410,10 +412,10 @@ class SectionPrimaryButton extends StatelessWidget {
         child: ElevatedButton.icon(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: messageTheme.infoBorder,
+            backgroundColor: messageTheme.infoForeground,
             foregroundColor: Colors.white,
-            disabledBackgroundColor: messageTheme.infoBorder,
-            disabledForegroundColor: messageTheme.infoText,
+            disabledBackgroundColor: messageTheme.infoForeground,
+            disabledForegroundColor: messageTheme.infoForeground,
             minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
@@ -461,10 +463,10 @@ class SectionSecondaryButton extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: onPressed,
           style: OutlinedButton.styleFrom(
-            backgroundColor: messageTheme.infoBorder,
-            foregroundColor: messageTheme.infoText,
-            disabledForegroundColor: messageTheme.infoText,
-            side: BorderSide(color: messageTheme.infoBorder, width: 1.6),
+            backgroundColor: messageTheme.infoForeground,
+            foregroundColor: messageTheme.infoForeground,
+            disabledForegroundColor: messageTheme.infoForeground,
+            side: BorderSide(color: messageTheme.infoForeground, width: 1.6),
             minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
@@ -500,13 +502,13 @@ class SectionStatusChip extends StatelessWidget {
         color: appColorScheme.surface,
         borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
         border: Border.all(
-          color: messageTheme.infoBorder.withValues(alpha: 0.5),
+          color: messageTheme.infoForeground.withValues(alpha: 0.5),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: messageTheme.infoBorder),
+          Icon(icon, size: 16, color: messageTheme.infoForeground),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
@@ -514,7 +516,7 @@ class SectionStatusChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: messageTheme.infoText,
+                color: messageTheme.infoForeground,
               ),
             ),
           ),
@@ -579,9 +581,9 @@ class SectionProgressBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: value.clamp(0.0, 1.0),
                 minHeight: 10,
-                backgroundColor: messageTheme.infoBorder,
+                backgroundColor: messageTheme.infoForeground,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  messageTheme.infoBorder,
+                  messageTheme.infoForeground,
                 ),
               ),
             ),
@@ -618,7 +620,7 @@ class SectionPendingContent extends StatelessWidget {
                 'Mientras tanto, estos son los objetivos previstos para esta '
                 'sección.',
             icon: Icons.hourglass_empty,
-            color: messageTheme.warningText,
+            color: messageTheme.warningForeground,
           ),
           const SizedBox(height: 16),
           SectionList(items: objectives, numbered: true),

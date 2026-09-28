@@ -236,7 +236,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
-                            color: appSemanticColors.infoText,
+                            color: appSemanticColors.infoForeground,
                           ),
                         ),
                         const SizedBox(height: AppMetrics.gap),
@@ -267,7 +267,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
     final appSemanticColors = context.messageColors;
     final where = Text(
       'Módulo ${widget.moduleNumber} · Sección ${widget.sectionNumber}',
-      style: TextStyle(fontSize: 12.5, color: appSemanticColors.infoText),
+      style: TextStyle(fontSize: 12.5, color: appSemanticColors.infoForeground),
     );
 
     final badge = edited
@@ -496,7 +496,9 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: appColorScheme.surface,
-        border: Border(top: BorderSide(color: appSemanticColors.infoBorder)),
+        border: Border(
+          top: BorderSide(color: appSemanticColors.infoForeground),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -517,7 +519,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                   fontWeight: changed ? FontWeight.w700 : FontWeight.w400,
                   color: changed
                       ? appSemanticColors.warningBackground
-                      : appSemanticColors.infoText,
+                      : appSemanticColors.infoForeground,
                 ),
               ),
             );
@@ -621,7 +623,7 @@ class _ActivityCard extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
-                  border: Border.all(color: appSemanticColors.infoBorder),
+                  border: Border.all(color: appSemanticColors.infoForeground),
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 ),
                 child: Row(
@@ -629,7 +631,7 @@ class _ActivityCard extends StatelessWidget {
                     Icon(
                       icon,
                       size: 22,
-                      color: empty ? appSemanticColors.infoText : color,
+                      color: empty ? appSemanticColors.infoForeground : color,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -642,14 +644,14 @@ class _ActivityCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w700,
-                              color: appSemanticColors.infoText,
+                              color: appSemanticColors.infoForeground,
                             ),
                           ),
                           Text(
                             detail,
                             style: TextStyle(
                               fontSize: 12.5,
-                              color: appSemanticColors.infoText,
+                              color: appSemanticColors.infoForeground,
                             ),
                           ),
                         ],
@@ -657,7 +659,7 @@ class _ActivityCard extends StatelessWidget {
                     ),
                     Icon(
                       Icons.chevron_right,
-                      color: appSemanticColors.infoText,
+                      color: appSemanticColors.infoForeground,
                     ),
                   ],
                 ),
@@ -689,7 +691,7 @@ class _LaboratoryCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
         decoration: BoxDecoration(
-          border: Border.all(color: appSemanticColors.infoBorder),
+          border: Border.all(color: appSemanticColors.infoForeground),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: SwitchListTile(
@@ -702,14 +704,17 @@ class _LaboratoryCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 14.5,
               fontWeight: FontWeight.w700,
-              color: appSemanticColors.infoText,
+              color: appSemanticColors.infoForeground,
             ),
           ),
           subtitle: Text(
             enabled
                 ? 'El estudiante puede escribir y ejecutar código'
                 : 'Esta sección no ofrece laboratorio',
-            style: TextStyle(fontSize: 12.5, color: appSemanticColors.infoText),
+            style: TextStyle(
+              fontSize: 12.5,
+              color: appSemanticColors.infoForeground,
+            ),
           ),
         ),
       ),

@@ -83,7 +83,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
             if (_pageIndex == 0) ...[
               SectionCard(
                 background: appTheme.infoBackground,
-                borderColor: appTheme.infoBorder.withValues(alpha: 0.4),
+                borderColor: appTheme.infoForeground.withValues(alpha: 0.4),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -91,7 +91,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
                       title: _reading.title,
                       subtitle: _reading.intro,
                       icon: Icons.auto_stories_outlined,
-                      color: appTheme.infoText,
+                      color: appTheme.infoForeground,
                     ),
                     if (widget.section.objectives.isNotEmpty) ...[
                       const SizedBox(height: 16),
@@ -100,7 +100,7 @@ class _SectionReadingScreenState extends State<SectionReadingScreen> {
                         style: TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
-                          color: appTheme.infoText,
+                          color: appTheme.infoForeground,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -214,7 +214,7 @@ class _ReadingBlockView extends StatelessWidget {
                 fontSize: 16.5,
                 fontWeight: FontWeight.w700,
                 height: 1.35,
-                color: appTheme.infoText,
+                color: appTheme.infoForeground,
               ),
             ),
           ),
@@ -260,7 +260,9 @@ class _PageDots extends StatelessWidget {
             width: isActive ? 22 : 9,
             height: 9,
             decoration: BoxDecoration(
-              color: isActive ? appTheme.infoBackground : appTheme.infoBorder,
+              color: isActive
+                  ? appTheme.infoBackground
+                  : appTheme.infoForeground,
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
           );

@@ -15,8 +15,8 @@ import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 /// navegación entre capítulos y el botón de edición docente se resuelven aquí
 /// a partir del catálogo. Así el mismo capítulo se ve igual en tema claro y
 /// oscuro, y añadir contenido no obliga a tocar ninguna pantalla.
-class CourseChapterPage extends StatefulWidget {
-  const CourseChapterPage({
+class ModuleChaptersScreen extends StatefulWidget {
+  const ModuleChaptersScreen({
     super.key,
     required this.moduleId,
     required this.sectionNumber,
@@ -30,10 +30,10 @@ class CourseChapterPage extends StatefulWidget {
   final bool enableTeacherEditor;
 
   @override
-  State<CourseChapterPage> createState() => _CourseChapterPageState();
+  State<ModuleChaptersScreen> createState() => _ModuleChaptersScreen();
 }
 
-class _CourseChapterPageState extends State<CourseChapterPage> {
+class _ModuleChaptersScreen extends State<ModuleChaptersScreen> {
   final CourseContentStore _content = CourseContentStore.instance;
 
   bool _isTeacher = false;
@@ -71,7 +71,7 @@ class _CourseChapterPageState extends State<CourseChapterPage> {
   void _goToChapter(int sectionNumber) {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => CourseChapterPage(
+        builder: (_) => ModuleChaptersScreen(
           moduleId: widget.moduleId,
           sectionNumber: sectionNumber,
           enableTeacherEditor: widget.enableTeacherEditor,

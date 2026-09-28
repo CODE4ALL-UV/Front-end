@@ -84,7 +84,7 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
             style: TextStyle(
               fontSize: 14.5,
               height: 1.5,
-              color: appSemanticColors.infoText,
+              color: appSemanticColors.infoForeground,
             ),
           ),
         ),
@@ -118,7 +118,7 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
                               '${sinEmpezar > 0 ? " · $sinEmpezar sin empezar" : ""}',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: appSemanticColors.infoText,
+                                color: appSemanticColors.infoForeground,
                               ),
                             ),
                           ),
@@ -127,7 +127,7 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
                               () => _strugglingFirst = !_strugglingFirst,
                             ),
                             style: TextButton.styleFrom(
-                              foregroundColor: appSemanticColors.infoText,
+                              foregroundColor: appSemanticColors.infoForeground,
                               minimumSize: const Size(
                                 0,
                                 AppMetrics.minTapTarget,
@@ -211,7 +211,7 @@ class _StudentRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: appSemanticColors.infoText,
+                    color: appSemanticColors.infoForeground,
                   ),
                 ),
               ),
@@ -226,7 +226,7 @@ class _StudentRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
-                        color: appSemanticColors.infoText,
+                        color: appSemanticColors.infoForeground,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -236,14 +236,14 @@ class _StudentRow extends StatelessWidget {
                           Icon(
                             Icons.hourglass_empty,
                             size: 13,
-                            color: appSemanticColors.infoText,
+                            color: appSemanticColors.infoForeground,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             'Sin empezar',
                             style: TextStyle(
                               fontSize: 12,
-                              color: appSemanticColors.infoText,
+                              color: appSemanticColors.infoForeground,
                             ),
                           ),
                         ],
@@ -255,7 +255,7 @@ class _StudentRow extends StatelessWidget {
                         '${student.answered == 0 ? "" : " · ${student.correct} aciertos · ${student.failed} fallos"}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: appSemanticColors.infoText,
+                          color: appSemanticColors.infoForeground,
                         ),
                       ),
                   ],

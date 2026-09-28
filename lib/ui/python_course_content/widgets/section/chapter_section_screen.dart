@@ -272,7 +272,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: messageTheme.infoBackground,
-        border: Border(top: BorderSide(color: messageTheme.infoBorder)),
+        border: Border(top: BorderSide(color: messageTheme.infoForeground)),
       ),
       child: SafeArea(
         top: false,
@@ -348,7 +348,7 @@ class _ActivityTile extends StatelessWidget {
         child: Material(
           color: isCompleted
               ? Colors.green.withValues(alpha: 0.1)
-              : colorScheme.surfaceContainerHighest,
+              : colorScheme.tertiary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           child: InkWell(
             onTap: onTap,
@@ -362,8 +362,8 @@ class _ActivityTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 border: Border.all(
                   color: isCompleted
-                      ? Colors.green.withValues(alpha: 0.55)
-                      : messageTheme.infoBorder,
+                      ? messageTheme.successForeground.withValues(alpha: 0.55)
+                      : messageTheme.infoForeground,
                   width: isCompleted ? 1.8 : 1.2,
                 ),
               ),
@@ -404,7 +404,7 @@ class _ActivityTile extends StatelessWidget {
                           fontSize: 15.5,
                           height: 1.35,
                           fontWeight: FontWeight.w700,
-                          color: messageTheme.infoText,
+                          color: colorScheme.onTertiary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -413,7 +413,7 @@ class _ActivityTile extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.5,
                           height: 1.45,
-                          color: messageTheme.infoText,
+                          color: colorScheme.onTertiary,
                         ),
                       ),
                       if (detail.isNotEmpty) ...[

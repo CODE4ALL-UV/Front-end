@@ -278,7 +278,7 @@ class _ChapterDetailScreenState extends State<ChapterDetailScreen> {
   ) {
     // Reutilizamos la paleta de textos sutiles de nuestro ThemeExtension
     final colors = context.messageColors;
-    final textColor = colors.infoText; // Fallback de seguridad
+    final textColor = colors.infoForeground; // Fallback de seguridad
 
     return Text(
       'Desliza hacia arriba para abrir $nextModuleName',

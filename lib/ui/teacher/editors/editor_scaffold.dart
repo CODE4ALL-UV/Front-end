@@ -108,7 +108,7 @@ class EditorEmptyState extends StatelessWidget {
       padding: const EdgeInsets.all(AppMetrics.sectionGap),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border.all(color: activityColors.infoBorder),
+        border: Border.all(color: activityColors.infoForeground),
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       ),
       child: Column(

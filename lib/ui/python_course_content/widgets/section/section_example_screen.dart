@@ -74,7 +74,7 @@ class SectionExampleScreen extends StatelessWidget {
         children: [
           SectionCard(
             background: appTheme.infoBackground,
-            borderColor: appTheme.infoBorder.withValues(alpha: 0.4),
+            borderColor: appTheme.infoForeground.withValues(alpha: 0.4),
             child: SectionHeading(
               title: _example.title,
               subtitle: _example.description,
@@ -191,7 +191,7 @@ class _OutputBlockState extends State<_OutputBlock> {
               ],
               fontSize: 14,
               height: 1.55,
-              color: appTheme.infoText,
+              color: appTheme.infoForeground,
             ),
           ),
         ),
@@ -228,7 +228,7 @@ class _StepRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
-                color: appTheme.infoText,
+                color: appTheme.infoForeground,
               ),
             ),
           ),
@@ -249,7 +249,7 @@ class _StepRow extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: appTheme.infoBackground,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: appTheme.infoBorder),
+                        border: Border.all(color: appTheme.infoForeground),
                       ),
                       child: SelectableText(
                         step.code,
@@ -262,7 +262,7 @@ class _StepRow extends StatelessWidget {
                           ],
                           fontSize: 13.5,
                           height: 1.5,
-                          color: appTheme.infoText,
+                          color: appTheme.infoForeground,
                         ),
                       ),
                     ),
@@ -274,7 +274,7 @@ class _StepRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     height: 1.55,
-                    color: appTheme.infoText,
+                    color: appTheme.infoForeground,
                   ),
                 ),
               ],

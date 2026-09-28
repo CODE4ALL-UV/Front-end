@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_screen.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/module_chapters_screen.dart';
 
 /// Prueba de humo de la ruta de aprendizaje.
 ///
@@ -14,7 +14,9 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(home: CourseChapterPage(moduleId: 2, sectionNumber: 1)),
+      const MaterialApp(
+        home: ModuleChaptersScreen(moduleId: 2, sectionNumber: 1),
+      ),
     );
     await tester.pump();
 
@@ -35,7 +37,9 @@ void main() {
   ) async {
     // Módulo 6: todavía sin contenido cargado.
     await tester.pumpWidget(
-      const MaterialApp(home: CourseChapterPage(moduleId: 6, sectionNumber: 1)),
+      const MaterialApp(
+        home: ModuleChaptersScreen(moduleId: 6, sectionNumber: 1),
+      ),
     );
     await tester.pump();
 
@@ -47,7 +51,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: CourseChapterPage(moduleId: 99, sectionNumber: 1),
+        home: ModuleChaptersScreen(moduleId: 99, sectionNumber: 1),
       ),
     );
     await tester.pump();

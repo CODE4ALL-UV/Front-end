@@ -410,7 +410,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
                 // leen los subtítulos cómodamente, igual que en televisión.
                 color: const Color(0xFF10161C),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: appTheme.infoBorder),
+                border: Border.all(color: appTheme.infoForeground),
               ),
               child: Text(
                 _caption.isEmpty
@@ -458,7 +458,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
-                      color: appTheme.infoText,
+                      color: appTheme.infoForeground,
                     ),
                   ),
                 ),
@@ -595,7 +595,7 @@ class _VideoSelector extends StatelessWidget {
                   child: Material(
                     color: i == currentIndex
                         ? appTheme.infoBackground
-                        : appTheme.dangerText,
+                        : appTheme.dangerForeground,
                     borderRadius: BorderRadius.circular(12),
                     child: InkWell(
                       onTap: () => onSelected(i),
@@ -613,7 +613,7 @@ class _VideoSelector extends StatelessWidget {
                           border: Border.all(
                             color: i == currentIndex
                                 ? appTheme.infoBackground
-                                : appTheme.infoBorder,
+                                : appTheme.infoForeground,
                             width: i == currentIndex ? 1.8 : 1.2,
                           ),
                         ),
@@ -626,7 +626,7 @@ class _VideoSelector extends StatelessWidget {
                               size: 24,
                               color: i == currentIndex
                                   ? appTheme.infoBackground
-                                  : appTheme.infoText,
+                                  : appTheme.infoForeground,
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -638,7 +638,7 @@ class _VideoSelector extends StatelessWidget {
                                   fontWeight: i == currentIndex
                                       ? FontWeight.w800
                                       : FontWeight.w600,
-                                  color: appTheme.infoText,
+                                  color: appTheme.infoForeground,
                                 ),
                               ),
                             ),
@@ -648,7 +648,7 @@ class _VideoSelector extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w700,
-                                color: appTheme.infoText,
+                                color: appTheme.infoForeground,
                               ),
                             ),
                           ],
@@ -698,7 +698,7 @@ class _PlayerCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-            border: Border.all(color: appTheme.infoBorder),
+            border: Border.all(color: appTheme.infoForeground),
           ),
           child: YoutubeTranslatorPlayer(
             videoUrl: video.url,
@@ -741,7 +741,7 @@ class _CaptionControl extends StatelessWidget {
         icon: Icon(icon, size: 24),
         tooltip: label,
         color: appTheme.infoBackground,
-        disabledColor: appTheme.infoText.withValues(alpha: 0.5),
+        disabledColor: appTheme.infoForeground.withValues(alpha: 0.5),
         constraints: const BoxConstraints(
           minWidth: AppMetrics.minTapTarget,
           minHeight: AppMetrics.minTapTarget,

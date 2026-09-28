@@ -47,8 +47,8 @@ class ChapterSummaryWidget extends StatelessWidget {
     final colors = context.messageColors;
 
     // Fallbacks por si acaso el tema falla
-    final titleColor = colors.infoText;
-    final bodyColor = colors.infoText;
+    final titleColor = colors.infoForeground;
+    final bodyColor = colors.infoForeground;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -46,10 +46,10 @@ class ScoreStars extends StatelessWidget {
 
     final value = score!;
     final tone = value >= 4
-        ? appSemanticColors.successBorder
+        ? appSemanticColors.successForeground
         : (value >= 3
-              ? appSemanticColors.warningBorder
-              : appSemanticColors.dangerBorder);
+              ? appSemanticColors.warningForeground
+              : appSemanticColors.dangerForeground);
 
     return Semantics(
       label: 'Nota $value de 5',
@@ -147,7 +147,7 @@ class DirectorNotice extends StatelessWidget {
             color: appSemanticColors.warningBackground,
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             border: Border.all(
-              color: appWarningTone.border.withValues(alpha: 0.35),
+              color: appWarningTone.foreground.withValues(alpha: 0.35),
             ),
           ),
           child: Row(
@@ -165,7 +165,7 @@ class DirectorNotice extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
-                        color: appWarningTone.text,
+                        color: appWarningTone.foreground,
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -174,7 +174,7 @@ class DirectorNotice extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12.5,
                         height: 1.4,
-                        color: appSemanticColors.infoText,
+                        color: appSemanticColors.infoForeground,
                       ),
                     ),
                   ],
@@ -275,7 +275,7 @@ class DirectorProblem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.5,
                 height: 1.45,
-                color: appSemanticColors.infoText,
+                color: appSemanticColors.infoForeground,
               ),
             ),
             const SizedBox(height: AppMetrics.sectionGap),
@@ -283,7 +283,7 @@ class DirectorProblem extends StatelessWidget {
               onPressed: onRetry,
               style: FilledButton.styleFrom(
                 backgroundColor: appSemanticColors.infoBackground,
-                foregroundColor: appSemanticColors.infoBorder,
+                foregroundColor: appSemanticColors.infoForeground,
                 minimumSize: const Size(0, AppMetrics.minTapTarget),
               ),
               icon: const Icon(Icons.refresh),

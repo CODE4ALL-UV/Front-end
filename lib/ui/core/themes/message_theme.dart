@@ -4,98 +4,69 @@ import 'package:flutter/material.dart';
 // success: verde
 // warning: amarillo
 // danger: rojo
-// lectura: azul violeta OK
-// capsula: amarillo verde OK (Retroalimentación, Ayudas, Tips, Buenas Prácticas)
-// ejemplo: amarillo naranja OK
-// ejercicio: violeta OK
-// video: rojo violeta OK
-// quiz: café OK
-// laboratorio: azul verde OK
-// evaluacion final: rojo naranja OK
-// Omitidos: Glosario, Diccionario de LSC, Diagramas de flujo, Glosario interactivo, Califiaciones
 enum MessageThemeTone { info, success, warning, danger }
 
 class MessageTheme extends ThemeExtension<MessageTheme> {
   final Color infoBackground;
-  final Color infoBorder;
-  final Color infoText;
+  final Color infoForeground;
   final Color successBackground;
-  final Color successBorder;
-  final Color successText;
+  final Color successForeground;
   final Color warningBackground;
-  final Color warningBorder;
-  final Color warningText;
+  final Color warningForeground;
   final Color dangerBackground;
-  final Color dangerBorder;
-  final Color dangerText;
+  final Color dangerForeground;
 
   const MessageTheme({
     required this.infoBackground,
-    required this.infoBorder,
-    required this.infoText,
+    required this.infoForeground,
     required this.successBackground,
-    required this.successBorder,
-    required this.successText,
+    required this.successForeground,
     required this.warningBackground,
-    required this.warningBorder,
-    required this.warningText,
+    required this.warningForeground,
     required this.dangerBackground,
-    required this.dangerBorder,
-    required this.dangerText,
+    required this.dangerForeground,
   });
 
-  ({Color background, Color border, Color text}) tone(MessageThemeTone tone) =>
+  ({Color background, Color foreground}) tone(MessageThemeTone tone) =>
       switch (tone) {
         MessageThemeTone.info => (
           background: infoBackground,
-          border: infoBorder,
-          text: infoText,
+          foreground: infoForeground,
         ),
         MessageThemeTone.success => (
           background: successBackground,
-          border: successBorder,
-          text: successText,
+          foreground: successForeground,
         ),
         MessageThemeTone.warning => (
           background: warningBackground,
-          border: warningBorder,
-          text: warningText,
+          foreground: warningForeground,
         ),
         MessageThemeTone.danger => (
           background: dangerBackground,
-          border: dangerBorder,
-          text: dangerText,
+          foreground: dangerForeground,
         ),
       };
 
   @override
   MessageTheme copyWith({
     Color? infoBackground,
-    Color? infoBorder,
-    Color? infoText,
+    Color? infoForeground,
     Color? successBackground,
-    Color? successBorder,
-    Color? successText,
+    Color? successForeground,
     Color? warningBackground,
-    Color? warningBorder,
-    Color? warningText,
+    Color? warningForeground,
     Color? dangerBackground,
-    Color? dangerBorder,
-    Color? dangerText,
+    Color? dangerForeground,
   }) {
     return MessageTheme(
       infoBackground: infoBackground ?? this.infoBackground,
-      infoBorder: infoBorder ?? this.infoBorder,
-      infoText: infoText ?? this.infoText,
+      infoForeground: infoForeground ?? this.infoForeground,
       successBackground: successBackground ?? this.successBackground,
-      successBorder: successBorder ?? this.successBorder,
-      successText: successText ?? this.successText,
+      successForeground: successForeground ?? this.successForeground,
       warningBackground: warningBackground ?? this.warningBackground,
-      warningBorder: warningBorder ?? this.warningBorder,
-      warningText: warningText ?? this.warningText,
+      warningForeground: warningForeground ?? this.warningForeground,
       dangerBackground: dangerBackground ?? this.dangerBackground,
-      dangerBorder: dangerBorder ?? this.dangerBorder,
-      dangerText: dangerText ?? this.dangerText,
+      dangerForeground: dangerForeground ?? this.dangerForeground,
     );
   }
 
@@ -104,29 +75,37 @@ class MessageTheme extends ThemeExtension<MessageTheme> {
     if (other is! MessageTheme) return this;
     return MessageTheme(
       infoBackground: Color.lerp(infoBackground, other.infoBackground, t)!,
-      infoBorder: Color.lerp(infoBorder, other.infoBorder, t)!,
-      infoText: Color.lerp(infoText, other.infoText, t)!,
+      infoForeground: Color.lerp(infoForeground, other.infoForeground, t)!,
       successBackground: Color.lerp(
         successBackground,
         other.successBackground,
         t,
       )!,
-      successBorder: Color.lerp(successBorder, other.successBorder, t)!,
-      successText: Color.lerp(successText, other.successText, t)!,
+      successForeground: Color.lerp(
+        successForeground,
+        other.successForeground,
+        t,
+      )!,
       warningBackground: Color.lerp(
         warningBackground,
         other.warningBackground,
         t,
       )!,
-      warningBorder: Color.lerp(warningBorder, other.warningBorder, t)!,
-      warningText: Color.lerp(warningText, other.warningText, t)!,
+      warningForeground: Color.lerp(
+        warningForeground,
+        other.warningForeground,
+        t,
+      )!,
       dangerBackground: Color.lerp(
         dangerBackground,
         other.dangerBackground,
         t,
       )!,
-      dangerBorder: Color.lerp(dangerBorder, other.dangerBorder, t)!,
-      dangerText: Color.lerp(dangerText, other.dangerText, t)!,
+      dangerForeground: Color.lerp(
+        dangerForeground,
+        other.dangerForeground,
+        t,
+      )!,
     );
   }
 }

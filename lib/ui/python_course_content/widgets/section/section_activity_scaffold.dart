@@ -5,6 +5,7 @@ import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.d
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'section_widgets.dart';
+import 'dactylology_floating_widget.dart';
 import 'sign_language_panel.dart';
 
 /// Estructura común de todas las pantallas de actividad de la ruta.
@@ -28,6 +29,7 @@ class SectionActivityScaffold extends StatefulWidget {
     required this.spokenText,
     required this.child,
     this.signText,
+    this.showFloatingDactylology = true,
     this.bottomBar,
     this.progress,
     this.progressLabel,
@@ -50,6 +52,9 @@ class SectionActivityScaffold extends StatefulWidget {
   /// Text to spell with dactylology below the activity content.
   /// When null, the activity provides its own sign-language placement.
   final String? signText;
+
+  /// Shows the collapsible reader above the activity content when enabled.
+  final bool showFloatingDactylology;
 
   final Widget child;
   final Widget? bottomBar;
@@ -76,12 +81,17 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
   @override
   void initState() {
     super.initState();
+    _prefs.addListener(_onPreferencesChanged);
     _prefs.ensureLoaded().then((_) {
       if (!mounted) return;
       setState(() {});
       _startAutoReadIfAsked();
       _showManualIfAsked();
     });
+  }
+
+  void _onPreferencesChanged() {
+    if (mounted) setState(() {});
   }
 
   /// Empieza a leer en voz alta sola, si el estudiante prefirió «Audios».
@@ -116,6 +126,7 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
 
   @override
   void dispose() {
+    _prefs.removeListener(_onPreferencesChanged);
     _scrollController.dispose();
     // Si el estudiante sale a mitad de la lectura, la voz no debe seguir
     // sonando sobre la pantalla siguiente.
@@ -157,35 +168,53 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
               ),
             ),
           Expanded(
-            child: Scrollbar(
-              controller: _scrollController,
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                padding: AppMetrics.pagePadding(width),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: AppMetrics.maxContentWidth,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        widget.child,
-                        if (widget.signText != null &&
-                            widget.signText!.trim().isNotEmpty &&
-                            _prefs.signSupport != SignSupportLevel.off) ...[
-                          const SizedBox(height: AppMetrics.sectionGap),
-                          SignLanguagePanel(
-                            text: widget.signText!,
-                            showWordSigns:
-                                _prefs.signSupport == SignSupportLevel.advanced,
-                          ),
-                        ],
-                      ],
+            child: Stack(
+              children: [
+                Scrollbar(
+                  controller: _scrollController,
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    padding: AppMetrics.pagePadding(width),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: AppMetrics.maxContentWidth,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            widget.child,
+                            if (widget.signText != null &&
+                                widget.signText!.trim().isNotEmpty &&
+                                _prefs.signSupport != SignSupportLevel.off) ...[
+                              const SizedBox(height: AppMetrics.sectionGap),
+                              SignLanguagePanel(
+                                text: widget.signText!,
+                                showWordSigns:
+                                    _prefs.signSupport ==
+                                    SignSupportLevel.advanced,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                if (widget.showFloatingDactylology &&
+                    widget.signText != null &&
+                    widget.signText!.trim().isNotEmpty &&
+                    _prefs.signSupport != SignSupportLevel.off)
+                  Positioned(
+                    right: 16,
+                    bottom: 16,
+                    child: DactylologyFloatingWidget(
+                      text: widget.signText!,
+                      showWordSigns:
+                          _prefs.signSupport == SignSupportLevel.advanced,
+                    ),
+                  ),
+              ],
             ),
           ),
           if (widget.bottomBar != null)
@@ -236,8 +265,6 @@ class _ActivityBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appColorScheme = context.colorScheme;
-    final appSemanticColors = context.messageColors;
     final appModuleTheme = context.moduleColors;
 
     return Semantics(

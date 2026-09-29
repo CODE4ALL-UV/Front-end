@@ -10,6 +10,7 @@ import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 //import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart'; //PAPACHO - MOVIDO A GlobalAppBarWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module2_light_screen.dart'; //PAPACHO - ELIMINADO USAR LearningModuleScreen
 import 'package:flutter_code4all/data/services/auth_storage.dart'; //PAPACHO
+import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 //import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart'; //PAPACHO - MOVIDO A ModuleHeaderWidget
 //import 'package:flutter_code4all/ui/python_course_content/widgets/section/course_chapter_screen.dart'; //PAPACHO - MOVIDO A ModuleRowWidget
 //import 'package:flutter_code4all/data/course/python_course_catalog.dart'; //PAPACHO - MOVIDO A ModuleRowWidget
@@ -19,6 +20,7 @@ import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart'; //REFACTOR-APPB
 import 'package:flutter_code4all/ui/core/ui/responsive_layout_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/module_header_widget.dart'; //REFACTOR-MODULEHEADERCARD
 import 'package:flutter_code4all/ui/python_course_content/widgets/module_row_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/dactylology_floating_widget.dart';
 
 class LearningModuleScreen extends StatefulWidget {
   final int moduleId; // Remplaza la necesidad de tener 6 pantallas
@@ -58,6 +60,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
 
   final _authStorage = AuthStorage();
   final CourseContentStore _content = CourseContentStore.instance;
+  final LearningPreferences _preferences = LearningPreferences.instance;
 
   String get _currentModuleId => widget.moduleId.toString();
 
@@ -77,6 +80,14 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     );
   }
 
+  String get _dactylologyText {
+    final sectionTitles = List.generate(3, (index) {
+      final section = PythonCourseCatalog.section(widget.moduleId, index + 1);
+      return section?.boxTitle ?? 'Sección ${index + 1}';
+    });
+    return '$_moduleTitle. ${sectionTitles.join('. ')}.';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +97,10 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     // no pasa nada: se sigue viendo el módulo de fábrica.
     _content.addListener(_onContentChanged);
     _content.refresh();
+    _preferences.addListener(_onPreferencesChanged);
+    _preferences.ensureLoaded().then((_) {
+      if (mounted) setState(() {});
+    });
 
     // NUEVO: Le avisamos a app.dart en qué módulo estamos para que actualice la paleta.
     // Usamos addPostFrameCallback para evitar errores de redibujado de Flutter.
@@ -104,10 +119,15 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   @override
   void dispose() {
     _content.removeListener(_onContentChanged);
+    _preferences.removeListener(_onPreferencesChanged);
     // Si se sale a mitad de la lectura, la voz no debe seguir sonando sobre
     // la pantalla siguiente.
     accessibilityReadingState.stop();
     super.dispose();
+  }
+
+  void _onPreferencesChanged() {
+    if (mounted) setState(() {});
   }
 
   /// El pie con la forma de ir al módulo anterior y al siguiente.
@@ -446,6 +466,16 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
                     ),
                   ),
                 ),
+                if (_preferences.signSupport != SignSupportLevel.off)
+                  Positioned(
+                    right: 16,
+                    bottom: 16,
+                    child: DactylologyFloatingWidget(
+                      text: _dactylologyText,
+                      showWordSigns:
+                          _preferences.signSupport == SignSupportLevel.advanced,
+                    ),
+                  ),
               ],
             ),
           ),

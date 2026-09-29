@@ -276,6 +276,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
       activityLabel: 'Video',
       activityIcon: Icons.play_circle_outline,
       spokenText: _spokenText,
+      showFloatingDactylology: false,
       bottomBar: SectionPrimaryButton(
         label: 'Marcar como visto',
         icon: Icons.check_circle_outline,

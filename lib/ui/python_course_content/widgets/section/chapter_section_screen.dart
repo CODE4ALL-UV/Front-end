@@ -106,7 +106,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
             child: Text(
               widget.module.label,
               style: TextStyle(
-                color: appModuleTheme.headerForegroundColor,
+                color: appModuleTheme.headerForeground,
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.3,

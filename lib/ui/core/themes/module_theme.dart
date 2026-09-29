@@ -4,7 +4,7 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 class ModuleTheme extends ThemeExtension<ModuleTheme> {
   final Color headerBackground;
   final Color headerIconBackground;
-  final Color headerForegroundColor;
+  final Color headerForeground;
   final Color chapterIconColor1;
   final Color chapterIconBackgroundColor1;
   final Color chapterIconColor2;
@@ -22,7 +22,7 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
   const ModuleTheme({
     required this.headerBackground,
     required this.headerIconBackground,
-    required this.headerForegroundColor,
+    required this.headerForeground,
     required this.chapterIconColor1,
     required this.chapterIconBackgroundColor1,
     required this.chapterIconColor2,
@@ -130,7 +130,7 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
       progressTrackFilled: primaryColor,
 
       // Estáticos (Dependen solo del tema/light/dark)
-      headerForegroundColor: isDark
+      headerForeground: isDark
           ? const Color(0xFF000000)
           : const Color(0xFFFFFFFF),
       lessonCardBackground: cardBackground,
@@ -153,7 +153,7 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
   ModuleTheme copyWith({
     Color? headerBackground,
     Color? headerIconBackground,
-    Color? headerForegroundColor,
+    Color? headerForeground,
     Color? chapterIconColor1,
     Color? chapterIconBackgroundColor1,
     Color? chapterIconColor2,
@@ -170,7 +170,7 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
   }) => ModuleTheme(
     headerBackground: headerBackground ?? this.headerBackground,
     headerIconBackground: headerIconBackground ?? this.headerIconBackground,
-    headerForegroundColor: headerForegroundColor ?? this.headerForegroundColor,
+    headerForeground: headerForeground ?? this.headerForeground,
     chapterIconColor1: chapterIconColor1 ?? this.chapterIconColor1,
     chapterIconBackgroundColor1:
         chapterIconBackgroundColor1 ?? this.chapterIconBackgroundColor1,
@@ -205,9 +205,9 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
         other.headerIconBackground,
         t,
       )!,
-      headerForegroundColor: Color.lerp(
-        headerForegroundColor,
-        other.headerForegroundColor,
+      headerForeground: Color.lerp(
+        headerForeground,
+        other.headerForeground,
         t,
       )!,
       chapterIconColor1: Color.lerp(

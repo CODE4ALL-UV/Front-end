@@ -238,6 +238,7 @@ class _ActivityBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final appColorScheme = context.colorScheme;
     final appSemanticColors = context.messageColors;
+    final appModuleTheme = context.moduleColors;
 
     return Semantics(
       header: true,
@@ -247,9 +248,9 @@ class _ActivityBanner extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
           decoration: BoxDecoration(
-            color: appSemanticColors.infoBackground,
+            color: appModuleTheme.headerBackground.withValues(alpha: 0.6),
             border: Border(
-              bottom: BorderSide(color: appSemanticColors.infoForeground),
+              bottom: BorderSide(color: appModuleTheme.headerForeground),
             ),
           ),
           child: Center(
@@ -264,13 +265,13 @@ class _ActivityBanner extends StatelessWidget {
                     height: 44,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: appSemanticColors.infoBackground,
+                      color: appModuleTheme.headerIconBackground,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       activityIcon,
                       size: 24,
-                      color: appColorScheme.surface,
+                      color: appModuleTheme.headerIconBackground,
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -284,7 +285,7 @@ class _ActivityBanner extends StatelessWidget {
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.4,
-                            color: appSemanticColors.infoForeground,
+                            color: appModuleTheme.headerForeground,
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -294,7 +295,7 @@ class _ActivityBanner extends StatelessWidget {
                             fontSize: 17,
                             height: 1.3,
                             fontWeight: FontWeight.w700,
-                            color: appSemanticColors.infoForeground,
+                            color: appModuleTheme.headerForeground,
                           ),
                         ),
                       ],

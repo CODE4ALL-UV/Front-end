@@ -70,7 +70,7 @@ class ModuleHeaderWidget extends StatelessWidget {
                       Text(
                         'Módulo $moduleId',
                         style: TextStyle(
-                          color: appModuleTheme.headerForegroundColor,
+                          color: appModuleTheme.headerForeground,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -79,7 +79,7 @@ class ModuleHeaderWidget extends StatelessWidget {
                       Text(
                         moduleTitle,
                         style: TextStyle(
-                          color: appModuleTheme.headerForegroundColor,
+                          color: appModuleTheme.headerForeground,
                           fontSize: 14,
                         ),
                       ),

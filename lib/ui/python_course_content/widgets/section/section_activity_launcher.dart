@@ -10,7 +10,6 @@ import 'section_exercise_screen.dart';
 import 'section_quiz_screen.dart';
 import 'section_reading_screen.dart';
 import 'section_video_screen.dart';
-import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 
 /// Decide qué actividades tiene una sección y abre la pantalla de cada una.
 ///

@@ -97,8 +97,7 @@ class AccessibilityToolbar extends StatelessWidget {
                           style: TextButton.styleFrom(
                             backgroundColor: appModuleTheme.headerBackground
                                 .withValues(alpha: 0.3),
-                            foregroundColor:
-                                appModuleTheme.headerForegroundColor,
+                            foregroundColor: appModuleTheme.headerForeground,
                             minimumSize: const Size(
                               AppMetrics.minTapTarget,
                               AppMetrics.minTapTarget,
@@ -150,7 +149,7 @@ class AccessibilityToolbar extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: appModuleTheme.headerForegroundColor,
+                            color: appModuleTheme.headerForeground,
                           ),
                         ),
                       ),
@@ -192,7 +191,7 @@ class _TextScaleButton extends StatelessWidget {
       child: IconButton(
         onPressed: onPressed,
         icon: Icon(icon, size: 24),
-        color: appModuleTheme.headerForegroundColor,
+        color: appModuleTheme.headerForeground,
         tooltip: label,
         constraints: const BoxConstraints(
           minWidth: AppMetrics.minTapTarget,

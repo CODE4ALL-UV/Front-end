@@ -149,6 +149,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
     return _letters.sublist(start, end + 1).join().trim();
   }
 
+  // Inicio - Dactilología: deletreo letra a letra. La mitad derecha del panel es la seña de
   @override
   Widget build(BuildContext context) {
     final appColorScheme = context.colorScheme;
@@ -261,6 +262,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
       ),
     );
   }
+  // Fin - Dactilología: deletreo letra a letra. La mitad derecha del panel es la seña de
 }
 
 /// Una de las dos mitades del panel: título, recuadro visual y pie.

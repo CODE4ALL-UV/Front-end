@@ -333,7 +333,7 @@ class AppTheme {
           moduleTheme: const ModuleTheme(
             headerBackground: Color(0xFF1565C0),
             headerIconBackground: Color(0xFF1E88E5),
-            headerForegroundColor: Color(0xFFF3E5F5),
+            headerForeground: Color(0xFFF3E5F5),
             chapterIconColor1: Color(0xFF1976D2), // OK
             chapterIconBackgroundColor1: Color(0xFFE3F2FD), // OK
             chapterIconColor2: Color(0xFF7B1FA2), // OK
@@ -409,7 +409,7 @@ class AppTheme {
           moduleTheme: const ModuleTheme(
             headerBackground: Color(0xFF0D47A1), // Azul más profundo
             headerIconBackground: Color(0xFF1976D2),
-            headerForegroundColor: Color(0xFFFFFFFF),
+            headerForeground: Color(0xFFFFFFFF),
             chapterIconColor1: Color(
               0xFF64B5F6,
             ), // Azul más claro para resaltar en oscuro
@@ -489,7 +489,7 @@ class AppTheme {
           moduleTheme: const ModuleTheme(
             headerBackground: Color(0xFF212121), // Gris casi negro
             headerIconBackground: Color(0xFF424242), // Gris medio
-            headerForegroundColor: Color(0xFFFFFFFF),
+            headerForeground: Color(0xFFFFFFFF),
             chapterIconColor1: Color(0xFF424242),
             chapterIconBackgroundColor1: Color(0xFFE0E0E0),
             chapterIconColor2: Color(0xFF616161),
@@ -569,7 +569,7 @@ class AppTheme {
           moduleTheme: const ModuleTheme(
             headerBackground: Color(0xFF0D47A1), // Azul profundo
             headerIconBackground: Color(0xFF1976D2),
-            headerForegroundColor: Color(0xFFFFFFFF),
+            headerForeground: Color(0xFFFFFFFF),
             chapterIconColor1: Color(0xFF1976D2),
             chapterIconBackgroundColor1: Color(0xFFE3F2FD),
             chapterIconColor2: Color(
@@ -650,7 +650,7 @@ class AppTheme {
             // La paleta azul se mantiene idéntica al Light Theme, ya que el azul es seguro
             headerBackground: Color(0xFF1565C0),
             headerIconBackground: Color(0xFF1E88E5),
-            headerForegroundColor: Color(0xFFFFFFFF),
+            headerForeground: Color(0xFFFFFFFF),
             chapterIconColor1: Color(0xFF1976D2),
             chapterIconBackgroundColor1: Color(0xFFE3F2FD),
             chapterIconColor2: Color(0xFF8E24AA),
@@ -730,7 +730,7 @@ class AppTheme {
           moduleTheme: const ModuleTheme(
             headerBackground: Color(0xFF00695C), // Azul -> Teal/Cian oscuro
             headerIconBackground: Color(0xFF00897B),
-            headerForegroundColor: Color(0xFFFFFFFF),
+            headerForeground: Color(0xFFFFFFFF),
             chapterIconColor1: Color(0xFF00897B),
             chapterIconBackgroundColor1: Color(0xFFE0F2F1),
             chapterIconColor2: Color(0xFFD32F2F), // Púrpura -> Rojo oscuro

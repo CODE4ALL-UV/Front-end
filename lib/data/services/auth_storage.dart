@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_code4all/ui/core/ui/display_preferences.dart';
 
 class AuthStorage {
   static const _tokenKey = 'auth_token';
@@ -61,15 +62,27 @@ class AuthStorage {
 
   /// Borra los datos de la sesión.
   ///
+  /// Se queda solo con los ajustes de pantalla (colores y tamaño del texto):
+  /// son del dispositivo, y quien los necesita no debería tener que volver a
+  /// ponerlos cada vez que alguien cierra sesión.
+  ///
   /// Si el almacenamiento seguro falla —pasa en algunos navegadores— no se
   /// propaga el error: quedarse dentro de la sesión por no poder borrar un
   /// token es peor que el token sin borrar. Quien llama debe poder salir
   /// igualmente.
   Future<void> clear() async {
     try {
-      await _storage.deleteAll();
+      final keys = (await _storage.readAll()).keys;
+      for (final key in keys) {
+        if (!key.startsWith(DisplayPreferences.prefix)) {
+          await _storage.delete(key: key);
+        }
+      }
     } catch (e) {
       debugPrint('No se pudo borrar la sesión guardada: $e');
+      try {
+        await _storage.deleteAll();
+      } catch (_) {}
     }
   }
 }

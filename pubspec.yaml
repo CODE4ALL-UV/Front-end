@@ -30,6 +30,8 @@ dependencies:
   camera: ^0.12.1
   camera_windows: ^0.2.6+5
   speech_to_text: ^7.5.0
+  flutter_localizations:
+    sdk: flutter
 dev_dependencies:
   flutter_test:
     sdk: flutter

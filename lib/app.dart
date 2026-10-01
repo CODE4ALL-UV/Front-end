@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'ui/core/themes/app_theme.dart';
 import 'ui/core/ui/accessibility_text_scale_widget.dart';
+import 'ui/core/ui/display_preferences.dart';
 import 'data/services/course_progress_store.dart';
 import 'data/services/session_controller.dart';
 import 'data/services/learning_analytics_service.dart';
@@ -68,6 +70,10 @@ class _AppState extends State<App> {
     );
 
     _textScaleController.addListener(_handleTextScaleChanged);
+
+    // Colores y tamaño del texto guardados en el dispositivo, también para
+    // el login.
+    DisplayPreferences.instance.restore();
 
     // NUEVO: Escuchamos los cambios del ThemeManager
     ThemeManager.themeNotifier.addListener(_onGlobalThemeChanged);
@@ -275,6 +281,12 @@ class _AppState extends State<App> {
         navigatorKey: _navigatorKey,
         title: 'Code4All',
         debugShowCheckedModeBanner: false,
+        // En español también lo que dibuja Flutter: el «Atrás» de la barra,
+        // «Cerrar», «Pegar»… Sin esto el lector de pantalla los decía en
+        // inglés en medio de una aplicación en español.
+        locale: const Locale('es'),
+        supportedLocales: const [Locale('es')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
         theme: activeTheme,
         darkTheme: activeTheme,
         themeMode: ThemeMode.light,
@@ -300,12 +312,11 @@ class _AppState extends State<App> {
                 child: currentPage,
               ),
             ),
-            // Ni el estudiante ni el docente llevan este boton: los dos
-            // tienen su propio sitio para cambiar el tema. En el login su
-            // sitio lo ocupa el atajo al teclado Braille.
-            if (_currentScreen != AppScreen.modulo &&
-                _currentScreen != AppScreen.docente &&
-                _currentScreen != AppScreen.login)
+            // Solo en el registro: el estudiante tiene su menú de ayuda, el
+            // docente y la dirección el botón de accesibilidad de la barra, y
+            // en el login el sitio lo ocupa el atajo al teclado Braille. En
+            // la dirección este botón además tapaba el final de las listas.
+            if (_currentScreen == AppScreen.register)
               Positioned(
                 left: 16,
                 bottom: 24,

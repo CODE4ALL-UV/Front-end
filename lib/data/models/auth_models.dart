@@ -5,12 +5,17 @@ class RegisterRequest {
   final int? tipoDiscapacidad;
   final String rol;
 
+  /// Solo para docente o director: el servidor no acepta esos roles sin el
+  /// código que entrega la coordinación.
+  final String? codigoInvitacion;
+
   const RegisterRequest({
     required this.nombre,
     required this.correo,
     required this.password,
     this.tipoDiscapacidad,
     required this.rol,
+    this.codigoInvitacion,
   });
 
   Map<String, dynamic> toJson() => {
@@ -19,6 +24,8 @@ class RegisterRequest {
     'password': password,
     'tipo_discapacidad': tipoDiscapacidad,
     'rol': rol,
+    if (codigoInvitacion != null && codigoInvitacion!.trim().isNotEmpty)
+      'codigo_invitacion': codigoInvitacion!.trim(),
   };
 }
 

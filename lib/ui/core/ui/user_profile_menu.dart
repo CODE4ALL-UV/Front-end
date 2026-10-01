@@ -179,7 +179,9 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
     if (picked == null) return;
 
     final userId = await _authStorage.getUserId();
-    if (userId == null) {
+    // El servidor solo cambia la foto de quien tiene la sesión abierta.
+    final token = await _authStorage.getToken();
+    if (userId == null || token == null || token.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -214,6 +216,7 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
             'POST',
             Uri.parse(_apiService.buildUrl('/api/user/upload-photo')),
           )
+          ..headers['Authorization'] = 'Bearer $token'
           ..fields['user_id'] = userId.toString()
           ..files.add(multipartFile);
 
@@ -221,7 +224,7 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
       if (response.statusCode != 200) {
-        throw Exception(response.body);
+        throw Exception(_uploadError(response));
       }
 
       final decoded = jsonDecode(response.body) as Map<String, dynamic>;
@@ -240,6 +243,19 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
         context,
       ).showSnackBar(SnackBar(content: Text('No se pudo subir la foto: $e')));
     }
+  }
+
+  /// Lo que dice el servidor, en vez del JSON entero en el aviso.
+  String _uploadError(http.Response response) {
+    if (response.statusCode == 401) {
+      return 'Tu sesión caducó. Vuelve a iniciar sesión.';
+    }
+    try {
+      final detail =
+          (jsonDecode(response.body) as Map<String, dynamic>)['detail'];
+      if (detail is String && detail.isNotEmpty) return detail;
+    } catch (_) {}
+    return 'el servidor respondió ${response.statusCode}';
   }
 
   void _showProfileDialog() {

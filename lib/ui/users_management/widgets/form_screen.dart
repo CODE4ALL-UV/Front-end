@@ -18,11 +18,16 @@ class _FormScreenState extends State<FormScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _inviteController = TextEditingController();
   final _apiService = ApiService();
 
   int? _tipoDiscapacidad;
   String _selectedRole = 'estudiante';
   bool _acceptTerms = false;
+
+  /// Docente y director necesitan el código de la coordinación: el servidor
+  /// no deja elegir esos roles a cualquiera.
+  bool get _needsInvitation => _selectedRole != 'estudiante';
   bool _isLoading = false;
 
   Future<void> _handleRegister() async {
@@ -45,6 +50,14 @@ class _FormScreenState extends State<FormScreen> {
       return;
     }
 
+    if (_needsInvitation && _inviteController.text.trim().isEmpty) {
+      _showMessage(
+        'Para registrarte como $_selectedRole escribe el código de '
+        'invitación que te dio la coordinación.',
+      );
+      return;
+    }
+
     if (!_acceptTerms) {
       _showMessage('Debes aceptar los términos y condiciones');
       return;
@@ -59,6 +72,7 @@ class _FormScreenState extends State<FormScreen> {
         password: password,
         tipoDiscapacidad: _tipoDiscapacidad,
         rol: _selectedRole,
+        codigoInvitacion: _needsInvitation ? _inviteController.text : null,
       );
 
       if (!mounted) return;
@@ -90,6 +104,7 @@ class _FormScreenState extends State<FormScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _inviteController.dispose();
     super.dispose();
   }
 
@@ -249,6 +264,28 @@ class _FormScreenState extends State<FormScreen> {
                                   () => _selectedRole = value ?? 'estudiante',
                                 ),
                               ),
+                              if (_needsInvitation) ...[
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Código de invitación',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF424242),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                TextField(
+                                  controller: _inviteController,
+                                  decoration: _inputDecoration().copyWith(
+                                    hintText: 'Lo entrega la coordinación',
+                                    hintStyle: const TextStyle(
+                                      color: Color(0xFF616161),
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ],
                               const SizedBox(height: 12),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,

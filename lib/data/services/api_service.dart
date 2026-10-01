@@ -53,6 +53,7 @@ class ApiService {
     required String password,
     int? tipoDiscapacidad,
     required String rol,
+    String? codigoInvitacion,
   }) async {
     final request = RegisterRequest(
       nombre: nombre,
@@ -60,6 +61,7 @@ class ApiService {
       password: password,
       tipoDiscapacidad: tipoDiscapacidad,
       rol: rol,
+      codigoInvitacion: codigoInvitacion,
     );
 
     try {

@@ -80,6 +80,16 @@ class _TeacherCoursesScreenState extends State<TeacherCoursesScreen> {
     }
   }
 
+  Future<void> _rename(CourseInfo course) async {
+    final renamed = await showDialog<CourseInfo>(
+      context: context,
+      builder: (_) => _RenameCourseDialog(course: course),
+    );
+    if (renamed != null && mounted) {
+      _say('El curso ahora se llama ${renamed.title}.');
+    }
+  }
+
   Future<void> _copyCode(CourseInfo course) async {
     final code = course.joinCode;
     if (code == null) return;
@@ -228,6 +238,7 @@ class _TeacherCoursesScreenState extends State<TeacherCoursesScreen> {
                         _TeacherCourseCard(
                           course: course,
                           onOpen: () => _open(course),
+                          onRename: () => _rename(course),
                           onCopyCode: () => _copyCode(course),
                           onRenewCode: () => _renewCode(course),
                           onDelete: (course.students ?? 0) == 0
@@ -251,6 +262,7 @@ class _TeacherCourseCard extends StatelessWidget {
   const _TeacherCourseCard({
     required this.course,
     required this.onOpen,
+    required this.onRename,
     required this.onCopyCode,
     required this.onRenewCode,
     this.onDelete,
@@ -258,6 +270,7 @@ class _TeacherCourseCard extends StatelessWidget {
 
   final CourseInfo course;
   final VoidCallback onOpen;
+  final VoidCallback onRename;
   final VoidCallback onCopyCode;
   final VoidCallback onRenewCode;
 
@@ -364,6 +377,14 @@ class _TeacherCourseCard extends StatelessWidget {
                 ),
                 icon: const Icon(Icons.copy, size: 18),
                 label: const Text('Copiar código'),
+              ),
+              TextButton.icon(
+                onPressed: onRename,
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(0, AppMetrics.minTapTarget),
+                ),
+                icon: const Icon(Icons.drive_file_rename_outline, size: 18),
+                label: const Text('Renombrar'),
               ),
               TextButton.icon(
                 onPressed: onRenewCode,
@@ -504,6 +525,112 @@ class _CreateCourseDialogState extends State<_CreateCourseDialog> {
             foregroundColor: colors.onPrimary,
           ),
           child: Text(_saving ? 'Creando…' : 'Crear'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Cambiar el nombre y la descripción de un curso.
+///
+/// Los estudiantes lo ven con el nombre nuevo en «Mis cursos»; el código y lo
+/// editado no cambian.
+class _RenameCourseDialog extends StatefulWidget {
+  const _RenameCourseDialog({required this.course});
+
+  final CourseInfo course;
+
+  @override
+  State<_RenameCourseDialog> createState() => _RenameCourseDialogState();
+}
+
+class _RenameCourseDialogState extends State<_RenameCourseDialog> {
+  late final TextEditingController _title = TextEditingController(
+    text: widget.course.title,
+  );
+  late final TextEditingController _description = TextEditingController(
+    text: widget.course.description,
+  );
+  bool _saving = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _title.dispose();
+    _description.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final title = _title.text.trim();
+    if (title.isEmpty) {
+      setState(() => _error = 'El curso necesita un nombre.');
+      return;
+    }
+
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      final course = await MyCoursesStore.instance.update(
+        widget.course,
+        title: title,
+        description: _description.text.trim(),
+      );
+      if (mounted) Navigator.of(context).pop(course);
+    } on CourseActionException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _error = e.message;
+      });
+      announceForAccessibility(context, e.message);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colorScheme;
+
+    return AlertDialog(
+      title: const Text('Renombrar curso'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _title,
+              autofocus: true,
+              maxLength: 120,
+              decoration: InputDecoration(
+                labelText: 'Nombre del curso',
+                errorText: _error,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _description,
+              maxLines: 3,
+              minLines: 2,
+              maxLength: 1000,
+              decoration: const InputDecoration(labelText: 'Descripción'),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _save,
+          style: FilledButton.styleFrom(
+            backgroundColor: colors.primary,
+            foregroundColor: colors.onPrimary,
+          ),
+          child: Text(_saving ? 'Guardando…' : 'Guardar'),
         ),
       ],
     );

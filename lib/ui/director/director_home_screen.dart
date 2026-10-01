@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/data/course/course_analytics_store.dart';
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
 import 'package:flutter_code4all/data/course/my_courses_store.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
@@ -44,6 +45,9 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
     super.initState();
     _store.addListener(_onChanged);
     _store.refresh();
+    // Para el filtro por curso de las estadísticas.
+    final courses = MyCoursesStore.instance;
+    if (courses.supported == null) courses.refresh();
   }
 
   @override
@@ -63,6 +67,10 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
   /// coordinación: los docentes editan los suyos.
   Future<void> _editGeneralCourse() async {
     final courses = MyCoursesStore.instance;
+    final stats = CourseAnalyticsStore.instance;
+    // El curso que estaba mirando en las estadísticas, para dejarlo igual
+    // al volver: el filtro de arriba lo sigue mostrando.
+    final filtered = stats.courseId;
     if (courses.supported == null) await courses.refresh();
     final general = courses.courses.where((c) => c.isGeneral).firstOrNull;
     await courses.select(general);
@@ -77,8 +85,9 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
         ),
       ),
     );
-    // De vuelta, las cifras son otra vez las de todos los cursos.
     await courses.select(null);
+    stats.useCourse(filtered);
+    stats.refresh();
     _store.refresh();
   }
 
@@ -129,8 +138,8 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
         child: TabBarView(
           controller: _tabs,
           children: const [
-            TeacherStatsScreen(),
-            TeacherStudentsScreen(),
+            _WithCourseFilter(child: TeacherStatsScreen()),
+            _WithCourseFilter(child: TeacherStudentsScreen()),
             DirectorTeachersScreen(),
             DirectorContentScreen(),
           ],
@@ -172,6 +181,116 @@ class _TabWithCount extends StatelessWidget {
       text: count == 0
           ? label
           : '$label ($count ${count == 1 ? "pendiente" : "pendientes"})',
+    );
+  }
+}
+
+/// Las estadísticas con un selector de curso encima.
+///
+/// La coordinación ve por defecto todos los cursos juntos, que sirve para
+/// saber cómo va Code4All en general. Para saber cómo va el grupo de un
+/// docente concreto hay que poder mirar solo ese curso.
+class _WithCourseFilter extends StatelessWidget {
+  const _WithCourseFilter({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const _CourseFilter(),
+        Expanded(child: child),
+      ],
+    );
+  }
+}
+
+/// El selector. Guarda su propia elección en vez de escuchar a las
+/// estadísticas: estas avisan de que empiezan a cargar justo mientras se
+/// construye su pestaña, y redibujar el selector en ese momento rompe.
+class _CourseFilter extends StatefulWidget {
+  const _CourseFilter();
+
+  @override
+  State<_CourseFilter> createState() => _CourseFilterState();
+}
+
+class _CourseFilterState extends State<_CourseFilter> {
+  final MyCoursesStore _courses = MyCoursesStore.instance;
+  int? _selected = CourseAnalyticsStore.instance.courseId;
+
+  @override
+  void initState() {
+    super.initState();
+    _courses.addListener(_onChanged);
+  }
+
+  @override
+  void dispose() {
+    _courses.removeListener(_onChanged);
+    super.dispose();
+  }
+
+  void _onChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _choose(int? courseId) async {
+    setState(() => _selected = courseId);
+    final stats = CourseAnalyticsStore.instance;
+    stats.useCourse(courseId);
+    await stats.refresh();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Con el servidor de antes no hay cursos que elegir.
+    if (_courses.supported != true || _courses.courses.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final colors = context.colorScheme;
+    final known = _courses.courses.any((c) => c.id == _selected);
+
+    return Material(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        child: Row(
+          children: [
+            Icon(Icons.filter_list, color: colors.onSurfaceVariant),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Semantics(
+                label: 'Ver las estadísticas de',
+                child: DropdownButton<int?>(
+                  isExpanded: true,
+                  value: known ? _selected : null,
+                  underline: const SizedBox.shrink(),
+                  onChanged: _choose,
+                  items: [
+                    const DropdownMenuItem<int?>(
+                      value: null,
+                      child: Text('Todos los cursos'),
+                    ),
+                    for (final course in _courses.courses)
+                      DropdownMenuItem<int?>(
+                        value: course.id,
+                        child: Text(
+                          course.isGeneral || course.teacherName == null
+                              ? course.title
+                              : '${course.title} · ${course.teacherName}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

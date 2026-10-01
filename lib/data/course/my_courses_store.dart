@@ -153,6 +153,27 @@ class MyCoursesStore extends ChangeNotifier {
     return renewed!;
   }
 
+  /// Cambia el nombre o la descripción de un curso. Solo su docente.
+  Future<CourseInfo> update(
+    CourseInfo course, {
+    required String title,
+    required String description,
+  }) async {
+    final updated = await _send('PATCH', '/api/courses/${course.id}', {
+      'title': title,
+      'description': description,
+    });
+    await refresh();
+    return updated!;
+  }
+
+  /// El docente saca a un estudiante de su curso. Su avance se conserva por
+  /// si vuelve a entrar con el código.
+  Future<void> removeStudent(CourseInfo course, int studentId) async {
+    await _send('DELETE', '/api/courses/${course.id}/students/$studentId');
+    await refresh();
+  }
+
   Future<void> leave(CourseInfo course) async {
     await _send('DELETE', '/api/courses/${course.id}/enrollment');
     if (_active?.id == course.id) await select(null);
@@ -176,6 +197,11 @@ class MyCoursesStore extends ChangeNotifier {
       final uri = _url(path);
       response = await switch (method) {
         'DELETE' => _client.delete(uri, headers: headers),
+        'PATCH' => _client.patch(
+          uri,
+          headers: headers,
+          body: jsonEncode(body ?? {}),
+        ),
         _ => _client.post(uri, headers: headers, body: jsonEncode(body ?? {})),
       }.timeout(_timeout);
     } catch (e) {

@@ -92,6 +92,7 @@ class LearningAnalyticsService {
               'section_id': sectionId,
               'activity': activity,
               'answers': answers,
+              ...?_course,
             }),
           )
           .timeout(timeout);
@@ -132,6 +133,7 @@ class LearningAnalyticsService {
             body: jsonEncode({
               'section_id': sectionId,
               'activity': kind.storageKey,
+              ...?_course,
             }),
           )
           .timeout(timeout);
@@ -141,6 +143,13 @@ class LearningAnalyticsService {
       debugPrint('No se pudo anotar la actividad terminada: $e');
       return false;
     }
+  }
+
+  /// El curso donde se está estudiando, para que cada respuesta cuente en el
+  /// curso de su docente. Sin curso, el servidor lo apunta al Curso general.
+  Map<String, Object>? get _course {
+    final id = CourseProgressStore.instance.courseId;
+    return id == null ? null : {'course_id': id};
   }
 
   void dispose() => _client.close();

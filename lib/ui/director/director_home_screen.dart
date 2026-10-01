@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
+import 'package:flutter_code4all/data/course/my_courses_store.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_quick_button.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
+import 'package:flutter_code4all/ui/teacher/teacher_course_screen.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_stats_screen.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_students_screen.dart';
 import 'director_content_screen.dart';
@@ -55,6 +57,31 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
     if (mounted) setState(() {});
   }
 
+  /// Abre el editor sobre el Curso general.
+  ///
+  /// Con cursos por docente, el curso de todos solo lo edita la
+  /// coordinación: los docentes editan los suyos.
+  Future<void> _editGeneralCourse() async {
+    final courses = MyCoursesStore.instance;
+    if (courses.supported == null) await courses.refresh();
+    final general = courses.courses.where((c) => c.isGeneral).firstOrNull;
+    await courses.select(general);
+    if (!mounted) return;
+
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => TeacherCourseScreen(
+          userName: widget.userName,
+          onLogout: widget.onLogout,
+          course: general,
+        ),
+      ),
+    );
+    // De vuelta, las cifras son otra vez las de todos los cursos.
+    await courses.select(null);
+    _store.refresh();
+  }
+
   /// Cuántas cosas piden atención, para avisarlo en la propia pestaña.
   int get _pendingTeachers => _store.workingWithoutFeedback.length;
   int get _pendingContent =>
@@ -69,7 +96,15 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
       appBar: GlobalAppBarWidget(
         userName: widget.userName,
         onLogout: widget.onLogout,
-        extraActions: const [AccessibilityQuickButton()],
+        extraActions: [
+          IconButton(
+            tooltip: 'Editar el curso general',
+            onPressed: _editGeneralCourse,
+            color: appColorScheme.onPrimary,
+            icon: const Icon(Icons.edit_note),
+          ),
+          const AccessibilityQuickButton(),
+        ],
         bottom: TabBar(
           controller: _tabs,
           isScrollable: true,

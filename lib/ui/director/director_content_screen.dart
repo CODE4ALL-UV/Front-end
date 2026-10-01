@@ -14,6 +14,9 @@ import 'director_widgets.dart';
 /// Solo salen las secciones que **el docente ha editado**. El material de
 /// fábrica no necesita revisión de nadie; lo que hay que mirar es lo que
 /// alguien cambió. Revisar dieciocho secciones intactas sería trabajo inútil.
+///
+/// Con cursos por docente cada sección se revisa en su curso: la misma
+/// sección puede estar bien en el curso de un docente y mal en el de otro.
 class DirectorContentScreen extends StatefulWidget {
   const DirectorContentScreen({super.key});
 
@@ -45,28 +48,47 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
     if (mounted) setState(() {});
   }
 
-  /// Las secciones editadas por el docente, que son las que hay que revisar.
-  List<CourseSection> get _edited {
-    final out = <CourseSection>[];
+  /// Las secciones editadas, que son las que hay que revisar: curso a curso
+  /// si el servidor tiene cursos por docente, o las del curso único si no.
+  List<_ReviewItem> get _edited {
+    if (_store.coursesSupported) {
+      return [
+        for (final course in _store.courses)
+          for (final sectionId in course.editedSections)
+            if (PythonCourseCatalog.sectionById(sectionId) case final section?)
+              _ReviewItem(section, course),
+      ];
+    }
+
+    final out = <_ReviewItem>[];
     for (final module in PythonCourseCatalog.modules) {
       for (final section in module.sections) {
         if (_content.isSectionEdited(section.id)) {
-          out.add(_content.section(module.number, section.number) ?? section);
+          out.add(
+            _ReviewItem(
+              _content.section(module.number, section.number) ?? section,
+              null,
+            ),
+          );
         }
       }
     }
     return out;
   }
 
-  Future<void> _judge(CourseSection section) async {
-    final verdict = _store.verdictOf(section.id);
+  Future<void> _judge(_ReviewItem item) async {
+    final verdict = _store.verdictOf(item.section.id, courseId: item.course?.id);
     final appTheme = Theme.of(context);
 
     final saved = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: appTheme.colorScheme.surface,
-      builder: (_) => _JudgeSheet(section: section, current: verdict),
+      builder: (_) => _JudgeSheet(
+        section: item.section,
+        current: verdict,
+        courseId: item.course?.id,
+      ),
     );
 
     if (saved == true && mounted) {
@@ -74,7 +96,16 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
     }
   }
 
-  void _preview(CourseSection section) {
+  Future<void> _preview(_ReviewItem item) async {
+    var section = item.section;
+    final course = item.course;
+    if (course != null) {
+      // Se ve tal y como la ven los estudiantes de ese curso.
+      await _content.useCourse(course.isGeneral ? null : course.id);
+      section =
+          _content.section(section.moduleNumber, section.number) ?? section;
+      if (!mounted) return;
+    }
     final module = PythonCourseCatalog.moduleByNumber(section.moduleNumber)!;
 
     Navigator.of(context).push(
@@ -154,12 +185,21 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
                         ),
                         const SizedBox(height: AppMetrics.gap),
                       ],
-                      for (final section in edited)
+                      for (final item in edited)
                         _SectionCard(
-                          section: section,
-                          verdict: _store.verdictOf(section.id),
-                          onJudge: () => _judge(section),
-                          onPreview: () => _preview(section),
+                          section: item.section,
+                          courseLabel: item.course == null
+                              ? null
+                              : item.course!.isGeneral
+                              ? item.course!.title
+                              : '${item.course!.title} · '
+                                    '${item.course!.teacherName ?? 'Docente'}',
+                          verdict: _store.verdictOf(
+                            item.section.id,
+                            courseId: item.course?.id,
+                          ),
+                          onJudge: () => _judge(item),
+                          onPreview: () => _preview(item),
                         ),
                       const SizedBox(height: 30),
                     ],
@@ -174,15 +214,29 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
   }
 }
 
+/// Una sección que revisar, con el curso donde se editó.
+class _ReviewItem {
+  const _ReviewItem(this.section, this.course);
+
+  final CourseSection section;
+
+  /// Nulo con el servidor de antes, que tenía un único curso.
+  final OversightCourse? course;
+}
+
 class _SectionCard extends StatelessWidget {
   const _SectionCard({
     required this.section,
     required this.verdict,
     required this.onJudge,
     required this.onPreview,
+    this.courseLabel,
   });
 
   final CourseSection section;
+
+  /// De qué curso (y de qué docente) es esta versión de la sección.
+  final String? courseLabel;
   final ContentVerdict? verdict;
   final VoidCallback onJudge;
   final VoidCallback onPreview;
@@ -220,6 +274,7 @@ class _SectionCard extends StatelessWidget {
 
     return Semantics(
       label:
+          '${courseLabel == null ? '' : 'Curso $courseLabel. '}'
           'Módulo ${section.moduleNumber}, ${section.title}. $label.'
           '${(current?.comment ?? '').isEmpty ? '' : ' ${current!.comment}'}',
       child: ExcludeSemantics(
@@ -246,6 +301,15 @@ class _SectionCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        if (courseLabel != null)
+                          Text(
+                            courseLabel!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: appColorScheme.onSurface,
+                            ),
+                          ),
                         Text(
                           'Módulo ${section.moduleNumber} · Sección ${section.number}',
                           style: TextStyle(
@@ -327,10 +391,13 @@ class _SectionCard extends StatelessWidget {
 
 /// Aprobar u observar una sección.
 class _JudgeSheet extends StatefulWidget {
-  const _JudgeSheet({required this.section, required this.current});
+  const _JudgeSheet({required this.section, required this.current, this.courseId});
 
   final CourseSection section;
   final ContentVerdict? current;
+
+  /// El curso donde se revisa la sección. Nulo: el curso único de antes.
+  final int? courseId;
 
   @override
   State<_JudgeSheet> createState() => _JudgeSheetState();
@@ -370,6 +437,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
         sectionId: widget.section.id,
         approved: _approved,
         comment: comment,
+        courseId: widget.courseId,
       );
       if (mounted) Navigator.of(context).pop(true);
     } on OversightException catch (e) {

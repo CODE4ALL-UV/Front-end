@@ -21,6 +21,10 @@ import 'python_course_catalog.dart';
 /// Al terminar de cargar avisa, así que cualquier pantalla que lo escuche se
 /// redibuja sola con el contenido nuevo. Eso es lo que hace que un cambio del
 /// docente llegue al estudiante sin recompilar nada.
+///
+/// Cada docente edita sus propios cursos, así que lo editado es siempre de un
+/// curso: el que se eligió con [useCourse]. Sin curso (null) se usa el de
+/// siempre, el Curso general, que funciona con cualquier versión del servidor.
 class CourseContentStore extends ChangeNotifier {
   CourseContentStore._();
 
@@ -34,6 +38,7 @@ class CourseContentStore extends ChangeNotifier {
 
   ApiService _api = ApiService();
   http.Client _client = http.Client();
+  AuthStorage _auth = AuthStorage();
 
   static const Duration _timeout = Duration(seconds: 8);
 
@@ -43,6 +48,27 @@ class CourseContentStore extends ChangeNotifier {
   bool _loaded = false;
   bool _loading = false;
   String? _problem;
+
+  int? _courseId;
+
+  /// El curso cuyo temario se está mostrando. Null es el Curso general.
+  int? get courseId => _courseId;
+
+  /// Dónde viven las ediciones del curso abierto.
+  String get _base => _courseId == null
+      ? '/api/course/overrides'
+      : '/api/courses/$_courseId/overrides';
+
+  /// Cambia de curso: se olvida lo editado del anterior y se pide lo del nuevo.
+  Future<void> useCourse(int? courseId) async {
+    if (courseId == _courseId && _loaded) return;
+    _courseId = courseId;
+    _edits.clear();
+    _loaded = false;
+    _problem = null;
+    notifyListeners();
+    await refresh();
+  }
 
   /// Ya se intentó cargar al menos una vez.
   bool get isLoaded => _loaded;
@@ -71,15 +97,27 @@ class CourseContentStore extends ChangeNotifier {
     _loading = true;
     notifyListeners();
 
+    final requested = _courseId;
     try {
+      // Los cursos de un docente piden sesión: solo los ven él, sus
+      // estudiantes y la coordinación.
+      final token = requested == null ? null : await _auth.getToken();
       final response = await _client
-          .get(Uri.parse(_api.buildUrl('/api/course/overrides')))
+          .get(
+            Uri.parse(_api.buildUrl(_base)),
+            headers: {
+              if (token != null && token.isNotEmpty)
+                'Authorization': 'Bearer $token',
+            },
+          )
           .timeout(_timeout);
 
-      if (response.statusCode != 200) {
+      if (requested != _courseId) {
+        // Mientras llegaba la respuesta se cambió de curso: esto ya no vale.
+      } else if (response.statusCode != 200) {
         _problem = 'El servidor respondió ${response.statusCode}.';
       } else {
-        _apply(response.body);
+        _apply(responseText(response));
         _problem = null;
       }
     } catch (e) {
@@ -166,7 +204,7 @@ class CourseContentStore extends ChangeNotifier {
   Future<void> saveSection(CourseSection section) async {
     await _write(
       method: 'PUT',
-      path: '/api/course/overrides/section/${section.id}',
+      path: '$_base/section/${section.id}',
       body: {'content': sectionToJson(section)},
     );
 
@@ -179,7 +217,7 @@ class CourseContentStore extends ChangeNotifier {
     final content = {'title': title};
     await _write(
       method: 'PUT',
-      path: '/api/course/overrides/module/$moduleNumber',
+      path: '$_base/module/$moduleNumber',
       body: {'content': content},
     );
 
@@ -194,7 +232,7 @@ class CourseContentStore extends ChangeNotifier {
   Future<void> revertSection(String sectionId) async {
     await _write(
       method: 'DELETE',
-      path: '/api/course/overrides/section/$sectionId',
+      path: '$_base/section/$sectionId',
     );
 
     _edits.remove(sectionKey(sectionId));
@@ -204,7 +242,7 @@ class CourseContentStore extends ChangeNotifier {
   Future<void> revertModuleTitle(int moduleNumber) async {
     await _write(
       method: 'DELETE',
-      path: '/api/course/overrides/module/$moduleNumber',
+      path: '$_base/module/$moduleNumber',
     );
 
     _edits.remove(moduleKey(moduleNumber));
@@ -216,7 +254,7 @@ class CourseContentStore extends ChangeNotifier {
     required String path,
     Map<String, dynamic>? body,
   }) async {
-    final token = await AuthStorage().getToken();
+    final token = await _auth.getToken();
     if (token == null || token.isEmpty) {
       throw const CourseEditException(
         'Tu sesión no está iniciada. Vuelve a entrar para poder editar.',
@@ -249,8 +287,11 @@ class CourseContentStore extends ChangeNotifier {
       );
     }
     if (response.statusCode == 403) {
-      throw const CourseEditException(
-        'Tu cuenta no tiene permiso para editar el contenido del curso.',
+      throw CourseEditException(
+        _courseId == null
+            ? 'El curso general solo lo edita la coordinación. Edita uno de '
+                  'tus cursos.'
+            : 'Solo el docente de este curso puede editarlo.',
       );
     }
     if (response.statusCode == 413) {
@@ -277,17 +318,24 @@ class CourseContentStore extends ChangeNotifier {
   @visibleForTesting
   void debugReset() {
     _edits.clear();
+    _courseId = null;
     _loaded = false;
     _loading = false;
     _problem = null;
     _api = ApiService();
     _client = http.Client();
+    _auth = AuthStorage();
   }
 
   @visibleForTesting
-  void debugUse({required ApiService api, required http.Client client}) {
+  void debugUse({
+    required ApiService api,
+    required http.Client client,
+    AuthStorage? auth,
+  }) {
     _api = api;
     _client = client;
+    if (auth != null) _auth = auth;
   }
 }
 
@@ -302,4 +350,14 @@ class CourseEditException implements Exception {
 
   @override
   String toString() => message;
+}
+
+/// El cuerpo de la respuesta en UTF-8, que es como lo manda el servidor. Si
+/// no lo fuera (una respuesta de prueba, por ejemplo), el texto tal cual.
+String responseText(http.Response response) {
+  try {
+    return utf8.decode(response.bodyBytes);
+  } on FormatException {
+    return response.body;
+  }
 }

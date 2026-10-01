@@ -19,6 +19,7 @@ class TeacherSummary {
     this.lastEdit,
     this.lastScore,
     this.avgScore,
+    this.courses = 0,
   });
 
   factory TeacherSummary.fromJson(Map<String, dynamic> json) => TeacherSummary(
@@ -30,6 +31,7 @@ class TeacherSummary {
     lastEdit: DateTime.tryParse(json['last_edit'] as String? ?? ''),
     lastScore: (json['last_score'] as num?)?.toInt(),
     avgScore: (json['avg_score'] as num?)?.toDouble(),
+    courses: (json['courses'] as num?)?.toInt() ?? 0,
   );
 
   final int userId;
@@ -44,6 +46,9 @@ class TeacherSummary {
   /// Última nota recibida, o nulo si nunca se le ha valorado.
   final int? lastScore;
   final double? avgScore;
+
+  /// Cursos propios que tiene abiertos.
+  final int courses;
 
   /// Todavía no ha tocado nada del temario.
   bool get hasNotEdited => edits == 0;
@@ -99,9 +104,11 @@ class ContentVerdict {
     required this.comment,
     required this.outdated,
     this.reviewedAt,
+    this.courseId,
   });
 
   factory ContentVerdict.fromJson(Map<String, dynamic> json) => ContentVerdict(
+    courseId: (json['course_id'] as num?)?.toInt(),
     sectionId: json['section_id'] as String? ?? '',
     status: json['status'] as String? ?? '',
     comment: json['comment'] as String? ?? '',
@@ -110,6 +117,9 @@ class ContentVerdict {
   );
 
   final String sectionId;
+
+  /// El curso de esa sección. Nulo con el servidor de antes, sin cursos.
+  final int? courseId;
 
   /// `aprobado` u `observado`.
   final String status;
@@ -123,6 +133,45 @@ class ContentVerdict {
 
   String get sectionTitle =>
       PythonCourseCatalog.sectionById(sectionId)?.title ?? sectionId;
+}
+
+/// Un curso visto por la dirección: de quién es y qué se editó en él.
+@immutable
+class OversightCourse {
+  const OversightCourse({
+    required this.id,
+    required this.title,
+    required this.isGeneral,
+    required this.students,
+    required this.editedSections,
+    this.teacherName,
+  });
+
+  factory OversightCourse.fromJson(Map<String, dynamic> json) {
+    final teacher = json['teacher'];
+    return OversightCourse(
+      id: (json['id'] as num).toInt(),
+      title: json['title'] as String? ?? 'Curso',
+      isGeneral: json['is_general'] == true,
+      students: (json['students'] as num?)?.toInt() ?? 0,
+      teacherName: teacher is Map ? teacher['nombre'] as String? : null,
+      editedSections: [
+        for (final item in (json['edited_sections'] as List? ?? const []))
+          if (item is Map && item['section_id'] is String)
+            item['section_id'] as String,
+      ],
+    );
+  }
+
+  final int id;
+  final String title;
+  final bool isGeneral;
+  final int students;
+  final String? teacherName;
+
+  /// Secciones que se cambiaron en este curso, de la más reciente a la más
+  /// antigua. Son las que hay que revisar.
+  final List<String> editedSections;
 }
 
 /// Una valoración que la dirección hizo de un docente.
@@ -174,6 +223,8 @@ class DirectorOversightStore extends ChangeNotifier {
 
   List<TeacherSummary> _teachers = const [];
   List<ContentVerdict> _verdicts = const [];
+  List<OversightCourse> _courses = const [];
+  bool _coursesSupported = false;
 
   bool _loading = false;
   bool _loaded = false;
@@ -181,6 +232,11 @@ class DirectorOversightStore extends ChangeNotifier {
 
   List<TeacherSummary> get teachers => _teachers;
   List<ContentVerdict> get verdicts => _verdicts;
+
+  /// Todos los cursos, con lo editado en cada uno. Vacío con el servidor de
+  /// antes, que no tenía cursos por docente.
+  List<OversightCourse> get courses => _courses;
+  bool get coursesSupported => _coursesSupported;
 
   bool get isLoading => _loading;
   bool get isLoaded => _loaded;
@@ -203,9 +259,12 @@ class DirectorOversightStore extends ChangeNotifier {
   List<ContentVerdict> get flagged =>
       _verdicts.where((v) => !v.isApproved).toList();
 
-  ContentVerdict? verdictOf(String sectionId) {
+  /// La revisión de una sección. Con cursos, la de esa sección en ese curso:
+  /// aprobar la versión de un docente no aprueba la de otro.
+  ContentVerdict? verdictOf(String sectionId, {int? courseId}) {
     for (final verdict in _verdicts) {
-      if (verdict.sectionId == sectionId) return verdict;
+      if (verdict.sectionId != sectionId) continue;
+      if (courseId == null || verdict.courseId == courseId) return verdict;
     }
     return null;
   }
@@ -238,6 +297,9 @@ class DirectorOversightStore extends ChangeNotifier {
       final content = await _client
           .get(Uri.parse(_api.buildUrl('/api/oversight/content')), headers: headers)
           .timeout(_timeout);
+      final courses = await _client
+          .get(Uri.parse(_api.buildUrl('/api/oversight/courses')), headers: headers)
+          .timeout(_timeout);
 
       if (teachers.statusCode == 403 || content.statusCode == 403) {
         _problem = 'Tu cuenta no tiene permiso para ver el seguimiento.';
@@ -251,6 +313,11 @@ class DirectorOversightStore extends ChangeNotifier {
           TeacherSummary.fromJson,
         );
         _verdicts = _parseList(content.body, 'items', ContentVerdict.fromJson);
+        // 404: el servidor de antes, sin cursos por docente.
+        _coursesSupported = courses.statusCode == 200;
+        _courses = _coursesSupported
+            ? _parseList(courses.body, 'courses', OversightCourse.fromJson)
+            : const [];
         _problem = null;
       }
     } on OversightException catch (e) {
@@ -336,6 +403,7 @@ class DirectorOversightStore extends ChangeNotifier {
     required String sectionId,
     required bool approved,
     required String comment,
+    int? courseId,
   }) async {
     final http.Response response;
     try {
@@ -347,6 +415,7 @@ class DirectorOversightStore extends ChangeNotifier {
               'section_id': sectionId,
               'status': approved ? 'aprobado' : 'observado',
               'comment': comment,
+              'course_id': ?courseId,
             }),
           )
           .timeout(_timeout);
@@ -405,9 +474,12 @@ class DirectorOversightStore extends ChangeNotifier {
   void debugSeed({
     List<TeacherSummary> teachers = const [],
     List<ContentVerdict> verdicts = const [],
+    List<OversightCourse>? courses,
   }) {
     _teachers = teachers;
     _verdicts = verdicts;
+    _courses = courses ?? const [];
+    _coursesSupported = courses != null;
     _loaded = true;
     _problem = null;
     notifyListeners();
@@ -417,6 +489,8 @@ class DirectorOversightStore extends ChangeNotifier {
   void debugReset() {
     _teachers = const [];
     _verdicts = const [];
+    _courses = const [];
+    _coursesSupported = false;
     _loading = false;
     _loaded = false;
     _problem = null;

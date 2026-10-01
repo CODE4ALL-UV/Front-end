@@ -1,6 +1,7 @@
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/courses/active_course_banner.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart'; //MIX
@@ -354,6 +355,8 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
           // fuera con el scroll, quien necesita agrandar la letra tendria
           // que buscarla primero.
           const AccessibilityToolbar(),
+          // En qué curso se está, cuando hay cursos por docente.
+          const ActiveCourseBanner(),
           Expanded(
             child: Stack(
               children: [

@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'ui/core/themes/app_theme.dart';
 import 'ui/core/ui/accessibility_text_scale_widget.dart';
 import 'ui/core/ui/display_preferences.dart';
+import 'data/course/my_courses_store.dart';
 import 'data/services/course_progress_store.dart';
 import 'data/services/session_controller.dart';
 import 'data/services/learning_analytics_service.dart';
@@ -10,6 +11,9 @@ import 'data/services/learning_analytics_service.dart';
 import 'ui/core/ui/sign_keyboard_settings.dart';
 import 'ui/director/director_home_screen.dart';
 import 'ui/teacher/teacher_course_screen.dart';
+import 'ui/courses/courses_gate.dart';
+import 'ui/courses/student_courses_screen.dart';
+import 'ui/courses/teacher_courses_screen.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'ui/users_management/widgets/login_screen.dart';
 //import 'ui/users_management/screens/login_dark_screen.dart'; // PAPACHO - ELIMINADO USAR login_screen.dart en pro de app_theme.dart
@@ -116,7 +120,11 @@ class _AppState extends State<App> {
   }
 
   void _goToRegister() => setState(() => _currentScreen = AppScreen.register);
-  void _goToLogin() => setState(() => _currentScreen = AppScreen.login);
+  void _goToLogin() {
+    // Los cursos son de quien entró: el siguiente no debe heredarlos.
+    MyCoursesStore.instance.clear();
+    setState(() => _currentScreen = AppScreen.login);
+  }
   void _goToModulo() => setState(() => _currentScreen = AppScreen.modulo);
 
   // NUEVO: Método para que cuando el usuario entre a un módulo, la app cambie de color.
@@ -239,15 +247,41 @@ class _AppState extends State<App> {
       case AppScreen.register:
         return FormScreen(onBack: _goToLogin, onSuccess: _goToLogin);
       case AppScreen.modulo:
-        return LearningModuleScreen(
+        // Con cursos por docente, el estudiante elige primero en qué curso
+        // estudia. Con el servidor de antes entra directo al curso único.
+        Widget modules(BuildContext _) => LearningModuleScreen(
           userName: _userName,
           onLogout: _goToLogin,
           bottomLabels: _bottomLabels,
           // ESTO ES LO QUE LOS CONECTA:
           onModuleChanged: _updateActiveModule,
         );
+        return CoursesGate(
+          userName: _userName,
+          onLogout: _goToLogin,
+          withoutCourses: modules,
+          withCourses: (_) => StudentCoursesScreen(
+            userName: _userName,
+            onLogout: _goToLogin,
+            courseHome: modules,
+          ),
+        );
       case AppScreen.docente:
-        return TeacherCourseScreen(userName: _userName, onLogout: _goToLogin);
+        return CoursesGate(
+          userName: _userName,
+          onLogout: _goToLogin,
+          withoutCourses: (_) =>
+              TeacherCourseScreen(userName: _userName, onLogout: _goToLogin),
+          withCourses: (_) => TeacherCoursesScreen(
+            userName: _userName,
+            onLogout: _goToLogin,
+            courseEditor: (_, course) => TeacherCourseScreen(
+              userName: _userName,
+              onLogout: _goToLogin,
+              course: course,
+            ),
+          ),
+        );
       case AppScreen.director:
         return DirectorHomeScreen(userName: _userName, onLogout: _goToLogin);
       case AppScreen.login:

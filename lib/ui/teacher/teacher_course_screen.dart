@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/domain/models/python_course_content/course_info.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_quick_button.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
@@ -24,7 +26,12 @@ class TeacherCourseScreen extends StatefulWidget {
     super.key,
     this.userName = 'Docente',
     this.onLogout,
+    this.course,
   });
+
+  /// El curso que se está editando. Nulo con el servidor de antes, que tenía
+  /// un único curso para todos.
+  final CourseInfo? course;
 
   /// Nombre de quien ha entrado, para el menú de la esquina.
   final String userName;
@@ -91,15 +98,63 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
     }
   }
 
+  /// El código para que los estudiantes entren, a mano mientras se edita.
+  Future<void> _showCode(CourseInfo course) async {
+    final code = course.joinCode ?? '';
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Código de ${course.title}'),
+        content: Semantics(
+          label: 'Código: ${code.split('').join(' ')}',
+          excludeSemantics: true,
+          child: SelectableText(
+            code,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 6,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: code));
+              if (context.mounted) Navigator.of(context).pop();
+            },
+            child: const Text('Copiar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appColorScheme = context.colorScheme;
+    final course = widget.course;
     return Scaffold(
       backgroundColor: appColorScheme.surface,
       appBar: GlobalAppBarWidget(
+        // Con varios cursos, el nombre del que se edita siempre a la vista:
+        // editar el que no era es justo el error que hay que evitar.
+        title: course?.title ?? 'CODE4ALL',
         userName: widget.userName,
         onLogout: widget.onLogout,
         extraActions: [
+          if (course?.joinCode != null)
+            IconButton(
+              tooltip: 'Código para inscribirse',
+              onPressed: () => _showCode(course!),
+              color: appColorScheme.onPrimary,
+              icon: const Icon(Icons.vpn_key_outlined),
+            ),
           IconButton(
             tooltip: 'Volver a consultar los cambios guardados',
             onPressed: _content.isLoading ? null : _content.refresh,

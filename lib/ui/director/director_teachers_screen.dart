@@ -251,6 +251,13 @@ class _TeacherCard extends StatelessWidget {
                       spacing: 6,
                       runSpacing: 6,
                       children: [
+                        if (teacher.courses > 0)
+                          DirectorBadge(
+                            icon: Icons.school_outlined,
+                            label: teacher.courses == 1
+                                ? '1 curso'
+                                : '${teacher.courses} cursos',
+                          ),
                         DirectorBadge(
                           icon: Icons.edit_outlined,
                           label: teacher.hasNotEdited

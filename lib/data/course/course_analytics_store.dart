@@ -198,6 +198,30 @@ class CourseAnalyticsStore extends ChangeNotifier {
   bool _loaded = false;
   String? _problem;
 
+  int? _courseId;
+
+  /// De qué curso son las cifras. Null: el Curso general, o todo junto si
+  /// quien mira es la coordinación.
+  int? get courseId => _courseId;
+
+  /// Cambia de curso. Las cifras del anterior se olvidan para no mezclarlas.
+  void useCourse(int? courseId) {
+    if (courseId == _courseId) return;
+    _courseId = courseId;
+    _sections = const [];
+    _questions = const [];
+    _students = const [];
+    _completions = const [];
+    _totalAnswers = 0;
+    _totalCompletions = 0;
+    _loaded = false;
+    _problem = null;
+    notifyListeners();
+  }
+
+  String _withCourse(String path) =>
+      _courseId == null ? path : '$path?course_id=$_courseId';
+
   List<SectionStats> get sections => _sections;
   List<QuestionStats> get questions => _questions;
   List<StudentStats> get students => _students;
@@ -288,14 +312,14 @@ class CourseAnalyticsStore extends ChangeNotifier {
 
         final summary = await _client
             .get(
-              Uri.parse(_api.buildUrl('/api/analytics/summary')),
+              Uri.parse(_api.buildUrl(_withCourse('/api/analytics/summary'))),
               headers: headers,
             )
             .timeout(_timeout);
 
         final students = await _client
             .get(
-              Uri.parse(_api.buildUrl('/api/analytics/students')),
+              Uri.parse(_api.buildUrl(_withCourse('/api/analytics/students'))),
               headers: headers,
             )
             .timeout(_timeout);

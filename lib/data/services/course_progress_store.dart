@@ -74,12 +74,33 @@ class CourseProgressStore extends ChangeNotifier {
   bool _loaded = false;
   bool get isLoaded => _loaded;
 
+  int? _courseId;
+
+  /// El curso cuyo avance se lleva. Null es el Curso general.
+  int? get courseId => _courseId;
+
+  /// Cada curso guarda su avance aparte: terminar la lectura de una sección
+  /// en el curso de un docente no la da por leída en el de otro. El Curso
+  /// general usa la clave de siempre, así nadie pierde lo que ya llevaba.
+  String get _key =>
+      _courseId == null ? _storageKey : '${_storageKey}_c$_courseId';
+
+  /// Cambia de curso y carga el avance que se llevaba en él.
+  Future<void> useCourse(int? courseId) async {
+    if (courseId == _courseId) return;
+    _courseId = courseId;
+    _completed.clear();
+    _loaded = false;
+    notifyListeners();
+    await load();
+  }
+
   /// Carga el progreso guardado. Es seguro llamarlo varias veces.
   Future<void> load() async {
     if (_loaded) return;
 
     try {
-      final raw = await _storage.read(key: _storageKey);
+      final raw = await _storage.read(key: _key);
       if (raw != null && raw.isNotEmpty) {
         final decoded = jsonDecode(raw);
         if (decoded is List) {
@@ -148,7 +169,7 @@ class CourseProgressStore extends ChangeNotifier {
   Future<void> _persist() async {
     try {
       await _storage.write(
-        key: _storageKey,
+        key: _key,
         value: jsonEncode(_completed.toList()),
       );
     } catch (e) {

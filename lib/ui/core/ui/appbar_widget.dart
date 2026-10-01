@@ -16,6 +16,10 @@ class GlobalAppBarWidget extends StatelessWidget
   final PreferredSizeWidget?
   bottom; // <-- Permite pestañas o elementos inferiores opcionales
 
+  /// Botones que van antes del menú de perfil, sin quitarlo. Con `actions`
+  /// se sustituye la fila entera.
+  final List<Widget> extraActions;
+
   const GlobalAppBarWidget({
     super.key,
     this.title = 'CODE4ALL', // Fusionado: Valor por defecto para no repetirlo,
@@ -28,6 +32,7 @@ class GlobalAppBarWidget extends StatelessWidget
     this.userRole,
     this.onLogout,
     this.bottom,
+    this.extraActions = const [],
   });
 
   @override
@@ -74,6 +79,7 @@ class GlobalAppBarWidget extends StatelessWidget
             actions ??
             (showUserIcon
                 ? [
+                    ...extraActions,
                     Padding(
                       padding: const EdgeInsets.only(
                         right: 12,
@@ -89,13 +95,16 @@ class GlobalAppBarWidget extends StatelessWidget
                       ),
                     ),
                   ]
-                : null),
+                : (extraActions.isEmpty ? null : extraActions)),
         bottom:
             bottom, // <-- Renderiza el TabBar pasándole el control desde la pantalla
       ),
     );
   }
 
+  /// La barra mide lo suyo más lo de abajo: sin sumar las pestañas, el
+  /// Scaffold les dejaba sitio solo para la barra y quedaban recortadas.
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize =>
+      Size.fromHeight(kToolbarHeight + (bottom?.preferredSize.height ?? 0));
 }

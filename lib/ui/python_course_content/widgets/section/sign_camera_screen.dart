@@ -7,7 +7,6 @@ import 'package:flutter_code4all/domain/models/sign_language/hand_alphabet.dart'
 import 'package:flutter_code4all/domain/models/sign_language/hand_landmark_classifier.dart';
 import 'package:flutter_code4all/domain/models/sign_language/sign_dictation.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
@@ -289,9 +288,12 @@ class _SignCameraScreenState extends State<SignCameraScreen>
 
     return Scaffold(
       backgroundColor: appColorScheme.surface,
+      // El título dice qué se está haciendo: practicar una letra concreta o
+      // dejar que la cámara lea la mano.
       appBar: GlobalAppBarWidget(
-        userName: '', //widget.userName,
-        onLogout: null, //widget.onLogout,
+        title: _isPractice
+            ? 'Practica la ${widget.targetLetter}'
+            : 'Lee mi mano',
       ),
       body: SafeArea(
         child: Column(
@@ -355,8 +357,8 @@ class _SignCameraScreenState extends State<SignCameraScreen>
         _check();
       },
       style: FilledButton.styleFrom(
-        backgroundColor: appTheme.extension<MessageTheme>()!.infoBackground,
-        foregroundColor: appTheme.extension<MessageTheme>()!.infoForeground,
+        backgroundColor: context.messageColors.infoBackground,
+        foregroundColor: context.messageColors.infoForeground,
         minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.refresh),
@@ -442,8 +444,8 @@ class _SignCameraScreenState extends State<SignCameraScreen>
   }
 
   ButtonStyle _outlined(ThemeData appTheme) => OutlinedButton.styleFrom(
-    foregroundColor: appTheme.extension<MessageTheme>()!.infoForeground,
-    side: BorderSide(color: appTheme.extension<MessageTheme>()!.infoForeground),
+    foregroundColor: context.messageColors.infoForeground,
+    side: BorderSide(color: context.messageColors.infoForeground),
     minimumSize: const Size(0, AppMetrics.minTapTarget),
   );
 }
@@ -456,7 +458,6 @@ class _Explanation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = context.messageColors;
     final text = target != null
         ? 'Coloca la mano delante de la cámara y haz la letra $target. '
               'Te iré diciendo qué te falta para conseguirla.'
@@ -466,8 +467,8 @@ class _Explanation extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppMetrics.gap),
       decoration: BoxDecoration(
-        color: appSemanticColors.dangerBackground,
-        border: Border.all(color: appSemanticColors.infoForeground),
+        color: context.colorScheme.surface,
+        border: Border.all(color: context.colorScheme.outline),
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       ),
       child: Column(
@@ -478,7 +479,7 @@ class _Explanation extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               height: 1.45,
-              color: appSemanticColors.infoForeground,
+              color: context.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: AppMetrics.gap),

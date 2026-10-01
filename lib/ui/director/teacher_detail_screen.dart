@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'director_widgets.dart';
@@ -67,22 +66,20 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Usando el shortcut de tu extensión en app_theme_2.dart
-    final activityColors = context.messageColors;
     final appColorScheme = context.colorScheme;
     final teacher = widget.teacher;
 
     return Scaffold(
       backgroundColor: appColorScheme.surface,
+      // El nombre en la barra: al volver de otra pestaña se sabe de quién
+      // es la ficha sin bajar hasta el correo.
       appBar: GlobalAppBarWidget(
-        userName: '', //widget.userName,
-        onLogout: null, //widget.onLogout,
+        title: teacher.name.isEmpty ? 'Docente' : teacher.name,
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openReviewSheet,
-        backgroundColor: activityColors.infoBackground,
-        foregroundColor:
-            activityColors.infoForeground, // Mejor contraste que infoForeground
+        backgroundColor: appColorScheme.primary,
+        foregroundColor: appColorScheme.onPrimary,
         icon: const Icon(Icons.rate_review_outlined),
         label: const Text('Valorar'),
       ),
@@ -101,7 +98,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: _body(activityColors, teacher),
+                            children: _body(appColorScheme, teacher),
                           ),
                         ),
                       ),
@@ -113,7 +110,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
     );
   }
 
-  List<Widget> _body(MessageTheme activityColors, TeacherSummary teacher) {
+  List<Widget> _body(ColorScheme colors, TeacherSummary teacher) {
     final edits = _edits;
     final reviews = _reviews;
 
@@ -122,22 +119,21 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
       Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: activityColors.infoBackground,
-          border: Border.all(color: activityColors.infoForeground),
+          color: Theme.of(context).scaffoldBackgroundColor,
+          border: Border.all(color: colors.outlineVariant),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: Row(
           children: [
             CircleAvatar(
               radius: 26,
-              backgroundColor: activityColors.infoBackground,
+              backgroundColor: colors.primary,
               child: Text(
                 teacher.name.isEmpty ? '?' : teacher.name[0].toUpperCase(),
                 style: TextStyle(
                   fontSize: 21,
                   fontWeight: FontWeight.w800,
-                  color: activityColors
-                      .infoForeground, // Ajustado para legibilidad
+                  color: colors.onPrimary,
                 ),
               ),
             ),
@@ -151,7 +147,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
                     teacher.email,
                     style: TextStyle(
                       fontSize: 13,
-                      color: activityColors.infoForeground,
+                      color: colors.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 7),
@@ -176,43 +172,35 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
       ],
 
       const SizedBox(height: AppMetrics.sectionGap),
-      _title(activityColors, 'Qué ha hecho', Icons.history),
+      _title(colors, 'Qué ha hecho', Icons.history),
       const SizedBox(height: 6),
       _note(
-        activityColors,
+        colors,
         'Sale de sus propias ediciones guardadas, no de lo que diga nadie.',
       ),
       const SizedBox(height: AppMetrics.gap),
 
       if (edits == null)
-        Center(
-          child: CircularProgressIndicator(
-            color: activityColors.infoForeground,
-          ),
-        )
+        const Center(child: CircularProgressIndicator())
       else if (edits.isEmpty)
-        _note(activityColors, 'Todavía no ha editado nada del temario.')
+        _note(colors, 'Todavía no ha editado nada del temario.')
       else
         for (final edit in edits) _EditRow(edit: edit),
 
       const SizedBox(height: AppMetrics.sectionGap),
-      _title(activityColors, 'Valoraciones', Icons.rate_review_outlined),
+      _title(colors, 'Valoraciones', Icons.rate_review_outlined),
       const SizedBox(height: 6),
       _note(
-        activityColors,
+        colors,
         'Se guarda el histórico: así se ve si mejora, que es para lo que '
         'sirve valorar a alguien.',
       ),
       const SizedBox(height: AppMetrics.gap),
 
       if (reviews == null)
-        Center(
-          child: CircularProgressIndicator(
-            color: activityColors.infoForeground,
-          ),
-        )
+        const Center(child: CircularProgressIndicator())
       else if (reviews.isEmpty)
-        _note(activityColors, 'Todavía no se le ha valorado.')
+        _note(colors, 'Todavía no se le ha valorado.')
       else
         for (final review in reviews) _ReviewRow(review: review),
 
@@ -220,11 +208,9 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
     ];
   }
 
-  // Corregido: Se pasa MessageTheme en lugar de AppTheme
-  Widget _title(MessageTheme activityColors, String text, IconData icon) => Row(
+  Widget _title(ColorScheme colors, String text, IconData icon) => Row(
     children: [
-      // Corregido: Reemplazado el inexistente appTheme.accent
-      Icon(icon, size: 19, color: activityColors.infoForeground),
+      Icon(icon, size: 19, color: colors.onSurface),
       const SizedBox(width: 8),
       Expanded(
         child: Text(
@@ -232,20 +218,19 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w800,
-            color: activityColors.infoForeground,
+            color: colors.onSurface,
           ),
         ),
       ),
     ],
   );
 
-  // Corregido: Se pasa MessageTheme en lugar de AppTheme
-  Widget _note(MessageTheme activityColors, String text) => Text(
+  Widget _note(ColorScheme colors, String text) => Text(
     text,
     style: TextStyle(
       fontSize: 12.5,
       height: 1.45,
-      color: activityColors.infoForeground,
+      color: colors.onSurfaceVariant,
     ),
   );
 }
@@ -258,7 +243,6 @@ class _EditRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.messageColors;
     final colorScheme = context.colorScheme;
     final status = edit.reviewStatus;
 
@@ -273,7 +257,7 @@ class _EditRow extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: colorScheme.surface,
-            border: Border.all(color: appTheme.infoForeground),
+            border: Border.all(color: colorScheme.outline),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
@@ -286,7 +270,7 @@ class _EditRow extends StatelessWidget {
                         ? Icons.folder_outlined
                         : Icons.article_outlined,
                     size: 17,
-                    color: appTheme.infoForeground,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -295,7 +279,7 @@ class _EditRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: appTheme.infoForeground,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -304,7 +288,7 @@ class _EditRow extends StatelessWidget {
                       relativeDate(edit.updatedAt!),
                       style: TextStyle(
                         fontSize: 11.5,
-                        color: appTheme.infoForeground,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                 ],
@@ -337,7 +321,7 @@ class _EditRow extends StatelessWidget {
                     fontSize: 12.5,
                     height: 1.4,
                     fontStyle: FontStyle.italic,
-                    color: appTheme.infoForeground,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -357,7 +341,6 @@ class _ReviewRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.messageColors;
     final colorScheme = context.colorScheme;
 
     return Semantics(
@@ -371,7 +354,7 @@ class _ReviewRow extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: colorScheme.surface,
-            border: Border.all(color: appTheme.infoForeground),
+            border: Border.all(color: colorScheme.outline),
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
           child: Column(
@@ -386,7 +369,7 @@ class _ReviewRow extends StatelessWidget {
                       relativeDate(review.createdAt!),
                       style: TextStyle(
                         fontSize: 11.5,
-                        color: appTheme.infoForeground,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                 ],
@@ -398,7 +381,7 @@ class _ReviewRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.5,
                     height: 1.45,
-                    color: appTheme.infoForeground,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -475,7 +458,6 @@ class _ReviewSheetState extends State<_ReviewSheet> {
 
   @override
   Widget build(BuildContext context) {
-    // Referencias a tu nueva arquitectura de temas
     final appTheme = context.messageColors;
     final colorScheme = context.colorScheme;
 
@@ -498,7 +480,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
-                color: appTheme.infoForeground,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: AppMetrics.sectionGap),
@@ -508,7 +490,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
-                color: appTheme.infoForeground,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -532,10 +514,12 @@ class _ReviewSheetState extends State<_ReviewSheet> {
                           i <= _score
                               ? Icons.star_rounded
                               : Icons.star_outline_rounded,
-                          // Colors.amber es el estándar habitual para estrellas de valoración
+                          // El dorado de los avisos, no Colors.amber: ese
+                          // amarillo sobre blanco no llega a 2:1, y en el
+                          // tema gris tiene que ser gris.
                           color: i <= _score
-                              ? Colors.amber
-                              : appTheme.infoForeground,
+                              ? appTheme.warningForeground
+                              : colorScheme.outline,
                         ),
                       ),
                     ),
@@ -548,7 +532,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
-                  color: appTheme.infoForeground,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
@@ -559,7 +543,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
-                color: appTheme.infoForeground,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 6),
@@ -568,23 +552,29 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               maxLines: 5,
               minLines: 3,
               onChanged: (_) => setState(() => _error = null),
-              style: TextStyle(fontSize: 14.5, color: appTheme.infoForeground),
+              style: TextStyle(fontSize: 14.5, color: colorScheme.onSurface),
               decoration: InputDecoration(
                 hintText: 'Qué está haciendo bien y qué puede mejorar',
-                hintStyle: TextStyle(color: appTheme.infoForeground),
+                hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                 filled: true,
-                // Fondo para resaltar el input
-                fillColor: colorScheme.surfaceContainerHighest,
+                fillColor: colorScheme.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-                  borderSide: BorderSide(color: appTheme.infoForeground),
+                  borderSide: BorderSide(color: colorScheme.outline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
+                  borderSide: BorderSide(color: colorScheme.outline),
                 ),
               ),
             ),
             const SizedBox(height: 6),
             Text(
               'Es lo que de verdad le sirve: la nota sola no dice qué hacer distinto.',
-              style: TextStyle(fontSize: 12, color: appTheme.infoForeground),
+              style: TextStyle(
+                fontSize: 12,
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
 
             if (_error != null) ...[

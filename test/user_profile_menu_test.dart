@@ -17,10 +17,7 @@ void main() {
   Widget inAppBar({VoidCallback? onLogout, String name = 'Mateo'}) {
     return MaterialApp(
       home: Scaffold(
-        appBar: GlobalAppBarWidget(
-          userName: '', //widget.userName,
-          onLogout: null, //widget.onLogout,
-        ),
+        appBar: GlobalAppBarWidget(userName: name, onLogout: onLogout),
         body: const SizedBox.expand(),
       ),
     );

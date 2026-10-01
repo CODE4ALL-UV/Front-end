@@ -89,6 +89,16 @@ class SignAssetIndex {
   @visibleForTesting
   static String normalizeForTest(String value) => _normalize(value);
 
+  /// Olvida lo leído. Una prueba que dibuja el panel deja la lectura a medias
+  /// en su tiempo falso, y la siguiente se quedaría esperándola para siempre.
+  @visibleForTesting
+  void debugReset() {
+    _loading = null;
+    _loaded = false;
+    _letters.clear();
+    _words.clear();
+  }
+
   static String _normalize(String value) {
     const from = 'áàäâéèëêíìïîóòöôúùüûÁÀÄÂÉÈËÊÍÌÏÎÓÒÖÔÚÙÜÛ';
     const to = 'aaaaeeeeiiiioooouuuuaaaaeeeeiiiioooouuuu';

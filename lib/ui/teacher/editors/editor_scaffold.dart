@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 
 /// El armazón común de todos los editores del docente.
 /// Todos funcionan igual a propósito: se escribe, se pulsa «Listo» y el
@@ -35,13 +36,40 @@ class EditorScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
-    final moduleTheme = context.moduleColors;
+    final colorScheme = appTheme.colorScheme;
 
     return Scaffold(
       backgroundColor: appTheme.scaffoldBackgroundColor,
+      // «Listo» y «Quitar» viven aquí. Al pasar a la barra común se habían
+      // quedado fuera: el docente podía escribir, pero lo escrito no volvía
+      // nunca a la sección y no había forma de quitar una actividad.
       appBar: GlobalAppBarWidget(
-        userName: '', //widget.userName,
-        onLogout: null, //widget.onLogout,
+        title: title,
+        actions: [
+          if (onDelete != null)
+            IconButton(
+              tooltip: deleteLabel ?? 'Quitar de la sección',
+              onPressed: onDelete,
+              color: colorScheme.onPrimary,
+              icon: const Icon(Icons.delete_outline),
+            ),
+          // También dentro de un editor se puede salir de la sesión.
+          const Padding(
+            padding: EdgeInsets.only(right: 4),
+            child: UserProfileMenu(showName: false),
+          ),
+          TextButton(
+            onPressed: onDone,
+            style: TextButton.styleFrom(
+              foregroundColor: colorScheme.onPrimary,
+              minimumSize: const Size(0, AppMetrics.minTapTarget),
+            ),
+            child: const Text(
+              'Listo',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -62,7 +90,7 @@ class EditorScaffold extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             height: 1.45,
-                            color: moduleTheme.lessonCardBorder,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: AppMetrics.sectionGap),
@@ -101,19 +129,17 @@ class EditorEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    final moduleTheme = context.moduleColors;
-    final activityColors = context.messageColors;
 
     return Container(
       padding: const EdgeInsets.all(AppMetrics.sectionGap),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border.all(color: activityColors.infoForeground),
+        border: Border.all(color: colorScheme.outlineVariant),
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 40, color: moduleTheme.lessonCardBorder),
+          Icon(icon, size: 40, color: colorScheme.onSurfaceVariant),
           const SizedBox(height: AppMetrics.gap),
           Text(
             text,
@@ -121,7 +147,7 @@ class EditorEmptyState extends StatelessWidget {
             style: TextStyle(
               fontSize: 14.5,
               height: 1.45,
-              color: moduleTheme.lessonCardBorder,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: AppMetrics.sectionGap),

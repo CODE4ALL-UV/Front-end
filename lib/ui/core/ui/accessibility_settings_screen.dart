@@ -37,10 +37,7 @@ class _AccessibilitySettingsScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F3F8),
-      appBar: GlobalAppBarWidget(
-        userName: '', //widget.userName,
-        onLogout: null, //widget.onLogout,
-      ),
+      appBar: GlobalAppBarWidget(title: 'Configuración de Accesibilidad'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

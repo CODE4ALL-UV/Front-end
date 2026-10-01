@@ -190,9 +190,11 @@ void main() {
     testWidgets('sin imágenes empaquetadas no devuelve ninguna ruta', (
       tester,
     ) async {
-      // Con testWidgets para que exista el binding: sin él, leer el
-      // manifiesto de assets se queda esperando indefinidamente.
-      await SignAssetIndex.instance.ensureLoaded();
+      // Con testWidgets para que exista el binding, y dentro de runAsync
+      // porque leer el manifiesto es E/S de verdad: en el tiempo falso de la
+      // prueba no termina nunca y la prueba se quedaba colgada.
+      SignAssetIndex.instance.debugReset();
+      await tester.runAsync(SignAssetIndex.instance.ensureLoaded);
 
       expect(SignAssetIndex.instance.isLoaded, isTrue);
       expect(SignAssetIndex.instance.letterAsset('A'), isNull);

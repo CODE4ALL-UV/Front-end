@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/director_oversight_store.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/ui/core/ui/accessibility_quick_button.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_stats_screen.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_students_screen.dart';
@@ -66,15 +67,13 @@ class _DirectorHomeScreenState extends State<DirectorHomeScreen>
     return Scaffold(
       backgroundColor: appColorScheme.surface,
       appBar: GlobalAppBarWidget(
-        userName: '', //widget.userName,
-        onLogout: null, //widget.onLogout,
+        userName: widget.userName,
+        onLogout: widget.onLogout,
+        extraActions: const [AccessibilityQuickButton()],
         bottom: TabBar(
           controller: _tabs,
           isScrollable: true,
           tabAlignment: TabAlignment.center,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
           tabs: [
             const Tab(icon: Icon(Icons.insights), text: 'Curso'),
             const Tab(icon: Icon(Icons.groups_outlined), text: 'Estudiantes'),
@@ -120,18 +119,24 @@ class _TabWithCount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColorScheme = context.colorScheme;
+
     return Tab(
       icon: count == 0
           ? Icon(icon)
           : Badge(
               label: Text('$count'),
-              backgroundColor: Colors.white,
-              textColor: const Color(0xFFC62828),
+              // Sobre la barra: el color de su texto de fondo y el de la
+              // barra para el número, que contrastan en los seis temas.
+              backgroundColor: appColorScheme.onPrimary,
+              textColor: appColorScheme.primary,
               child: Icon(icon),
             ),
       // El contador también se dice, no solo se pinta: un número en rojo que
       // no se lee en voz alta no existe para quien navega por voz.
-      text: count == 0 ? label : '$label ($count pendientes)',
+      text: count == 0
+          ? label
+          : '$label ($count ${count == 1 ? "pendiente" : "pendientes"})',
     );
   }
 }

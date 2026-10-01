@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
@@ -200,7 +201,18 @@ class _ReadingBlockView extends StatelessWidget {
     final appTheme = context.messageColors;
 
     if (block.kind == ReadingBlockKind.callout) {
-      return SectionCallout(title: block.title, body: block.body);
+      // El tono dice si es una idea, un acierto, un aviso o un peligro: se
+      // nota en el color y también en la etiqueta que se lee en voz alta.
+      return SectionCallout(
+        title: block.title,
+        body: block.body,
+        tone: switch (block.tone) {
+          CalloutTone.info => MessageThemeTone.info,
+          CalloutTone.success => MessageThemeTone.success,
+          CalloutTone.warning => MessageThemeTone.warning,
+          CalloutTone.danger => MessageThemeTone.danger,
+        },
+      );
     }
 
     return Column(
@@ -262,8 +274,8 @@ class _PageDots extends StatelessWidget {
             height: 9,
             decoration: BoxDecoration(
               color: isActive
-                  ? appTheme.infoBackground
-                  : appTheme.infoForeground,
+                  ? appTheme.infoForeground
+                  : context.colorScheme.outlineVariant,
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
           );

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/data/services/session_controller.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
+import 'package:flutter_code4all/ui/core/ui/braille_keyboard_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/sign_keyboard_settings.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -405,6 +406,8 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
           _handleLogout();
         } else if (value == 'sign_keyboard') {
           _toggleSignKeyboard();
+        } else if (value == 'braille_keyboard') {
+          Navigator.of(context).push(BrailleKeyboardScreen.route());
         }
       },
       // El color va explicito. Sin el, los iconos heredan el blanco de la
@@ -412,7 +415,8 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
       // el texto pero no el icono.
       itemBuilder: (context) {
         final onMenu = theme.colorScheme.onSurface;
-        final isStudent = (_userRole ?? '').trim().toLowerCase() == 'estudiante';
+        final isStudent =
+            (_userRole ?? '').trim().toLowerCase() == 'estudiante';
 
         return [
           // Sólo para el estudiante: es quien está aprendiendo el alfabeto
@@ -439,6 +443,36 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
                 ],
               ),
             ),
+          // Para todos los roles, no sólo el estudiante: quien no ve
+          // necesita escribir sea docente o estudiante. Abre su propia
+          // ventana, que se presenta en voz alta al abrirse.
+          PopupMenuItem<String>(
+            value: 'braille_keyboard',
+            child: Semantics(
+              hint: 'Abre el teclado Braille con asistente de voz',
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                    child: Center(
+                      child: BrailleCellIcon(
+                        dots: const {1, 2, 4},
+                        size: 22,
+                        color: onMenu,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'Teclado Braille',
+                      style: TextStyle(color: onMenu),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           PopupMenuItem<String>(
             value: 'profile',
             child: Row(

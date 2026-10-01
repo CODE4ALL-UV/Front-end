@@ -301,9 +301,11 @@ class _AppState extends State<App> {
               ),
             ),
             // Ni el estudiante ni el docente llevan este boton: los dos
-            // tienen su propio sitio para cambiar el tema.
+            // tienen su propio sitio para cambiar el tema. En el login su
+            // sitio lo ocupa el atajo al teclado Braille.
             if (_currentScreen != AppScreen.modulo &&
-                _currentScreen != AppScreen.docente)
+                _currentScreen != AppScreen.docente &&
+                _currentScreen != AppScreen.login)
               Positioned(
                 left: 16,
                 bottom: 24,

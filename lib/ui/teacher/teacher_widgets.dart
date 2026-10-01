@@ -16,8 +16,7 @@ class EditedDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. El widget extrae sus propios colores aquí adentro:
-    final activityColors = context.messageColors;
+    final appColorScheme = context.colorScheme;
     return Semantics(
       label: label,
       child: Container(
@@ -25,7 +24,7 @@ class EditedDot extends StatelessWidget {
         height: 9,
         margin: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
-          color: activityColors.infoForeground,
+          color: appColorScheme.secondary,
           shape: BoxShape.circle,
         ),
       ),
@@ -102,7 +101,6 @@ class TeacherField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorsTheme = context.colorScheme;
-    final appSemanticColors = context.messageColors;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,7 +110,7 @@ class TeacherField extends StatelessWidget {
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: colorsTheme.secondary,
+            color: colorsTheme.onSurface,
           ),
         ),
         const SizedBox(height: 5),
@@ -126,28 +124,28 @@ class TeacherField extends StatelessWidget {
           style: TextStyle(
             fontSize: 14.5,
             height: 1.45,
-            color: colorsTheme.primary,
+            color: colorsTheme.onSurface,
             fontFamily: monospace ? 'monospace' : null,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: colorsTheme.secondary, fontSize: 14),
+            hintStyle: TextStyle(
+              color: colorsTheme.onSurfaceVariant,
+              fontSize: 14,
+            ),
             filled: true,
-            fillColor: appSemanticColors.infoBackground,
+            fillColor: colorsTheme.surface,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 12,
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-              borderSide: BorderSide(color: appSemanticColors.infoForeground),
+              borderSide: BorderSide(color: colorsTheme.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-              borderSide: BorderSide(
-                color: appSemanticColors.infoForeground,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: colorsTheme.secondary, width: 2),
             ),
           ),
         ),
@@ -155,10 +153,7 @@ class TeacherField extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             helper!,
-            style: TextStyle(
-              fontSize: 12,
-              color: appSemanticColors.infoForeground,
-            ),
+            style: TextStyle(fontSize: 12, color: colorsTheme.onSurfaceVariant),
           ),
         ],
       ],
@@ -177,7 +172,6 @@ class TeacherCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColorScheme = context.colorScheme;
-    final appSemanticColors = context.messageColors;
 
     // El fondo lo pinta un Material, no la decoración del contenedor. Es lo
     // que permite meter dentro cosas que se pulsan —un ListTile, un
@@ -188,7 +182,7 @@ class TeacherCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          border: Border.all(color: appSemanticColors.infoForeground),
+          border: Border.all(color: appColorScheme.outlineVariant),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: Column(
@@ -203,7 +197,7 @@ class TeacherCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: appSemanticColors.infoForeground,
+                        color: appColorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -233,13 +227,9 @@ class TeacherAddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = context.messageColors;
-
     return OutlinedButton.icon(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: appSemanticColors.infoForeground,
-        side: BorderSide(color: appSemanticColors.infoForeground),
         minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.add, size: 18),
@@ -255,7 +245,6 @@ Future<bool> confirmDelete(
   String? detail,
 }) async {
   final appColorScheme = context.colorScheme;
-  final appSemanticColors = context.messageColors;
 
   final answer = await showDialog<bool>(
     context: context,
@@ -263,11 +252,11 @@ Future<bool> confirmDelete(
       backgroundColor: appColorScheme.surface,
       title: Text(
         '¿Borrar $what?',
-        style: TextStyle(color: appSemanticColors.infoForeground),
+        style: TextStyle(color: appColorScheme.onSurface),
       ),
       content: Text(
         detail ?? 'Esto no se puede deshacer una vez guardes la sección.',
-        style: TextStyle(color: appSemanticColors.infoForeground, height: 1.4),
+        style: TextStyle(color: appColorScheme.onSurface, height: 1.4),
       ),
       actions: [
         TextButton(
@@ -277,8 +266,8 @@ Future<bool> confirmDelete(
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: FilledButton.styleFrom(
-            backgroundColor: appSemanticColors.dangerBackground,
-            foregroundColor: appSemanticColors.dangerForeground,
+            backgroundColor: appColorScheme.error,
+            foregroundColor: appColorScheme.onError,
           ),
           child: const Text('Borrar'),
         ),
@@ -316,13 +305,14 @@ class TeacherListRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColorScheme = context.colorScheme;
     final appSemanticColors = context.messageColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: appSemanticColors.infoBackground,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-        border: Border.all(color: appSemanticColors.infoForeground),
+        border: Border.all(color: appColorScheme.outlineVariant),
       ),
       child: Column(
         children: [
@@ -354,8 +344,8 @@ class TeacherListRow extends StatelessWidget {
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: title.isEmpty
-                                    ? appSemanticColors.infoForeground
-                                    : appSemanticColors.infoForeground,
+                                    ? appColorScheme.onSurfaceVariant
+                                    : appColorScheme.onSurface,
                               ),
                             ),
                             if (subtitle.isNotEmpty)
@@ -365,7 +355,7 @@ class TeacherListRow extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 12.5,
-                                  color: appSemanticColors.infoForeground,
+                                  color: appColorScheme.onSurfaceVariant,
                                 ),
                               ),
                           ],
@@ -374,7 +364,7 @@ class TeacherListRow extends StatelessWidget {
                       if (onTap != null)
                         Icon(
                           Icons.chevron_right,
-                          color: appSemanticColors.infoForeground,
+                          color: appColorScheme.onSurfaceVariant,
                         ),
                     ],
                   ),
@@ -400,7 +390,7 @@ class TeacherListRow extends StatelessWidget {
               _RowAction(
                 icon: Icons.delete_outline,
                 label: 'Borrar $title',
-                color: appSemanticColors.dangerBackground,
+                color: appSemanticColors.dangerForeground,
                 onPressed: onDelete,
               ),
             ],
@@ -426,12 +416,11 @@ class _RowAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = context.messageColors;
     return IconButton(
       onPressed: onPressed,
       tooltip: label,
       iconSize: 20,
-      color: color ?? appSemanticColors.infoForeground,
+      color: color ?? context.colorScheme.onSurfaceVariant,
       constraints: const BoxConstraints(
         minWidth: AppMetrics.minTapTarget,
         minHeight: AppMetrics.minTapTarget,

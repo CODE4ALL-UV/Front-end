@@ -192,7 +192,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
-                        color: appSemanticColors.infoBackground,
+                        color: appSemanticColors.infoForeground,
                       ),
                     ),
                   ),

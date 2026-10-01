@@ -153,7 +153,7 @@ class DirectorNotice extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, size: 20, color: appColorScheme.surface),
+              Icon(icon, size: 20, color: appWarningTone.foreground),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -174,7 +174,7 @@ class DirectorNotice extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12.5,
                         height: 1.4,
-                        color: appSemanticColors.infoForeground,
+                        color: appColorScheme.onSurface,
                       ),
                     ),
                   ],
@@ -203,7 +203,7 @@ class DirectorEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = context.messageColors;
+    final appColorScheme = context.colorScheme;
 
     return Center(
       child: Padding(
@@ -213,7 +213,7 @@ class DirectorEmpty extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 44, color: appSemanticColors.infoBackground),
+              Icon(icon, size: 44, color: appColorScheme.onSurfaceVariant),
               const SizedBox(height: AppMetrics.gap),
               Text(
                 title,
@@ -221,7 +221,7 @@ class DirectorEmpty extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  color: appSemanticColors.infoBackground,
+                  color: appColorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
@@ -231,7 +231,7 @@ class DirectorEmpty extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.5,
-                  color: appSemanticColors.infoBackground,
+                  color: appColorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -255,6 +255,7 @@ class DirectorProblem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColorScheme = context.colorScheme;
     final appSemanticColors = context.messageColors;
 
     return Center(
@@ -266,7 +267,7 @@ class DirectorProblem extends StatelessWidget {
             Icon(
               Icons.cloud_off,
               size: 40,
-              color: appSemanticColors.dangerBackground,
+              color: appSemanticColors.dangerForeground,
             ),
             const SizedBox(height: AppMetrics.gap),
             Text(
@@ -275,15 +276,15 @@ class DirectorProblem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.5,
                 height: 1.45,
-                color: appSemanticColors.infoForeground,
+                color: appColorScheme.onSurface,
               ),
             ),
             const SizedBox(height: AppMetrics.sectionGap),
             FilledButton.icon(
               onPressed: onRetry,
               style: FilledButton.styleFrom(
-                backgroundColor: appSemanticColors.infoBackground,
-                foregroundColor: appSemanticColors.infoForeground,
+                backgroundColor: appColorScheme.secondary,
+                foregroundColor: appColorScheme.onSecondary,
                 minimumSize: const Size(0, AppMetrics.minTapTarget),
               ),
               icon: const Icon(Icons.refresh),

@@ -59,10 +59,18 @@ class AccessibilityToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final textScale = AccessibilityTextScaleScope.of(context);
     final appModuleTheme = context.moduleColors;
+    // Un tinte suave del color del módulo, y encima el texto que mejor se lea
+    // sobre ese tinte. Antes iba siempre en blanco sobre el color a medio
+    // transparentar y en el tema claro apenas se distinguía.
+    final background = Color.alphaBlend(
+      appModuleTheme.headerBackground.withValues(alpha: 0.14),
+      context.colorScheme.surface,
+    );
+    final foreground = AppContrast.onColor(background);
 
     return Container(
       width: double.infinity,
-      color: appModuleTheme.headerBackground.withValues(alpha: 0.4),
+      color: background,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Center(
         child: ConstrainedBox(
@@ -95,8 +103,7 @@ class AccessibilityToolbar extends StatelessWidget {
                         child: TextButton.icon(
                           onPressed: () => _toggleSpeech(context),
                           style: TextButton.styleFrom(
-                            backgroundColor: appModuleTheme.headerBackground
-                                .withValues(alpha: 0.3),
+                            backgroundColor: appModuleTheme.headerBackground,
                             foregroundColor: appModuleTheme.headerForeground,
                             minimumSize: const Size(
                               AppMetrics.minTapTarget,
@@ -132,6 +139,7 @@ class AccessibilityToolbar extends StatelessWidget {
               _TextScaleButton(
                 icon: Icons.text_decrease,
                 label: 'Reducir el tamaño del texto',
+                color: foreground,
                 onPressed: textScale.decrease,
               ),
               AnimatedBuilder(
@@ -149,7 +157,7 @@ class AccessibilityToolbar extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: appModuleTheme.headerForeground,
+                            color: foreground,
                           ),
                         ),
                       ),
@@ -160,6 +168,7 @@ class AccessibilityToolbar extends StatelessWidget {
               _TextScaleButton(
                 icon: Icons.text_increase,
                 label: 'Aumentar el tamaño del texto',
+                color: foreground,
                 onPressed: textScale.increase,
               ),
             ],
@@ -174,24 +183,24 @@ class _TextScaleButton extends StatelessWidget {
   const _TextScaleButton({
     required this.icon,
     required this.label,
+    required this.color,
     required this.onPressed,
   });
 
   final IconData icon;
   final String label;
+  final Color color;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final appModuleTheme = context.moduleColors;
-
     return Semantics(
       button: true,
       label: label,
       child: IconButton(
         onPressed: onPressed,
         icon: Icon(icon, size: 24),
-        color: appModuleTheme.headerForeground,
+        color: color,
         tooltip: label,
         constraints: const BoxConstraints(
           minWidth: AppMetrics.minTapTarget,

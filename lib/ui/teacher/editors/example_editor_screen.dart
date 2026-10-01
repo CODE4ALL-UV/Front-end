@@ -76,7 +76,6 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = context.messageColors;
 
     return EditorScaffold(
       title: 'Ejemplo comentado',
@@ -155,7 +154,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: appSemanticColors.infoForeground,
+                    color: context.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -165,7 +164,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
-                    color: appSemanticColors.infoForeground,
+                    color: context.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: AppMetrics.gap),
@@ -188,7 +187,7 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
                             });
                           }
                         },
-                        color: appSemanticColors.infoForeground,
+                        color: context.colorScheme.onSurfaceVariant,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(

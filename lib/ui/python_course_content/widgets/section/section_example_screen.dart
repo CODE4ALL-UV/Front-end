@@ -80,7 +80,7 @@ class SectionExampleScreen extends StatelessWidget {
               title: _example.title,
               subtitle: _example.description,
               icon: Icons.code,
-              color: appTheme.infoBackground,
+              color: appTheme.infoForeground,
             ),
           ),
           const SizedBox(height: AppMetrics.sectionGap),
@@ -173,7 +173,9 @@ class _OutputBlockState extends State<_OutputBlock> {
       decoration: BoxDecoration(
         color: appTheme.successBackground,
         borderRadius: BorderRadius.circular(12),
-        border: const Border(left: BorderSide(color: Colors.green, width: 4)),
+        border: Border(
+          left: BorderSide(color: appTheme.successForeground, width: 4),
+        ),
       ),
       child: Scrollbar(
         controller: _controller,

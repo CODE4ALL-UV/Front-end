@@ -93,12 +93,8 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
-
     if (_store.isLoading && !_store.isLoaded) {
-      return Center(
-        child: CircularProgressIndicator(color: appTheme.primaryColor),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (_store.problem != null) {
@@ -196,7 +192,7 @@ class _SectionCard extends StatelessWidget {
     final current = verdict;
     final appTheme = Theme.of(context);
     final appColorScheme = appTheme.colorScheme;
-    final appSemanticColors = appTheme.extension<MessageTheme>()!;
+    final appSemanticColors = context.messageColors;
 
     final (String label, IconData icon, Color tone) = current == null
         ? (
@@ -235,8 +231,9 @@ class _SectionCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
             border: Border.all(
               color: current == null || current.outdated || !current.isApproved
-                  ? tone.withValues(alpha: 0.45)
-                  : appSemanticColors.infoForeground,
+                  ? tone
+                  : appColorScheme.outline,
+              width: current == null || current.isApproved ? 1 : 1.6,
             ),
           ),
           child: Column(
@@ -253,7 +250,7 @@ class _SectionCard extends StatelessWidget {
                           'Módulo ${section.moduleNumber} · Sección ${section.number}',
                           style: TextStyle(
                             fontSize: 11.5,
-                            color: appSemanticColors.infoForeground,
+                            color: appColorScheme.onSurfaceVariant,
                           ),
                         ),
                         Text(
@@ -261,7 +258,7 @@ class _SectionCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: appSemanticColors.infoForeground,
+                            color: appColorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -278,15 +275,16 @@ class _SectionCard extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: appTheme.colorScheme.surface,
+                    color: appTheme.scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: appColorScheme.outlineVariant),
                   ),
                   child: Text(
                     current!.comment,
                     style: TextStyle(
                       fontSize: 12.5,
                       height: 1.45,
-                      color: appSemanticColors.infoForeground,
+                      color: appColorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -298,10 +296,6 @@ class _SectionCard extends StatelessWidget {
                     child: OutlinedButton.icon(
                       onPressed: onPreview,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: appSemanticColors.infoForeground,
-                        side: BorderSide(
-                          color: appSemanticColors.infoForeground,
-                        ),
                         minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.visibility_outlined, size: 18),
@@ -313,8 +307,8 @@ class _SectionCard extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: onJudge,
                       style: FilledButton.styleFrom(
-                        backgroundColor: appSemanticColors.infoBackground,
-                        foregroundColor: appSemanticColors.infoForeground,
+                        backgroundColor: appColorScheme.primary,
+                        foregroundColor: appColorScheme.onPrimary,
                         minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.fact_check_outlined, size: 18),
@@ -390,9 +384,8 @@ class _JudgeSheetState extends State<_JudgeSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context);
+    final appColorScheme = context.colorScheme;
     final appSemanticColors = context.messageColors;
-    //final appToneSucess = appTheme.tone(AppThemeTone.success);
     final appToneDanger = appSemanticColors.tone(MessageThemeTone.danger);
 
     return Padding(
@@ -412,7 +405,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
-                color: appSemanticColors.infoForeground,
+                color: appColorScheme.onSurface,
               ),
             ),
             const SizedBox(height: AppMetrics.sectionGap),
@@ -450,7 +443,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               onChanged: (_) => setState(() => _error = null),
               style: TextStyle(
                 fontSize: 14.5,
-                color: appSemanticColors.infoForeground,
+                color: appColorScheme.onSurface,
               ),
               decoration: InputDecoration(
                 labelText: _approved
@@ -459,14 +452,16 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                 hintText: _approved
                     ? 'Puedes dejarlo vacío'
                     : 'Explica qué está mal para que pueda arreglarlo',
-                hintStyle: TextStyle(color: appSemanticColors.infoForeground),
+                hintStyle: TextStyle(color: appColorScheme.onSurfaceVariant),
                 filled: true,
-                fillColor: appTheme.colorScheme.surface,
+                fillColor: appColorScheme.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-                  borderSide: BorderSide(
-                    color: appSemanticColors.infoForeground,
-                  ),
+                  borderSide: BorderSide(color: appColorScheme.outline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
+                  borderSide: BorderSide(color: appColorScheme.outline),
                 ),
               ),
             ),
@@ -498,8 +493,8 @@ class _JudgeSheetState extends State<_JudgeSheet> {
                   child: FilledButton(
                     onPressed: _saving ? null : _save,
                     style: FilledButton.styleFrom(
-                      backgroundColor: appSemanticColors.infoForeground,
-                      foregroundColor: appSemanticColors.dangerForeground,
+                      backgroundColor: appColorScheme.primary,
+                      foregroundColor: appColorScheme.onPrimary,
                       minimumSize: const Size(0, AppMetrics.minTapTarget),
                     ),
                     child: Text(_saving ? 'Guardando…' : 'Guardar'),
@@ -530,7 +525,9 @@ class _Choice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColorScheme = context.colorScheme;
-    final appSemanticColors = context.messageColors;
+    // El secundario se lee como texto en los seis temas; el primario no en
+    // el oscuro, donde es el gris de la barra.
+    final chosen = appColorScheme.secondary;
 
     return Semantics(
       button: true,
@@ -539,7 +536,7 @@ class _Choice extends StatelessWidget {
       child: ExcludeSemantics(
         child: Material(
           color: selected
-              ? appSemanticColors.infoForeground.withValues(alpha: 0.12)
+              ? chosen.withValues(alpha: 0.12)
               : appColorScheme.surface,
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           child: InkWell(
@@ -553,10 +550,8 @@ class _Choice extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 border: Border.all(
-                  color: selected
-                      ? appColorScheme.primary
-                      : appSemanticColors.infoForeground,
-                  width: selected ? 1.8 : 1,
+                  color: selected ? chosen : appColorScheme.outline,
+                  width: selected ? 2.2 : 1,
                 ),
               ),
               child: Column(
@@ -565,9 +560,7 @@ class _Choice extends StatelessWidget {
                   Icon(
                     icon,
                     size: 22,
-                    color: selected
-                        ? appColorScheme.primary
-                        : appSemanticColors.infoForeground,
+                    color: selected ? chosen : appColorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(height: 5),
                   Text(
@@ -576,9 +569,7 @@ class _Choice extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                      color: selected
-                          ? appColorScheme.primary
-                          : appSemanticColors.infoForeground,
+                      color: selected ? chosen : appColorScheme.onSurface,
                     ),
                   ),
                 ],

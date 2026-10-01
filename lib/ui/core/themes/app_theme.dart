@@ -15,15 +15,27 @@ class AppBreakpoints {
 ///         context.moduleTheme
 ///         context.codeConsoleTheme
 ///         context.activityColors
+///
+/// Si el tema activo no trae alguna extensión —un `Theme` anidado, un diálogo
+/// con su propio tema o una prueba con `MaterialApp()` a secas— se usan los
+/// colores del tema claro. Con `!` la pantalla entera se rompía.
 extension AppThemeContext on BuildContext {
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
-  ModuleTheme get moduleColors => Theme.of(this).extension<ModuleTheme>()!;
+  ModuleTheme get moduleColors =>
+      Theme.of(this).extension<ModuleTheme>() ??
+      _fallbackTheme.extension<ModuleTheme>()!;
   CodeConsoleTheme get codeConsoleTheme =>
-      Theme.of(this).extension<CodeConsoleTheme>()!;
+      Theme.of(this).extension<CodeConsoleTheme>() ??
+      _fallbackTheme.extension<CodeConsoleTheme>()!;
   ActivityTheme get activityColors =>
-      Theme.of(this).extension<ActivityTheme>()!;
-  MessageTheme get messageColors => Theme.of(this).extension<MessageTheme>()!;
+      Theme.of(this).extension<ActivityTheme>() ??
+      _fallbackTheme.extension<ActivityTheme>()!;
+  MessageTheme get messageColors =>
+      Theme.of(this).extension<MessageTheme>() ??
+      _fallbackTheme.extension<MessageTheme>()!;
 }
+
+final ThemeData _fallbackTheme = AppTheme.getTheme(mode: AppThemeMode.light);
 
 /*
   APP THEME
@@ -136,6 +148,49 @@ enum AppThemeMode {
   tritanopia, // Deficiencia Azul-Amarillo (Rojo/Rosa y Cian/Verde)
 }
 
+/// Cuentas de contraste (WCAG 2.1) para elegir colores que se puedan leer.
+///
+/// Los temas son para personas con baja visión o con daltonismo: un color que
+/// no contrasta deja fuera justo a quien eligió ese tema. Con esto los colores
+/// que se calculan al vuelo —los de cada módulo, por ejemplo— salen legibles
+/// sin tener que probar a mano cada combinación.
+abstract final class AppContrast {
+  /// Mínimo para texto normal.
+  static const double text = 4.5;
+
+  /// Mínimo para iconos, bordes y piezas grandes.
+  static const double ui = 3.0;
+
+  static const Color _darkText = Color(0xFF1A1A1A);
+
+  /// Relación de contraste entre dos colores, de 1 a 21.
+  static double ratio(Color a, Color b) {
+    final la = a.computeLuminance();
+    final lb = b.computeLuminance();
+    final hi = la > lb ? la : lb;
+    final lo = la > lb ? lb : la;
+    return (hi + 0.05) / (lo + 0.05);
+  }
+
+  /// Blanco o casi negro: el que mejor se lea encima de [background].
+  static Color onColor(Color background) =>
+      ratio(Colors.white, background) >= ratio(_darkText, background)
+      ? Colors.white
+      : _darkText;
+
+  /// El mismo tono, oscurecido o aclarado lo justo para contrastar [min]
+  /// con [background].
+  static Color readableOn(Color color, Color background, double min) {
+    var hsl = HSLColor.fromColor(color);
+    final darken = background.computeLuminance() > 0.18;
+    for (var i = 0; i < 50 && ratio(hsl.toColor(), background) < min; i++) {
+      final next = hsl.lightness + (darken ? -0.02 : 0.02);
+      hsl = hsl.withLightness(next.clamp(0.0, 1.0));
+    }
+    return hsl.toColor();
+  }
+}
+
 class AppTheme {
   /// Ensambla un ThemeData completo a partir de los tokens visuales del tema.
   ///
@@ -143,17 +198,19 @@ class AppTheme {
   /// - brightness → Define la luminosidad base: Brightness.light o Brightness.dark.
   /// - scaffoldBackgroundColor → Color de fondo general de las pantallas.
   /// - colorScheme → Colores generales de Material 3 y base cromática de los componentes.
-  /// - moduleTheme → Colores específicos de lecciones y cursos.
   /// - codeConsoleTheme → Colores específicos de la consola/editor de Python.
-  /// - activityTheme → Colores semánticos para info, success, warning y danger.
+  /// - activityTheme → Colores de cada tipo de actividad.
+  /// - messageTheme → Colores semánticos para info, success, warning y danger.
   ///
-  /// Los valores recibidos se aplican a ThemeData, sus temas de componentes y
-  /// sus ThemeExtension personalizadas.
+  /// Los colores de cada módulo (ModuleTheme) no se pasan: se calculan a
+  /// partir del módulo activo y del modo, en ModuleTheme.fromModule.
+  ///
+  /// Ningún texto lleva un color fijo: todos salen del colorScheme. Un negro
+  /// fijo se ve bien en el tema claro y desaparece en el oscuro.
   static ThemeData _buildTheme({
     required Brightness brightness,
     required Color scaffoldBackgroundColor,
     required ColorScheme colorScheme,
-    required ModuleTheme moduleTheme,
     required CodeConsoleTheme codeConsoleTheme,
     required ActivityTheme activityTheme,
     required MessageTheme messageTheme,
@@ -164,6 +221,18 @@ class AppTheme {
     final baseTextTheme = baseTheme.textTheme;
     // Generación dinámica de ModuleTheme pasando el módulo y el modo activo
     final moduleTheme = ModuleTheme.fromModule(currentModuleId, themeMode);
+
+    // En el tema oscuro el color principal es el gris de la barra superior:
+    // como color de texto o de casilla marcada no se vería sobre el fondo.
+    // Ahí los componentes que pintan sobre la superficie usan el secundario.
+    final accent =
+        AppContrast.ratio(colorScheme.primary, colorScheme.surface) >=
+            AppContrast.text
+        ? colorScheme.primary
+        : colorScheme.secondary;
+    final onAccent = accent == colorScheme.primary
+        ? colorScheme.onPrimary
+        : colorScheme.onSecondary;
 
     return baseTheme.copyWith(
       colorScheme: colorScheme,
@@ -183,9 +252,11 @@ class AppTheme {
             bodyLarge: baseTextTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurface,
             ),
-            bodyMedium: baseTextTheme.bodyMedium?.copyWith(color: Colors.black),
+            bodyMedium: baseTextTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
+            ),
             bodySmall: baseTextTheme.bodySmall?.copyWith(
-              color: Colors.black,
+              color: colorScheme.onSurfaceVariant,
               fontSize: 12, // Aseguramos un tamaño legible para textos de apoyo
             ),
             labelLarge: baseTextTheme.labelLarge?.copyWith(
@@ -208,24 +279,16 @@ class AppTheme {
               .onPrimary, // Solo pisamos el color, hereda todo lo demás
         ),
       ),
-      // bottomAppBarTheme: BottomAppBarThemeData(
-      //   color: colorScheme.primary,
-      //   elevation: 8.0,
-      //   height: 56.0,
-      //   padding: const EdgeInsets.symmetric(vertical: 1.0),
-      //   shadowColor: const Color(0x14000000),
-      //   surfaceTintColor: colorScheme.onPrimary,
-      // ),
       cardTheme: CardThemeData(
         color: colorScheme.surface,
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: Color(0xFFE0E0E0)),
+          side: BorderSide(color: colorScheme.outlineVariant),
         ),
         shadowColor: const Color(0x14000000),
       ),
-      splashColor: colorScheme.primary.withValues(alpha: 0.15),
+      splashColor: accent.withValues(alpha: 0.15),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: colorScheme.secondary,
         foregroundColor: colorScheme.onSecondary,
@@ -246,15 +309,20 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: colorScheme.surface,
-        labelStyle: TextStyle(color: Colors.black),
-        hintStyle: TextStyle(color: Colors.black),
+        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+        floatingLabelStyle: TextStyle(color: accent),
+        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: moduleTheme.lessonCardBorder),
+          borderSide: BorderSide(color: colorScheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: colorScheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -287,7 +355,7 @@ class AppTheme {
           fontWeight: FontWeight.bold,
         ),
         contentTextStyle: baseTextTheme.bodyMedium?.copyWith(
-          color: Colors.black,
+          color: colorScheme.onSurface,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppMetrics.dialogRadius),
@@ -295,6 +363,7 @@ class AppTheme {
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: colorScheme.secondary,
+        linearTrackColor: colorScheme.outlineVariant,
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith<Color?>(
@@ -307,6 +376,34 @@ class AppTheme {
               ? colorScheme.secondary.withValues(alpha: 0.5)
               : null,
         ),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith<Color?>(
+          (states) => states.contains(WidgetState.selected) ? accent : null,
+        ),
+        checkColor: WidgetStatePropertyAll(onAccent),
+      ),
+      chipTheme: ChipThemeData(
+        selectedColor: accent.withValues(alpha: 0.18),
+        checkmarkColor: colorScheme.onSurface,
+        labelStyle: TextStyle(color: colorScheme.onSurface),
+        side: BorderSide(color: colorScheme.outline),
+      ),
+      listTileTheme: ListTileThemeData(
+        selectedColor: accent,
+        iconColor: colorScheme.onSurface,
+        textColor: colorScheme.onSurface,
+      ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: colorScheme.onPrimary,
+        unselectedLabelColor: colorScheme.onPrimary.withValues(alpha: 0.78),
+        indicatorColor: colorScheme.onPrimary,
+        dividerColor: Colors.transparent,
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: accent,
+        selectionColor: accent.withValues(alpha: 0.3),
+        selectionHandleColor: accent,
       ),
       extensions: [moduleTheme, codeConsoleTheme, activityTheme, messageTheme],
     );
@@ -321,70 +418,59 @@ class AppTheme {
           colorScheme: const ColorScheme.light(
             primary: Color(0xFFC62828), // Rojo Univalle
             onPrimary: Colors.white,
-            secondary: Color(0xFF4B8BBE), // Azul Python
+            // Azul Python oscuro: el claro (4B8BBE) no llegaba a 4,5:1 y es
+            // el color de los botones de texto.
+            secondary: Color(0xFF306998),
             onSecondary: Colors.white,
             tertiary: Color(0xFFFFD43B), // Amarillo Python
             onTertiary: Color(0xFF212121),
             surface: Colors.white,
             onSurface: Color(0xFF212121),
+            onSurfaceVariant: Color(0xFF4F4F4F),
+            outline: Color(0xFF757575),
+            outlineVariant: Color(0xFFE0E0E0),
             error: Color(0xFFD32F2F),
             onError: Colors.white,
-          ),
-          moduleTheme: const ModuleTheme(
-            headerBackground: Color(0xFF1565C0),
-            headerIconBackground: Color(0xFF1E88E5),
-            headerForeground: Color(0xFFF3E5F5),
-            chapterIconColor1: Color(0xFF1976D2), // OK
-            chapterIconBackgroundColor1: Color(0xFFE3F2FD), // OK
-            chapterIconColor2: Color(0xFF7B1FA2), // OK
-            chapterIconBackgroundColor2: Color(0xFFF3E5F5), //
-            chapterIconColor3: Color(0xFF5C6BC0), // OK
-            chapterIconBackgroundColor3: Color(0xFFE8EAF6), //
-            lessonCardBackground: Colors.white,
-            lessonCardBorder: Color(0xFFE3ECF7),
-            lessonCardText: Color(0xFF263238),
-            lessonCardNumber: Color(0xFFFFFFFF),
-            lessonCardNumberBackground: Color(0xFF1E88E5),
-            progressTrackRemaining: Color(0xFFE8F5E9),
-            progressTrackFilled: Color(0xFFE0E0E0),
           ),
           codeConsoleTheme: const CodeConsoleTheme(
             background: Color(0xFFF8FBFF),
             border: Color(0xFFB0BEC5),
             text: Color(0xFF263238),
             prompt: Color(0xFF3776AB),
-            keyword: Color(0xFFD73A49),
+            keyword: Color(0xFFB31D28),
             string: Color(0xFF032F62),
-            comment: Color(0xFF6A737D),
-            error: Color(0xFFD32F2F),
+            comment: Color(0xFF5F6670),
+            error: Color(0xFFC62828),
           ),
+          // Fondo suave y texto oscuro del mismo tono: el texto siempre
+          // contrasta con su fondo y también suelto sobre blanco.
           messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE3F2FD),
-            infoForeground: Color(0xFF90CAF9),
+            infoForeground: Color(0xFF1565C0),
             successBackground: Color(0xFFE8F5E9),
-            successForeground: Color(0xFF66BB6A),
+            successForeground: Color(0xFF1B5E20),
             warningBackground: Color(0xFFFFF3E0),
-            warningForeground: Color(0xFFFFB74D),
+            warningForeground: Color(0xFF8A5000),
             dangerBackground: Color(0xFFFFEBEE),
-            dangerForeground: Color(0xFFEF5350),
+            dangerForeground: Color(0xFFC62828),
           ),
           activityTheme: const ActivityTheme(
             readingBackground: Color(0xFFF8F8FF),
             readingForeground: Color(0xFF382983),
             nuggetBackground: Color(0xFFFFFFF0),
-            nuggetForeground: Color(0xFF75B313),
+            nuggetForeground: Color(0xFF4A7A0C),
             exampleBackground: Color(0xFFFFFAF0),
-            exampleForeground: Color(0xFFFFBF00),
+            exampleForeground: Color(0xFF8A5A00),
             exerciseBackground: Color(0xFFF0F8FF),
-            exerciseForeground: Color(0xFF8000FF),
+            exerciseForeground: Color(0xFF6A00D4),
             videoBackground: Color(0xFFFFF0F5),
             videoForeground: Color(0xFFA11C55),
             quizBackground: Color(0xFFFAF0E6),
             quizForeground: Color(0xFF591F0B),
             labBackground: Color(0xFFF5FFFA),
-            labForeground: Color(0xFF009C8C),
+            labForeground: Color(0xFF00796B),
             finalEvaluationBackground: Color(0xFFFFF5EE),
-            finalEvaluationForeground: Color(0xFFE95400),
+            finalEvaluationForeground: Color(0xFFB34000),
           ),
           themeMode: mode,
           currentModuleId: moduleId,
@@ -400,31 +486,14 @@ class AppTheme {
             secondary: Color(0xFF80CBC4),
             onSecondary: Color(0xFF003731),
             tertiary: Color(0xFFFFD43B), // Amarillo Python
-            onTertiary: Color(0xFFFFFFFF),
+            onTertiary: Color(0xFF212121),
             surface: Color(0xFF1E1E1E),
-            onSurface: Colors.white,
+            onSurface: Color(0xFFF1F1F1),
+            onSurfaceVariant: Color(0xFFBDBDBD),
+            outline: Color(0xFF8A8A8A),
+            outlineVariant: Color(0xFF3A3A3A),
             error: Color(0xFFEF9A9A),
             onError: Color(0xFF601410),
-          ),
-          moduleTheme: const ModuleTheme(
-            headerBackground: Color(0xFF0D47A1), // Azul más profundo
-            headerIconBackground: Color(0xFF1976D2),
-            headerForeground: Color(0xFFFFFFFF),
-            chapterIconColor1: Color(
-              0xFF64B5F6,
-            ), // Azul más claro para resaltar en oscuro
-            chapterIconBackgroundColor1: Color(0xFF0D47A1),
-            chapterIconColor2: Color(0xFFCE93D8), // Púrpura claro
-            chapterIconBackgroundColor2: Color(0xFF4A148C),
-            chapterIconColor3: Color(0xFF9FA8DA), // Índigo claro
-            chapterIconBackgroundColor3: Color(0xFF1A237E),
-            lessonCardBackground: Color(0xFF1E1E1E), // Gris oscuro
-            lessonCardBorder: Color(0xFF37474F), // Borde gris azulado oscuro
-            lessonCardText: Color(0xFFF8FAFC), // Texto casi blanco
-            lessonCardNumber: Color(0xFFFFFFFF),
-            lessonCardNumberBackground: Color(0xFF1976D2),
-            progressTrackRemaining: Color(0xFF263238),
-            progressTrackFilled: Color(0xFF42A5F5),
           ),
           codeConsoleTheme: const CodeConsoleTheme(
             background: Color(0xFF121212), // Fondo tipo IDE oscuro
@@ -435,74 +504,63 @@ class AppTheme {
             string: Color(
               0xFFA5D6A7,
             ), // Verde desaturado (típico de strings en dark mode)
-            comment: Color(0xFF78909C),
+            comment: Color(0xFF90A4AE),
             error: Color(0xFFEF5350),
           ),
+          // En oscuro el fondo es una tinta apagada y el texto el tono claro.
+          // Al revés —cajas claras sobre fondo negro— deslumbra.
           messageTheme: const MessageTheme(
             infoBackground: Color(0xFF0D2840),
-            infoForeground: Color(0xFF1976D2),
+            infoForeground: Color(0xFF90CAF9),
             successBackground: Color(0xFF103018),
-            successForeground: Color(0xFF66BB6A),
-            warningBackground: Color(0xFF3E2723),
-            warningForeground: Color(0xFFF57C00),
+            successForeground: Color(0xFFA5D6A7),
+            warningBackground: Color(0xFF3A2A12),
+            warningForeground: Color(0xFFFFCC80),
             dangerBackground: Color(0xFF3B1314),
-            dangerForeground: Color(0xFFD32F2F),
+            dangerForeground: Color(0xFFEF9A9A),
           ),
           activityTheme: const ActivityTheme(
-            readingBackground: Color(0xFFE3F2FD),
-            readingForeground: Color(0xFF90CAF9),
-            nuggetBackground: Color(0xFFFFFDE7),
-            nuggetForeground: Color(0xFFFFF176),
-            exampleBackground: Color(0xFFE1F5FE),
-            exampleForeground: Color(0xFF81D4FA),
-            exerciseBackground: Color(0xFFF3E5F5),
-            exerciseForeground: Color(0xFFBA68C8),
-            videoBackground: Color(0xFFE3F2FD),
-            videoForeground: Color(0xFF90CAF9),
-            quizBackground: Color(0xFFFFF3E0),
-            quizForeground: Color(0xFFFFB74D),
-            labBackground: Color(0xFFE8F5E9),
-            labForeground: Color(0xFFA5D6A7),
-            finalEvaluationBackground: Color(0xFFFFEBEE),
-            finalEvaluationForeground: Color(0xFFEF5350),
+            readingBackground: Color(0xFF221C38),
+            readingForeground: Color(0xFFB39DDB),
+            nuggetBackground: Color(0xFF22301A),
+            nuggetForeground: Color(0xFFC5E1A5),
+            exampleBackground: Color(0xFF332A12),
+            exampleForeground: Color(0xFFFFE082),
+            exerciseBackground: Color(0xFF2E1A33),
+            exerciseForeground: Color(0xFFCE93D8),
+            videoBackground: Color(0xFF361A26),
+            videoForeground: Color(0xFFF48FB1),
+            quizBackground: Color(0xFF2E2522),
+            quizForeground: Color(0xFFD7CCC8),
+            labBackground: Color(0xFF12302D),
+            labForeground: Color(0xFF80CBC4),
+            finalEvaluationBackground: Color(0xFF3A2217),
+            finalEvaluationForeground: Color(0xFFFFAB91),
           ),
           themeMode: mode,
           currentModuleId: moduleId,
         );
 
       case AppThemeMode.achromatopsia:
+        // Escala de grises de verdad: ni un solo tono. Los avisos y las
+        // actividades se distinguen por su icono y su texto, no por el color.
         return _buildTheme(
           brightness: Brightness.light,
           scaffoldBackgroundColor: const Color(0xFFFAFAFA),
           colorScheme: const ColorScheme.light(
-            primary: Color(0xFF000000),
+            primary: Color(0xFF212121),
             onPrimary: Colors.white,
             secondary: Color(0xFF424242),
             onSecondary: Colors.white,
-            tertiary: Color(0xFFFFD43B), // Amarillo Python
+            tertiary: Color(0xFFE0E0E0),
             onTertiary: Color(0xFF212121),
             surface: Colors.white,
             onSurface: Color(0xFF000000),
+            onSurfaceVariant: Color(0xFF424242),
+            outline: Color(0xFF616161),
+            outlineVariant: Color(0xFFBDBDBD),
             error: Color(0xFF000000),
             onError: Colors.white,
-          ),
-          moduleTheme: const ModuleTheme(
-            headerBackground: Color(0xFF212121), // Gris casi negro
-            headerIconBackground: Color(0xFF424242), // Gris medio
-            headerForeground: Color(0xFFFFFFFF),
-            chapterIconColor1: Color(0xFF424242),
-            chapterIconBackgroundColor1: Color(0xFFE0E0E0),
-            chapterIconColor2: Color(0xFF616161),
-            chapterIconBackgroundColor2: Color(0xFFEEEEEE),
-            chapterIconColor3: Color(0xFF757575),
-            chapterIconBackgroundColor3: Color(0xFFF5F5F5),
-            lessonCardBackground: Colors.white,
-            lessonCardBorder: Color(0xFFBDBDBD),
-            lessonCardText: Color(0xFF212121),
-            lessonCardNumber: Color(0xFFFFFFFF),
-            lessonCardNumberBackground: Color(0xFF424242),
-            progressTrackRemaining: Color(0xFFEEEEEE),
-            progressTrackFilled: Color(0xFF424242),
           ),
           codeConsoleTheme: const CodeConsoleTheme(
             background: Color(0xFFF5F5F5),
@@ -510,288 +568,226 @@ class AppTheme {
             text: Color(0xFF212121),
             prompt: Color(0xFF424242),
             keyword: Color(0xFF000000), // Negro fuerte para destacar
-            string: Color(0xFF616161),
-            comment: Color(0xFF9E9E9E),
+            string: Color(0xFF545454),
+            comment: Color(0xFF616161),
             error: Color(
               0xFF000000,
             ), // En escala de grises, el error es negro puro
           ),
           messageTheme: const MessageTheme(
             infoBackground: Color(0xFFF5F5F5),
-            infoForeground: Color(0xFF9E9E9E),
+            infoForeground: Color(0xFF212121),
             successBackground: Color(0xFFEEEEEE),
-            successForeground: Color(0xFF757575),
+            successForeground: Color(0xFF1A1A1A),
             warningBackground: Color(0xFFE0E0E0),
-            warningForeground: Color(0xFF616161),
+            warningForeground: Color(0xFF000000),
             dangerBackground: Color(
-              0xFFBDBDBD,
+              0xFFD6D6D6,
             ), // Fondo más oscuro para alerta máxima
-            dangerForeground: Color(0xFF424242),
+            dangerForeground: Color(0xFF000000),
           ),
           activityTheme: const ActivityTheme(
-            readingBackground: Color(0xFFE3F2FD),
-            readingForeground: Color(0xFF90CAF9),
-            nuggetBackground: Color(0xFFFFFDE7),
-            nuggetForeground: Color(0xFFFFF176),
-            exampleBackground: Color(0xFFE1F5FE),
-            exampleForeground: Color(0xFF81D4FA),
-            exerciseBackground: Color(0xFFF3E5F5),
-            exerciseForeground: Color(0xFFBA68C8),
-            videoBackground: Color(0xFFE3F2FD),
-            videoForeground: Color(0xFF90CAF9),
-            quizBackground: Color(0xFFFFF3E0),
-            quizForeground: Color(0xFFFFB74D),
-            labBackground: Color(0xFFE8F5E9),
-            labForeground: Color(0xFFA5D6A7),
-            finalEvaluationBackground: Color(0xFFFFEBEE),
-            finalEvaluationForeground: Color(0xFFEF5350),
+            readingBackground: Color(0xFFF5F5F5),
+            readingForeground: Color(0xFF212121),
+            nuggetBackground: Color(0xFFF2F2F2),
+            nuggetForeground: Color(0xFF303030),
+            exampleBackground: Color(0xFFEFEFEF),
+            exampleForeground: Color(0xFF3A3A3A),
+            exerciseBackground: Color(0xFFF5F5F5),
+            exerciseForeground: Color(0xFF424242),
+            videoBackground: Color(0xFFEEEEEE),
+            videoForeground: Color(0xFF2B2B2B),
+            quizBackground: Color(0xFFF0F0F0),
+            quizForeground: Color(0xFF353535),
+            labBackground: Color(0xFFF2F2F2),
+            labForeground: Color(0xFF404040),
+            finalEvaluationBackground: Color(0xFFE8E8E8),
+            finalEvaluationForeground: Color(0xFF000000),
           ),
           themeMode: mode,
           currentModuleId: moduleId,
         );
 
       case AppThemeMode.deuteranopia:
+        // Sin verde: azules, naranjas y amarillos, que sí se distinguen.
         return _buildTheme(
           brightness: Brightness.light,
           scaffoldBackgroundColor: const Color(0xFFF4F6F9),
           colorScheme: const ColorScheme.light(
             primary: Color(0xFF0D47A1), // Azul profundo accesible
             onPrimary: Colors.white,
-            secondary: Color(0xFFF57F17), // Amarillo/Ámbar
-            onSecondary: Colors.black,
+            secondary: Color(0xFFB45309), // Ámbar oscuro, legible como texto
+            onSecondary: Colors.white,
             tertiary: Color(0xFFFFD43B), // Amarillo Python
             onTertiary: Color(0xFF212121),
             surface: Colors.white,
             onSurface: Color(0xFF0D1B2A),
+            onSurfaceVariant: Color(0xFF3D4A5C),
+            outline: Color(0xFF6B7785),
+            outlineVariant: Color(0xFFDCE3EC),
             error: Color(0xFFB71C1C),
             onError: Colors.white,
-          ),
-          moduleTheme: const ModuleTheme(
-            headerBackground: Color(0xFF0D47A1), // Azul profundo
-            headerIconBackground: Color(0xFF1976D2),
-            headerForeground: Color(0xFFFFFFFF),
-            chapterIconColor1: Color(0xFF1976D2),
-            chapterIconBackgroundColor1: Color(0xFFE3F2FD),
-            chapterIconColor2: Color(
-              0xFF1565C0,
-            ), // Púrpura reemplazado por un azul fuerte
-            chapterIconBackgroundColor2: Color(0xFFBBDEFB),
-            chapterIconColor3: Color(
-              0xFF0277BD,
-            ), // Índigo reemplazado por azul cielo
-            chapterIconBackgroundColor3: Color(0xFFE1F5FE),
-            lessonCardBackground: Colors.white,
-            lessonCardBorder: Color(0xFFE3ECF7),
-            lessonCardText: Color(0xFF263238),
-            lessonCardNumber: Color(0xFFFFFFFF),
-            lessonCardNumberBackground: Color(0xFF1976D2),
-            progressTrackRemaining: Color(0xFFE3F2FD),
-            progressTrackFilled: Color(0xFF0288D1),
           ),
           codeConsoleTheme: const CodeConsoleTheme(
             background: Color(0xFFF8FBFF),
             border: Color(0xFFB0BEC5),
             text: Color(0xFF263238),
             prompt: Color(0xFF3776AB),
-            keyword: Color(0xFFF57C00), // Rojo -> Naranja brillante
+            keyword: Color(0xFFB34700), // Rojo -> Naranja oscuro
             string: Color(0xFF032F62),
-            comment: Color(0xFF6A737D),
-            error: Color(0xFFE65100), // Rojo -> Naranja quemado muy oscuro
+            comment: Color(0xFF5F6670),
+            error: Color(0xFFBF360C), // Rojo -> Naranja quemado muy oscuro
           ),
           messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE3F2FD),
-            infoForeground: Color(0xFF90CAF9),
+            infoForeground: Color(0xFF0D47A1),
             successBackground: Color(0xFFE0F7FA), // Verde -> Cian claro
-            successForeground: Color(0xFF4DD0E1), // Cian
-            warningBackground: Color(0xFFFFF9C4),
-            warningForeground: Color(0xFFFBC02D),
+            successForeground: Color(0xFF00607A), // Cian oscuro
+            warningBackground: Color(0xFFFFF8E1),
+            warningForeground: Color(0xFF7A5200),
             dangerBackground: Color(0xFFFFEDE1),
-            dangerForeground: Color(0xFFFF9800),
+            dangerForeground: Color(0xFFA33B00),
           ),
-          activityTheme: const ActivityTheme(
-            readingBackground: Color(0xFFE3F2FD),
-            readingForeground: Color(0xFF90CAF9),
-            nuggetBackground: Color(0xFFFFFDE7),
-            nuggetForeground: Color(0xFFFFF176),
-            exampleBackground: Color(0xFFE1F5FE),
-            exampleForeground: Color(0xFF81D4FA),
-            exerciseBackground: Color(0xFFF3E5F5),
-            exerciseForeground: Color(0xFFBA68C8),
-            videoBackground: Color(0xFFE3F2FD),
-            videoForeground: Color(0xFF90CAF9),
-            quizBackground: Color(0xFFFFF3E0),
-            quizForeground: Color(0xFFFFB74D),
-            labBackground: Color(0xFFE8F5E9),
-            labForeground: Color(0xFFA5D6A7),
-            finalEvaluationBackground: Color(0xFFFFEBEE),
-            finalEvaluationForeground: Color(0xFFEF5350),
-          ),
+          activityTheme: _colorBlindActivities,
           themeMode: mode,
           currentModuleId: moduleId,
         );
 
       case AppThemeMode.protanopia:
+        // Sin rojo: azul profundo y dorado oscuro.
         return _buildTheme(
           brightness: Brightness.light,
           scaffoldBackgroundColor: const Color(0xFFF4F6F9),
           colorScheme: const ColorScheme.light(
             primary: Color(0xFF005B96), // Azul seguro
             onPrimary: Colors.white,
-            secondary: Color(0xFFFFC107), // Ámbar brillante
-            onSecondary: Colors.black,
+            // Dorado oscuro: el ámbar brillante (FFC107) escrito sobre
+            // blanco no se leía (1,6:1).
+            secondary: Color(0xFF7A5C00),
+            onSecondary: Colors.white,
             tertiary: Color(0xFFFFD43B), // Amarillo Python
             onTertiary: Color(0xFF212121),
             surface: Colors.white,
             onSurface: Color(0xFF1A252C),
+            onSurfaceVariant: Color(0xFF3D4A55),
+            outline: Color(0xFF6B7785),
+            outlineVariant: Color(0xFFDCE3EC),
             error: Color(0xFF8D021F),
             onError: Colors.white,
-          ),
-          moduleTheme: const ModuleTheme(
-            // La paleta azul se mantiene idéntica al Light Theme, ya que el azul es seguro
-            headerBackground: Color(0xFF1565C0),
-            headerIconBackground: Color(0xFF1E88E5),
-            headerForeground: Color(0xFFFFFFFF),
-            chapterIconColor1: Color(0xFF1976D2),
-            chapterIconBackgroundColor1: Color(0xFFE3F2FD),
-            chapterIconColor2: Color(0xFF8E24AA),
-            chapterIconBackgroundColor2: Color(0xFFF3E5F5),
-            chapterIconColor3: Color(0xFF5C6BC0),
-            chapterIconBackgroundColor3: Color(0xFFE8EAF6),
-            lessonCardBackground: Colors.white,
-            lessonCardBorder: Color(0xFFE3ECF7),
-            lessonCardText: Color(0xFF263238),
-            lessonCardNumber: Color(0xFFFFFFFF),
-            lessonCardNumberBackground: Color(0xFF1E88E5),
-            progressTrackRemaining: Color(0xFFE8EAF6),
-            progressTrackFilled: Color(0xFF3949AB),
           ),
           codeConsoleTheme: const CodeConsoleTheme(
             background: Color(0xFFF8FBFF),
             border: Color(0xFFB0BEC5),
             text: Color(0xFF263238),
             prompt: Color(0xFF3776AB),
-            keyword: Color(
-              0xFFFFB300,
-            ), // Rojo -> Ámbar brillante para ser visible
+            keyword: Color(0xFF7A5C00), // Rojo -> Dorado oscuro
             string: Color(0xFF032F62),
-            comment: Color(0xFF6A737D),
+            comment: Color(0xFF5F6670),
             error: Color(0xFF8E24AA), // Rojo oscuro -> Púrpura/Magenta fuerte
           ),
           messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE3F2FD),
-            infoForeground: Color(0xFF90CAF9),
+            infoForeground: Color(0xFF005B96),
             successBackground: Color(
               0xFFE0F2F1,
             ), // Verde -> Teal (verde-azulado)
-            successForeground: Color(0xFF4DB6AC),
-            warningBackground: Color(0xFFFFF3E0),
-            warningForeground: Color(0xFFFFB74D),
+            successForeground: Color(0xFF00695C),
+            warningBackground: Color(0xFFFFF8E1),
+            warningForeground: Color(0xFF7A5C00),
             dangerBackground: Color(0xFFF3E5F5), // Rojo -> Púrpura claro
-            dangerForeground: Color(0xFFBA68C8),
+            dangerForeground: Color(0xFF6A1B9A),
           ),
-          activityTheme: const ActivityTheme(
-            readingBackground: Color(0xFFE3F2FD),
-            readingForeground: Color(0xFF90CAF9),
-            nuggetBackground: Color(0xFFFFFDE7),
-            nuggetForeground: Color(0xFFFFF176),
-            exampleBackground: Color(0xFFE1F5FE),
-            exampleForeground: Color(0xFF81D4FA),
-            exerciseBackground: Color(0xFFF3E5F5),
-            exerciseForeground: Color(0xFFBA68C8),
-            videoBackground: Color(0xFFE3F2FD),
-            videoForeground: Color(0xFF90CAF9),
-            quizBackground: Color(0xFFFFF3E0),
-            quizForeground: Color(0xFFFFB74D),
-            labBackground: Color(0xFFE8F5E9),
-            labForeground: Color(0xFFA5D6A7),
-            finalEvaluationBackground: Color(0xFFFFEBEE),
-            finalEvaluationForeground: Color(0xFFEF5350),
-          ),
+          activityTheme: _colorBlindActivities,
           themeMode: mode,
           currentModuleId: moduleId,
         );
 
       case AppThemeMode.tritanopia:
+        // Sin azul ni amarillo: rosas, rojos y verdes azulados.
         return _buildTheme(
           brightness: Brightness.light,
           scaffoldBackgroundColor: const Color(0xFFFDF7F9),
           colorScheme: const ColorScheme.light(
             primary: Color(0xFF880E4F), // Rosa/Magenta profundo
             onPrimary: Colors.white,
-            secondary: Color(0xFF00838F), // Cian accesible
+            secondary: Color(0xFF00727C), // Cian oscuro accesible
             onSecondary: Colors.white,
-            tertiary: Color(0xFFFFD43B), // Amarillo Python
+            tertiary: Color(0xFFF48FB1), // Amarillo -> Rosa
             onTertiary: Color(0xFF212121),
             surface: Colors.white,
             onSurface: Color(0xFF2C001E),
+            onSurfaceVariant: Color(0xFF5A3D4C),
+            outline: Color(0xFF7D6470),
+            outlineVariant: Color(0xFFEBDDE3),
             error: Color(0xFFC62828),
             onError: Colors.white,
-          ),
-          moduleTheme: const ModuleTheme(
-            headerBackground: Color(0xFF00695C), // Azul -> Teal/Cian oscuro
-            headerIconBackground: Color(0xFF00897B),
-            headerForeground: Color(0xFFFFFFFF),
-            chapterIconColor1: Color(0xFF00897B),
-            chapterIconBackgroundColor1: Color(0xFFE0F2F1),
-            chapterIconColor2: Color(0xFFD32F2F), // Púrpura -> Rojo oscuro
-            chapterIconBackgroundColor2: Color(0xFFFFEBEE),
-            chapterIconColor3: Color(0xFFC2185B), // Índigo -> Rosa fuerte
-            chapterIconBackgroundColor3: Color(0xFFFCE4EC),
-            lessonCardBackground: Colors.white,
-            lessonCardBorder: Color(0xFFB2DFDB), // Borde teal claro
-            lessonCardText: Color(0xFF263238),
-            lessonCardNumber: Color(0xFFFFFFFF),
-            lessonCardNumberBackground: Color(0xFF00897B),
-            progressTrackRemaining: Color(0xFFE0F2F1),
-            progressTrackFilled: Color(0xFF00695C),
           ),
           codeConsoleTheme: const CodeConsoleTheme(
             background: Color(0xFFFAFAFA),
             border: Color(0xFFB0BEC5),
             text: Color(0xFF263238),
             prompt: Color(0xFF00695C), // Azul -> Teal
-            keyword: Color(0xFFD32F2F), // Rojo (Se mantiene, lo ven bien)
-            string: Color(0xFFC2185B), // Azul oscuro -> Rosa oscuro
-            comment: Color(0xFF9E9E9E),
+            keyword: Color(0xFFC62828), // Rojo (Se mantiene, lo ven bien)
+            string: Color(0xFFAD1457), // Azul oscuro -> Rosa oscuro
+            comment: Color(0xFF6E6E6E),
             error: Color(0xFFB71C1C), // Rojo muy oscuro
           ),
           messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE0F2F1), // Azul -> Teal claro
-            infoForeground: Color(0xFF4DB6AC),
-            successBackground: Color(
-              0xFFE8F5E9,
-            ), // Verde oscuro (lo ven como rojo/gris, es seguro si es oscuro)
-            successForeground: Color(0xFF66BB6A),
+            infoForeground: Color(0xFF00695C),
+            successBackground: Color(0xFFE8F5E9),
+            successForeground: Color(0xFF1B5E20),
             warningBackground: Color(
               0xFFFCE4EC,
             ), // Amarillo/Naranja -> Rosa pálido
-            warningForeground: Color(0xFFF06292),
+            warningForeground: Color(0xFFAD1457),
             dangerBackground: Color(0xFFFFEBEE),
-            dangerForeground: Color(0xFFE57373),
+            dangerForeground: Color(0xFFB71C1C),
           ),
           activityTheme: const ActivityTheme(
-            readingBackground: Color(0xFFE3F2FD),
-            readingForeground: Color(0xFF90CAF9),
-            nuggetBackground: Color(0xFFFFFDE7),
-            nuggetForeground: Color(0xFFFFF176),
-            exampleBackground: Color(0xFFE1F5FE),
-            exampleForeground: Color(0xFF81D4FA),
+            readingBackground: Color(0xFFE0F2F1),
+            readingForeground: Color(0xFF00695C),
+            nuggetBackground: Color(0xFFF1F8E9),
+            nuggetForeground: Color(0xFF33691E),
+            exampleBackground: Color(0xFFFCE4EC),
+            exampleForeground: Color(0xFFAD1457),
             exerciseBackground: Color(0xFFF3E5F5),
-            exerciseForeground: Color(0xFFBA68C8),
-            videoBackground: Color(0xFFE3F2FD),
-            videoForeground: Color(0xFF90CAF9),
-            quizBackground: Color(0xFFFFF3E0),
-            quizForeground: Color(0xFFFFB74D),
-            labBackground: Color(0xFFE8F5E9),
-            labForeground: Color(0xFFA5D6A7),
-            finalEvaluationBackground: Color(0xFFFFEBEE),
-            finalEvaluationForeground: Color(0xFFEF5350),
+            exerciseForeground: Color(0xFF6A1B9A),
+            videoBackground: Color(0xFFFFEBEE),
+            videoForeground: Color(0xFFC62828),
+            quizBackground: Color(0xFFEFEBE9),
+            quizForeground: Color(0xFF5D4037),
+            labBackground: Color(0xFFE0F2F1),
+            labForeground: Color(0xFF00796B),
+            finalEvaluationBackground: Color(0xFFFBE9E7),
+            finalEvaluationForeground: Color(0xFFB71C1C),
           ),
           themeMode: mode,
           currentModuleId: moduleId,
         );
     }
   }
+
+  /// Actividades para protanopía y deuteranopía: las dos confunden rojo y
+  /// verde, así que se apoyan en azules, morados, ocres y marrones.
+  static const ActivityTheme _colorBlindActivities = ActivityTheme(
+    readingBackground: Color(0xFFE8EAF6),
+    readingForeground: Color(0xFF1A237E),
+    nuggetBackground: Color(0xFFFFFDE7),
+    nuggetForeground: Color(0xFF5D4A00),
+    exampleBackground: Color(0xFFFFF3E0),
+    exampleForeground: Color(0xFF8A4B00),
+    exerciseBackground: Color(0xFFF3E5F5),
+    exerciseForeground: Color(0xFF4A148C),
+    videoBackground: Color(0xFFFCE4EC),
+    videoForeground: Color(0xFF880E4F),
+    quizBackground: Color(0xFFEFEBE9),
+    quizForeground: Color(0xFF4E342E),
+    labBackground: Color(0xFFE1F5FE),
+    labForeground: Color(0xFF01579B),
+    finalEvaluationBackground: Color(0xFFFBE9E7),
+    finalEvaluationForeground: Color(0xFFA33B00),
+  );
 
   /// Mapas de resaltado de sintaxis para el editor/consola.
   /// Ideales para usar con paquetes como flutter_highlight.

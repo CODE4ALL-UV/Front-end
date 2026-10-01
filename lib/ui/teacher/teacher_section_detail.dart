@@ -3,6 +3,7 @@ import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/chapter_section_screen.dart';
 import 'course_section_edits.dart';
@@ -174,12 +175,13 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
 
   void _toast(String message, {bool ok = false}) {
     final appTheme = context.messageColors;
+    final tone = appTheme.tone(
+      ok ? MessageThemeTone.success : MessageThemeTone.danger,
+    );
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: ok
-            ? appTheme.successBackground
-            : appTheme.dangerBackground,
+        content: Text(message, style: TextStyle(color: tone.foreground)),
+        backgroundColor: tone.background,
       ),
     );
   }
@@ -208,7 +210,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = context.messageColors;
+    final appColorScheme = context.colorScheme;
     final section = _current;
     final edited = _content.isSectionEdited(section.id);
 
@@ -236,7 +238,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
-                            color: appSemanticColors.infoForeground,
+                            color: appColorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: AppMetrics.gap),
@@ -264,17 +266,16 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
 
   Widget _header(bool edited) {
     final appColorScheme = context.colorScheme;
-    final appSemanticColors = context.messageColors;
     final where = Text(
       'Módulo ${widget.moduleNumber} · Sección ${widget.sectionNumber}',
-      style: TextStyle(fontSize: 12.5, color: appSemanticColors.infoForeground),
+      style: TextStyle(fontSize: 12.5, color: appColorScheme.onSurfaceVariant),
     );
 
     final badge = edited
         ? Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: appColorScheme.surface,
+              color: appColorScheme.secondary,
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
             ),
             child: Text(
@@ -282,7 +283,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: appColorScheme.surface,
+                color: appColorScheme.onSecondary,
               ),
             ),
           )
@@ -291,7 +292,6 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
     final preview = TextButton.icon(
       onPressed: _previewAsStudent,
       style: TextButton.styleFrom(
-        foregroundColor: appColorScheme.surface,
         minimumSize: const Size(0, AppMetrics.minTapTarget),
       ),
       icon: const Icon(Icons.visibility_outlined, size: 18),
@@ -362,12 +362,11 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   List<Widget> _activityCards(CourseSection section) {
-    final appColorScheme = context.colorScheme;
-    final appSemanticColors = context.messageColors;
+    final activityColors = context.activityColors;
     return [
       _ActivityCard(
         icon: Icons.menu_book,
-        color: appColorScheme.surface,
+        color: activityColors.readingForeground,
         title: 'Lectura',
         detail: section.reading == null
             ? 'Sin lectura'
@@ -383,7 +382,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.lightbulb_outline,
-        color: appSemanticColors.warningBackground,
+        color: activityColors.nuggetForeground,
         title: 'Cápsula de conocimiento',
         detail: section.capsule == null
             ? 'Sin cápsula'
@@ -398,7 +397,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.play_circle_outline,
-        color: appSemanticColors.dangerBackground,
+        color: activityColors.videoForeground,
         title: 'Videos',
         detail: section.videos.isEmpty
             ? 'Sin videos'
@@ -414,7 +413,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.quiz_outlined,
-        color: appSemanticColors.successBackground,
+        color: activityColors.quizForeground,
         title: 'Quiz',
         detail: section.quiz.isEmpty
             ? 'Sin preguntas'
@@ -433,7 +432,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.fact_check_outlined,
-        color: appSemanticColors.successBackground,
+        color: activityColors.finalEvaluationForeground,
         title: 'Evaluación final',
         detail: section.finalEvaluation.isEmpty
             ? 'Sin preguntas'
@@ -451,7 +450,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.code,
-        color: appSemanticColors.infoBackground,
+        color: activityColors.exampleForeground,
         title: 'Ejemplo comentado',
         detail: section.example == null
             ? 'Sin ejemplo'
@@ -466,7 +465,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       ),
       _ActivityCard(
         icon: Icons.edit_note,
-        color: appSemanticColors.warningBackground,
+        color: activityColors.exerciseForeground,
         title: 'Ejercicio',
         detail: section.exercise == null || section.exercise!.isEmpty
             ? 'Sin ejercicio'
@@ -496,9 +495,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: appColorScheme.surface,
-        border: Border(
-          top: BorderSide(color: appSemanticColors.infoForeground),
-        ),
+        border: Border(top: BorderSide(color: appColorScheme.outlineVariant)),
       ),
       child: SafeArea(
         top: false,
@@ -518,8 +515,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                   fontSize: 13,
                   fontWeight: changed ? FontWeight.w700 : FontWeight.w400,
                   color: changed
-                      ? appSemanticColors.warningBackground
-                      : appSemanticColors.infoForeground,
+                      ? appSemanticColors.warningForeground
+                      : appColorScheme.onSurfaceVariant,
                 ),
               ),
             );
@@ -528,8 +525,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                 ? TextButton(
                     onPressed: _saving ? null : _revert,
                     style: TextButton.styleFrom(
-                      backgroundColor: appSemanticColors.infoBackground,
-                      foregroundColor: appSemanticColors.dangerBackground,
+                      foregroundColor: appColorScheme.error,
                       minimumSize: const Size(0, AppMetrics.minTapTarget),
                     ),
                     child: const Text('Volver al original'),
@@ -539,8 +535,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
             final save = FilledButton.icon(
               onPressed: (_saving || !changed) ? null : _save,
               style: FilledButton.styleFrom(
-                backgroundColor: appSemanticColors.infoBackground,
-                foregroundColor: appSemanticColors.successBackground,
+                backgroundColor: appColorScheme.primary,
+                foregroundColor: appColorScheme.onPrimary,
                 minimumSize: const Size(0, AppMetrics.minTapTarget),
               ),
               icon: const Icon(Icons.save_outlined, size: 18),
@@ -604,7 +600,6 @@ class _ActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColorScheme = context.colorScheme;
-    final appSemanticColors = context.messageColors;
     return Semantics(
       button: true,
       label: '$title. $detail. Toca para editar.',
@@ -623,7 +618,7 @@ class _ActivityCard extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
-                  border: Border.all(color: appSemanticColors.infoForeground),
+                  border: Border.all(color: appColorScheme.outlineVariant),
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 ),
                 child: Row(
@@ -631,7 +626,7 @@ class _ActivityCard extends StatelessWidget {
                     Icon(
                       icon,
                       size: 22,
-                      color: empty ? appSemanticColors.infoForeground : color,
+                      color: empty ? appColorScheme.onSurfaceVariant : color,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -644,14 +639,14 @@ class _ActivityCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w700,
-                              color: appSemanticColors.infoForeground,
+                              color: appColorScheme.onSurface,
                             ),
                           ),
                           Text(
                             detail,
                             style: TextStyle(
                               fontSize: 12.5,
-                              color: appSemanticColors.infoForeground,
+                              color: appColorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -659,7 +654,7 @@ class _ActivityCard extends StatelessWidget {
                     ),
                     Icon(
                       Icons.chevron_right,
-                      color: appSemanticColors.infoForeground,
+                      color: appColorScheme.onSurfaceVariant,
                     ),
                   ],
                 ),
@@ -682,7 +677,6 @@ class _LaboratoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColorScheme = context.colorScheme;
-    final appSemanticColors = context.messageColors;
     // El fondo va en el Material y no en la decoración: si no, el interruptor
     // pinta su pulsación por debajo y no se ve.
     return Material(
@@ -691,20 +685,19 @@ class _LaboratoryCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
         decoration: BoxDecoration(
-          border: Border.all(color: appSemanticColors.infoForeground),
+          border: Border.all(color: appColorScheme.outlineVariant),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: SwitchListTile(
           value: enabled,
           onChanged: onChanged,
           contentPadding: EdgeInsets.zero,
-          activeThumbColor: appSemanticColors.infoBackground,
           title: Text(
             'Laboratorio',
             style: TextStyle(
               fontSize: 14.5,
               fontWeight: FontWeight.w700,
-              color: appSemanticColors.infoForeground,
+              color: appColorScheme.onSurface,
             ),
           ),
           subtitle: Text(
@@ -713,7 +706,7 @@ class _LaboratoryCard extends StatelessWidget {
                 : 'Esta sección no ofrece laboratorio',
             style: TextStyle(
               fontSize: 12.5,
-              color: appSemanticColors.infoForeground,
+              color: appColorScheme.onSurfaceVariant,
             ),
           ),
         ),

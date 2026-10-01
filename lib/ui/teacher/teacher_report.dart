@@ -128,13 +128,12 @@ Future<void> showReportSheet(
   CourseAnalyticsStore stats,
 ) async {
   final appColorScheme = context.colorScheme;
-  final appSemanticColors = context.messageColors;
   final report = buildCourseReport(stats);
 
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: appSemanticColors.infoForeground,
+    backgroundColor: appColorScheme.surface,
     builder: (context) {
       return DraggableScrollableSheet(
         expand: false,
@@ -153,7 +152,7 @@ Future<void> showReportSheet(
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: appSemanticColors.infoForeground,
+                          color: appColorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -171,7 +170,7 @@ Future<void> showReportSheet(
                       },
                       style: FilledButton.styleFrom(
                         backgroundColor: appColorScheme.primary,
-                        foregroundColor: appSemanticColors.dangerForeground,
+                        foregroundColor: appColorScheme.onPrimary,
                         minimumSize: const Size(0, AppMetrics.minTapTarget),
                       ),
                       icon: const Icon(Icons.copy, size: 18),
@@ -180,7 +179,7 @@ Future<void> showReportSheet(
                   ],
                 ),
               ),
-              Divider(height: 1, color: appSemanticColors.infoForeground),
+              Divider(height: 1, color: appColorScheme.outlineVariant),
               Expanded(
                 child: SingleChildScrollView(
                   controller: controller,
@@ -191,7 +190,7 @@ Future<void> showReportSheet(
                       fontFamily: 'monospace',
                       fontSize: 12.5,
                       height: 1.5,
-                      color: appSemanticColors.infoForeground,
+                      color: appColorScheme.onSurface,
                     ),
                   ),
                 ),

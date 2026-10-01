@@ -185,7 +185,6 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
   }
 
   Future<void> _openInBrowser() async {
-    final appTheme = context.messageColors;
     if (_opening) return;
     setState(() => _opening = true);
 
@@ -198,20 +197,14 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
       opened
           ? 'Video abierto en tu navegador'
           : 'No se pudo abrir el video. Copia el enlace y ábrelo manualmente.',
-      opened
-          ? appTheme.tone(MessageThemeTone.success).background
-          : appTheme.tone(MessageThemeTone.danger).background,
+      opened ? MessageThemeTone.success : MessageThemeTone.danger,
     );
   }
 
   Future<void> _copyLink() async {
-    final appTheme = context.messageColors;
     await Clipboard.setData(ClipboardData(text: _video.url));
     if (!mounted) return;
-    _showMessage(
-      'Enlace copiado al portapapeles',
-      appTheme.tone(MessageThemeTone.info).background,
-    );
+    _showMessage('Enlace copiado al portapapeles', MessageThemeTone.success);
   }
 
   Future<void> _finish() async {
@@ -226,24 +219,27 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
   }
 
   /// Muestra el aviso en pantalla y lo anuncia por voz.
-  void _showMessage(String message, Color colorTone) {
+  void _showMessage(String message, MessageThemeTone tone) {
     announceForAccessibility(context, message);
+    final colors = context.messageColors.tone(tone);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
             Icon(
-              colorTone == colorTone
+              tone == MessageThemeTone.success
                   ? Icons.check_circle_outline
                   : Icons.error_outline,
-              color: Colors.white,
+              color: colors.foreground,
             ),
             const SizedBox(width: 10),
-            Expanded(child: Text(message)),
+            Expanded(
+              child: Text(message, style: TextStyle(color: colors.foreground)),
+            ),
           ],
         ),
-        backgroundColor: colorTone,
+        backgroundColor: colors.background,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 4),
       ),
@@ -296,14 +292,14 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
           ],
           SectionCard(
             background: appTheme.infoBackground,
-            borderColor: appTheme.infoBackground.withValues(alpha: 0.4),
+            borderColor: appTheme.infoForeground.withValues(alpha: 0.4),
             child: SectionHeading(
               title: _video.title,
               subtitle: _video.duration.isEmpty
                   ? _video.description
                   : '${_video.description}  ·  Duración ${_video.duration}',
               icon: Icons.ondemand_video_outlined,
-              color: appTheme.infoBackground,
+              color: appTheme.infoForeground,
             ),
           ),
           const SizedBox(height: AppMetrics.sectionGap),
@@ -379,7 +375,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
               Icon(
                 Icons.closed_caption,
                 size: 20,
-                color: appTheme.infoBackground,
+                color: appTheme.infoForeground,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -388,7 +384,7 @@ class _SectionVideoScreenState extends State<SectionVideoScreen> {
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w800,
-                    color: appTheme.infoBackground,
+                    color: appTheme.infoForeground,
                   ),
                 ),
               ),
@@ -596,7 +592,7 @@ class _VideoSelector extends StatelessWidget {
                   child: Material(
                     color: i == currentIndex
                         ? appTheme.infoBackground
-                        : appTheme.dangerForeground,
+                        : context.colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                     child: InkWell(
                       onTap: () => onSelected(i),
@@ -613,8 +609,8 @@ class _VideoSelector extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: i == currentIndex
-                                ? appTheme.infoBackground
-                                : appTheme.infoForeground,
+                                ? appTheme.infoForeground
+                                : context.colorScheme.outlineVariant,
                             width: i == currentIndex ? 1.8 : 1.2,
                           ),
                         ),
@@ -626,8 +622,8 @@ class _VideoSelector extends StatelessWidget {
                                   : Icons.play_circle_outline,
                               size: 24,
                               color: i == currentIndex
-                                  ? appTheme.infoBackground
-                                  : appTheme.infoForeground,
+                                  ? appTheme.infoForeground
+                                  : context.colorScheme.onSurfaceVariant,
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -639,7 +635,7 @@ class _VideoSelector extends StatelessWidget {
                                   fontWeight: i == currentIndex
                                       ? FontWeight.w800
                                       : FontWeight.w600,
-                                  color: appTheme.infoForeground,
+                                  color: context.colorScheme.onSurface,
                                 ),
                               ),
                             ),
@@ -649,7 +645,7 @@ class _VideoSelector extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w700,
-                                color: appTheme.infoForeground,
+                                color: context.colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],
@@ -741,7 +737,7 @@ class _CaptionControl extends StatelessWidget {
         onPressed: onPressed,
         icon: Icon(icon, size: 24),
         tooltip: label,
-        color: appTheme.infoBackground,
+        color: appTheme.infoForeground,
         disabledColor: appTheme.infoForeground.withValues(alpha: 0.5),
         constraints: const BoxConstraints(
           minWidth: AppMetrics.minTapTarget,

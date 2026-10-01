@@ -43,7 +43,6 @@ class _VideosEditorScreenState extends State<VideosEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.messageColors;
 
     return EditorScaffold(
       title: 'Videos',
@@ -75,7 +74,7 @@ class _VideosEditorScreenState extends State<VideosEditorScreen> {
                 leading: Icon(
                   Icons.play_circle_outline,
                   size: 22,
-                  color: appTheme.dangerForeground,
+                  color: context.activityColors.videoForeground,
                 ),
                 onTap: () => _edit(i),
                 onMoveUp: i == 0

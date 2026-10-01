@@ -41,7 +41,7 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
   factory ModuleTheme.fromModule(int moduleId, AppThemeMode themeMode) {
     final bool isDark = themeMode == AppThemeMode.dark;
 
-    // 1. Determinar Paleta Base o ADN según el Grupo de Módulos
+    // 1. Color propio de cada grupo de módulos.
     Color primaryColor;
 
     if (moduleId == 1 || moduleId == 2) {
@@ -54,41 +54,40 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
       // Módulo 5: Paleta Amarilla
       primaryColor = const Color(0xFFFFCA28);
     } else {
-      // Módulo 6 (y por defecto): Paleta Roja
-      primaryColor = const Color(0xFFE53935);
+      // Módulo 6 (y por defecto): Paleta Roja. C62828 y no E53935: con
+      // texto blanco el segundo se queda en 4,2:1.
+      primaryColor = const Color(0xFFC62828);
     }
 
-    // 2. Ajustes de Paleta según el Modo de Daltonismo o Tema Oscuro/Claro
+    // 2. Ajustes según el daltonismo: cada modo cambia los colores que no
+    // distingue y deja los demás.
     switch (themeMode) {
-      // Ajustes para vista en blanco y negro
       case AppThemeMode.achromatopsia:
         // Todos los módulos usan gris oscuro
         primaryColor = const Color(0xFF424242);
         break;
 
       case AppThemeMode.deuteranopia:
-        // Ajustes para baja sensibilidad al verde
-        if (moduleId == 3 && moduleId == 4) {
-          // Si entra al módulo verde, lo volvemos un ámbar/mostaza
+        // Baja sensibilidad al verde: el módulo verde pasa a ámbar.
+        if (moduleId == 3 || moduleId == 4) {
           primaryColor = const Color(0xFFFF8F00);
         }
         break;
 
       case AppThemeMode.protanopia:
-        // Ajustes para baja sensibilidad al rojo
+        // Baja sensibilidad al rojo: el módulo rojo pasa a azul.
         if (moduleId == 6) {
-          // Si entra al módulo rojo, lo volvemos un azul seguro
           primaryColor = const Color(0xFF0D47A1);
         }
         break;
 
       case AppThemeMode.tritanopia:
-        // Ajustes para baja sencibilidad al azul-amarillo
-        if (moduleId == 1 && moduleId == 2) {
+        // Baja sensibilidad al azul y al amarillo.
+        if (moduleId == 1 || moduleId == 2) {
           primaryColor = const Color(0xFFC2185B); // Rojo/Rosa accesible
         }
         if (moduleId == 5) {
-          primaryColor = const Color(0xFF2E7D32); // Verde/Cian accesible
+          primaryColor = const Color(0xFF2E7D32); // Verde accesible
         }
         break;
 
@@ -98,28 +97,53 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
         break;
     }
 
-    // 3. Ajustes de COLORES CONSTANTES (Dependen solo del Light/Dark/Theme)
-    // Aquí aplicas tu idea: cosas que NO cambian por el módulo, solo por el tema.
+    // En oscuro el mismo tono, pero apagado: un azul o un amarillo puros
+    // sobre fondo negro deslumbran.
+    if (isDark) {
+      final hsl = HSLColor.fromColor(primaryColor);
+      primaryColor = hsl
+          .withSaturation(hsl.saturation.clamp(0.0, 0.55))
+          .withLightness(hsl.lightness.clamp(0.0, 0.32))
+          .toColor();
+    }
+
+    // 3. Colores que solo dependen del modo claro u oscuro.
     final Color cardBackground = isDark
         ? const Color(0xFF1E1E1E)
         : Colors.white;
     final Color textColor = isDark ? Colors.white : const Color(0xFF212121);
 
-    // Iconos fijos (ejemplo: Capítulo 1 siempre es morado, Capítulo 2 siempre es naranja, etc.)
-    // Excepto si hay acromatopsia, que los volvemos grises.
-    final Color fixedIcon1 = themeMode == AppThemeMode.achromatopsia
-        ? Colors.grey
-        : const Color(0xFF8E24AA);
-    final Color fixedIcon2 = themeMode == AppThemeMode.achromatopsia
-        ? Colors.grey
-        : const Color(0xFF5C6BC0);
-    final Color fixedIcon3 = themeMode == AppThemeMode.achromatopsia
-        ? Colors.grey
-        : const Color(0xFF1976D2);
+    // Texto encima del color del módulo: blanco o casi negro, el que más
+    // contraste. Con el amarillo del módulo 5 el blanco no se leía.
+    final Color onPrimary = AppContrast.onColor(primaryColor);
+
+    // Iconos fijos de cada capítulo. En oscuro van en su versión clara para
+    // que se vean sobre el fondo, y en acromatopsia en gris.
+    final (Color, Color, Color) icons = switch (themeMode) {
+      AppThemeMode.achromatopsia => (
+        const Color(0xFF424242),
+        const Color(0xFF545454),
+        const Color(0xFF616161),
+      ),
+      AppThemeMode.dark => (
+        const Color(0xFFCE93D8),
+        const Color(0xFF9FA8DA),
+        const Color(0xFF90CAF9),
+      ),
+      AppThemeMode.tritanopia => (
+        const Color(0xFFAD1457),
+        const Color(0xFF00796B),
+        const Color(0xFF5D4037),
+      ),
+      _ => (
+        const Color(0xFF8E24AA),
+        const Color(0xFF5C6BC0),
+        const Color(0xFF1976D2),
+      ),
+    };
 
     // 4. Estructura del MOLDE FINAL (Combinando ADN y Constantes)
     return ModuleTheme(
-      // Dinámicos (Usan el ADN del módulo + el truco de withValues para ajustar la opacidad)
       headerBackground: primaryColor,
       headerIconBackground: isDark
           ? primaryColor.withValues(alpha: 0.5)
@@ -127,25 +151,25 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
       lessonCardBorder: primaryColor.withValues(alpha: 0.4),
       lessonCardNumberBackground: primaryColor,
       progressTrackRemaining: primaryColor.withValues(alpha: 0.1),
-      progressTrackFilled: primaryColor,
+      // La barra de progreso es lo único del color del módulo que va suelto
+      // sobre la tarjeta: se ajusta para que se vea (3:1).
+      progressTrackFilled: AppContrast.readableOn(
+        primaryColor,
+        cardBackground,
+        AppContrast.ui,
+      ),
 
-      // Estáticos (Dependen solo del tema/light/dark)
-      headerForeground: isDark
-          ? const Color(0xFF000000)
-          : const Color(0xFFFFFFFF),
+      headerForeground: onPrimary,
       lessonCardBackground: cardBackground,
       lessonCardText: textColor,
-      lessonCardNumber: isDark
-          ? const Color(0xFF000000)
-          : const Color(0xFFFFFFFF),
+      lessonCardNumber: onPrimary,
 
-      // Los íconos fijos de los capítulos que mencionaste
-      chapterIconColor1: fixedIcon1,
-      chapterIconBackgroundColor1: fixedIcon1.withValues(alpha: 0.15),
-      chapterIconColor2: fixedIcon2,
-      chapterIconBackgroundColor2: fixedIcon2.withValues(alpha: 0.15),
-      chapterIconColor3: fixedIcon3,
-      chapterIconBackgroundColor3: fixedIcon3.withValues(alpha: 0.15),
+      chapterIconColor1: icons.$1,
+      chapterIconBackgroundColor1: icons.$1.withValues(alpha: 0.15),
+      chapterIconColor2: icons.$2,
+      chapterIconBackgroundColor2: icons.$2.withValues(alpha: 0.15),
+      chapterIconColor3: icons.$3,
+      chapterIconBackgroundColor3: icons.$3.withValues(alpha: 0.15),
     );
   }
 

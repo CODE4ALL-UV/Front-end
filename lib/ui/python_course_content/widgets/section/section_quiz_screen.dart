@@ -357,8 +357,8 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                     ? Icons.emoji_events_outlined
                     : Icons.refresh_outlined,
                 color: _passed
-                    ? appTheme.successBackground
-                    : appTheme.warningBackground,
+                    ? appTheme.successForeground
+                    : appTheme.warningForeground,
               ),
               const SizedBox(height: 16),
               SectionProgressBar(

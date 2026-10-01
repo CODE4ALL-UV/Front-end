@@ -275,7 +275,7 @@ class _ActivityBanner extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
           decoration: BoxDecoration(
-            color: appModuleTheme.headerBackground.withValues(alpha: 0.6),
+            color: appModuleTheme.headerBackground,
             border: Border(
               bottom: BorderSide(color: appModuleTheme.headerForeground),
             ),

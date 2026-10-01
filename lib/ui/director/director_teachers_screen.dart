@@ -58,14 +58,8 @@ class _DirectorTeachersScreenState extends State<DirectorTeachersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = context.messageColors;
-
     if (_store.isLoading && !_store.isLoaded) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: appSemanticColors.infoBackground,
-        ),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (_store.problem != null) {
@@ -172,7 +166,7 @@ class _TeacherCard extends StatelessWidget {
                   border: Border.all(
                     color: needsFeedback
                         ? appSemanticColors.warningForeground
-                        : appSemanticColors.infoForeground,
+                        : appColorScheme.outline,
                     width: needsFeedback ? 1.6 : 1,
                   ),
                 ),
@@ -207,14 +201,14 @@ class _TeacherCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 15.5,
                                 fontWeight: FontWeight.w700,
-                                color: appSemanticColors.infoForeground,
+                                color: appColorScheme.onSurface,
                               ),
                             ),
                             Text(
                               teacher.email,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: appSemanticColors.infoForeground,
+                                color: appColorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],

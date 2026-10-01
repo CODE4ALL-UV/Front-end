@@ -65,7 +65,7 @@ class SectionHeading extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 22, color: colorTheme.onTertiary),
+            Icon(icon, size: 22, color: color ?? colorTheme.onSurface),
             const SizedBox(width: 10),
           ],
           Expanded(
@@ -78,7 +78,7 @@ class SectionHeading extends StatelessWidget {
                     fontSize: 19,
                     height: 1.3,
                     fontWeight: FontWeight.w700,
-                    color: colorTheme.onTertiary,
+                    color: colorTheme.onSurface,
                   ),
                 ),
                 if (subtitle != null && subtitle!.isNotEmpty) ...[
@@ -88,7 +88,7 @@ class SectionHeading extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15,
                       height: 1.5,
-                      color: colorTheme.onTertiary,
+                      color: colorTheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -150,7 +150,7 @@ class SectionList extends StatelessWidget {
                   height: 26,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: messageTheme.infoForeground,
+                    color: messageTheme.infoBackground,
                     shape: BoxShape.circle,
                   ),
                   child: numbered
@@ -159,13 +159,13 @@ class SectionList extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: colorTheme.onTertiary,
+                            color: messageTheme.infoForeground,
                           ),
                         )
                       : Icon(
                           Icons.circle,
                           size: 8,
-                          color: colorTheme.onTertiary,
+                          color: messageTheme.infoForeground,
                         ),
                 ),
                 const SizedBox(width: 12),
@@ -175,7 +175,7 @@ class SectionList extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15.5,
                       height: 1.55,
-                      color: colorTheme.onTertiary,
+                      color: colorTheme.onSurface,
                     ),
                   ),
                 ),
@@ -561,7 +561,7 @@ class SectionProgressBar extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
-                      color: colorTheme.onTertiary,
+                      color: colorTheme.onSurface,
                     ),
                   ),
                 ),
@@ -570,7 +570,7 @@ class SectionProgressBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
-                    color: colorTheme.onTertiary,
+                    color: colorTheme.onSurface,
                   ),
                 ),
               ],

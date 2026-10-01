@@ -138,14 +138,13 @@ class _Number extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.messageColors;
 
     return Container(
       width: 26,
       height: 26,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: appTheme.dangerForeground,
+        color: context.colorScheme.secondary,
         shape: BoxShape.circle,
       ),
       child: Text(
@@ -153,7 +152,7 @@ class _Number extends StatelessWidget {
         style: TextStyle(
           fontSize: 12.5,
           fontWeight: FontWeight.w800,
-          color: appTheme.dangerForeground,
+          color: context.colorScheme.onSecondary,
         ),
       ),
     );
@@ -283,7 +282,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                     'Marca el círculo de la respuesta correcta.',
                     style: TextStyle(
                       fontSize: 12.5,
-                      color: appSemanticColors.infoForeground,
+                      color: context.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: AppMetrics.gap),
@@ -298,7 +297,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                                 : 'Marcar la opción ${i + 1} como correcta',
                             child: Radio<int>(
                               value: i,
-                              activeColor: appSemanticColors.successBackground,
+                              activeColor: appSemanticColors.successForeground,
                             ),
                           ),
                           Expanded(
@@ -307,7 +306,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                               onChanged: (_) => setState(() => _error = null),
                               style: TextStyle(
                                 fontSize: 14.5,
-                                color: appSemanticColors.infoForeground,
+                                color: context.colorScheme.onSurface,
                               ),
                               decoration: InputDecoration(
                                 hintText: 'Opción ${i + 1}',
@@ -315,7 +314,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                                 filled: true,
                                 fillColor: _correct == i
                                     ? appSemanticColors.successBackground
-                                    : appSemanticColors.infoBackground,
+                                    : context.colorScheme.surface,
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 12,
@@ -323,7 +322,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: appSemanticColors.infoForeground,
+                                    color: context.colorScheme.outline,
                                   ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
@@ -331,7 +330,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                                   borderSide: BorderSide(
                                     color: _correct == i
                                         ? appSemanticColors.successForeground
-                                        : appSemanticColors.infoForeground,
+                                        : context.colorScheme.outline,
                                   ),
                                 ),
                               ),
@@ -340,7 +339,7 @@ class _QuestionEditorScreenState extends State<_QuestionEditorScreen> {
                           IconButton(
                             tooltip: 'Quitar la opción ${i + 1}',
                             onPressed: () => _removeOption(i),
-                            color: appSemanticColors.infoForeground,
+                            color: context.colorScheme.onSurfaceVariant,
                             constraints: const BoxConstraints(
                               minWidth: AppMetrics.minTapTarget,
                               minHeight: AppMetrics.minTapTarget,

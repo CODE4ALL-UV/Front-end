@@ -48,9 +48,16 @@ class ModuleHeaderWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
+          // Del color del módulo a un tono más hondo del mismo color. Con
+          // transparencia el lado izquierdo —donde va el texto— se aclaraba
+          // tanto que el blanco dejaba de leerse.
           colors: [
-            appModuleTheme.headerBackground.withValues(alpha: 0.7),
             appModuleTheme.headerBackground,
+            AppContrast.readableOn(
+              appModuleTheme.headerBackground,
+              appModuleTheme.headerForeground,
+              7,
+            ),
           ],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,

@@ -127,7 +127,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: appSemanticColors.infoForeground,
+                    color: context.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -137,7 +137,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
-                    color: appSemanticColors.infoForeground,
+                    color: context.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: AppMetrics.gap),
@@ -160,7 +160,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                             });
                           }
                         },
-                        color: appSemanticColors.infoForeground,
+                        color: context.colorScheme.onSurfaceVariant,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(
@@ -196,7 +196,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                       'Preguntas del ejercicio',
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: appSemanticColors.infoForeground,
+                        color: context.colorScheme.onSurface,
                       ),
                     ),
                     subtitle: Text(
@@ -204,11 +204,13 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                           ? 'Sin preguntas'
                           : '${_questions.length} '
                                 '${_questions.length == 1 ? "pregunta" : "preguntas"}',
-                      style: TextStyle(color: appSemanticColors.infoForeground),
+                      style: TextStyle(
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     trailing: Icon(
                       Icons.chevron_right,
-                      color: appSemanticColors.infoForeground,
+                      color: context.colorScheme.onSurfaceVariant,
                     ),
                     onTap: _editQuestions,
                   ),

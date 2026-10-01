@@ -101,7 +101,9 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
         children: [
           Container(
             width: double.infinity,
-            color: appModuleTheme.headerBackground.withValues(alpha: 0.6),
+            // Opaco: el texto de la cabecera contrasta con el color del
+            // módulo, no con ese color a medio transparentar.
+            color: appModuleTheme.headerBackground,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Text(
               widget.module.label,
@@ -194,7 +196,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
               style: TextStyle(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w700,
-                color: colorScheme.onTertiary,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 10),
@@ -347,7 +349,7 @@ class _ActivityTile extends StatelessWidget {
       child: ExcludeSemantics(
         child: Material(
           color: isCompleted
-              ? Colors.green.withValues(alpha: 0.1)
+              ? messageTheme.successBackground
               : colorScheme.tertiary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           child: InkWell(
@@ -362,8 +364,8 @@ class _ActivityTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 border: Border.all(
                   color: isCompleted
-                      ? messageTheme.successForeground.withValues(alpha: 0.55)
-                      : messageTheme.infoForeground,
+                      ? messageTheme.successForeground
+                      : colorScheme.outline,
                   width: isCompleted ? 1.8 : 1.2,
                 ),
               ),
@@ -404,7 +406,7 @@ class _ActivityTile extends StatelessWidget {
                           fontSize: 15.5,
                           height: 1.35,
                           fontWeight: FontWeight.w700,
-                          color: colorScheme.onTertiary,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -413,7 +415,7 @@ class _ActivityTile extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.5,
                           height: 1.45,
-                          color: colorScheme.onTertiary,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                       if (detail.isNotEmpty) ...[

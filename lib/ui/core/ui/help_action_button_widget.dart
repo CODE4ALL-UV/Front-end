@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
-import 'package:flutter_code4all/web_player_html.dart'; //Daniel Pruebas
-import 'package:flutter_code4all/web_player_html_2.dart'; //Daniel Pruebas
 import 'accessibility_settings_screen.dart';
 import 'accessibility_announcer_widget.dart';
 import 'accessibility_text_scale_widget.dart';
@@ -44,8 +42,6 @@ class _HelpActionButtonState extends State<HelpActionButton>
   final Map<String, List<Map<String, dynamic>>> categoryOptions = {
     'Ayuda': [
       {'icon': Icons.settings, 'label': 'Configuración'},
-      {'icon': Icons.assignment_late, 'label': 'Video prueba Daniel'},
-      {'icon': Icons.notifications_paused, 'label': 'Audio prueba Daniel'},
       {'icon': Icons.text_fields, 'label': 'Tamaño de texto'},
       {'icon': Icons.brightness_4, 'label': 'Modo visual'},
       {'icon': Icons.hearing, 'label': 'Asistencia auditiva'},
@@ -515,14 +511,6 @@ class _HelpActionButtonState extends State<HelpActionButton>
       _navigateToSettings();
       return;
     }
-    if (option == 'Video prueba Daniel') {
-      _navigateToVideoDaniel();
-      return;
-    }
-    if (option == 'Audio prueba Daniel') {
-      _navigateToAudioDaniel();
-      return;
-    }
     setState(() {
       _selectedOption = option;
     });
@@ -537,33 +525,6 @@ class _HelpActionButtonState extends State<HelpActionButton>
       Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute(
           builder: (context) => const AccessibilitySettingsScreen(),
-        ),
-      );
-    });
-  }
-
-  void _navigateToVideoDaniel() {
-    _hideOverlay();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).push(
-        MaterialPageRoute(
-          builder: (context) =>
-              const YoutubeIframeTestScreen(videoId: 'dQw4w9WgXcQ'),
-        ),
-      );
-    });
-  }
-
-  void _navigateToAudioDaniel() {
-    _hideOverlay();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).push(
-        MaterialPageRoute(
-          builder: (context) => const CustomAudioPlayerScreen(),
         ),
       );
     });

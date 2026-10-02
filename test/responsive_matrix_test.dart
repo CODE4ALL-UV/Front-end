@@ -48,8 +48,10 @@ import 'package:flutter_code4all/ui/teacher/teacher_course_screen.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_section_detail.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_stats_screen.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_students_screen.dart';
+import 'package:flutter_code4all/ui/users_management/widgets/forgot_password_screen.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/form_screen.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/login_screen.dart';
+import 'package:flutter_code4all/ui/users_management/widgets/reset_password_screen.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 
 /// Toda la aplicación, pantalla por pantalla, en los tamaños donde se usa.
@@ -373,6 +375,11 @@ final Map<String, Widget Function()> _screens = {
   // --- entrada ---
   'login': () => const LoginScreen(),
   'registro': () => const FormScreen(),
+  // Un correo largo: es lo que se desborda en un celular estrecho.
+  'recuperar contraseña': () => const ForgotPasswordScreen(
+    initialEmail: 'estudiante.con.un.correo.largo@correounivalle.edu.co',
+  ),
+  'contraseña nueva': () => ResetPasswordScreen(token: 't', onDone: () {}),
   'teclado Braille': () => const BrailleKeyboardScreen(),
   // --- estudiante ---
   'estudiante: mis cursos': () => StudentCoursesScreen(

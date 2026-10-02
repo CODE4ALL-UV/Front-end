@@ -12,8 +12,11 @@ import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.d
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/braille_keyboard_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/social_auth_block.dart';
+import 'package:flutter_code4all/data/services/facebook_auth_service.dart';
 import 'package:flutter_code4all/data/services/google_auth_service.dart';
+import 'package:flutter_code4all/data/services/launch_link.dart';
 import 'package:flutter_code4all/data/services/voice_dictation_service.dart';
+import 'package:flutter_code4all/ui/users_management/widgets/forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback? onRegister;
@@ -24,7 +27,11 @@ class LoginScreen extends StatefulWidget {
     this.onRegister,
     this.onSuccess,
     this.dictation,
+    this.facebookAuth,
   });
+
+  /// Para las pruebas.
+  final FacebookAuthService? facebookAuth;
 
   /// Para las pruebas. Sin él se dicta con el micrófono de verdad.
   final VoiceDictation? dictation;
@@ -44,6 +51,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _apiService = ApiService();
   final _authStorage = AuthStorage();
   final _googleAuthService = GoogleAuthService();
+  late final FacebookAuthService _facebookAuth =
+      widget.facebookAuth ?? FacebookAuthService();
   bool _isLoading = false;
 
   /// Si se entró con el teclado Braille. Entonces los avisos —contraseña
@@ -131,6 +140,13 @@ class _LoginScreenState extends State<LoginScreen> {
     // puede leer el texto, y sin oírlo no sabría que existe el atajo.
     WidgetsBinding.instance.addPostFrameCallback((_) => _speakHint());
     HardwareKeyboard.instance.addHandler(_onAnyKey);
+
+    // Volviendo de Facebook: mientras el servidor confirma, el login se
+    // muestra ocupado en vez de pedir otra vez los datos.
+    if (LaunchLink.hasFacebookReturn) {
+      _isLoading = true;
+      unawaited(_finishFacebookReturn());
+    }
   }
 
   void _speakHint() {
@@ -285,17 +301,51 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// El inicio con Facebook todavía no existe: ni hay SDK, ni ruta en el
-  /// servidor.
+  /// Va a Facebook. La página vuelve a abrirse a la vuelta y entonces sigue
+  /// [_finishFacebookReturn].
   ///
-  /// El botón se queda a la vista, pero diciéndolo. Antes tenía el callback
-  /// vacío: se pulsaba y no ocurría nada, sin explicación. Para quien usa
-  /// lector de pantalla eso es peor todavía, porque no hay forma de saber si
-  /// el toque se registró.
+  /// Si la app se compiló sin FACEBOOK_APP_ID, el botón se queda a la vista
+  /// pero lo dice. Antes tenía el callback vacío: se pulsaba y no ocurría
+  /// nada, y quien usa lector de pantalla no tenía forma de saber si el toque
+  /// se registró.
   void _handleFacebookSignIn() {
-    _showMessage(
-      'El inicio de sesión con Facebook todavía no está disponible. '
-      'Entra con Google o con tu correo y contraseña.',
+    if (!_facebookAuth.isAvailable) {
+      _showMessage(
+        'El inicio de sesión con Facebook todavía no está disponible. '
+        'Entra con Google o con tu correo y contraseña.',
+      );
+      return;
+    }
+    setState(() => _isLoading = true);
+    _showMessage('Abriendo Facebook…');
+    _facebookAuth.start();
+  }
+
+  /// Se vuelve de Facebook: termina de entrar.
+  Future<void> _finishFacebookReturn() async {
+    try {
+      final response = await _facebookAuth.finishIfReturning();
+      if (response != null) await _completeSignIn(response);
+    } on FacebookAuthCanceledException {
+      if (!mounted) return;
+      _showMessage('Inicio de sesión con Facebook cancelado');
+    } on FacebookAuthException catch (e) {
+      if (!mounted) return;
+      _showMessage(e.message);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      _showMessage(e.message);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _openForgotPassword() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            ForgotPasswordScreen(initialEmail: _emailController.text.trim()),
+      ),
     );
   }
 
@@ -423,7 +473,18 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          Align(
+                            alignment: AlignmentDirectional.centerEnd,
+                            child: TextButton(
+                              key: const ValueKey('forgot-password'),
+                              onPressed: _openForgotPassword,
+                              style: TextButton.styleFrom(
+                                minimumSize: const Size(48, 48),
+                              ),
+                              child: const Text('¿Olvidaste tu contraseña?'),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
                           SizedBox(
                             width: double.infinity,
                             height: 52,
@@ -510,20 +571,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await _googleAuthService.signIn(context: context);
-
-      await _authStorage.saveToken(response.accessToken);
-      await _authStorage.saveRole(response.rol);
-      await _authStorage.saveName(response.nombre);
-      await _authStorage.saveEmail(response.email);
-      await _authStorage.saveUserId(response.userId);
-      final existingPhotoUrl = await _authStorage.getPhotoUrl();
-      final nextPhotoUrl = (response.photoUrl?.trim().isNotEmpty ?? false)
-          ? response.photoUrl!
-          : (existingPhotoUrl ?? '');
-      await _authStorage.savePhotoUrl(nextPhotoUrl);
-
-      _showMessage(_buildWelcomeMessage(response));
-      widget.onSuccess?.call(response.rol);
+      await _completeSignIn(response);
     } on GoogleAuthCanceledException {
       if (!mounted) return;
       _showMessage('Inicio de sesión cancelado');
@@ -542,5 +590,23 @@ class _LoginScreenState extends State<LoginScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  /// Guarda la sesión que abrió Google o Facebook y entra.
+  Future<void> _completeSignIn(LoginResponse response) async {
+    await _authStorage.saveToken(response.accessToken);
+    await _authStorage.saveRole(response.rol);
+    await _authStorage.saveName(response.nombre);
+    await _authStorage.saveEmail(response.email);
+    await _authStorage.saveUserId(response.userId);
+    final existingPhotoUrl = await _authStorage.getPhotoUrl();
+    final nextPhotoUrl = (response.photoUrl?.trim().isNotEmpty ?? false)
+        ? response.photoUrl!
+        : (existingPhotoUrl ?? '');
+    await _authStorage.savePhotoUrl(nextPhotoUrl);
+
+    if (!mounted) return;
+    _showMessage(_buildWelcomeMessage(response));
+    widget.onSuccess?.call(response.rol);
   }
 }

@@ -33,10 +33,83 @@
 
   <title>Code4All</title>
   <link rel="manifest" href="manifest.json">
+
+  <!--
+    Pantalla de carga. Mientras se descarga la aplicación (unos 3 MB) la
+    página estaba en blanco, y el lector de pantalla no decía nada: no había
+    forma de saber si algo estaba pasando. Se quita sola cuando Flutter pinta
+    su primera pantalla.
+  -->
+  <style>
+    #code4all-loading {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 16px;
+      background: #F5F5F5;
+      color: #1A1A1A;
+      font-family: Roboto, "Segoe UI", Arial, sans-serif;
+      font-size: 20px;
+      line-height: 1.4;
+      text-align: center;
+    }
+    #code4all-loading p { margin: 0; max-width: 32em; }
+    #code4all-loading .c4a-slow { font-size: 18px; }
+    .c4a-spinner {
+      width: 48px;
+      height: 48px;
+      border: 5px solid #D0D0D0;
+      border-top-color: #C62828;
+      border-radius: 50%;
+      animation: c4a-spin 0.9s linear infinite;
+    }
+    @keyframes c4a-spin { to { transform: rotate(360deg); } }
+    /* Quien pidió menos movimiento ve un círculo quieto. */
+    @media (prefers-reduced-motion: reduce) {
+      .c4a-spinner { animation: none; border-color: #C62828; }
+    }
+    /*
+      Siempre clara, como el login que aparece después: con fondo oscuro, la
+      pantalla pasaba de negro a blanco de golpe al terminar de cargar.
+    */
+  </style>
   <script src="https://apis.google.com/js/api.js" defer onload="gapi.load('client', function() {})"></script>
   <script src="https://accounts.google.com/gsi/client" defer></script>
 </head>
 <body>
+  <div id="code4all-loading" role="status" aria-live="polite">
+    <img src="assets/assets/images/logo-flutter.png" alt="" width="180" height="120">
+    <div class="c4a-spinner" aria-hidden="true"></div>
+    <p><strong>Cargando Code4All…</strong></p>
+    <p class="c4a-slow" id="code4all-loading-slow" hidden>
+      Está tardando más de lo normal. Con una conexión lenta puede tardar
+      hasta un minuto; no hace falta recargar la página.
+    </p>
+  </div>
+  <noscript>
+    <p style="font-size:20px;padding:16px">
+      Code4All necesita JavaScript para funcionar. Actívalo en tu navegador y
+      vuelve a cargar la página.
+    </p>
+  </noscript>
+  <script>
+    (function () {
+      var slow = setTimeout(function () {
+        var el = document.getElementById('code4all-loading-slow');
+        if (el) el.hidden = false;
+      }, 10000);
+      window.addEventListener('flutter-first-frame', function () {
+        clearTimeout(slow);
+        var el = document.getElementById('code4all-loading');
+        if (el) el.remove();
+      });
+    })();
+  </script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader

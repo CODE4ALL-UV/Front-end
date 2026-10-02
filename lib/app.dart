@@ -16,6 +16,8 @@ import 'ui/courses/student_courses_screen.dart';
 import 'ui/courses/teacher_courses_screen.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'ui/users_management/widgets/login_screen.dart';
+import 'ui/users_management/widgets/reset_password_screen.dart';
+import 'data/services/launch_link.dart';
 //import 'ui/users_management/screens/login_dark_screen.dart'; // PAPACHO - ELIMINADO USAR login_screen.dart en pro de app_theme.dart
 import 'ui/users_management/widgets/form_screen.dart';
 //import 'ui/users_management/screens/form_dark_screen.dart'; // PAPACHO - ELIMINADO USAR form_screen.dart en pro de app_theme.dart
@@ -23,7 +25,7 @@ import 'ui/python_course_content/widgets/learning_module_screen.dart'; // MIX - 
 
 //import 'ui/python_course_content/widgets/learning_module_dark_screen.dart'; // PAPACHO - ELIMINADO USAR learning_module_screen.dart en pro de app_theme.dart
 
-enum AppScreen { login, register, modulo, docente, director }
+enum AppScreen { login, register, resetPassword, modulo, docente, director }
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -41,6 +43,9 @@ class _AppState extends State<App> {
   AppScreen _currentScreen = AppScreen.login;
   String _userName = 'Usuario';
 
+  /// El token del enlace del correo, si la app se abrió con él.
+  String? _resetToken;
+
   // NUEVO: Agregamos una variable para saber en qué módulo estamos globalmente.
   // Por defecto es 1 (Azul). Cuando el usuario abra un módulo, debes actualizar esta variable.
   int _currentModuleId = 6;
@@ -55,6 +60,10 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
+
+    // Se abrió con el enlace del correo para cambiar la contraseña.
+    _resetToken = LaunchLink.takeResetToken();
+    if (_resetToken != null) _currentScreen = AppScreen.resetPassword;
 
     // Cada actividad que un estudiante termina pasa por el almacen de
     // progreso. Enganchando aqui el aviso, el curso entero queda registrado
@@ -241,6 +250,14 @@ class _AppState extends State<App> {
     switch (_currentScreen) {
       case AppScreen.register:
         return FormScreen(onBack: _goToLogin, onSuccess: _goToLogin);
+      case AppScreen.resetPassword:
+        return ResetPasswordScreen(
+          token: _resetToken ?? '',
+          onDone: () {
+            _resetToken = null;
+            _goToLogin();
+          },
+        );
       case AppScreen.modulo:
         // Con cursos por docente, el estudiante elige primero en qué curso
         // estudia. Con el servidor de antes entra directo al curso único.

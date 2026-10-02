@@ -240,6 +240,90 @@ class ApiService {
     }
   }
 
+  /// Entrar o registrarse con el código que devuelve Facebook.
+  Future<LoginResponse> signInWithFacebook({
+    required String code,
+    required String redirectUri,
+  }) async {
+    final body = await _postJson(
+      '/api/auth/facebook',
+      {'code': code, 'redirect_uri': redirectUri},
+      notFound:
+          'El inicio con Facebook todavía no está disponible en el servidor.',
+    );
+    return LoginResponse.fromJson(body);
+  }
+
+  /// Pide el correo con el enlace para cambiar la contraseña.
+  ///
+  /// Devuelve lo que dice el servidor, que es lo mismo haya o no una cuenta
+  /// con ese correo.
+  Future<String> requestPasswordReset(String email) async {
+    final body = await _postJson(
+      '/api/auth/password/forgot',
+      {'correo': email},
+      notFound:
+          'La recuperación de contraseña todavía no está disponible en el '
+          'servidor.',
+    );
+    return (body['detail'] ?? '').toString();
+  }
+
+  /// Guarda la contraseña nueva con el token del enlace del correo.
+  Future<String> resetPassword({
+    required String token,
+    required String password,
+  }) async {
+    final body = await _postJson(
+      '/api/auth/password/reset',
+      {'token': token, 'password': password},
+      notFound:
+          'La recuperación de contraseña todavía no está disponible en el '
+          'servidor.',
+    );
+    return (body['detail'] ?? '').toString();
+  }
+
+  /// Un POST con JSON que devuelve el JSON de la respuesta.
+  ///
+  /// [notFound] es lo que se dice si el servidor no conoce la ruta: pasa con
+  /// el servidor de antes, que no tiene las funciones nuevas. Sin él se vería
+  /// un «Not Found» que no explica nada.
+  Future<Map<String, dynamic>> _postJson(
+    String path,
+    Map<String, dynamic> payload, {
+    required String notFound,
+  }) async {
+    final http.Response response;
+    try {
+      response = await http.post(
+        Uri.parse(buildUrl(path)),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(payload),
+      );
+    } catch (_) {
+      throw ApiException(statusCode: null, message: _connectionErrorMessage());
+    }
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      try {
+        final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+        if (decoded is Map<String, dynamic>) return decoded;
+      } catch (_) {}
+      return const {};
+    }
+
+    throw ApiException(
+      statusCode: response.statusCode,
+      message: response.statusCode == 404
+          ? notFound
+          : _extractMessage(utf8.decode(response.bodyBytes)),
+    );
+  }
+
   String resolveMediaUrl(String? url) {
     if (url == null || url.trim().isEmpty) {
       return '';

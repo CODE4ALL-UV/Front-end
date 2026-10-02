@@ -24,7 +24,7 @@ services:
       export PATH="$HOME/flutter/bin:$PATH"
       flutter --version
       flutter pub get
-      flutter build web --release --dart-define=BACKEND_URL=$BACKEND_URL
+      flutter build web --release --dart-define=BACKEND_URL=$BACKEND_URL --dart-define=FACEBOOK_APP_ID=$FACEBOOK_APP_ID
 
     staticPublishPath: ./build/web
 
@@ -32,6 +32,12 @@ services:
       # La dirección del backend ya desplegado. Se escribe en el panel de
       # Render, no aquí.
       - key: BACKEND_URL
+        sync: false
+
+      # El identificador de la app de Facebook (no es secreto). Sin él, el
+      # botón «Facebook» del login dice que todavía no está disponible. La
+      # clave secreta va solo en el backend.
+      - key: FACEBOOK_APP_ID
         sync: false
 
     # Flutter web es una aplicación de una sola página: cualquier ruta tiene

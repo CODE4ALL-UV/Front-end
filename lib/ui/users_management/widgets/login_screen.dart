@@ -12,6 +12,7 @@ import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.d
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/braille_keyboard_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/social_auth_block.dart';
+import 'package:flutter_code4all/ui/core/ui/user_manual.dart';
 import 'package:flutter_code4all/data/services/facebook_auth_service.dart';
 import 'package:flutter_code4all/data/services/google_auth_service.dart';
 import 'package:flutter_code4all/data/services/launch_link.dart';
@@ -349,6 +350,18 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// Abre el manual en las guías de primeros pasos. Va directo desde el
+  /// toque: el navegador solo deja abrir pestañas en respuesta a un gesto.
+  Future<void> _openManual() async {
+    final opened = await openUserManual();
+    if (!opened && mounted) {
+      _showMessage(
+        'No se pudo abrir el manual. Está en '
+        'code4all-web.onrender.com/manual.html',
+      );
+    }
+  }
+
   @override
   void dispose() {
     HardwareKeyboard.instance.removeHandler(_onAnyKey);
@@ -542,6 +555,16 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
+      ),
+      const SizedBox(height: 8),
+      // Antes de tener cuenta: abre las guías para entrar y registrarse. Ya
+      // dentro, el manual está en el menú de perfil, en la parte de cada rol.
+      TextButton.icon(
+        key: const ValueKey('user-manual'),
+        onPressed: _openManual,
+        style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+        icon: const Icon(Icons.menu_book_outlined),
+        label: const Text('¿Cómo se usa Code4All? Ver el manual'),
       ),
     ],
   );

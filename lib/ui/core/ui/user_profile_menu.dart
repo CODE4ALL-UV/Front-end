@@ -9,6 +9,7 @@ import 'package:flutter_code4all/data/services/session_controller.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'package:flutter_code4all/ui/core/ui/braille_keyboard_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/sign_keyboard_settings.dart';
+import 'package:flutter_code4all/ui/core/ui/user_manual.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
@@ -79,6 +80,26 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
         ),
       ),
     );
+  }
+
+  /// Abre el manual de uso en la parte del rol de quien lo pide.
+  ///
+  /// Se llama desde el `onTap` del elemento y no desde `onSelected`: este
+  /// último llega cuando el menú ya se cerró, fuera del toque, y el navegador
+  /// bloquearía la pestaña nueva.
+  Future<void> _openManual() async {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final opened = await openUserManual(role: _userRole);
+    if (!opened) {
+      messenger?.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No se pudo abrir el manual. Está en '
+            'code4all-web.onrender.com/manual.html',
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -485,6 +506,21 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
                       style: TextStyle(color: onMenu),
                     ),
                   ),
+                ],
+              ),
+            ),
+          ),
+          // Para todos los roles. Abre el manual en las guías de quien lo pide.
+          PopupMenuItem<String>(
+            value: 'manual',
+            onTap: _openManual,
+            child: Semantics(
+              hint: 'Abre en otra pestaña las guías paso a paso de tu rol',
+              child: Row(
+                children: [
+                  Icon(Icons.menu_book_outlined, color: onMenu),
+                  const SizedBox(width: 8),
+                  Text('Manual de uso', style: TextStyle(color: onMenu)),
                 ],
               ),
             ),

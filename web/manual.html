@@ -174,7 +174,8 @@ button{font:inherit; color:inherit}
 .m-btn.full{width:100%}
 .m-btn.red{background:var(--a-red); color:#fff}
 .m-btn.blue{background:var(--a-blue); color:#fff}
-.m-btn.dark{background:var(--a-black); color:var(--a-yellow)}
+.m-btn.dark{background:linear-gradient(90deg,#1152A8,#0D47A1); color:#FFD600; letter-spacing:.12em}
+.m-btn.login{background:#1565C0; color:#fff}
 .m-btn.black{background:var(--a-black); color:#fff}
 .m-btn.ghost{background:var(--a-surface); border-color:var(--a-blue); color:var(--a-blue)}
 .m-btn.text{background:none; color:var(--a-blue); padding:6px 8px}
@@ -480,7 +481,8 @@ const P = {
   building:'<path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6M8 11h.5M15.5 11h.5"/>',
   door:'<path d="M5 21V4h11v17M3 21h16M13 12h.5"/><path d="M16 6l4 2v13"/>',
   trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
-  plus:'<path d="M12 5v14M5 12h14"/>'
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7"/>'
 };
 const ic = (n, cls='') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
 
@@ -623,9 +625,10 @@ const login = (c='', k='', extra={}) => ({els:[
   fld('Correo electrónico', c, {icon:'mic', id:'correo', ph:'ana@gmail.com'}),
   fld('Contraseña', k, {icon:'mic', id:'clave', pw:1}),
   {k:'link', t:'¿Olvidaste tu contraseña?', id:'olvido'},
-  btn('INICIAR SESIÓN','blue',{id:'entrar', full:1}),
+  btn('INICIAR SESIÓN','login',{id:'entrar', full:1}),
   {k:'social'},
   btn('REGISTRARSE','dark',{id:'registro', full:1}),
+  btn('¿Cómo se usa Code4All? Ver el manual','text',{id:'vermanual', icon:'book'}),
   {k:'fab', icon:'braille', pos:'l', id:'braillefab', name:'botón «Teclado Braille»'}
 ], ...extra});
 
@@ -767,7 +770,8 @@ const ROLES = [
   { id:'inicio', name:'Primeros pasos', who:'Para todos', dots:[1,2,3,4], letter:'p',
     desc:'Entrar, crear la cuenta, recuperar la contraseña y adaptar la app a ti.',
     intro:['Estas guías sirven para cualquier rol. Empieza por aquí si es la primera vez que abres Code4All.',
-           'La app funciona en el navegador, en el celular y en la tableta. Lo que cambies de colores y tamaño de letra queda guardado en tu dispositivo.'],
+           'La app funciona en el navegador, en el celular y en la tableta. Lo que cambies de colores y tamaño de letra queda guardado en tu dispositivo.',
+           'Desde la app abres este manual con «¿Cómo se usa Code4All? Ver el manual», en el inicio de sesión, o con «Manual de uso», en el menú de tu perfil.'],
     guides:[
       { id:'entrar', t:'Iniciar sesión', s:'Con tu correo y contraseña', steps:[
         { t:'Abre Code4All', scr:{els:[{k:'loading'}]},
@@ -837,12 +841,15 @@ const ROLES = [
           d:`<p>Toca el icono de accesibilidad de la barra superior. En la hoja ${u('Accesibilidad')} eliges el tamaño del texto y uno de los seis temas: Claro, Oscuro, Escala de grises, Deuteranopía, Protanopía y Tritanopía.</p>`,
           tip:'Los estudiantes cambian los colores desde el botón «?» → Ayuda → Modo visual. En el registro hay un botón de paleta abajo a la izquierda.' }
       ]},
-      { id:'perfil', t:'Mi perfil y cerrar sesión', s:'Foto, datos y salida', steps:[
+      { id:'perfil', t:'Mi perfil y cerrar sesión', s:'Manual, foto, datos y salida', steps:[
         { t:'Abre las opciones de perfil', scr:misCursosEst(), hl:'avatar',
           d:`<p>Toca tu foto o tu inicial, arriba a la derecha.</p>` },
-        { t:'Sube tu foto', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Teclado Braille','tb','braille'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'miperfil',
+        { t:'Abre este manual', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Teclado Braille','tb','braille'],['Manual de uso','manualapp','book'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'manualapp',
+          d:`<p>Toca ${u('Manual de uso')}. El manual se abre en otra pestaña, directamente en las guías de tu rol.</p>`,
+          tip:'Antes de iniciar sesión también lo tienes: debajo de REGISTRARSE está «¿Cómo se usa Code4All? Ver el manual».' },
+        { t:'Sube tu foto', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Teclado Braille','tb','braille'],['Manual de uso','manualapp','book'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'miperfil',
           d:`<p>Toca ${u('Mi perfil')}. Verás tu nombre, tu rol y tu correo.</p><p>Toca ${u('Subir foto')} y elige una imagen de menos de 5 MB. Al terminar aparece «Foto actualizada correctamente».</p>` },
-        { t:'Cierra sesión', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Teclado Braille','tb','braille'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'salirapp',
+        { t:'Cierra sesión', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Teclado Braille','tb','braille'],['Manual de uso','manualapp','book'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'salirapp',
           d:`<p>En el mismo menú toca ${u('Cerrar sesión')}. Vuelves a la pantalla de inicio de sesión.</p>`,
           tip:'Si la app dice «Tu sesión caducó. Vuelve a iniciar sesión», entra otra vez con tu correo: tu avance no se pierde.' }
       ]}

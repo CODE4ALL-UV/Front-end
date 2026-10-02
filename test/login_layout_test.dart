@@ -72,6 +72,11 @@ void main() {
         expectFullyVisible(tester, 'INICIAR SESIÓN', entry.value);
         expectFullyVisible(tester, 'REGISTRARSE', entry.value);
         expectFullyVisible(tester, '¿Olvidaste tu contraseña?', entry.value);
+        expectFullyVisible(
+          tester,
+          '¿Cómo se usa Code4All? Ver el manual',
+          entry.value,
+        );
         expect(tester.takeException(), isNull);
       });
     }

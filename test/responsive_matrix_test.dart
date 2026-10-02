@@ -445,6 +445,18 @@ final Map<String, Widget Function()> _screens = {
       client: _client,
     ),
   ),
+  // El aviso de cuando el servidor no puede: era azul sobre rojo.
+  'actividad: cámara de señas sin servidor': () => SignCameraScreen(
+    service: SignRecognitionService(
+      api: ApiService(baseUrl: 'http://srv'),
+      client: MockClient(
+        (_) async => _json({
+          'available': false,
+          'reason': 'El servidor no puede crear el detector de manos',
+        }),
+      ),
+    ),
+  ),
   // --- docente ---
   'docente: mis cursos': () => TeacherCoursesScreen(
     userName: 'María',

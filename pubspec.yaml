@@ -44,6 +44,7 @@ flutter:
     - assets/audios/
     - assets/sign_language/letras/
     - assets/sign_language/palabras/
+    - assets/docs/
     - .env
   fonts:
     - family: Roboto

@@ -120,6 +120,10 @@ abstract final class HandLandmarkClassifier {
   /// Diferencia por debajo de la cual dos letras se consideran empatadas.
   static const double _tieMargin = 0.30;
 
+  /// Lo mismo, para quien explique el alfabeto: dos letras a esta distancia o
+  /// menos la cámara no las sabe separar.
+  static const double tieMargin = _tieMargin;
+
   /// Tamaño mínimo de la mano, en proporción a la foto.
   ///
   /// Por debajo de esto la mano está demasiado lejos —o los puntos llegaron
@@ -305,6 +309,12 @@ abstract final class HandLandmarkClassifier {
     return ((ratio - 1.0) / range).clamp(0.0, 1.0);
   }
 
+  /// Cuánto se parecen dos formas, con la misma vara que usa el
+  /// reconocimiento. Cero es idéntico.
+  ///
+  /// Lo usa la guía del alfabeto para avisar de qué letras se confunden.
+  static double shapeDistance(HandShape a, HandShape b) => _distance(a, b);
+
   /// Cuánto se parecen dos formas. Cero es idéntico.
   static double _distance(HandShape observed, HandShape expected) {
     var score = 0.0;
@@ -366,6 +376,14 @@ abstract final class HandLandmarkClassifier {
       return expected.crossed
           ? 'Cruza el índice sobre el corazón.'
           : 'Separa el índice del corazón.';
+    }
+
+    // Lo único que cambia es cuánto se abren los dedos: G y L, U y V.
+    final spreadGap = expected.spread - observed.spread;
+    if (spreadGap.abs() >= 0.3) {
+      return spreadGap > 0
+          ? 'Separa más los dedos estirados.'
+          : 'Junta más los dedos estirados.';
     }
 
     return 'Casi. Mantén la mano quieta y bien enfocada.';

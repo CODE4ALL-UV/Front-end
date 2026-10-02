@@ -262,6 +262,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
       ),
     );
   }
+
   // Fin - Dactilología: deletreo letra a letra. La mitad derecha del panel es la seña de
 }
 

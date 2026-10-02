@@ -64,6 +64,17 @@ class SignRecognitionService {
 
   bool? _available;
 
+  /// Por qué no estaba disponible en la última comprobación: no se pudo
+  /// hablar con el servidor ([SignFailureKind.offline]) o el servidor dijo que
+  /// no ([SignFailureKind.unavailable]). Antes las dos cosas se contaban igual
+  /// y se le decía «no está disponible en el servidor» a quien en realidad no
+  /// tenía conexión.
+  SignFailureKind? lastFailure;
+
+  /// Lo que explicó el servidor, si lo explicó. Es técnico: sirve a quien
+  /// mantiene el servidor, no al estudiante.
+  String? lastReason;
+
   /// Dice si el servidor puede reconocer manos, sin llegar a mandarle ninguna.
   ///
   /// Se consulta antes de encender la cámara, para no pedirle permiso a nadie
@@ -71,16 +82,28 @@ class SignRecognitionService {
   Future<bool> isAvailable({bool refresh = false}) async {
     if (_available != null && !refresh) return _available!;
 
+    lastFailure = null;
+    lastReason = null;
     try {
       final response = await _client
           .get(Uri.parse(_api.buildUrl('/api/signs/status')))
           .timeout(timeout);
 
-      if (response.statusCode != 200) return _available = false;
+      if (response.statusCode != 200) {
+        lastFailure = SignFailureKind.unavailable;
+        return _available = false;
+      }
 
       final body = jsonDecode(response.body);
-      return _available = body is Map && body['available'] == true;
+      final available = body is Map && body['available'] == true;
+      if (!available) {
+        lastFailure = SignFailureKind.unavailable;
+        final reason = body is Map ? body['reason'] : null;
+        if (reason is String && reason.trim().isNotEmpty) lastReason = reason;
+      }
+      return _available = available;
     } catch (_) {
+      lastFailure = SignFailureKind.offline;
       return _available = false;
     }
   }

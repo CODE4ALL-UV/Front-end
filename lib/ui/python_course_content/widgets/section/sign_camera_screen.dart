@@ -9,7 +9,9 @@ import 'package:flutter_code4all/domain/models/sign_language/sign_dictation.dart
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
+import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/sign_guide.dart';
 
 /// En qué punto está la pantalla.
 enum _Stage { checking, unavailable, ready, running, failed }
@@ -32,7 +34,19 @@ enum _Stage { checking, unavailable, ready, running, failed }
 /// imagen y no se manda nada a servicios de terceros. La cámara solo se
 /// enciende cuando la persona pulsa el botón, nunca sola.
 class SignCameraScreen extends StatefulWidget {
-  const SignCameraScreen({super.key, this.targetLetter, this.service});
+  const SignCameraScreen({
+    super.key,
+    this.targetLetter,
+    this.service,
+    this.guidePrompt = const SignGuidePrompt(),
+    this.openGuide = openSignGuide,
+  });
+
+  /// Si toca ofrecer la guía del alfabeto al entrar. Para las pruebas.
+  final SignGuidePrompt guidePrompt;
+
+  /// Cómo se abre la guía. Para las pruebas.
+  final Future<bool> Function() openGuide;
 
   /// Letra que se quiere practicar.
   ///
@@ -66,6 +80,9 @@ class _SignCameraScreenState extends State<SignCameraScreen>
 
   _Stage _stage = _Stage.checking;
   String _problem = '';
+
+  /// Lo que explicó el servidor al decir que no, si lo explicó.
+  String? _problemDetail;
   SignReading _reading = SignRecognitionService.noHand;
   bool _achieved = false;
 
@@ -76,6 +93,16 @@ class _SignCameraScreenState extends State<SignCameraScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _check();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _offerGuide());
+  }
+
+  /// La primera vez, antes de encender nada, se ofrece la guía: sin saber
+  /// cómo colocar la mano, lo normal es que la cámara no lea nada.
+  Future<void> _offerGuide() async {
+    if (!await widget.guidePrompt.shouldOffer() || !mounted) return;
+    await widget.guidePrompt.markOffered();
+    if (!mounted) return;
+    await showSignGuideDialog(context, open: widget.openGuide);
   }
 
   @override
@@ -104,9 +131,13 @@ class _SignCameraScreenState extends State<SignCameraScreen>
     if (!available) {
       setState(() {
         _stage = _Stage.unavailable;
-        _problem =
-            'El reconocimiento de señas no está disponible ahora mismo. '
-            'Necesita que el servidor de Code4All esté encendido.';
+        _problem = _service.lastFailure == SignFailureKind.offline
+            ? 'No se pudo conectar con el servidor de Code4All. Si estaba en '
+                  'reposo tarda hasta un minuto en despertar: espera un '
+                  'momento y vuelve a intentarlo.'
+            : 'El servidor de Code4All no tiene activo el reconocimiento de '
+                  'manos ahora mismo.';
+        _problemDetail = _service.lastReason;
       });
       return;
     }
@@ -337,12 +368,20 @@ class _SignCameraScreenState extends State<SignCameraScreen>
         ),
       ],
       _Stage.unavailable => [
-        _Message(text: _problem, icon: Icons.cloud_off),
+        _Message(
+          text: _problem,
+          detail: _problemDetail,
+          icon: Icons.cloud_off,
+          error: true,
+        ),
         const SizedBox(height: AppMetrics.gap),
         _retryButton(Theme.of(context)),
+        const SizedBox(height: AppMetrics.gap),
+        // La guía se puede leer aunque la cámara no funcione ahora.
+        Center(child: SignGuideButton(open: widget.openGuide)),
       ],
       _Stage.failed => [
-        _Message(text: _problem, icon: Icons.error_outline),
+        _Message(text: _problem, icon: Icons.error_outline, error: true),
         const SizedBox(height: AppMetrics.gap),
         _retryButton(Theme.of(context)),
       ],
@@ -371,6 +410,8 @@ class _SignCameraScreenState extends State<SignCameraScreen>
 
     return [
       _Explanation(target: widget.targetLetter),
+      const SizedBox(height: AppMetrics.gap),
+      Center(child: SignGuideButton(open: widget.openGuide)),
       const SizedBox(height: AppMetrics.sectionGap),
       _Preview(camera: _camera, running: running),
       const SizedBox(height: AppMetrics.sectionGap),
@@ -767,43 +808,68 @@ class _LetterBadge extends StatelessWidget {
 
 /// Mensaje a pantalla completa, para esperar o para explicar un problema.
 class _Message extends StatelessWidget {
-  const _Message({required this.text, this.icon, this.busy = false});
+  const _Message({
+    required this.text,
+    this.detail,
+    this.icon,
+    this.busy = false,
+    this.error = false,
+  });
 
   final String text;
+
+  /// Lo que dijo el servidor, para quien lo mantiene.
+  final String? detail;
   final IconData? icon;
   final bool busy;
+  final bool error;
 
   @override
   Widget build(BuildContext context) {
-    final appSemanticColors = context.messageColors;
+    final tone = context.messageColors.tone(
+      error ? MessageThemeTone.danger : MessageThemeTone.info,
+    );
+    // Antes el fondo era el rojo pensado para texto y el texto, azul: no se
+    // leía. Ahora fondo claro del tono y texto oscuro del mismo tono.
+    final foreground = AppContrast.readableOn(
+      tone.foreground,
+      tone.background,
+      AppContrast.text,
+    );
 
     return Semantics(
       liveRegion: true,
       child: Container(
         padding: const EdgeInsets.all(AppMetrics.sectionGap),
         decoration: BoxDecoration(
-          color: appSemanticColors.dangerForeground,
-          border: Border.all(color: appSemanticColors.infoForeground),
+          color: tone.background,
+          border: Border.all(color: foreground),
           borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
         ),
         child: Column(
           children: [
             if (busy)
-              CircularProgressIndicator(
-                color: appSemanticColors.warningBackground,
-              )
+              CircularProgressIndicator(color: foreground)
             else if (icon != null)
-              Icon(icon, size: 40, color: appSemanticColors.infoForeground),
+              Icon(icon, size: 40, color: foreground),
             const SizedBox(height: AppMetrics.gap),
             Text(
               text,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15.5,
-                height: 1.45,
-                color: appSemanticColors.infoForeground,
-              ),
+              style: TextStyle(fontSize: 15.5, height: 1.45, color: foreground),
             ),
+            if (detail != null) ...[
+              const SizedBox(height: AppMetrics.gap),
+              Text(
+                'Detalle técnico: $detail',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  height: 1.4,
+                  color: foreground,
+                ),
+              ),
+            ],
           ],
         ),
       ),

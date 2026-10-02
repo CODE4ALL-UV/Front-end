@@ -255,40 +255,47 @@ class _CourseFilterState extends State<_CourseFilter> {
 
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        child: Row(
-          children: [
-            Icon(Icons.filter_list, color: colors.onSurfaceVariant),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Semantics(
-                label: 'Ver las estadísticas de',
-                child: DropdownButton<int?>(
-                  isExpanded: true,
-                  value: known ? _selected : null,
-                  underline: const SizedBox.shrink(),
-                  onChanged: _choose,
-                  items: [
-                    const DropdownMenuItem<int?>(
-                      value: null,
-                      child: Text('Todos los cursos'),
-                    ),
-                    for (final course in _courses.courses)
-                      DropdownMenuItem<int?>(
-                        value: course.id,
-                        child: Text(
-                          course.isGeneral || course.teacherName == null
-                              ? course.title
-                              : '${course.title} · ${course.teacherName}',
-                          overflow: TextOverflow.ellipsis,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: AppMetrics.maxContentWidth + 40,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            child: Row(
+              children: [
+                Icon(Icons.filter_list, color: colors.onSurfaceVariant),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Semantics(
+                    label: 'Ver las estadísticas de',
+                    child: DropdownButton<int?>(
+                      isExpanded: true,
+                      value: known ? _selected : null,
+                      underline: const SizedBox.shrink(),
+                      onChanged: _choose,
+                      items: [
+                        const DropdownMenuItem<int?>(
+                          value: null,
+                          child: Text('Todos los cursos'),
                         ),
-                      ),
-                  ],
+                        for (final course in _courses.courses)
+                          DropdownMenuItem<int?>(
+                            value: course.id,
+                            child: Text(
+                              course.isGeneral || course.teacherName == null
+                                  ? course.title
+                                  : '${course.title} · ${course.teacherName}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

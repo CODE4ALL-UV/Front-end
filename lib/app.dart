@@ -125,18 +125,13 @@ class _AppState extends State<App> {
     MyCoursesStore.instance.clear();
     setState(() => _currentScreen = AppScreen.login);
   }
+
   void _goToModulo() => setState(() => _currentScreen = AppScreen.modulo);
 
   // NUEVO: Método para que cuando el usuario entre a un módulo, la app cambie de color.
   void _updateActiveModule(int moduleId) {
-    debugPrint('🟢 [APP.DART] Petición para cambiar al módulo: $moduleId');
     if (_currentModuleId != moduleId) {
       setState(() => _currentModuleId = moduleId);
-      debugPrint(
-        '🟢 [APP.DART] ¡setState ejecutado! _activeModuleId ahora es: $_currentModuleId',
-      );
-    } else {
-      debugPrint('🟡 [APP.DART] Ignorado: El módulo ya era $_currentModuleId');
     }
   }
 
@@ -299,10 +294,6 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(
-      '🏗️ [APP.DART] Haciendo BUILD principal. Módulo activo actual: $_currentModuleId | Filtro daltónico: $_themeMode',
-    );
-    debugPrint('🟡 [MAIN/APP] Reconstruyendo MaterialApp / Root Widget');
     final activeTheme = AppTheme.getTheme(
       mode: _themeMode,
       moduleId: _currentModuleId,

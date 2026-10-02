@@ -47,9 +47,10 @@ class _ModuleChaptersScreen extends State<ModuleChaptersScreen> {
 
     // Lo que el docente haya cambiado se pide al abrir el capítulo, no al
     // arrancar la aplicación: así el estudiante ve la última versión aunque
-    // lleve la app abierta desde antes de la clase.
+    // lleve la app abierta desde antes de la clase. Si se acaba de pedir al
+    // entrar al módulo, no se vuelve a pedir.
     _content.addListener(_onContentChanged);
-    _content.refresh();
+    _content.refreshIfStale();
   }
 
   @override

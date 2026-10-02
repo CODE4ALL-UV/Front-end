@@ -409,7 +409,24 @@ class AppTheme {
     );
   }
 
-  static ThemeData getTheme({required AppThemeMode mode, int moduleId = 6}) {
+  static final Map<(AppThemeMode, int), ThemeData> _cache = {};
+
+  /// El tema para un modo de color y un módulo.
+  ///
+  /// Se guarda la primera vez que se pide. La raíz de la app lo pedía en cada
+  /// reconstrucción y armar un ThemeData completo (colores, textos, botones,
+  /// extensiones) no es barato; además, con un objeto nuevo cada vez, Flutter
+  /// tenía que compararlo campo por campo para saber si había cambiado.
+  static ThemeData getTheme({required AppThemeMode mode, int moduleId = 6}) =>
+      _cache.putIfAbsent((
+        mode,
+        moduleId,
+      ), () => _createTheme(mode: mode, moduleId: moduleId));
+
+  static ThemeData _createTheme({
+    required AppThemeMode mode,
+    required int moduleId,
+  }) {
     switch (mode) {
       case AppThemeMode.light:
         return _buildTheme(

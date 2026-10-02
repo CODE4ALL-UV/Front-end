@@ -153,237 +153,255 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFFFF),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x1A000000),
-                          blurRadius: 10,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 110,
-                          height: 130,
-                          child: Image.asset(
-                            'assets/images/ardilla_univalle.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Laboratorio de Python',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF0F172A),
-                                  fontSize: 18,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFE8F1FF),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: const Color(0xFFBFDBFE),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Escribe un código en Python y valida el resultado esperado. Ejemplo: imprime un texto con print().',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    height: 1.35,
-                                    color: Color(0xFF1E3A8A),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Objetivo: imprimir "$_expectedOutput"',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF2563EB),
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFF334155)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Consola',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        SignKeyboardField(
-                          controller: _codeController,
-                          builder: (context, focusNode, readOnly) => TextField(
-                            controller: _codeController,
-                            focusNode: focusNode,
-                            readOnly: readOnly,
-                            showCursor: true,
-                            maxLines: 8,
-                            style: const TextStyle(
-                              color: Color(0xFF60A5FA),
-                              fontFamily: 'monospace',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            decoration: const InputDecoration(
-                              hintText: 'Escribe tu código aquí...',
-                              hintStyle: TextStyle(color: Colors.white54),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
+              // Centrado y con tope: en un portátil la consola iba de borde a
+              // borde y las líneas de código quedaban larguísimas.
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 960),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _runCode,
-                          icon: const Icon(Icons.play_arrow, size: 20),
-                          label: const Text('Ejecutar'),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 13),
-                            backgroundColor: const Color(0xFF2563EB),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFFFFF),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x1A000000),
+                              blurRadius: 10,
+                              offset: Offset(0, 3),
                             ),
-                          ),
+                          ],
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 110,
+                              height: 130,
+                              child: Image.asset(
+                                'assets/images/ardilla_univalle.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Laboratorio de Python',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF0F172A),
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE8F1FF),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: const Color(0xFFBFDBFE),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Escribe un código en Python y valida el resultado esperado. Ejemplo: imprime un texto con print().',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        height: 1.35,
+                                        color: Color(0xFF1E3A8A),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        width: 120,
-                        child: OutlinedButton.icon(
-                          onPressed: _restoreExample,
-                          icon: const Icon(Icons.refresh, size: 18),
-                          label: const Text('Ejemplo'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFF1D4ED8),
-                            side: const BorderSide(color: Color(0xFF93C5FD)),
-                            padding: const EdgeInsets.symmetric(vertical: 13),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Objetivo: imprimir "$_expectedOutput"',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF2563EB),
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0F172A),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFF334155)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Consola',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SignKeyboardField(
+                              controller: _codeController,
+                              builder: (context, focusNode, readOnly) =>
+                                  TextField(
+                                    controller: _codeController,
+                                    focusNode: focusNode,
+                                    readOnly: readOnly,
+                                    showCursor: true,
+                                    maxLines: 8,
+                                    style: const TextStyle(
+                                      color: Color(0xFF60A5FA),
+                                      fontFamily: 'monospace',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    decoration: const InputDecoration(
+                                      hintText: 'Escribe tu código aquí...',
+                                      hintStyle: TextStyle(
+                                        color: Colors.white54,
+                                      ),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _runCode,
+                              icon: const Icon(Icons.play_arrow, size: 20),
+                              label: const Text('Ejecutar'),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                backgroundColor: const Color(0xFF2563EB),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
                             ),
                           ),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 120,
+                            child: OutlinedButton.icon(
+                              onPressed: _restoreExample,
+                              icon: const Icon(Icons.refresh, size: 18),
+                              label: const Text('Ejemplo'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF1D4ED8),
+                                side: const BorderSide(
+                                  color: Color(0xFF93C5FD),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Resultado',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF0F172A),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextField(
+                              controller: _outputController,
+                              maxLines: 6,
+                              readOnly: true,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: EdgeInsets.all(12),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            if (_hasRun)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: _feedback!.contains('✅')
+                                      ? const Color(0xFFDCFCE7)
+                                      : const Color(0xFFFEE2E2),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: _feedback!.contains('✅')
+                                        ? const Color(0xFF86EFAC)
+                                        : const Color(0xFFFDA4AF),
+                                  ),
+                                ),
+                                child: Text(
+                                  _feedback!,
+                                  style: const TextStyle(
+                                    color: Color(0xFF111827),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _finishLaboratory,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF2E7D32),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text('Terminar'),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Resultado',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF0F172A),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: _outputController,
-                          maxLines: 6,
-                          readOnly: true,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: EdgeInsets.all(12),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        if (_hasRun)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _feedback!.contains('✅')
-                                  ? const Color(0xFFDCFCE7)
-                                  : const Color(0xFFFEE2E2),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: _feedback!.contains('✅')
-                                    ? const Color(0xFF86EFAC)
-                                    : const Color(0xFFFDA4AF),
-                              ),
-                            ),
-                            child: Text(
-                              _feedback!,
-                              style: const TextStyle(
-                                color: Color(0xFF111827),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _finishLaboratory,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2E7D32),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Text('Terminar'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

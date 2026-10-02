@@ -369,9 +369,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 560),
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                        vertical: 24.0,
+                      // Abajo, sitio para el botón del teclado Braille: con la
+                      // letra grande tapaba «Iniciar sesión».
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        24,
+                        horizontalPadding,
+                        96,
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,

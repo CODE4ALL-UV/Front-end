@@ -504,12 +504,17 @@ class _Badge extends StatelessWidget {
         children: [
           Icon(icon, size: 12, color: appColorScheme.onSurfaceVariant),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              color: appColorScheme.onSurfaceVariant,
+          // Flexible: con la letra al doble, en la columna de 300 px del
+          // temario, una etiqueta larga no cabía y se salía del distintivo.
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w600,
+                color: appColorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ],

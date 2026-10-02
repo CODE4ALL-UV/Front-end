@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
+import 'package:flutter_code4all/ui/core/themes/module_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
@@ -160,11 +161,20 @@ class _SectionActivityScaffoldState extends State<SectionActivityScaffold> {
           ),
           AccessibilityToolbar(spokenText: _spokenScript),
           if (widget.progress != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
-              child: SectionProgressBar(
-                value: widget.progress!,
-                label: widget.progressLabel ?? 'Avance de la actividad',
+            // Al mismo ancho que el contenido: en un portátil la barra iba de
+            // borde a borde mientras el texto quedaba centrado debajo.
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: AppMetrics.maxContentWidth + 40,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                  child: SectionProgressBar(
+                    value: widget.progress!,
+                    label: widget.progressLabel ?? 'Avance de la actividad',
+                  ),
+                ),
               ),
             ),
           Expanded(
@@ -267,6 +277,16 @@ class _ActivityBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final appModuleTheme = context.moduleColors;
 
+    // La cabecera repite dónde se está; el contenido es lo que hay que leer.
+    // Con la letra al 200 % en un celular ocupaba un tercio de la pantalla,
+    // así que crece hasta el 140 % y el resto del espacio queda para el texto.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.4,
+      child: _banner(context, appModuleTheme),
+    );
+  }
+
+  Widget _banner(BuildContext context, ModuleTheme appModuleTheme) {
     return Semantics(
       header: true,
       label: '$activityLabel. $sectionTitle. $moduleLabel',

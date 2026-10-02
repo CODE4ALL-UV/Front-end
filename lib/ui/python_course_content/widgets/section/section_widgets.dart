@@ -581,7 +581,9 @@ class SectionProgressBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: value.clamp(0.0, 1.0),
                 minHeight: 10,
-                backgroundColor: messageTheme.infoForeground,
+                // El fondo distinto del relleno: con los dos del mismo color
+                // la barra se veía llena aunque no se hubiera hecho nada.
+                backgroundColor: colorTheme.outlineVariant,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   messageTheme.infoForeground,
                 ),

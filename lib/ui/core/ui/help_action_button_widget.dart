@@ -109,7 +109,6 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
   @override
   void dispose() {
-    debugPrint('🔴 [MODAL] dispose() llamado - El modal se destruyó');
     _textScaleController.removeListener(_handleTextScaleChanged);
     _controller.dispose();
     super.dispose();
@@ -161,15 +160,33 @@ class _HelpActionButtonState extends State<HelpActionButton>
         final overlayMediaQuery = MediaQuery.of(overlayContext);
         final overlayHeight = overlayMediaQuery.size.height;
         final overlayWidth = overlayMediaQuery.size.width;
-        final overlaySafeWidth = (overlayWidth - 24).clamp(220.0, 380.0);
-        final overlayPanelWidth = (overlaySafeWidth - 92).clamp(200.0, 260.0);
-        final overlayPanelLeft = (overlaySafeWidth > 300 ? 72.0 : 56.0).clamp(
-          0.0,
-          (overlaySafeWidth - overlayPanelWidth - 16).clamp(
-            0.0,
-            overlaySafeWidth,
-          ),
+        // Lo que hay a la derecha del botón «?» hasta el borde de la pantalla.
+        final available = overlayWidth - exactLeft - 12;
+
+        // Los botones crecen con la letra, pero solo hasta donde cabe la fila
+        // de cuatro (tres categorías y cerrar). Con la letra al 200 % en un
+        // celular la fila medía unos 400 px y el botón de cerrar se salía.
+        final rowFits = (available - 4 * 12) / (4 * 44);
+        final buttonScale = scale.clamp(1.0, rowFits < 1.0 ? 1.0 : rowFits);
+        final buttonWidth = 44.0 * buttonScale;
+        final overlaySafeWidth = (4 * (buttonWidth + 12)).clamp(
+          220.0,
+          available < 220.0 ? 220.0 : available,
         );
+
+        // El panel de cada opción va a la derecha de los botones y crece con
+        // la letra. Si ahí no cabe con un ancho decente, ocupa el ancho de la
+        // pantalla por encima de los botones: mejor tapar los botones un
+        // momento que leer el texto partido a mitad de palabra.
+        var overlayPanelLeft = buttonWidth + (overlayWidth > 360 ? 28.0 : 12.0);
+        var overlayPanelWidth = (available - overlayPanelLeft).clamp(
+          0.0,
+          260.0 * scale,
+        );
+        if (overlayPanelWidth < 260.0) {
+          overlayPanelLeft = 12.0 - exactLeft;
+          overlayPanelWidth = overlayWidth - 24.0;
+        }
         final panelHeight = (overlayHeight - 24.0).clamp(280.0, 520.0);
 
         // Calculate vertical alignment so the modal's TOP aligns with the vertical button's TOP
@@ -214,232 +231,240 @@ class _HelpActionButtonState extends State<HelpActionButton>
         final double absoluteBottom = exactBottom + panelBottomPosition;
         final double absoluteLeft = exactLeft + overlayPanelLeft;
 
-        return Stack(
-          children: [
-            // Fondo atenuado mientras el menú está abierto.
-            //
-            // Antes era transparente del todo, así que los botones parecían
-            // sueltos encima de la pantalla en lugar de una capa, y se
-            // confundían con el contenido que tenían detrás. Atenuar separa
-            // una cosa de la otra y, de paso, sube el contraste de los
-            // botones sobre lo que haya debajo.
-            //
-            // Se anuncia como botón de cerrar: tocar fuera ya cerraba el
-            // menú, pero quien usa lector de pantalla no tenía forma de
-            // saberlo porque no había nada que anunciar.
-            Semantics(
-              button: true,
-              label: 'Cerrar el menú de accesibilidad',
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: _hideOverlay,
-                child: Container(
-                  width: overlayWidth,
-                  height: overlayHeight,
-                  color: Colors.black.withValues(alpha: 0.45),
-                ),
-              ),
-            ),
-            Positioned(
-              left: exactLeft,
-              bottom: exactBottom,
-              child: Material(
-                color: Colors.transparent,
-                child: SizedBox(
-                  width: overlaySafeWidth,
-                  height: panelHeight,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned(
-                        left: 0,
-                        bottom: 0,
-                        // ROW OF COLUMNS: This keeps everything horizontally aligned
-                        // while allowing vertical buttons to shoot up from their specific parent.
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            // 2. The 3 Dynamic Category Buttons
-                            if (_isExpanded)
-                              ...horizontalCategories.map((category) {
-                                bool isActive = _activeCategory == category;
-
-                                IconData displayIcon;
-                                if (category == 'Ajustes de aprendizaje') {
-                                  displayIcon = Icons.psychology;
-                                } else if (category == 'Apoyo') {
-                                  displayIcon = Icons.volunteer_activism;
-                                } else {
-                                  displayIcon = Icons.help;
-                                }
-
-                                /* Horizontal Buttons */
-                                return Padding(
-                                  // This ensures an equal gap between all buttons AND the main closed button.
-                                  padding: const EdgeInsets.only(right: 12.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (isActive) ...[
-                                        ...categoryOptions[category]!.map((
-                                          optionData,
-                                        ) {
-                                          return _buildAnimatedOption(
-                                            icon:
-                                                optionData['icon'] as IconData,
-                                            label:
-                                                optionData['label'] as String,
-                                            color: const Color(0xFF7E57C2),
-                                            onTap: () => _selectOption(
-                                              optionData['label'] as String,
-                                            ),
-                                          );
-                                        }),
-                                        const SizedBox(height: 12),
-                                      ],
-
-                                      // Vertical Buttons
-                                      // (44 - 44) = 12 / 2 = 0. No adding 0px of bottom padding perfectly centers it!
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 0.0,
-                                        ),
-                                        child: GestureDetector(
-                                          behavior: HitTestBehavior.opaque,
-                                          onTap: () =>
-                                              _onHorizontalButtonTapped(
-                                                category,
-                                              ),
-                                          child: AnimatedContainer(
-                                            duration: const Duration(
-                                              milliseconds: 300,
-                                            ),
-                                            width:
-                                                44 *
-                                                scale, // Same as Vertical Buttons
-                                            height:
-                                                44 *
-                                                scale, // Same as Vertical Buttons
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: isActive
-                                                    ? const [
-                                                        Color(0xFFAB47BC),
-                                                        Color(0xFF8E24AA),
-                                                      ]
-                                                    : const [
-                                                        Color(0xFFD8C8F5),
-                                                        Color(0xFFC0A8F0),
-                                                      ],
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                              ),
-                                              shape: BoxShape.circle,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withValues(alpha: 0.18),
-                                                  blurRadius: 10,
-                                                  offset: const Offset(0, 4),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Icon(
-                                              displayIcon,
-                                              color: isActive
-                                                  ? Colors.white
-                                                  : const Color(0xFF7E57C2),
-                                              size:
-                                                  33 *
-                                                  scale, //Same as Vertical Buttons
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
-
-                            // Main and Close Button, Same circle and icons Sizes as Horizontal Buttons
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: _toggleMenu,
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
-                                    width:
-                                        44 *
-                                        scale, // Same as Vertical and Horizontal Buttons
-                                    height:
-                                        44 *
-                                        scale, // Same as Vertical and Horizontal Buttons
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: _isExpanded
-                                            ? const [
-                                                Color(0xFFAB47BC),
-                                                Color(0xFF8E24AA),
-                                              ]
-                                            : const [
-                                                Color(0xFFCD00D3),
-                                                Color(0xFFB000D1),
-                                              ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.18,
-                                          ),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Icon(
-                                      Icons.close,
-                                      color: Colors.white,
-                                      size:
-                                          33.0 *
-                                          scale, // Same as Vertical and Horizontal Buttons
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+        return _HelpButtonScale(
+          scale: buttonScale,
+          child: Stack(
+            children: [
+              // Fondo atenuado mientras el menú está abierto.
+              //
+              // Antes era transparente del todo, así que los botones parecían
+              // sueltos encima de la pantalla en lugar de una capa, y se
+              // confundían con el contenido que tenían detrás. Atenuar separa
+              // una cosa de la otra y, de paso, sube el contraste de los
+              // botones sobre lo que haya debajo.
+              //
+              // Se anuncia como botón de cerrar: tocar fuera ya cerraba el
+              // menú, pero quien usa lector de pantalla no tenía forma de
+              // saberlo porque no había nada que anunciar.
+              Semantics(
+                button: true,
+                label: 'Cerrar el menú de accesibilidad',
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _hideOverlay,
+                  child: Container(
+                    width: overlayWidth,
+                    height: overlayHeight,
+                    color: Colors.black.withValues(alpha: 0.45),
                   ),
                 ),
               ),
-            ),
-            if (_selectedOption != null)
               Positioned(
-                left: absoluteLeft,
-                bottom: absoluteBottom,
+                left: exactLeft,
+                bottom: exactBottom,
                 child: Material(
                   color: Colors.transparent,
                   child: SizedBox(
-                    width: overlayPanelWidth,
-                    child: _OptionPanel(
-                      option: _selectedOption!,
-                      onClose: _closePanel,
-                      width: overlayPanelWidth,
-                      height: panelHeight,
-                      onRefresh: _refreshOverlay,
+                    width: overlaySafeWidth,
+                    height: panelHeight,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned(
+                          left: 0,
+                          bottom: 0,
+                          // ROW OF COLUMNS: This keeps everything horizontally aligned
+                          // while allowing vertical buttons to shoot up from their specific parent.
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              // 2. The 3 Dynamic Category Buttons
+                              if (_isExpanded)
+                                ...horizontalCategories.map((category) {
+                                  bool isActive = _activeCategory == category;
+
+                                  IconData displayIcon;
+                                  if (category == 'Ajustes de aprendizaje') {
+                                    displayIcon = Icons.psychology;
+                                  } else if (category == 'Apoyo') {
+                                    displayIcon = Icons.volunteer_activism;
+                                  } else {
+                                    displayIcon = Icons.help;
+                                  }
+
+                                  /* Horizontal Buttons */
+                                  return Padding(
+                                    // This ensures an equal gap between all buttons AND the main closed button.
+                                    padding: const EdgeInsets.only(right: 12.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (isActive) ...[
+                                          ...categoryOptions[category]!.map((
+                                            optionData,
+                                          ) {
+                                            return _buildAnimatedOption(
+                                              icon:
+                                                  optionData['icon']
+                                                      as IconData,
+                                              label:
+                                                  optionData['label'] as String,
+                                              color: const Color(0xFF7E57C2),
+                                              onTap: () => _selectOption(
+                                                optionData['label'] as String,
+                                              ),
+                                            );
+                                          }),
+                                          const SizedBox(height: 12),
+                                        ],
+
+                                        // Vertical Buttons
+                                        // (44 - 44) = 12 / 2 = 0. No adding 0px of bottom padding perfectly centers it!
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 0.0,
+                                          ),
+                                          child: GestureDetector(
+                                            behavior: HitTestBehavior.opaque,
+                                            onTap: () =>
+                                                _onHorizontalButtonTapped(
+                                                  category,
+                                                ),
+                                            child: AnimatedContainer(
+                                              duration: const Duration(
+                                                milliseconds: 300,
+                                              ),
+                                              width:
+                                                  44 *
+                                                  buttonScale, // Same as Vertical Buttons
+                                              height:
+                                                  44 *
+                                                  buttonScale, // Same as Vertical Buttons
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: isActive
+                                                      ? const [
+                                                          Color(0xFFAB47BC),
+                                                          Color(0xFF8E24AA),
+                                                        ]
+                                                      : const [
+                                                          Color(0xFFD8C8F5),
+                                                          Color(0xFFC0A8F0),
+                                                        ],
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                ),
+                                                shape: BoxShape.circle,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withValues(
+                                                          alpha: 0.18,
+                                                        ),
+                                                    blurRadius: 10,
+                                                    offset: const Offset(0, 4),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Icon(
+                                                displayIcon,
+                                                color: isActive
+                                                    ? Colors.white
+                                                    : const Color(0xFF7E57C2),
+                                                size:
+                                                    33 *
+                                                    buttonScale, //Same as Vertical Buttons
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+
+                              // Main and Close Button, Same circle and icons Sizes as Horizontal Buttons
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: _toggleMenu,
+                                    child: AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      width:
+                                          44 *
+                                          buttonScale, // Same as Vertical and Horizontal Buttons
+                                      height:
+                                          44 *
+                                          buttonScale, // Same as Vertical and Horizontal Buttons
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: _isExpanded
+                                              ? const [
+                                                  Color(0xFFAB47BC),
+                                                  Color(0xFF8E24AA),
+                                                ]
+                                              : const [
+                                                  Color(0xFFCD00D3),
+                                                  Color(0xFFB000D1),
+                                                ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.18,
+                                            ),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Icon(
+                                        Icons.close,
+                                        color: Colors.white,
+                                        size:
+                                            33.0 *
+                                            buttonScale, // Same as Vertical and Horizontal Buttons
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
-          ],
+              if (_selectedOption != null)
+                Positioned(
+                  left: absoluteLeft,
+                  bottom: absoluteBottom,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: SizedBox(
+                      width: overlayPanelWidth,
+                      child: _OptionPanel(
+                        option: _selectedOption!,
+                        onClose: _closePanel,
+                        width: overlayPanelWidth,
+                        height: panelHeight,
+                        onRefresh: _refreshOverlay,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         );
       },
     );
@@ -560,28 +585,36 @@ class _HelpActionButtonState extends State<HelpActionButton>
     // consistently across screens. No SafeArea to avoid the white row.
     return Offstage(
       offstage: _overlayEntry != null,
-      child: GestureDetector(
-        key: _buttonKey, // <-- Attach the key here
-        behavior: HitTestBehavior.opaque,
-        onTap: _toggleMenu,
-        child: Container(
-          width: 44 * scale, // Same as Vertical and Horizontal Buttons
-          height: 44 * scale, // Same as Vertical and Horizontal Buttons
-          decoration: BoxDecoration(
-            color: const Color(0xFF7E57C2),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF7E57C2).withValues(alpha: 0.25),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Icon(
-            Icons.question_mark,
-            color: Colors.white,
-            size: 33 * scale, // Same as Vertical and Horizontal Buttons
+      // Sin etiqueta, el lector de pantalla anunciaba un botón sin nombre:
+      // justo quien más necesita este menú no sabía qué era.
+      child: Semantics(
+        button: true,
+        label: 'Ayuda y accesibilidad',
+        hint: 'Abre el menú de ayuda, ajustes de aprendizaje y apoyo',
+        excludeSemantics: true,
+        child: GestureDetector(
+          key: _buttonKey, // <-- Attach the key here
+          behavior: HitTestBehavior.opaque,
+          onTap: _toggleMenu,
+          child: Container(
+            width: 44 * scale, // Same as Vertical and Horizontal Buttons
+            height: 44 * scale, // Same as Vertical and Horizontal Buttons
+            decoration: BoxDecoration(
+              color: const Color(0xFF7E57C2),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF7E57C2).withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.question_mark,
+              color: Colors.white,
+              size: 33 * scale, // Same as Vertical and Horizontal Buttons
+            ),
           ),
         ),
       ),
@@ -618,6 +651,20 @@ class _HelpActionButtonState extends State<HelpActionButton>
   }
 }
 
+/// El tamaño de los botones del menú abierto, ya ajustado a lo que cabe.
+class _HelpButtonScale extends InheritedWidget {
+  const _HelpButtonScale({required this.scale, required super.child});
+
+  final double scale;
+
+  static double? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_HelpButtonScale>()?.scale;
+
+  @override
+  bool updateShouldNotify(_HelpButtonScale oldWidget) =>
+      oldWidget.scale != scale;
+}
+
 class _AccessibilityIconButton extends StatelessWidget {
   /*
   Vertical Buttons, Figma aesthetic perfectly.
@@ -636,7 +683,9 @@ class _AccessibilityIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double scale = AccessibilityTextScaleScope.of(context).scale;
+    final double scale =
+        _HelpButtonScale.maybeOf(context) ??
+        AccessibilityTextScaleScope.of(context).scale;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -755,7 +804,6 @@ I assume the final parts of the file contain the small helper widgets mentioned 
   }
 
   void _applyVisualMode(AppThemeMode mode) {
-    debugPrint('🔵 [MODAL] _applyVisualMode(): Cambiando modo a: $mode');
     // The notifier rebuilds both the app theme and this panel.
     ThemeManager.changeTheme(mode);
   }
@@ -985,7 +1033,6 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                       label: const Text('Oscuro'),
                       selected: currentThemeMode == AppThemeMode.dark,
                       onSelected: (_) {
-                        debugPrint('🔵 [MODAL] Cambiando modo a DARK');
                         _applyVisualMode(AppThemeMode.dark);
                       },
                     ),
@@ -995,7 +1042,6 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                       label: const Text('Claro'),
                       selected: currentThemeMode == AppThemeMode.light,
                       onSelected: (_) {
-                        debugPrint('🔵 [MODAL] Cambiando modo a LIGHT');
                         _applyVisualMode(AppThemeMode.light);
                       },
                     ),
@@ -1074,9 +1120,6 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                       showCheckmark: true,
                       onSelected: (bool selected) {
                         if (selected) {
-                          debugPrint(
-                            '🔵 [MODAL] Cambiando modo de daltonismo: $mode, y enviado a _applyVisualMode()',
-                          );
                           _applyVisualMode(mode);
                         } else {
                           // Si el usuario vuelve a tocar el chip activo para desmarcarlo, vuelve a claro
@@ -1444,7 +1487,6 @@ Widget _buildInfoBanner({
   required String title,
   required String subtitle,
 }) {
-  debugPrint('🚨 [TEST] _buildInfoBanner: BOTONES VERTICALES DESPLEGADOS');
   return Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(

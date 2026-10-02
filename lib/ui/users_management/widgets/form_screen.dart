@@ -144,6 +144,10 @@ class _FormScreenState extends State<FormScreen> {
                         ),
                         const SizedBox(height: 20),
                         Container(
+                          // A todo el ancho disponible. Sin esto la tarjeta
+                          // medía lo que su contenido y en una tablet quedaba
+                          // más estrecha que en un celular.
+                          width: double.infinity,
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -214,6 +218,9 @@ class _FormScreenState extends State<FormScreen> {
                               ),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int?>(
+                                // Sin esto la opción elegida no se encoge y se
+                                // sale por la derecha en un celular estrecho.
+                                isExpanded: true,
                                 initialValue: _tipoDiscapacidad,
                                 decoration: _inputDecoration(),
                                 items: const [
@@ -244,6 +251,7 @@ class _FormScreenState extends State<FormScreen> {
                               ),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<String>(
+                                isExpanded: true,
                                 initialValue: _selectedRole,
                                 decoration: _inputDecoration(),
                                 items: const [
@@ -287,45 +295,53 @@ class _FormScreenState extends State<FormScreen> {
                                 ),
                               ],
                               const SizedBox(height: 12),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: Checkbox(
-                                      value: _acceptTerms,
-                                      activeColor: const Color(0xFF5C6BC0),
-                                      onChanged: (val) {
-                                        setState(
-                                          () => _acceptTerms = val ?? false,
-                                        );
-                                      },
-                                    ),
+                              // Toda la fila se pulsa, no solo la casilla: la
+                              // casilla de 20 px era menos de la mitad del
+                              // mínimo táctil, difícil de acertar con el dedo
+                              // o con poco control motor.
+                              MergeSemantics(
+                                child: InkWell(
+                                  onTap: () => setState(
+                                    () => _acceptTerms = !_acceptTerms,
                                   ),
-                                  const SizedBox(width: 8),
-                                  const Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  child: Row(
                                     children: [
-                                      Text(
-                                        'Aviso',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFF424242),
-                                        ),
+                                      Checkbox(
+                                        value: _acceptTerms,
+                                        activeColor: const Color(0xFF5C6BC0),
+                                        onChanged: (val) {
+                                          setState(
+                                            () => _acceptTerms = val ?? false,
+                                          );
+                                        },
                                       ),
-                                      Text(
-                                        'Acepto términos y condiciones',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0xFF757575),
+                                      const SizedBox(width: 4),
+                                      const Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Aviso',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xFF424242),
+                                              ),
+                                            ),
+                                            Text(
+                                              'Acepto términos y condiciones',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Color(0xFF616161),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
                               const SizedBox(height: 16),
                               SizedBox(

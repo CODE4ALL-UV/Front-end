@@ -69,35 +69,44 @@ class GlobalAppBarWidget extends StatelessWidget
       );
     }
 
-    return Semantics(
-      header: true, // Avisa al lector de pantalla que es un navbar
-      label: 'Encabezado de la pantalla: $title',
-      child: AppBar(
-        leading: buildLeading(),
-        title: Text(title),
-        actions:
-            actions ??
-            (showUserIcon
-                ? [
-                    ...extraActions,
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        right: 12,
-                      ), //ORIGINAL ES/ERA EdgeInsets.symmetric(horizontal: 8.0)
-                      child: UserProfileMenu(
-                        userName: userName,
-                        userPhotoUrl: userPhotoUrl,
-                        userEmail: userEmail,
-                        userRole: userRole,
-                        onLogout: onLogout,
-                        showName:
-                            true, // Fusionado: Para que se vea el nombre al lado del avatar
+    // En un celular la barra lleva el título, los botones y el avatar. Con el
+    // nombre al lado no cabía nada: el título quedaba en «C…». Se muestra a
+    // partir de tablet.
+    final roomy = MediaQuery.sizeOf(context).width >= 600;
+
+    // La barra crece con la letra hasta el 150 %: más allá los botones se
+    // salían y el título desaparecía. El contenido sí llega al 200 %.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.5,
+      child: Semantics(
+        header: true, // Avisa al lector de pantalla que es un navbar
+        label: 'Encabezado de la pantalla: $title',
+        child: AppBar(
+          leading: buildLeading(),
+          title: Text(title),
+          actions:
+              actions ??
+              (showUserIcon
+                  ? [
+                      ...extraActions,
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          right: 12,
+                        ), //ORIGINAL ES/ERA EdgeInsets.symmetric(horizontal: 8.0)
+                        child: UserProfileMenu(
+                          userName: userName,
+                          userPhotoUrl: userPhotoUrl,
+                          userEmail: userEmail,
+                          userRole: userRole,
+                          onLogout: onLogout,
+                          showName: roomy,
+                        ),
                       ),
-                    ),
-                  ]
-                : (extraActions.isEmpty ? null : extraActions)),
-        bottom:
-            bottom, // <-- Renderiza el TabBar pasándole el control desde la pantalla
+                    ]
+                  : (extraActions.isEmpty ? null : extraActions)),
+          bottom:
+              bottom, // <-- Renderiza el TabBar pasándole el control desde la pantalla
+        ),
       ),
     );
   }

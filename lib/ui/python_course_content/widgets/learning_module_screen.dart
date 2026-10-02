@@ -92,12 +92,11 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
   @override
   void initState() {
     super.initState();
-    debugPrint('🔵 [SCREEN] initState Módulo ${widget.moduleId}');
 
     // Lo que el docente haya editado del temario. Si el servidor no responde
     // no pasa nada: se sigue viendo el módulo de fábrica.
     _content.addListener(_onContentChanged);
-    _content.refresh();
+    _content.refreshIfStale();
     _preferences.addListener(_onPreferencesChanged);
     _preferences.ensureLoaded().then((_) {
       if (mounted) setState(() {});
@@ -107,9 +106,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     // Usamos addPostFrameCallback para evitar errores de redibujado de Flutter.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && widget.onModuleChanged != null) {
-        debugPrint(
-          '🔵 [SCREEN] Avisando a app.dart que estamos en el Módulo ${widget.moduleId}',
-        );
         widget.onModuleChanged!(widget.moduleId);
       }
     });
@@ -269,10 +265,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     _isNavigating = true;
     _stopSpeechBeforeLeaving();
 
-    debugPrint(
-      '⏩ [SCREEN] Navegando del Módulo ${widget.moduleId} al ${widget.moduleId + 1}',
-    );
-
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -288,7 +280,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
       ),
     ).then((_) {
       _isNavigating = false;
-      debugPrint('⏪ [SCREEN] Regresamos (pop) al Módulo ${widget.moduleId}');
       // NUEVO: Cuando el usuario le da "Atrás" (pop) y vuelve a este módulo,
       // volvemos a avisarle a app.dart que recupere el color de ESTE módulo.
       if (mounted && widget.onModuleChanged != null) {
@@ -301,10 +292,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     if (_isNavigating || widget.moduleId <= 1) return;
     _isNavigating = true;
     _stopSpeechBeforeLeaving();
-
-    debugPrint(
-      '⏪ [SCREEN] Navegando del Módulo ${widget.moduleId} al ${widget.moduleId - 1}',
-    );
 
     Navigator.push(
       context,
@@ -320,7 +307,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
       ),
     ).then((_) {
       _isNavigating = false;
-      debugPrint('⏪ [SCREEN] Regresamos (pop) al Módulo ${widget.moduleId}');
       if (mounted && widget.onModuleChanged != null) {
         widget.onModuleChanged!(widget.moduleId);
       }
@@ -335,14 +321,6 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
         .clamp(12.0, 28.0)
         .toDouble();
     final appModuleTheme = context.moduleColors;
-    final currentThemeMode = ThemeManager.themeNotifier.value;
-
-    debugPrint(
-      '🟣 [SCREEN] Haciendo BUILD Módulo ${widget.moduleId} with AppThemeMode $currentThemeMode',
-    );
-    // debugPrint(
-    //   '🟣 [SCREEN] Colores extraídos: Header=${appModuleTheme.headerBackground}, Icono1=${appModuleTheme.chapterIconColor1}',
-    // );
 
     return Scaffold(
       appBar: GlobalAppBarWidget(

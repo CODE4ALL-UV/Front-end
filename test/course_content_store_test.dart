@@ -8,6 +8,7 @@ import 'package:flutter_code4all/data/course/course_content_json.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
+import 'package:flutter_code4all/data/services/auth_storage.dart';
 
 /// Comprueba que lo que el docente edita llega al estudiante, y que cuando el
 /// servidor no está el curso se sigue viendo entero.
@@ -264,6 +265,62 @@ void main() {
     });
   });
 
+  group('sin pedir de más', () {
+    var requests = 0;
+
+    void countingServer(int status) {
+      requests = 0;
+      store.debugUse(
+        api: ApiService(baseUrl: 'http://servidor.de.prueba'),
+        auth: _FakeAuth(),
+        client: MockClient((request) async {
+          requests++;
+          return http.Response(
+            jsonEncode({'version': 'x', 'count': 0, 'items': []}),
+            status,
+          );
+        }),
+      );
+    }
+
+    test('al pasar del módulo al capítulo no se vuelve a pedir', () async {
+      countingServer(200);
+
+      await store.refreshIfStale(); // al abrir el módulo
+      await store.refreshIfStale(); // al abrir el capítulo, justo después
+
+      expect(requests, 1);
+    });
+
+    test('pasado el rato, sí se pide otra vez', () async {
+      countingServer(200);
+
+      await store.refreshIfStale();
+      await store.refreshIfStale(maxAge: Duration.zero);
+
+      expect(requests, 2);
+    });
+
+    test('si el servidor falló, se vuelve a intentar enseguida', () async {
+      countingServer(500);
+
+      await store.refreshIfStale();
+      await store.refreshIfStale();
+
+      expect(requests, 2);
+    });
+
+    test('al cambiar de curso se pide lo del nuevo', () async {
+      countingServer(200);
+
+      await store.refreshIfStale();
+      await store.useCourse(7);
+      await store.refreshIfStale();
+
+      expect(requests, 2);
+    });
+  });
+
   group('ida y vuelta', () {
     test('una sección convertida a JSON y de vuelta es la misma', () {
       final original = PythonCourseCatalog.section(1, 1)!;
@@ -325,6 +382,12 @@ void main() {
       }
     });
   });
+}
+
+/// Los cursos de un docente piden sesión.
+class _FakeAuth extends AuthStorage {
+  @override
+  Future<String?> getToken() async => 'token-de-prueba';
 }
 
 class _SinRed implements Exception {

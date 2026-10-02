@@ -49,6 +49,9 @@ class CourseContentStore extends ChangeNotifier {
   bool _loading = false;
   String? _problem;
 
+  /// Cuándo llegó del servidor la última versión buena.
+  DateTime? _syncedAt;
+
   int? _courseId;
 
   /// El curso cuyo temario se está mostrando. Null es el Curso general.
@@ -66,6 +69,7 @@ class CourseContentStore extends ChangeNotifier {
     _edits.clear();
     _loaded = false;
     _problem = null;
+    _syncedAt = null;
     notifyListeners();
     await refresh();
   }
@@ -119,6 +123,7 @@ class CourseContentStore extends ChangeNotifier {
       } else {
         _apply(responseText(response));
         _problem = null;
+        _syncedAt = DateTime.now();
       }
     } catch (e) {
       // Sin servidor se sigue viendo el curso de fábrica, que es justo el
@@ -146,6 +151,21 @@ class CourseContentStore extends ChangeNotifier {
 
       _edits['$scope:$target'] = Map<String, dynamic>.from(content);
     }
+  }
+
+  /// Como [refresh], pero sin volver a preguntar si la última respuesta
+  /// llegó hace menos de [maxAge].
+  ///
+  /// Al entrar a un módulo, luego a un capítulo y volver, cada pantalla pedía
+  /// el temario otra vez: varias peticiones por minuto que traían lo mismo y
+  /// redibujaban la pantalla dos veces cada una. Con una ventana corta el
+  /// estudiante sigue viendo lo que cambie el docente casi al momento.
+  Future<void> refreshIfStale({Duration maxAge = const Duration(seconds: 30)}) {
+    final synced = _syncedAt;
+    if (synced != null && DateTime.now().difference(synced) < maxAge) {
+      return Future.value();
+    }
+    return refresh();
   }
 
   /// Carga una sola vez. Las siguientes llamadas no hacen nada.
@@ -230,20 +250,14 @@ class CourseContentStore extends ChangeNotifier {
   /// No borra nada del curso: quita la edición, con lo que vuelve a verse el
   /// material original. Por eso se puede deshacer sin miedo.
   Future<void> revertSection(String sectionId) async {
-    await _write(
-      method: 'DELETE',
-      path: '$_base/section/$sectionId',
-    );
+    await _write(method: 'DELETE', path: '$_base/section/$sectionId');
 
     _edits.remove(sectionKey(sectionId));
     notifyListeners();
   }
 
   Future<void> revertModuleTitle(int moduleNumber) async {
-    await _write(
-      method: 'DELETE',
-      path: '$_base/module/$moduleNumber',
-    );
+    await _write(method: 'DELETE', path: '$_base/module/$moduleNumber');
 
     _edits.remove(moduleKey(moduleNumber));
     notifyListeners();
@@ -322,6 +336,7 @@ class CourseContentStore extends ChangeNotifier {
     _loaded = false;
     _loading = false;
     _problem = null;
+    _syncedAt = null;
     _api = ApiService();
     _client = http.Client();
     _auth = AuthStorage();

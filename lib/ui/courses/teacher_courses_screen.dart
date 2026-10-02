@@ -331,8 +331,10 @@ class _TeacherCourseCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: colors.outlineVariant),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+              // Wrap y no Row: con la letra grande o en un celular estrecho
+              // el código baja a su propia línea en vez de salirse.
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
                     'Código: ',

@@ -163,9 +163,14 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Row(
+                      // Wrap y no Row: con la letra grande el botón de orden
+                      // baja a su línea en vez de empujar fuera el recuento.
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          Expanded(
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
                             child: Text(
                               '${students.length} '
                               '${students.length == 1 ? "estudiante" : "estudiantes"}'
@@ -304,11 +309,13 @@ class _StudentRow extends StatelessWidget {
                                   color: appColorScheme.onSurfaceVariant,
                                 ),
                                 const SizedBox(width: 4),
-                                Text(
-                                  'Sin empezar',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: appColorScheme.onSurfaceVariant,
+                                Flexible(
+                                  child: Text(
+                                    'Sin empezar',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: appColorScheme.onSurfaceVariant,
+                                    ),
                                   ),
                                 ),
                               ],

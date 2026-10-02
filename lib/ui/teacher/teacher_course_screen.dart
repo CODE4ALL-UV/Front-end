@@ -618,7 +618,14 @@ class _SectionRow extends StatelessWidget {
                                   ? FontWeight.w700
                                   : FontWeight.w600,
                               color: selected
-                                  ? accent
+                                  ? AppContrast.readableOn(
+                                      accent,
+                                      Color.alphaBlend(
+                                        accent.withValues(alpha: 0.12),
+                                        appColorScheme.surface,
+                                      ),
+                                      AppContrast.text,
+                                    )
                                   : appColorScheme.onSurface,
                             ),
                           ),

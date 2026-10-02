@@ -362,11 +362,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final isWide = screenWidth >= 800;
-    final logoSize = screenWidth < 360 ? 180.0 : (isWide ? 250.0 : 220.0);
-    final horizontalPadding = screenWidth < 480 ? 20.0 : 32.0;
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: GlobalAppBarWidget(
@@ -415,150 +410,200 @@ class _LoginScreenState extends State<LoginScreen> {
               // encontrarlo antes de escribir nada, no después de desplazarse.
               const AccessibilityToolbar(),
               Expanded(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 560),
-                    child: SingleChildScrollView(
-                      // Abajo, sitio para el botón del teclado Braille: con la
-                      // letra grande tapaba «Iniciar sesión».
-                      padding: EdgeInsets.fromLTRB(
-                        horizontalPadding,
-                        24,
-                        horizontalPadding,
-                        96,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset(
-                            'assets/images/logo-flutter.png',
-                            height: logoSize,
-                            width: logoSize,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            LoginScreen.brailleHint,
-                            key: const ValueKey('braille-login-hint'),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 12),
-                          TextField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              labelText: 'Correo electrónico',
-                              suffixIcon: _micButton(
-                                _emailController,
-                                DictationKind.email,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          TextField(
-                            controller: _passwordController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: 'Contraseña',
-                              suffixIcon: _micButton(
-                                _passwordController,
-                                DictationKind.password,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: AlignmentDirectional.centerEnd,
-                            child: TextButton(
-                              key: const ValueKey('forgot-password'),
-                              onPressed: _openForgotPassword,
-                              style: TextButton.styleFrom(
-                                minimumSize: const Size(48, 48),
-                              ),
-                              child: const Text('¿Olvidaste tu contraseña?'),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 52,
-                            child: ElevatedButton(
-                              onPressed: _isLoading ? null : _handleLogin,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF1E88E5),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              child: _isLoading
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Text('INICIAR SESIÓN'),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          SocialAuthBlock(
-                            onGoogleTap: () {
-                              _handleGoogleSignIn();
-                            },
-                            onFacebookTap: _handleFacebookSignIn,
-                          ),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 52,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFF1E88E5),
-                                    Color(0xFF1565C0),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: ElevatedButton(
-                                onPressed: widget.onRegister ?? () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: const Text(
-                                  'REGISTRARSE',
-                                  style: TextStyle(
-                                    color: Color(0xFFFFD600),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 2,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) => constraints.maxWidth >= 900
+                      ? _twoColumns(context, constraints)
+                      : _oneColumn(context, constraints),
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// El logo. Su alto lo decide quien lo coloca, según el sitio que haya.
+  Widget _logo(double height) => Image.asset(
+    'assets/images/logo-flutter.png',
+    height: height,
+    fit: BoxFit.contain,
+  );
+
+  Widget _brailleHint(BuildContext context) => Text(
+    LoginScreen.brailleHint,
+    key: const ValueKey('braille-login-hint'),
+    textAlign: TextAlign.center,
+    style: Theme.of(
+      context,
+    ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+  );
+
+  /// Correo, contraseña y todas las formas de entrar o registrarse.
+  Widget _form() => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      TextField(
+        controller: _emailController,
+        keyboardType: TextInputType.emailAddress,
+        decoration: InputDecoration(
+          labelText: 'Correo electrónico',
+          suffixIcon: _micButton(_emailController, DictationKind.email),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+      const SizedBox(height: 12),
+      TextField(
+        controller: _passwordController,
+        obscureText: true,
+        decoration: InputDecoration(
+          labelText: 'Contraseña',
+          suffixIcon: _micButton(_passwordController, DictationKind.password),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+      Align(
+        alignment: AlignmentDirectional.centerEnd,
+        child: TextButton(
+          key: const ValueKey('forgot-password'),
+          onPressed: _openForgotPassword,
+          style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+          child: const Text('¿Olvidaste tu contraseña?'),
+        ),
+      ),
+      const SizedBox(height: 4),
+      SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: ElevatedButton(
+          onPressed: _isLoading ? null : _handleLogin,
+          style: ElevatedButton.styleFrom(
+            // 1E88E5 con letra blanca: 3,7:1. Este, 5,8:1.
+            backgroundColor: const Color(0xFF1565C0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          child: _isLoading
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Text('INICIAR SESIÓN'),
+        ),
+      ),
+      const SizedBox(height: 20),
+      SocialAuthBlock(
+        onGoogleTap: () {
+          _handleGoogleSignIn();
+        },
+        onFacebookTap: _handleFacebookSignIn,
+      ),
+      const SizedBox(height: 20),
+      SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                // El amarillo sobre 1E88E5 se quedaba en
+                // 2,6:1. Sobre estos azules pasa de 5,3.
+                Color(0xFF1152A8),
+                Color(0xFF0D47A1),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: ElevatedButton(
+            onPressed: widget.onRegister ?? () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              elevation: 0,
+            ),
+            child: const Text(
+              'REGISTRARSE',
+              style: TextStyle(
+                color: Color(0xFFFFD600),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+
+  /// Celular y tablet en vertical: todo en una columna.
+  ///
+  /// El logo se ajusta al alto que haya. Fijo en 220 px, en un celular bajo
+  /// empujaba «Iniciar sesión» fuera de la vista nada más abrir la app.
+  Widget _oneColumn(BuildContext context, BoxConstraints constraints) {
+    final padding = constraints.maxWidth < 480 ? 20.0 : 32.0;
+    final logoHeight = (constraints.maxHeight * 0.2).clamp(80.0, 160.0);
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: SingleChildScrollView(
+          // Abajo, sitio para el botón del teclado Braille: con la letra
+          // grande tapaba «Iniciar sesión».
+          padding: EdgeInsets.fromLTRB(padding, 16, padding, 96),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _logo(logoHeight),
+              const SizedBox(height: 8),
+              _brailleHint(context),
+              const SizedBox(height: 12),
+              _form(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Portátil y tablet en horizontal: el logo y el aviso a la izquierda, el
+  /// formulario a la derecha.
+  ///
+  /// En una sola columna, con el logo de 250 px, el login medía unos 800 px de
+  /// alto. En un portátil quedan unos 600 bajo la barra del navegador:
+  /// «Registrarse» salía cortado y había que desplazarse para encontrarlo.
+  Widget _twoColumns(BuildContext context, BoxConstraints constraints) {
+    final logoHeight = (constraints.maxHeight * 0.3).clamp(100.0, 200.0);
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1000),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _logo(logoHeight),
+                    const SizedBox(height: 16),
+                    _brailleHint(context),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 56),
+              Expanded(child: _form()),
             ],
           ),
         ),

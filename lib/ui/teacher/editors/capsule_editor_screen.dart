@@ -101,7 +101,6 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final appColorsTheme = context.colorScheme;
-    final moduleTheme = context.moduleColors;
 
     return EditorScaffold(
       title: 'Cápsula de conocimiento',
@@ -187,7 +186,9 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                             });
                           }
                         },
-                        color: moduleTheme.lessonCardBorder,
+                        // Era el color de un borde semitransparente: la X
+                        // de quitar apenas se veía (2:1).
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         icon: const Icon(Icons.close, size: 18),
                       ),
                       child: Column(
@@ -223,7 +224,9 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
                         style: TextStyle(
                           fontSize: 12.5,
                           height: 1.4,
-                          color: moduleTheme.lessonCardBorder,
+                          // Era el color de un borde, semitransparente: en el
+                          // tema oscuro no se leía.
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(height: AppMetrics.gap),

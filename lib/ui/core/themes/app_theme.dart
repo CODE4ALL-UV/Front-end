@@ -207,6 +207,29 @@ class AppTheme {
   ///
   /// Ningún texto lleva un color fijo: todos salen del colorScheme. Un negro
   /// fijo se ve bien en el tema claro y desaparece en el oscuro.
+  /// Fondo y texto de un botón desactivado que todavía se lee.
+  ///
+  /// Material pinta los desactivados con el texto al 38 %: gris claro sobre
+  /// gris claro, unos 2:1. Quien tiene baja visión no llegaba a leer
+  /// «Guardar» y no sabía que estaba ahí, esperando un cambio. Desactivado se
+  /// distingue del activo por el color, no por desaparecer.
+  static ({Color background, Color foreground}) disabledColors(
+    ColorScheme scheme,
+  ) {
+    final background = Color.alphaBlend(
+      scheme.onSurface.withValues(alpha: 0.12),
+      scheme.surface,
+    );
+    return (
+      background: background,
+      foreground: AppContrast.readableOn(
+        scheme.onSurfaceVariant,
+        background,
+        AppContrast.text,
+      ),
+    );
+  }
+
   static ThemeData _buildTheme({
     required Brightness brightness,
     required Color scaffoldBackgroundColor,
@@ -233,6 +256,19 @@ class AppTheme {
     final onAccent = accent == colorScheme.primary
         ? colorScheme.onPrimary
         : colorScheme.onSecondary;
+
+    final disabled = disabledColors(colorScheme);
+    // Texto e iconos desactivados sobre la superficie, sin fondo propio.
+    final disabledText = AppContrast.readableOn(
+      colorScheme.onSurfaceVariant,
+      colorScheme.surface,
+      AppContrast.text,
+    );
+    final disabledIcon = AppContrast.readableOn(
+      colorScheme.outline,
+      colorScheme.surface,
+      AppContrast.ui,
+    );
 
     return baseTheme.copyWith(
       colorScheme: colorScheme,
@@ -298,6 +334,8 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
+          disabledBackgroundColor: disabled.background,
+          disabledForegroundColor: disabled.foreground,
           minimumSize: const Size(0, AppMetrics.minTapTarget),
           padding: const EdgeInsets.symmetric(
             horizontal: AppMetrics.paddingH,
@@ -337,12 +375,25 @@ class AppTheme {
         ),
       ),
       iconTheme: IconThemeData(color: colorScheme.onSurface, size: 24),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          disabledBackgroundColor: disabled.background,
+          disabledForegroundColor: disabled.foreground,
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(disabledForegroundColor: disabledIcon),
+      ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: colorScheme.secondary),
+        style: TextButton.styleFrom(
+          foregroundColor: colorScheme.secondary,
+          disabledForegroundColor: disabledText,
+        ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: colorScheme.secondary,
+          disabledForegroundColor: disabledText,
           side: BorderSide(color: colorScheme.secondary, width: 1.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -386,6 +437,9 @@ class AppTheme {
       chipTheme: ChipThemeData(
         selectedColor: accent.withValues(alpha: 0.18),
         checkmarkColor: colorScheme.onSurface,
+        // Sin esto el icono de un chip elegido salía blanco sobre el tinte
+        // claro de la selección.
+        iconTheme: IconThemeData(color: colorScheme.onSurface, size: 18),
         labelStyle: TextStyle(color: colorScheme.onSurface),
         side: BorderSide(color: colorScheme.outline),
       ),
@@ -396,7 +450,7 @@ class AppTheme {
       ),
       tabBarTheme: TabBarThemeData(
         labelColor: colorScheme.onPrimary,
-        unselectedLabelColor: colorScheme.onPrimary.withValues(alpha: 0.78),
+        unselectedLabelColor: colorScheme.onPrimary.withValues(alpha: 0.92),
         indicatorColor: colorScheme.onPrimary,
         dividerColor: Colors.transparent,
       ),

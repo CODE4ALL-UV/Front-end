@@ -315,10 +315,11 @@ class _ActivityBanner extends StatelessWidget {
                       color: appModuleTheme.headerIconBackground,
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    // Antes tenía el color de su propio fondo y no se veía.
                     child: Icon(
                       activityIcon,
                       size: 24,
-                      color: appModuleTheme.headerIconBackground,
+                      color: appModuleTheme.headerForeground,
                     ),
                   ),
                   const SizedBox(width: 14),

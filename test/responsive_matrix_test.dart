@@ -52,6 +52,8 @@ import 'package:flutter_code4all/ui/users_management/widgets/forgot_password_scr
 import 'package:flutter_code4all/ui/users_management/widgets/form_screen.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/login_screen.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/reset_password_screen.dart';
+
+import 'support/text_contrast.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 
 /// Toda la aplicación, pantalla por pantalla, en los tamaños donde se usa.
@@ -98,6 +100,12 @@ const _viewports = [
 
 /// Carpeta donde guardar capturas. Vacía: no se guarda nada.
 const _shotsDir = String.fromEnvironment('SHOTS_DIR');
+
+/// Archivo donde apuntar los textos con poco contraste en vez de fallar,
+/// para revisarlos todos de una vez:
+///
+///     flutter test test/responsive_matrix_test.dart --dart-define=CONTRAST_REPORT=contraste.txt
+const _contrastReport = String.fromEnvironment('CONTRAST_REPORT');
 
 /// Los tamaños que se fotografían: con más serían demasiadas para revisar.
 bool _photographed(_Viewport v) =>
@@ -646,7 +654,7 @@ void main() {
               key: _shotKey,
               child: MaterialApp(
                 debugShowCheckedModeBanner: false,
-              theme: AppTheme.getTheme(mode: AppThemeMode.light),
+                theme: AppTheme.getTheme(mode: AppThemeMode.light),
                 builder: (context, child) => MediaQuery(
                   data: MediaQuery.of(
                     context,
@@ -670,6 +678,59 @@ void main() {
       } finally {
         FlutterError.onError = previous;
         AccessibilityTextScaleController.global.reset();
+        tester.view.reset();
+      }
+
+      expect(problems, isEmpty, reason: problems.toSet().join('\n'));
+    });
+  }
+
+  // Que el texto se lea. Un botón con la letra del mismo color que el fondo
+  // pasa todas las pruebas de tamaño: no se sale de nada, simplemente no se
+  // ve. Se mira en los seis temas, porque cada uno tiene sus colores.
+  for (final entry in cases.entries) {
+    testWidgets('${entry.key}: el texto se lee en los seis temas', (
+      tester,
+    ) async {
+      final problems = <String>[];
+      final previous = FlutterError.onError;
+      FlutterError.onError = (details) {};
+
+      try {
+        tester.view.physicalSize = const Size(1366, 900);
+        tester.view.devicePixelRatio = 1.0;
+
+        for (final mode in AppThemeMode.values) {
+          ThemeManager.changeTheme(mode);
+          await tester.pumpWidget(const SizedBox());
+          await tester.pumpWidget(
+            MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.getTheme(mode: mode),
+              home: entry.value.$1(),
+            ),
+          );
+          for (var i = 0; i < 5; i++) {
+            await tester.pump(const Duration(milliseconds: 120));
+          }
+          await entry.value.$2(tester);
+
+          for (final problem in lowContrastTexts(tester)) {
+            problems.add('${mode.name}: $problem [${entry.key}]');
+          }
+          if (_contrastReport.isNotEmpty && problems.isNotEmpty) {
+            File(_contrastReport).writeAsStringSync(
+              '${problems.join('\n')}\n',
+              mode: FileMode.append,
+            );
+            problems.clear();
+          }
+        }
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump(const Duration(seconds: 1));
+      } finally {
+        FlutterError.onError = previous;
+        ThemeManager.changeTheme(AppThemeMode.light);
         tester.view.reset();
       }
 

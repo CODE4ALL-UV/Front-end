@@ -77,7 +77,10 @@ class _DirectorContentScreenState extends State<DirectorContentScreen> {
   }
 
   Future<void> _judge(_ReviewItem item) async {
-    final verdict = _store.verdictOf(item.section.id, courseId: item.course?.id);
+    final verdict = _store.verdictOf(
+      item.section.id,
+      courseId: item.course?.id,
+    );
     final appTheme = Theme.of(context);
 
     final saved = await showModalBottomSheet<bool>(
@@ -391,7 +394,11 @@ class _SectionCard extends StatelessWidget {
 
 /// Aprobar u observar una sección.
 class _JudgeSheet extends StatefulWidget {
-  const _JudgeSheet({required this.section, required this.current, this.courseId});
+  const _JudgeSheet({
+    required this.section,
+    required this.current,
+    this.courseId,
+  });
 
   final CourseSection section;
   final ContentVerdict? current;
@@ -509,10 +516,7 @@ class _JudgeSheetState extends State<_JudgeSheet> {
               maxLines: 5,
               minLines: 3,
               onChanged: (_) => setState(() => _error = null),
-              style: TextStyle(
-                fontSize: 14.5,
-                color: appColorScheme.onSurface,
-              ),
+              style: TextStyle(fontSize: 14.5, color: appColorScheme.onSurface),
               decoration: InputDecoration(
                 labelText: _approved
                     ? 'Comentario (opcional)'
@@ -637,7 +641,16 @@ class _Choice extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                      color: selected ? chosen : appColorScheme.onSurface,
+                      color: selected
+                          ? AppContrast.readableOn(
+                              chosen,
+                              Color.alphaBlend(
+                                chosen.withValues(alpha: 0.12),
+                                appColorScheme.surface,
+                              ),
+                              AppContrast.text,
+                            )
+                          : appColorScheme.onSurface,
                     ),
                   ),
                 ],

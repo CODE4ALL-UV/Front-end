@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_progress.dart';
 
@@ -88,7 +89,16 @@ class CircleProgressWidget extends StatelessWidget {
                       style: TextStyle(
                         fontSize: size * 0.12,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF424242),
+                        // Gris fijo: en el tema oscuro quedaba casi negro
+                        // sobre el círculo oscuro.
+                        // El fondo del círculo es semitransparente: lo que
+                        // cuenta es cómo queda sobre la tarjeta.
+                        color: AppContrast.onColor(
+                          Color.alphaBlend(
+                            bgColor,
+                            Theme.of(context).colorScheme.surface,
+                          ),
+                        ),
                         letterSpacing: 0.5,
                       ),
                     ),

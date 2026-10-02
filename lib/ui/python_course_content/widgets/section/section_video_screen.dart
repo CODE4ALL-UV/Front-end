@@ -738,7 +738,13 @@ class _CaptionControl extends StatelessWidget {
         icon: Icon(icon, size: 24),
         tooltip: label,
         color: appTheme.infoForeground,
-        disabledColor: appTheme.infoForeground.withValues(alpha: 0.5),
+        // A media opacidad, sobre blanco, el «anterior» de la primera frase
+        // no llegaba a verse (2,2:1).
+        disabledColor: AppContrast.readableOn(
+          context.colorScheme.outline,
+          context.colorScheme.surface,
+          AppContrast.ui,
+        ),
         constraints: const BoxConstraints(
           minWidth: AppMetrics.minTapTarget,
           minHeight: AppMetrics.minTapTarget,

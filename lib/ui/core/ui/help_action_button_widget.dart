@@ -367,7 +367,9 @@ class _HelpActionButtonState extends State<HelpActionButton>
                                                 displayIcon,
                                                 color: isActive
                                                     ? Colors.white
-                                                    : const Color(0xFF7E57C2),
+                                                    // 7E57C2 sobre el lila se
+                                                    // quedaba en 2,5:1.
+                                                    : const Color(0xFF4527A0),
                                                 size:
                                                     33 *
                                                     buttonScale, //Same as Vertical Buttons
@@ -771,6 +773,24 @@ I assume the final parts of the file contain the small helper widgets mentioned 
 
   @override
   Widget build(BuildContext context) {
+    // El panel es siempre lila claro. Con el tema oscuro, los textos y
+    // chips tomaban sus colores claros y no se veían sobre él: dentro del
+    // panel manda un tema claro. Los temas de daltonismo ya son claros.
+    final theme = Theme.of(context);
+    return Theme(
+      data: theme.brightness == Brightness.dark
+          ? AppTheme.getTheme(mode: AppThemeMode.light)
+          : theme,
+      // El Material pone también el estilo de texto del tema: sin él, los
+      // títulos seguían con el color claro heredado del tema oscuro.
+      child: Material(
+        type: MaterialType.transparency,
+        child: Builder(builder: _panel),
+      ),
+    );
+  }
+
+  Widget _panel(BuildContext context) {
     return SizedBox(
       width: widget.width,
       height: widget.height,
@@ -1035,7 +1055,8 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                 const SizedBox(height: 5),
                 const Text(
                   'Ajusta los colores si tienes alguna dificultad visual.',
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                  // Colors.grey sobre el lila: 2,3:1.
+                  style: TextStyle(fontSize: 13, color: Color(0xFF5F5F5F)),
                 ),
                 const SizedBox(height: 12),
 
@@ -1070,9 +1091,9 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                             sub,
                             style: TextStyle(
                               fontSize: 10,
-                              color: isSelected
-                                  ? context.colorScheme.onPrimaryContainer
-                                  : Colors.grey[600],
+                              // onPrimaryContainer no está definido en los
+                              // temas y salía blanco sobre el chip claro.
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
@@ -1483,7 +1504,7 @@ Widget _buildInfoBanner({
                 subtitle,
                 style: const TextStyle(
                   fontSize: 12.2,
-                  color: Color(0xFF6A5B7D),
+                  color: Color(0xFF4A3B5E),
                 ),
               ),
             ],

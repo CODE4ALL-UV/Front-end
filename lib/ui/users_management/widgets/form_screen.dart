@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/data/models/auth_models.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
@@ -110,6 +111,19 @@ class _FormScreenState extends State<FormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // La pantalla es blanca por diseño, con el texto oscuro fijado a mano.
+    // Con el tema oscuro, lo que no estaba fijado (los desplegables, sus
+    // flechas) salía claro sobre blanco y no se veía. Aquí manda el claro.
+    final theme = Theme.of(context);
+    return Theme(
+      data: theme.brightness == Brightness.dark
+          ? AppTheme.getTheme(mode: AppThemeMode.light)
+          : theme,
+      child: Builder(builder: _buildForm),
+    );
+  }
+
+  Widget _buildForm(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final logoSize = screenWidth < 360 ? 140.0 : 180.0;
     final horizontalPadding = screenWidth < 480 ? 20.0 : 32.0;
@@ -396,9 +410,11 @@ class _FormScreenState extends State<FormScreen> {
     );
   }
 
+  // Sin «Valor» de ejemplo: no decía nada (el nombre del campo ya está
+  // encima) y el lector de pantalla lo anunciaba en cada campo. Además era
+  // gris claro sobre blanco, 1,9:1.
   InputDecoration _inputDecoration() => InputDecoration(
-    hintText: 'Valor',
-    hintStyle: const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14),
+    hintStyle: const TextStyle(color: Color(0xFF616161), fontSize: 14),
     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(6),

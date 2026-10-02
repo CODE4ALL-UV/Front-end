@@ -547,7 +547,15 @@ class _OptionTile extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
-                        color: foreground,
+                        // El círculo tiñe el fondo y le quitaba contraste.
+                        color: AppContrast.readableOn(
+                          foreground,
+                          Color.alphaBlend(
+                            foreground.withValues(alpha: 0.15),
+                            background,
+                          ),
+                          AppContrast.text,
+                        ),
                       ),
                     ),
                   ),

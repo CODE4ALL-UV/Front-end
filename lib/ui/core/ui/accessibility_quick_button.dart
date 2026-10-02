@@ -95,137 +95,144 @@ class _AccessibilitySheet extends StatelessWidget {
             final current = ThemeManager.themeNotifier.value;
             final percent = (textScale.scale * 100).round();
 
-            return ListView(
-              shrinkWrap: true,
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              children: [
-                Semantics(
-                  header: true,
-                  child: Text(
-                    'Accesibilidad',
+            // El panel se abre desde la barra superior y heredaba su estilo de
+            // botones: iconos blancos. A− y A+ quedaban blancos sobre blanco.
+            return IconButtonTheme(
+              data: Theme.of(context).iconButtonTheme,
+              child: ListView(
+                shrinkWrap: true,
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                children: [
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      'Accesibilidad',
+                      style: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w800,
+                        color: colors.onSurface,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Tamaño del texto',
                     style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
                       color: colors.onSurface,
                     ),
                   ),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'Tamaño del texto',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: colors.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    IconButton.outlined(
-                      tooltip: 'Texto más pequeño',
-                      onPressed: textScale.scale <= 0.9
-                          ? null
-                          : () {
-                              textScale.decrease();
-                              _announce(
-                                context,
-                                'Texto al ${(textScale.scale * 100).round()} por ciento',
-                              );
-                            },
-                      icon: const Icon(Icons.text_decrease),
-                    ),
-                    Expanded(
-                      child: Semantics(
-                        liveRegion: true,
-                        child: Text(
-                          '$percent %',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: colors.onSurface,
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      IconButton.outlined(
+                        tooltip: 'Texto más pequeño',
+                        onPressed: textScale.scale <= 0.9
+                            ? null
+                            : () {
+                                textScale.decrease();
+                                _announce(
+                                  context,
+                                  'Texto al ${(textScale.scale * 100).round()} por ciento',
+                                );
+                              },
+                        icon: const Icon(Icons.text_decrease),
+                      ),
+                      Expanded(
+                        child: Semantics(
+                          liveRegion: true,
+                          child: Text(
+                            '$percent %',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: colors.onSurface,
+                            ),
                           ),
                         ),
                       ),
+                      IconButton.outlined(
+                        tooltip: 'Texto más grande',
+                        onPressed: textScale.scale >= 2.0
+                            ? null
+                            : () {
+                                textScale.increase();
+                                _announce(
+                                  context,
+                                  'Texto al ${(textScale.scale * 100).round()} por ciento',
+                                );
+                              },
+                        icon: const Icon(Icons.text_increase),
+                      ),
+                    ],
+                  ),
+                  if (textScale.isEnabled)
+                    Align(
+                      child: TextButton(
+                        onPressed: () {
+                          textScale.reset();
+                          _announce(context, 'Texto a su tamaño normal');
+                        },
+                        child: const Text('Volver al tamaño normal'),
+                      ),
                     ),
-                    IconButton.outlined(
-                      tooltip: 'Texto más grande',
-                      onPressed: textScale.scale >= 2.0
-                          ? null
-                          : () {
-                              textScale.increase();
-                              _announce(
-                                context,
-                                'Texto al ${(textScale.scale * 100).round()} por ciento',
-                              );
-                            },
-                      icon: const Icon(Icons.text_increase),
-                    ),
-                  ],
-                ),
-                if (textScale.isEnabled)
-                  Align(
-                    child: TextButton(
-                      onPressed: () {
-                        textScale.reset();
-                        _announce(context, 'Texto a su tamaño normal');
-                      },
-                      child: const Text('Volver al tamaño normal'),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Colores',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: colors.onSurface,
                     ),
                   ),
-                const SizedBox(height: 18),
-                Text(
-                  'Colores',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: colors.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                for (final (mode, name, hint, icon) in _themes)
-                  Semantics(
-                    selected: mode == current,
-                    inMutuallyExclusiveGroup: true,
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                      minTileHeight: AppMetrics.minTapTarget + 8,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppMetrics.cardRadius,
+                  const SizedBox(height: 6),
+                  for (final (mode, name, hint, icon) in _themes)
+                    Semantics(
+                      selected: mode == current,
+                      inMutuallyExclusiveGroup: true,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 8,
                         ),
-                        side: BorderSide(
-                          color: mode == current
-                              ? colors.secondary
-                              : Colors.transparent,
-                          width: 2,
+                        minTileHeight: AppMetrics.minTapTarget + 8,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppMetrics.cardRadius,
+                          ),
+                          side: BorderSide(
+                            color: mode == current
+                                ? colors.secondary
+                                : Colors.transparent,
+                            width: 2,
+                          ),
                         ),
-                      ),
-                      leading: Icon(icon, color: colors.onSurface),
-                      title: Text(
-                        name,
-                        style: TextStyle(
-                          fontWeight: mode == current
-                              ? FontWeight.w800
-                              : FontWeight.w500,
-                          color: colors.onSurface,
+                        leading: Icon(icon, color: colors.onSurface),
+                        title: Text(
+                          name,
+                          style: TextStyle(
+                            fontWeight: mode == current
+                                ? FontWeight.w800
+                                : FontWeight.w500,
+                            color: colors.onSurface,
+                          ),
                         ),
+                        subtitle: Text(
+                          hint,
+                          style: TextStyle(color: colors.onSurfaceVariant),
+                        ),
+                        trailing: mode == current
+                            ? Icon(Icons.check_circle, color: colors.secondary)
+                            : null,
+                        onTap: () {
+                          ThemeManager.changeTheme(mode);
+                          _announce(context, 'Tema $name activado');
+                        },
                       ),
-                      subtitle: Text(
-                        hint,
-                        style: TextStyle(color: colors.onSurfaceVariant),
-                      ),
-                      trailing: mode == current
-                          ? Icon(Icons.check_circle, color: colors.secondary)
-                          : null,
-                      onTap: () {
-                        ThemeManager.changeTheme(mode);
-                        _announce(context, 'Tema $name activado');
-                      },
                     ),
-                  ),
-              ],
+                ],
+              ),
             );
           },
         ),

@@ -487,6 +487,14 @@ class _ModuleNavigationHint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appSemanticColors = context.messageColors;
+    final surface = context.colorScheme.surface;
+    // Sobre un fondo propio, para que se lea pase lo que pase detrás: en el
+    // tema oscuro el azul quedaba sobre gris a 2,8:1.
+    final color = AppContrast.readableOn(
+      appSemanticColors.infoForeground,
+      surface,
+      AppContrast.text,
+    );
 
     return Semantics(
       button: true,
@@ -495,26 +503,32 @@ class _ModuleNavigationHint extends StatelessWidget {
         child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 20, color: appSemanticColors.infoForeground),
-                const SizedBox(width: 4),
-                // Flexible para que con la letra agrandada parta el renglón
-                // en lugar de desbordar por el lado.
-                Flexible(
-                  child: Text(
-                    message,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: appSemanticColors.infoForeground,
-                      fontWeight: FontWeight.w600,
+          child: Ink(
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 20, color: color),
+                  const SizedBox(width: 4),
+                  // Flexible para que con la letra agrandada parta el renglón
+                  // en lugar de desbordar por el lado.
+                  Flexible(
+                    child: Text(
+                      message,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: color,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

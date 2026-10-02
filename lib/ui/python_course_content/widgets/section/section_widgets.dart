@@ -402,6 +402,8 @@ class SectionPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final messageTheme = context.messageColors;
+    final background = messageTheme.infoForeground;
+    final disabled = AppTheme.disabledColors(context.colorScheme);
 
     return Semantics(
       button: true,
@@ -412,10 +414,13 @@ class SectionPrimaryButton extends StatelessWidget {
         child: ElevatedButton.icon(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: messageTheme.infoForeground,
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: messageTheme.infoForeground,
-            disabledForegroundColor: messageTheme.infoForeground,
+            backgroundColor: background,
+            // Blanco o casi negro, el que se lea. En el tema oscuro el fondo
+            // es azul claro y el blanco se quedaba en 1,7:1.
+            foregroundColor: AppContrast.onColor(background),
+            // Desactivado era azul sobre azul: el botón se veía vacío.
+            disabledBackgroundColor: disabled.background,
+            disabledForegroundColor: disabled.foreground,
             minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
@@ -453,6 +458,13 @@ class SectionSecondaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final messageTheme = context.messageColors;
+    final surface = context.colorScheme.surface;
+    final accent = AppContrast.readableOn(
+      messageTheme.infoForeground,
+      surface,
+      AppContrast.text,
+    );
+    final disabled = AppTheme.disabledColors(context.colorScheme);
 
     return Semantics(
       button: true,
@@ -462,11 +474,16 @@ class SectionSecondaryButton extends StatelessWidget {
         width: double.infinity,
         child: OutlinedButton.icon(
           onPressed: onPressed,
+          // El fondo era del mismo azul que el texto: «Anterior», «Ver en
+          // YouTube» o «Copiar enlace» se veían como una barra azul vacía.
           style: OutlinedButton.styleFrom(
-            backgroundColor: messageTheme.infoForeground,
-            foregroundColor: messageTheme.infoForeground,
-            disabledForegroundColor: messageTheme.infoForeground,
-            side: BorderSide(color: messageTheme.infoForeground, width: 1.6),
+            backgroundColor: surface,
+            foregroundColor: accent,
+            disabledForegroundColor: disabled.foreground,
+            side: BorderSide(
+              color: onPressed == null ? disabled.foreground : accent,
+              width: 1.6,
+            ),
             minimumSize: const Size.fromHeight(AppMetrics.minTapTarget),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppMetrics.pillRadius),

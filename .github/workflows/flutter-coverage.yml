@@ -1,0 +1,40 @@
+name: Flutter Test & Codecov Coverage
+
+on:
+  push:
+    branches: [ main, master, dev-daniel ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Descargar el código del repositorio
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Configurar el entorno de Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
+      # 3. Obtener dependencias de Flutter
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 4. Ejecutar pruebas unitarias y generar el archivo coverage/lcov.info
+      - name: Run Flutter tests with coverage
+        run: flutter test --coverage
+
+      # 5. Subir el reporte lcov.info a Codecov
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          files: coverage/lcov.info
+          fail_ci_if_error: true

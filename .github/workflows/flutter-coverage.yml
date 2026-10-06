@@ -11,25 +11,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code (v4.2.2)
+      # 1. Descargar el código del repositorio
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@v7
 
-      # 2. Set up Flutter (v2.12.0)
+      # 2. Configurar el entorno de Flutter
       - name: Set up Flutter
-        uses: subosito/flutter-action@f2c4840d5889ed270a312386a512702221b6d195
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
 
-      # 3. Install dependencies
+      # 3. Obtener dependencias de Flutter
       - name: Install dependencies
         run: flutter pub get
 
-      # 4. Run tests with coverage
+      # 4. Ejecutar pruebas unitarias y generar el archivo coverage/lcov.info
       - name: Run Flutter tests with coverage
         run: flutter test --coverage
 
-      # 5. Upload coverage to Codecov (v5.3.1)
+      # 5. Subir el reporte lcov.info a Codecov
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@0565863a31f2c77da5bf9563814856f6f9c87893
+        uses: codecov/codecov-action@v303a32d7a59b442fa8d48b6a1cc6825c09c847a5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage/lcov.info

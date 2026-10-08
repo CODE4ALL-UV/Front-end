@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{color-scheme:light; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+<script>
+/* Tema y tamaño de letra antes de pintar, para que la página no parpadee.
+   El oscuro es el tema de siempre; el claro se elige con el botón «Claro». */
+(function(){
+  var d = document.documentElement;
+  var get = function(k){ try { return JSON.parse(localStorage.getItem('c4a-manual:' + k)); } catch(e){ return null; } };
+  d.dataset.theme = get('theme') === 'light' ? 'light' : 'dark';
+  var fs = +get('fs'); if (fs >= 0.9 && fs <= 2) d.style.setProperty('--fs', fs);
+})();
+</script>
 <title>Manual de Code4All</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,22 +32,29 @@
   --a-purple:#6A00D4; --a-green:#1B5E20; --a-green-bg:#E8F5E9; --a-info:#1565C0; --a-info-bg:#E3F2FD; --a-warn:#8A5000; --a-warn-bg:#FFF3E0; --a-danger-bg:#FFEBEE;
   --logo-l:block; --logo-d:none;
   --a-code-bg:#F8FBFF; --a-code:#263238; --a-yellow:#FFD43B; --a-black:#111111; --a-dim:rgba(0,0,0,.55);
+  --hand-bg:#E3EEF8;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0F1318; --surface:#171C23; --surface-2:#212833; --fg:#E6EAF0; --muted:#9FA9B4; --line:#2D3540;
     --red:#F26B60; --red-ink:#1B0B0A; --blue:#8DBBE3; --ok:#8FD49A; --ok-bg:#1B2B1E;
     --phone:#05070A; --phone-edge:#4A5461; --logo-l:none; --logo-d:block; color-scheme:dark;
+    --hand-bg:#1F2A37;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0F1318; --surface:#171C23; --surface-2:#212833; --fg:#E6EAF0; --muted:#9FA9B4; --line:#2D3540;
   --red:#F26B60; --red-ink:#1B0B0A; --blue:#8DBBE3; --ok:#8FD49A; --ok-bg:#1B2B1E;
   --phone:#05070A; --phone-edge:#4A5461; --logo-l:none; --logo-d:block; color-scheme:dark;
+  --hand-bg:#1F2A37;
 }
 *{box-sizing:border-box}
-body{background:var(--bg); color:var(--fg); font-family:var(--body); font-size:16px; line-height:1.55}
-.wrap{max-width:1200px; margin:0 auto; padding-inline:20px; padding-block:28px 64px}
+/* A− y A+ cambian la base de las rem, así que el texto de la página crece con ellas. El teléfono simulado va en px a propósito:
+   reproduce la pantalla de la app tal cual, y la app tiene su propio A− / A+. */
+html{font-size:calc(var(--fs, 1) * 100%)}
+body{background:var(--bg); color:var(--fg); font-family:var(--body); font-size:1rem; line-height:1.55; overflow-wrap:break-word}
+/* Los cortes del diseño se miden en rem sobre el ancho de la página: con la letra grande, la página se reordena antes. */
+.wrap{container:page / inline-size; max-width:75rem; margin:0 auto; padding-inline:20px; padding-block:28px 64px}
 h1,h2,h3{font-family:var(--display); text-wrap:balance; margin:0; line-height:1.1}
 button{font:inherit; color:inherit}
 :focus-visible{outline:3px solid var(--blue); outline-offset:2px; border-radius:6px}
@@ -45,86 +62,103 @@ button{font:inherit; color:inherit}
 /* Cabecera */
 .top{display:flex; flex-wrap:wrap; gap:20px 32px; align-items:flex-end; justify-content:space-between; padding-bottom:22px; border-bottom:1px solid var(--line)}
 .brand{display:flex; flex-direction:column; gap:8px; min-width:0}
-.eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
-.brand h1{font-size:clamp(34px,5vw,54px); font-weight:800; letter-spacing:-.02em}
+.eyebrow{font-family:var(--mono); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.brand h1{font-size:clamp(2.125rem,5vw,3.375rem); font-weight:800; letter-spacing:-.02em}
 .brandlogo img{height:clamp(46px,6vw,64px); width:auto; max-width:100%}
 .brandlogo .logo-l{display:var(--logo-l)}
 .brandlogo .logo-d{display:var(--logo-d)}
 .brand p{margin:0; color:var(--muted); max-width:58ch}
-.search{position:relative; flex:0 1 340px; min-width:0}
-.search label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
+.search{position:relative; flex:0 1 21.25rem; min-width:0}
+.search label{display:block; font-size:.8125rem; color:var(--muted); margin-bottom:6px}
+.sbox{position:relative}
 .search input{width:100%; font:inherit; padding:11px 14px 11px 40px; border-radius:12px; border:1.5px solid var(--line); background:var(--surface); color:var(--fg)}
 .search input:focus{outline:none; border-color:var(--blue)}
-.search svg{position:absolute; left:13px; bottom:13px; width:18px; height:18px; color:var(--muted)}
+.search svg{position:absolute; left:13px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:var(--muted)}
 .results{position:absolute; z-index:20; top:100%; left:0; right:0; margin-top:6px; background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,.18); max-height:340px; overflow:auto; padding:6px}
 .results button{display:block; width:100%; text-align:left; border:0; background:none; padding:9px 10px; border-radius:8px; cursor:pointer}
 .results button:hover,.results button:focus-visible{background:var(--surface-2)}
-.results small{display:block; color:var(--muted); font-size:12px}
-.results .none{padding:10px; color:var(--muted); font-size:14px}
+.results small{display:block; color:var(--muted); font-size:.75rem}
+.results .none{padding:10px; color:var(--muted); font-size:.875rem}
+
+/* Opciones de lectura: tema, tamaño de la letra y dactilología */
+.tools{display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:flex-end; gap:12px 20px; margin-bottom:22px}
+.tgroup{display:flex; flex-direction:column; gap:5px; min-width:0}
+.tgroup > span{font-family:var(--mono); font-size:.6875rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.seg{display:flex; border:1.5px solid var(--line); border-radius:12px; background:var(--surface); overflow:hidden}
+.seg button{flex:1 1 auto; display:inline-flex; align-items:center; justify-content:center; gap:7px; min-width:44px; min-height:44px; padding:0 14px; border:0; background:none; cursor:pointer; font-weight:700; font-size:.9375rem; white-space:nowrap}
+.seg button + button{border-left:1.5px solid var(--line)}
+.seg button:hover{background:var(--surface-2)}
+.seg button[aria-pressed="true"]{background:var(--fg); color:var(--bg)}
+.seg button[aria-disabled="true"]{opacity:.4; cursor:default; background:none}
+.seg button:focus-visible{outline-offset:-4px}
+.seg svg{width:18px; height:18px; flex:none}
+.seg .val{padding:0 10px; min-width:5ch; font-family:var(--mono); font-weight:600; font-size:.875rem; font-variant-numeric:tabular-nums}
+.seg .up{font-size:1.125rem}
+.sr{position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
 
 /* Roles */
 .roles{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-block:24px}
-.role{display:grid; grid-template-columns:auto 1fr; gap:4px 14px; align-items:start; text-align:left; padding:16px; border-radius:16px; border:1.5px solid var(--line); background:var(--surface); cursor:pointer; transition:border-color .15s, transform .15s}
+.role{display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 14px; align-items:start; text-align:left; padding:16px; border-radius:16px; border:1.5px solid var(--line); background:var(--surface); cursor:pointer; transition:border-color .15s, transform .15s}
 .role:hover{border-color:var(--muted)}
 .role[aria-selected="true"]{border-color:var(--fg); box-shadow:inset 0 0 0 1.5px var(--fg)}
 .cell{grid-row:span 3; display:grid; grid-template-columns:repeat(2,10px); grid-auto-rows:10px; gap:5px; padding:8px; border-radius:10px; background:var(--on-yellow); }
 .cell i{border-radius:50%; background:#3A3A3A}
 .cell i.on{background:var(--yellow)}
-.role b{font-family:var(--display); font-size:19px; font-weight:800}
-.role .who{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
-.role .rd{font-size:14px; color:var(--muted); line-height:1.4}
-.role .meter{grid-column:1 / -1; margin-top:10px; display:flex; align-items:center; gap:10px; font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums}
+.role b{font-family:var(--display); font-size:1.1875rem; font-weight:800}
+.role .who{font-family:var(--mono); font-size:.6875rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+.role .rd{font-size:.875rem; color:var(--muted); line-height:1.4}
+.role .meter{grid-column:1 / -1; margin-top:10px; display:flex; align-items:center; gap:10px; font-size:.75rem; color:var(--muted); font-variant-numeric:tabular-nums}
 .meter span.bar{flex:1; height:5px; border-radius:9px; background:var(--surface-2); overflow:hidden}
 .meter span.bar span{display:block; height:100%; background:var(--ok); border-radius:9px}
 
 /* Área de trabajo */
-.work{display:grid; grid-template-columns:290px minmax(0,1fr); gap:24px; align-items:start}
+.work{display:grid; grid-template-columns:18.125rem minmax(0,1fr); gap:24px; align-items:start}
 .side{position:sticky; top:calc(env(safe-area-inset-top,0px) + 16px); display:flex; flex-direction:column; gap:14px; min-width:0}
 .intro{padding:16px; border-radius:14px; background:var(--surface-2)}
-.intro h2{font-size:20px; margin-bottom:6px}
-.intro p{margin:0; font-size:14px; color:var(--muted)}
+.intro h2{font-size:1.25rem; margin-bottom:6px}
+.intro p{margin:0; font-size:.875rem; color:var(--muted)}
 .intro p + p{margin-top:8px}
 .guides{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px}
-.guides button{width:100%; display:grid; grid-template-columns:26px 1fr; gap:10px; align-items:start; text-align:left; padding:10px 10px; border:0; border-radius:10px; background:none; cursor:pointer; line-height:1.3}
+.guides button{width:100%; display:grid; grid-template-columns:1.625rem minmax(0,1fr); gap:10px; align-items:start; text-align:left; padding:10px 10px; border:0; border-radius:10px; background:none; cursor:pointer; line-height:1.3}
 .guides button:hover{background:var(--surface)}
 .guides button[aria-current="true"]{background:var(--surface); box-shadow:0 0 0 1.5px var(--line)}
-.guides .num{width:26px; height:26px; border-radius:50%; display:grid; place-items:center; font-family:var(--mono); font-size:12px; font-weight:600; border:1.5px solid var(--line); color:var(--muted)}
+.guides .num{width:1.625rem; height:1.625rem; border-radius:50%; display:grid; place-items:center; font-family:var(--mono); font-size:.75rem; font-weight:600; border:1.5px solid var(--line); color:var(--muted)}
 .guides .done .num{background:var(--ok); border-color:var(--ok); color:var(--surface)}
-.guides .gt{font-weight:700; font-size:15px}
-.guides small{display:block; color:var(--muted); font-size:12.5px; margin-top:2px}
+.guides .gt{font-weight:700; font-size:.9375rem}
+.guides small{display:block; color:var(--muted); font-size:.78125rem; margin-top:2px}
 
 .player{background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:24px; min-width:0}
 .ph{display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px 20px; align-items:flex-start; margin-bottom:18px}
-.ph h2{font-size:clamp(24px,3vw,30px); font-weight:800; letter-spacing:-.01em}
-.ph .for{font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--red); margin-bottom:6px}
+.ph h2{font-size:clamp(1.5rem,3vw,1.875rem); font-weight:800; letter-spacing:-.01em}
+.ph .for{font-family:var(--mono); font-size:.75rem; letter-spacing:.06em; text-transform:uppercase; color:var(--red); margin-bottom:6px}
 .dots{display:flex; flex-wrap:wrap; gap:6px}
-.dots button{min-width:34px; height:34px; border-radius:9px; border:1.5px solid var(--line); background:var(--bg); font-family:var(--mono); font-size:13px; cursor:pointer; font-variant-numeric:tabular-nums}
+.dots button{min-width:2.125rem; height:2.125rem; border-radius:9px; border:1.5px solid var(--line); background:var(--bg); font-family:var(--mono); font-size:.8125rem; cursor:pointer; font-variant-numeric:tabular-nums}
 .dots button[aria-current="step"]{background:var(--fg); color:var(--bg); border-color:var(--fg)}
 .dots button.seen{border-color:var(--muted)}
 .stage{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:28px; align-items:start}
 .copy{min-width:0; display:flex; flex-direction:column; gap:16px}
-.stepno{font-family:var(--mono); font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums}
-.copy h3{font-size:24px; font-weight:800}
-.copy .txt{font-size:17px; max-width:56ch}
+.stepno{font-family:var(--mono); font-size:.8125rem; color:var(--muted); font-variant-numeric:tabular-nums}
+.copy h3{font-size:1.5rem; font-weight:800}
+.copy .txt{font-size:1.0625rem; max-width:56ch}
 .copy .txt p{margin:0 0 10px}
 .copy .txt b{font-weight:700}
-.ui{font-weight:700; white-space:nowrap; background:var(--surface-2); padding:1px 6px; border-radius:5px; font-size:.94em}
+.ui{font-weight:700; white-space:nowrap; background:var(--surface-2); padding:1px 6px; border-radius:5px; font-size:.94em; -webkit-box-decoration-break:clone; box-decoration-break:clone}
 .copy ul{margin:0; padding-left:20px}
 .copy li{margin-bottom:4px}
-.tip{display:grid; grid-template-columns:auto 1fr; gap:10px; padding:12px 14px; border-radius:12px; background:var(--surface-2); font-size:15px; max-width:56ch}
+.tip{display:grid; grid-template-columns:auto 1fr; gap:10px; padding:12px 14px; border-radius:12px; background:var(--surface-2); font-size:.9375rem; max-width:56ch}
 .tip svg{width:20px; height:20px; color:var(--blue); margin-top:2px}
 .tip.warn svg{color:var(--red)}
-.pointer{display:flex; align-items:center; gap:10px; font-size:14px; color:var(--muted)}
+.pointer{display:flex; align-items:center; gap:10px; font-size:.875rem; color:var(--muted)}
 .pointer i{flex:none; width:18px; height:18px; border-radius:50%; background:var(--yellow); box-shadow:0 0 0 2px var(--on-yellow)}
 .ctrls{display:flex; flex-wrap:wrap; gap:10px; margin-top:4px}
-.btn{display:inline-flex; align-items:center; gap:8px; padding:11px 18px; border-radius:11px; border:1.5px solid var(--line); background:var(--surface); cursor:pointer; font-weight:700; font-size:15px}
+.btn{display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:11px 18px; border-radius:11px; border:1.5px solid var(--line); background:var(--surface); cursor:pointer; font-weight:700; font-size:.9375rem}
 .btn:hover{border-color:var(--muted)}
 .btn.primary{background:var(--red); border-color:var(--red); color:var(--red-ink)}
 .btn.primary:hover{filter:brightness(1.06)}
 .btn[disabled]{opacity:.45; cursor:default}
 .btn svg{width:18px; height:18px}
-.keys{font-size:12.5px; color:var(--muted)}
-.keys kbd{font-family:var(--mono); font-size:11px; padding:1px 5px; border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; background:var(--bg)}
+.keys{font-size:.78125rem; color:var(--muted)}
+.keys kbd{font-family:var(--mono); font-size:.6875rem; padding:1px 5px; border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; background:var(--bg)}
 
 /* Teléfono */
 .phone{width:300px; max-width:100%; height:604px; border-radius:38px; background:var(--phone); padding:11px; box-shadow:0 0 0 1px var(--phone-edge), 0 18px 40px rgba(0,0,0,.22); position:relative; flex:none}
@@ -132,7 +166,7 @@ button{font:inherit; color:inherit}
 .scroll{position:absolute; inset:0; overflow:auto; padding-bottom:64px; scrollbar-width:none}
 .scroll::-webkit-scrollbar{display:none}
 .notch{position:absolute; top:6px; left:50%; transform:translateX(-50%); width:70px; height:18px; border-radius:12px; background:var(--phone); z-index:9}
-.caption{margin-top:12px; text-align:center; font-size:13px; color:var(--muted); max-width:300px}
+.caption{margin-top:12px; text-align:center; font-size:.8125rem; color:var(--muted); max-width:300px}
 
 /* Elementos de la app simulada */
 .m-bar{position:sticky; top:0; z-index:4; display:flex; align-items:center; gap:8px; padding:30px 12px 10px; background:var(--a-red); color:#fff; font-weight:700; font-size:13px}
@@ -372,44 +406,142 @@ button{font:inherit; color:inherit}
 
 /* Módulos */
 .modules{margin-top:32px}
-.modules h2{font-size:24px; font-weight:800; margin-bottom:6px}
+.modules h2{font-size:1.5rem; font-weight:800; margin-bottom:6px}
 .modules > p{margin:0 0 16px; color:var(--muted); max-width:62ch}
 .mgrid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
 .mcard{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px 16px}
-.mcard .n{font-family:var(--mono); font-size:12px; color:var(--muted); letter-spacing:.05em}
-.mcard h3{font-size:17px; margin:2px 0 8px}
-.mcard ol{margin:0; padding-left:20px; font-size:14.5px}
+.mcard .n{font-family:var(--mono); font-size:.75rem; color:var(--muted); letter-spacing:.05em}
+.mcard h3{font-size:1.0625rem; margin:2px 0 8px}
+.mcard ol{margin:0; padding-left:20px; font-size:.90625rem}
 .mcard li.pend{color:var(--muted)}
-.mcard li.pend::after{content:" · en preparación"; font-size:12px}
+.mcard li.pend::after{content:" · en preparación"; font-size:.75rem}
 
-footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; display:flex; flex-wrap:wrap; gap:8px 24px; justify-content:space-between}
+footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line); color:var(--muted); font-size:.8125rem; display:flex; flex-wrap:wrap; gap:8px 24px; justify-content:space-between}
 
-@media (max-width:980px){
+/* Dactilología: la mano del alfabeto manual, el mismo dibujo que HandPainter en la app */
+.hand{display:block; --sk:#F0C3A0; --sk-d:#D69C76; --sk-l:#FCE4D0; --sk-o:#8A5A3C; --sk-n:#F9E2D2}
+.hand.idle{--sk:#CFD8E3; --sk-d:#AAB6C4; --sk-l:#E8EDF3; --sk-o:#7B8896; --sk-n:#E4EAF1}
+.hand .hb{fill:var(--hand-bg)}
+.hand .hk,.hand .hs,.hand .ho{stroke:var(--sk-o); stroke-width:.9; stroke-linejoin:round}
+.hand .hk,.hand .hp{fill:var(--sk)}
+.hand .hs,.hand .hd{fill:var(--sk-d)}
+.hand .hw{fill:var(--sk-l)}
+.hand .hn{fill:var(--sk-n)}
+.hand .ho{fill:none}
+.hand .hm{fill:none; stroke:var(--sk-o); stroke-opacity:.7; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.hand .hg{font-family:var(--display); font-weight:800; font-size:46px; fill:var(--fg)}
+
+/* Lector de dactilología: flota abajo a la derecha; en el celular ocupa el ancho de la pantalla */
+.dock{font-size:min(1rem, 20px); position:fixed; z-index:40; right:16px; bottom:calc(16px + env(safe-area-inset-bottom,0px)); width:min(24em, calc(100vw - 32px)); max-height:calc(100vh - 32px); overflow:auto; overscroll-behavior:contain; display:flex; flex-direction:column; gap:10px; padding:12px 14px 14px; background:var(--surface); color:var(--fg); border:1.5px solid var(--line); border-radius:18px; box-shadow:0 18px 44px rgba(0,0,0,.3)}
+.dk-head{display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:0 2px}
+.dk-ttl{grid-area:1 / 1; display:flex; align-items:center; gap:8px; font-family:var(--display); font-size:1.0625em; font-weight:800}
+.dk-ttl svg{width:20px; height:20px; color:var(--blue); flex:none}
+.dk-src{grid-area:2 / 1; font-size:.8125em; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.dk-ib{grid-row:1 / span 2; width:44px; height:44px; display:grid; place-items:center; border:0; border-radius:12px; background:none; color:var(--muted); cursor:pointer}
+#dk-min{grid-column:2}
+#dk-close{grid-column:3}
+.dk-ib:hover{background:var(--surface-2); color:var(--fg)}
+.dk-ib svg{width:20px; height:20px}
+.dk-main{display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:6px 16px}
+.dk-hand{width:min(8.5em, 30vw); aspect-ratio:1}
+.dk-hand svg{width:100%; height:100%}
+.dk-hand.pop svg{animation:dkpop .2s ease-out}
+@keyframes dkpop{from{opacity:.35; transform:scale(.92)}}
+.dk-info{display:flex; flex-direction:column; gap:6px; min-width:0}
+.dk-letter{font-family:var(--display); font-size:3.5em; font-weight:800; line-height:1}
+.dk-note{font-size:.875em; color:var(--muted); min-height:1.4em}
+.dk-strip{position:relative; display:flex; gap:4px; overflow-x:auto; padding:2px 2px 6px; scrollbar-width:thin}
+.dk-l{flex:none; display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 3px 3px; border:2px solid transparent; border-radius:10px}
+.dk-l svg{width:2.5em; height:2.5em}
+.dk-l .hk,.dk-l .hs,.dk-l .ho{stroke-width:1.6}
+.dk-l b{font-family:var(--mono); font-size:.8125em; font-weight:600}
+.dk-l.on{border-color:var(--yellow); background:var(--surface-2)}
+.dk-l.past{opacity:.5}
+.dk-prog{display:flex; align-items:center; gap:10px; font-size:.75em; color:var(--muted); font-variant-numeric:tabular-nums}
+.dk-prog span{flex:1; height:5px; border-radius:9px; background:var(--surface-2); overflow:hidden}
+.dk-prog i{display:block; width:0; height:100%; background:var(--blue); transition:width .2s}
+.dk-ctrls{display:flex; flex-wrap:wrap; gap:6px}
+.dk-b{min-width:44px; height:44px; padding:0 10px; display:inline-flex; align-items:center; justify-content:center; gap:6px; border:1.5px solid var(--line); border-radius:11px; background:var(--bg); cursor:pointer; font-weight:700; font-size:.875em}
+.dk-b:hover{border-color:var(--muted)}
+.dk-b.primary{background:var(--red); border-color:var(--red); color:var(--red-ink)}
+.dk-b svg{width:18px; height:18px; flex:none}
+.dk-speed{margin-left:auto}
+.dk-hint{margin:0; font-size:.8125em; color:var(--muted)}
+.dk-back{align-self:flex-start; padding:8px 4px; border:0; background:none; color:var(--blue); font-weight:700; font-size:.875em; text-decoration:underline; text-underline-offset:3px; cursor:pointer}
+.dock.min{gap:6px}
+.dock.min .dk-strip,.dock.min .dk-prog,.dock.min .dk-ctrls,.dock.min .dk-hint{display:none}
+.dock.min .dk-hand{width:4em}
+.dock.min .dk-letter{font-size:2.25em}
+/* La palabra que se está deletreando, marcada en el texto del manual */
+::highlight(dacti){background-color:var(--yellow); color:var(--on-yellow)}
+.dk-reading{outline:2px dashed var(--blue); outline-offset:4px; border-radius:4px}
+.dk-on .wrap :is(p, .copy li, .mcard li, h1, h2, h3, .eyebrow, .tip > div, .pointer > span, .stepno, .keys, .caption), .dk-on .screen{cursor:pointer}
+.dk-on .wrap :is(p, .copy li, .mcard li, h1, h2, h3, .eyebrow, .tip > div, .pointer > span, .stepno, .keys, .caption):hover{text-decoration:underline dotted var(--blue) 2px; text-underline-offset:4px}
+.dk-on .wrap{padding-bottom:calc(64px + var(--dock-h, 0px))}
+
+@container page (max-width:58.75rem){
   .roles{grid-template-columns:repeat(2,minmax(0,1fr))}
   .work{grid-template-columns:minmax(0,1fr)}
   .side{position:static}
-  .guides{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+  .guides{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(13.75rem,100%),1fr))}
   .mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media (max-width:760px){
+@container page (max-width:45rem){
   .stage{grid-template-columns:minmax(0,1fr)}
   .phonewrap{justify-self:center}
   .player{padding:18px}
 }
-@media (max-width:520px){
-  .wrap{padding-inline:16px}
+@container page (max-width:30rem){
   .roles{grid-template-columns:minmax(0,1fr)}
   .mgrid{grid-template-columns:minmax(0,1fr)}
   .role .meter{margin-top:6px}
+  .tools{justify-content:flex-start}
+  .tgroup:last-child{flex-basis:100%}
+  .ui{white-space:normal}
+  .seg .tl{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+}
+@media (max-width:520px){
+  .wrap{padding-inline:16px}
+}
+@media (max-width:760px){
+  /* En el celular el lector se queda bajo para no tapar media pantalla. */
+  .dock{left:8px; right:8px; bottom:calc(8px + env(safe-area-inset-bottom,0px)); width:auto; max-height:60vh; padding:8px 12px 12px; gap:6px; border-radius:16px}
+  .dk-hand{width:5.5em}
+  .dk-letter{font-size:2.5em}
+  .dk-l svg{width:2.25em; height:2.25em}
 }
 @media (prefers-reduced-motion:reduce){
-  .hl,.m-spin{animation:none}
-  .role{transition:none}
+  .hl,.m-spin,.dk-hand.pop svg{animation:none}
+  .role,.dk-prog i{transition:none}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="tools" role="group" aria-label="Opciones de lectura">
+    <div class="tgroup">
+      <span id="lbl-theme">Tema</span>
+      <div class="seg" id="theme" role="group" aria-labelledby="lbl-theme">
+        <button type="button" data-set="dark" aria-pressed="true"><i data-ic="moon"></i><span class="tl">Oscuro</span></button>
+        <button type="button" data-set="light" aria-pressed="false"><i data-ic="sun"></i><span class="tl">Claro</span></button>
+      </div>
+    </div>
+    <div class="tgroup">
+      <span id="lbl-fs">Tamaño de la letra</span>
+      <div class="seg" role="group" aria-labelledby="lbl-fs">
+        <button type="button" id="fs-dec" aria-label="Letra más pequeña">A−</button>
+        <button type="button" id="fs-val" class="val">100 %</button>
+        <button type="button" id="fs-inc" class="up" aria-label="Letra más grande">A+</button>
+      </div>
+    </div>
+    <div class="tgroup">
+      <span id="lbl-dk">Lengua de señas</span>
+      <div class="seg">
+        <button type="button" id="dk-toggle" aria-pressed="false" aria-controls="dock"><i data-ic="hand"></i>Dactilología</button>
+      </div>
+    </div>
+  </div>
+
   <header class="top">
     <div class="brand">
       <span class="eyebrow">Universidad del Valle · Code4All v0.1</span>
@@ -419,8 +551,10 @@ footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line); colo
     </div>
     <div class="search">
       <label for="q">Buscar en el manual</label>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-      <input id="q" type="search" autocomplete="off" placeholder="foto, código, contraseña, quiz…" aria-controls="results" aria-expanded="false">
+      <div class="sbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="q" type="search" autocomplete="off" placeholder="foto, código, contraseña, quiz…" aria-controls="results" aria-expanded="false">
+      </div>
       <div id="results" class="results" role="listbox" hidden></div>
     </div>
   </header>
@@ -445,6 +579,32 @@ footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line); colo
     <span class="keys">Atajos: <kbd>←</kbd> <kbd>→</kbd> cambian de paso · <kbd>/</kbd> busca</span>
   </footer>
 </div>
+
+<aside class="dock" id="dock" aria-label="Lector de dactilología" hidden>
+  <div class="dk-head">
+    <b class="dk-ttl"><i data-ic="hand"></i>Dactilología</b>
+    <span class="dk-src" id="dk-src"></span>
+    <button type="button" class="dk-ib" id="dk-min" aria-expanded="true" aria-label="Encoger el lector"><i data-ic="chevdown"></i></button>
+    <button type="button" class="dk-ib" id="dk-close" aria-label="Cerrar la dactilología"><i data-ic="close"></i></button>
+  </div>
+  <!-- La mano y las letras se ocultan al lector de pantalla: ese texto ya está en la página. -->
+  <div class="dk-main" aria-hidden="true">
+    <div class="dk-hand" id="dk-hand"></div>
+    <div class="dk-info"><span class="dk-letter" id="dk-letter"></span><span class="dk-note" id="dk-note"></span></div>
+  </div>
+  <div class="dk-strip" id="dk-strip" aria-hidden="true"></div>
+  <div class="dk-prog"><span><i id="dk-bar"></i></span><small id="dk-count"></small></div>
+  <div class="dk-ctrls">
+    <button type="button" class="dk-b" id="dk-prev" aria-label="Palabra anterior" title="Palabra anterior"><i data-ic="skipb"></i></button>
+    <button type="button" class="dk-b" id="dk-again" aria-label="Repetir la palabra" title="Repetir la palabra"><i data-ic="refresh"></i></button>
+    <button type="button" class="dk-b primary" id="dk-play"></button>
+    <button type="button" class="dk-b" id="dk-next" aria-label="Palabra siguiente" title="Palabra siguiente"><i data-ic="skipf"></i></button>
+    <button type="button" class="dk-b dk-speed" id="dk-speed"></button>
+  </div>
+  <p class="dk-hint">Toca o selecciona cualquier texto del manual, también el del teléfono, para deletrearlo.</p>
+  <button type="button" class="dk-back" id="dk-back" hidden>Volver a deletrear el paso</button>
+</aside>
+<p class="sr" id="live" aria-live="polite"></p>
 
 <script>
 /* ---------- Iconos ---------- */
@@ -481,7 +641,16 @@ const P = {
   door:'<path d="M5 21V4h11v17M3 21h16M13 12h.5"/><path d="M16 6l4 2v13"/>',
   trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
   plus:'<path d="M12 5v14M5 12h14"/>',
-  book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7"/>'
+  book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  pause:'<path d="M9 5v14M15 5v14"/>',
+  skipb:'<path d="M6 5v14M19 5l-10 7 10 7z"/>',
+  skipf:'<path d="M18 5v14M5 5l10 7-10 7z"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18"/>',
+  chevdown:'<path d="M6 9l6 6 6-6"/>',
+  chevup:'<path d="M6 15l6-6 6 6"/>',
+  gauge:'<path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 18l4-6"/>'
 };
 const ic = (n, cls='') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
 
@@ -1094,7 +1263,10 @@ let done = new Set(store.get('done', []));
 let state = { role:'inicio', guide:null, step:0 };
 
 const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
 const roleOf = id => ROLES.find(r => r.id === id);
+// La barra lateral pasa encima del reproductor cuando falta ancho o la letra es grande.
+const stacked = () => getComputedStyle($('.side')).position === 'static';
 
 function cell(dots){ return `<span class="cell" aria-hidden="true">${[1,4,2,5,3,6].map(n=>`<i class="${dots.includes(n)?'on':''}"></i>`).join('')}</span>`; }
 
@@ -1154,6 +1326,7 @@ function renderPlayer(){
     const ptr = $('#pointer'); ptr.hidden = false; ptr.querySelector('span').textContent = `En amarillo: ${name}`;
   }
   try { history.replaceState(null, '', '#' + r.id + '-' + g.id); } catch(e){}
+  dactiFollowStep();
 }
 
 function render(){ renderRoles(); renderSide(); renderPlayer(); }
@@ -1176,7 +1349,7 @@ $('#roles').addEventListener('keydown', e => {
   const n = ROLES[(i + (e.key==='ArrowRight'?1:-1) + ROLES.length) % ROLES.length];
   go(n.id); $('#tab-'+n.id).focus(); e.preventDefault(); e.stopPropagation();
 });
-$('#guides').addEventListener('click', e => { const b = e.target.closest('[data-guide]'); if (b) go(state.role, b.dataset.guide, 0, matchMedia('(max-width:980px)').matches); });
+$('#guides').addEventListener('click', e => { const b = e.target.closest('[data-guide]'); if (b) go(state.role, b.dataset.guide, 0, stacked()); });
 $('#player').addEventListener('click', e => {
   const r = roleOf(state.role), g = r.guides.find(x => x.id === state.guide);
   const d = e.target.closest('[data-step]');
@@ -1254,6 +1427,342 @@ document.addEventListener('click', e => { if (!e.target.closest('.search')) { re
 /* Módulos */
 $('#mgrid').innerHTML = MODULES.map(([t,secs],i) => `<div class="mcard"><span class="n">MÓDULO ${i+1}</span><h3>${esc(t)}</h3><ol>${secs.map(s => s.startsWith('*') ? `<li class="pend">${esc(s.slice(1))}</li>` : `<li>${esc(s)}</li>`).join('')}</ol></div>`).join('');
 
+/* ---------- Opciones de lectura: tema y tamaño de la letra ---------- */
+$$('[data-ic]').forEach(el => { el.outerHTML = ic(el.dataset.ic); });
+const say = t => { $('#live').textContent = t; };
+
+function setTheme(t){
+  document.documentElement.dataset.theme = t;
+  $$('#theme [data-set]').forEach(b => b.setAttribute('aria-pressed', b.dataset.set === t));
+  store.set('theme', t);
+}
+$('#theme').addEventListener('click', e => { const b = e.target.closest('[data-set]'); if (b) { setTheme(b.dataset.set); say(b.dataset.set === 'light' ? 'Tema claro' : 'Tema oscuro'); } });
+setTheme(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
+
+// Los mismos límites y el mismo paso que el A− / A+ de la app: del 90 % al 200 %, de diez en diez.
+const FS_MIN = 0.9, FS_MAX = 2;
+let fs = 1;
+function setFs(v){
+  fs = Math.round(Math.min(FS_MAX, Math.max(FS_MIN, v)) * 10) / 10;
+  document.documentElement.style.setProperty('--fs', fs);
+  store.set('fs', fs);
+  const pc = Math.round(fs * 100) + ' %';
+  $('#fs-val').textContent = pc;
+  $('#fs-val').setAttribute('aria-label', `Letra al ${pc}. Volver al 100 %`);
+  $('#fs-dec').setAttribute('aria-disabled', fs <= FS_MIN);
+  $('#fs-inc').setAttribute('aria-disabled', fs >= FS_MAX);
+  return pc;
+}
+$('#fs-dec').addEventListener('click', () => say('Letra al ' + setFs(fs - 0.1)));
+$('#fs-inc').addEventListener('click', () => say('Letra al ' + setFs(fs + 0.1)));
+$('#fs-val').addEventListener('click', () => say('Letra al ' + setFs(1)));
+setFs(+store.get('fs', 1) || 1);
+
+/* ---------- Dactilología ----------
+   Deletrea con el alfabeto manual el texto del manual: el paso que está abierto, o cualquier texto que se toque o se seleccione.
+   Es dactilología, como el panel de la app: una mano esquemática letra por letra, no una interpretación en Lengua de Señas
+   Colombiana, que tiene gramática propia. */
+
+/* Copia de signAlphabet (lib/domain/models/sign_language/hand_alphabet.dart). f = [pulgar, índice, corazón, anular, meñique],
+   de 0 (recogido) a 2 (estirado). El manual no puede importar la tabla de la app, así que va copiada:
+   test/manual_alphabet_test.dart falla si las dos dejan de coincidir. */
+const SIGNS = {
+  A:{f:[2,0,0,0,0]},
+  B:{f:[0,2,2,2,2], across:1},
+  C:{f:[1,1,1,1,1]},
+  D:{f:[1,2,0,0,0]},
+  E:{f:[0,0,0,0,0], across:1},
+  F:{f:[1,1,2,2,2], spread:.4},
+  G:{f:[2,2,0,0,0], spread:.2},
+  H:{f:[0,2,2,0,0]},
+  I:{f:[0,0,0,0,2]},
+  J:{f:[0,0,0,0,2], motion:1},
+  K:{f:[2,2,2,0,0], spread:.6},
+  L:{f:[2,2,0,0,0], spread:.9},
+  M:{f:[0,1,1,1,0], across:1},
+  N:{f:[0,1,1,0,0], across:1},
+  'Ñ':{f:[0,1,1,0,0], across:1, motion:1},
+  O:{f:[1,1,1,1,1], spread:.1},
+  P:{f:[2,2,2,0,0], spread:.6, down:1},
+  Q:{f:[2,2,0,0,0], spread:.2, down:1},
+  R:{f:[0,2,2,0,0], crossed:1},
+  S:{f:[1,0,0,0,0], across:1},
+  T:{f:[1,1,0,0,0], across:1},
+  U:{f:[0,2,2,0,0]},
+  V:{f:[0,2,2,0,0], spread:.8},
+  W:{f:[0,2,2,2,0], spread:.7},
+  X:{f:[0,1,0,0,0]},
+  Y:{f:[2,0,0,0,2], spread:1},
+  Z:{f:[0,2,0,0,0], motion:1}
+};
+// La mano en reposo, entre palabras: la misma que dibuja la app cuando no hay subtítulo.
+const IDLE = {f:[1,1,1,1,1]};
+
+/* El dibujo es HandPainter (lib/ui/core/ui/hand_sign_painter_widget.dart) pasado a SVG: lado 100 y centro en 0,0. */
+const F_LEN = [1.02, 1.12, 1.0, 0.80], F_ANG = [-0.11, -0.035, 0.045, 0.125];
+const r2 = v => Math.round(v * 100) / 100;
+const xy = (x, y) => `${r2(x)} ${r2(y)}`;
+let clipSeq = 0;
+
+// Dedo cónico con la punta redondeada y un ligero abombamiento lateral.
+function fingerPath(bx, by, a, len, wb, wt){
+  const dx = Math.sin(a), dy = -Math.cos(a), px = -dy, py = dx;
+  const tx = bx + dx * len, ty = by + dy * len, bu = wb * 0.08;
+  const b1x = bx + px * wb / 2, b1y = by + py * wb / 2, b2x = bx - px * wb / 2, b2y = by - py * wb / 2;
+  const t1x = tx + px * wt / 2, t1y = ty + py * wt / 2, t2x = tx - px * wt / 2, t2y = ty - py * wt / 2;
+  return `M${xy(b1x, b1y)}Q${xy((b1x + t1x) / 2 + px * bu, (b1y + t1y) / 2 + py * bu)} ${xy(t1x, t1y)}`
+    + `Q${xy(tx + dx * wt * 0.66, ty + dy * wt * 0.66)} ${xy(t2x, t2y)}`
+    + `Q${xy((b2x + t2x) / 2 - px * bu, (b2y + t2y) / 2 - py * bu)} ${xy(b2x, b2y)}Z`;
+}
+function nailRect(bx, by, a, len, wt){
+  const d = len - wt * 0.30, w = wt * 0.56, h = wt * 0.70;
+  return `<rect class="hn" x="${r2(-w / 2)}" y="${r2(-h / 2)}" width="${r2(w)}" height="${r2(h)}" rx="${r2(wt * 0.26)}" transform="translate(${xy(bx + Math.sin(a) * d, by - Math.cos(a) * d)}) rotate(${r2(a * 180 / Math.PI)})"/>`;
+}
+// Palma ancha en los nudillos, con la base del pulgar abultada y estrechándose hacia la muñeca.
+function palmPath(w, h, top){
+  const l = -w / 2, r = w / 2, b = top + h;
+  return `M${xy(l, top + h * 0.12)}C${xy(l - w * 0.09, top + h * 0.48)} ${xy(l + w * 0.01, b - h * 0.04)} ${xy(l + w * 0.17, b)}`
+    + `Q${xy(0, b + h * 0.07)} ${xy(r - w * 0.17, b)}`
+    + `C${xy(r - w * 0.01, b - h * 0.06)} ${xy(r + w * 0.04, top + h * 0.46)} ${xy(r, top + h * 0.12)}`
+    + `Q${xy(0, top - h * 0.07)} ${xy(l, top + h * 0.12)}Z`;
+}
+function handSVG(sh, idle){
+  const W = 40, H = 33, K = -4, FW = W * 0.185, sp = sh.spread || 0, th = sh.f[0];
+  let g = `<rect class="hs" x="${r2(-W * 0.3)}" y="${r2(K + H * 0.9)}" width="${r2(W * 0.6)}" height="13" rx="5"/>`;
+  // Dedos, detrás de la palma para esconder su nacimiento.
+  sh.f.slice(1).forEach((ext, i) => {
+    let bx = -W / 2 + W * (i + 0.5) / 4;
+    if (sh.crossed && i < 2) bx += i === 0 ? FW * 0.55 : -FW * 0.55;
+    if (ext === 0) {
+      // Dedo recogido: se ve el nudillo asomando sobre la palma.
+      const w = FW * 1.12, h = FW * 1.05;
+      g += `<rect class="hk" x="${r2(bx - w / 2)}" y="${r2(K + FW * 0.1 - h / 2)}" width="${r2(w)}" height="${r2(h)}" rx="${r2(FW * 0.5)}"/>`;
+      return;
+    }
+    const a = F_ANG[i] * (1 + sp * 2.2), by = K + H * 0.06;
+    const full = H * F_LEN[i] * 1.06, len = ext === 2 ? full : full * 0.5, wt = FW * (ext === 2 ? 0.8 : 0.88);
+    g += `<path class="hk" d="${fingerPath(bx, by, a, len, FW, wt)}"/>`;
+    if (ext === 2) g += nailRect(bx, by, a, len, wt);
+  });
+  // Pulgar hacia el lado.
+  if (th > 0 && !sh.across) {
+    const bx = -W * 0.44, by = K + H * 0.42, a = -Math.PI / 3.1 - sp * Math.PI / 7, len = H * (th === 2 ? 0.82 : 0.5), w = FW * 1.25;
+    g += `<path class="hk" d="${fingerPath(bx, by, a, len, w, w * 0.82)}"/>`;
+    if (th === 2) g += nailRect(bx, by, a, len, w * 0.82);
+  }
+  // Palma, con volumen: la base del pulgar y el borde del meñique más oscuros.
+  const palm = palmPath(W, H, K), id = 'hc' + (++clipSeq);
+  g += `<clipPath id="${id}"><path d="${palm}"/></clipPath><path class="hp" d="${palm}"/>`
+    + `<g clip-path="url(#${id})"><circle class="hd" cx="${r2(-W * 0.3)}" cy="${r2(K + H * 0.62)}" r="${r2(W * 0.34)}" opacity=".45"/>`
+    + `<circle class="hd" cx="${r2(W * 0.38)}" cy="${r2(K + H * 0.55)}" r="${r2(W * 0.22)}" opacity=".28"/>`
+    + `<circle class="hw" cx="${r2(W * 0.02)}" cy="${r2(K + H * 0.28)}" r="${r2(W * 0.26)}" opacity=".55"/></g>`
+    + `<path class="ho" d="${palm}"/>`;
+  // Pulgar cruzado sobre la palma.
+  if (th > 0 && sh.across) {
+    const w = FW * 1.2;
+    g += `<path class="hk" d="${fingerPath(-W * 0.42, K + H * 0.3, Math.PI / 2, W * (th === 2 ? 0.78 : 0.58), w, w * 0.85)}"/>`;
+  }
+  if (sh.down) g = `<g transform="rotate(180)">${g}</g>`;
+  if (sh.motion) g += '<path class="hm" d="M24 26Q36 32 32 40M27 37L32 40L31 34"/>';
+  return `<svg class="hand${idle ? ' idle' : ''}" viewBox="-50 -50 100 100" aria-hidden="true"><circle class="hb" r="47"/>${g}</svg>`;
+}
+// Números y signos no tienen mano en el alfabeto manual: se muestran tal cual.
+const glyphSVG = ch => `<svg class="hand" viewBox="-50 -50 100 100" aria-hidden="true"><circle class="hb" r="47"/><text class="hg" text-anchor="middle" dominant-baseline="central">${esc(ch)}</text></svg>`;
+const signOf = ch => SIGNS[ch] ? handSVG(SIGNS[ch]) : glyphSVG(ch);
+
+// Quita tildes y pasa a mayúscula, que es como se deletrea. La Ñ es una letra propia y se queda.
+const spell = w => [...w.normalize('NFC').toUpperCase()].map(ch => ch === 'Ñ' ? ch : ch.normalize('NFD').replace(/[̀-ͯ]/g, '')).filter(Boolean);
+const EDGE = /[.,;:!?¡¿«»"“”'‘’()[\]{}…—–·•*-]/;
+
+// Palabras de unos elementos (o de lo seleccionado en ellos), con su sitio en el texto para poder marcarlas.
+function wordsIn(roots, range){
+  const out = [];
+  roots.forEach(root => {
+    const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+      if (range && !range.intersectsNode(n)) continue;
+      if (n.parentElement.closest('svg, .sr')) continue;
+      const from = range && n === range.startContainer ? range.startOffset : 0;
+      const txt = n.data.slice(0, range && n === range.endContainer ? range.endOffset : n.data.length);
+      const re = /\S+/g; re.lastIndex = from;
+      for (let mt = re.exec(txt); mt; mt = re.exec(txt)) {
+        let s = mt.index, e = s + mt[0].length;
+        while (s < e && EDGE.test(txt[s])) s++;
+        while (e > s && EDGE.test(txt[e - 1])) e--;
+        if (e > s) out.push({ node:n, s, e, ch:spell(txt.slice(s, e)) });
+      }
+    }
+  });
+  return out;
+}
+
+// El ritmo «Normal» es el del panel de la app.
+const SPEEDS = [['Lenta', 950], ['Normal', 620], ['Rápida', 400]];
+const DK = { on:false, words:[], w:0, c:0, gap:false, playing:false, ended:false, timer:0, step:true, sel:'',
+  speed: Math.min(2, Math.max(0, +store.get('dacti-speed', 1) || 0)) };
+const canMark = !!(window.CSS && CSS.highlights && window.Highlight);
+
+function dkLoad(roots, label, opts = {}){
+  clearTimeout(DK.timer);
+  $$('.dk-reading').forEach(el => el.classList.remove('dk-reading'));
+  if (opts.outline) roots.forEach(el => el.classList.add('dk-reading'));
+  DK.words = wordsIn(roots, opts.range);
+  DK.w = 0; DK.c = 0; DK.gap = false; DK.ended = false;
+  DK.step = !!opts.step; DK.sel = '';
+  $('#dk-src').textContent = label;
+  $('#dk-back').hidden = DK.step;
+  dkStrip(); dkPaint(); dkPlay(true);
+}
+// La palabra entera en manos pequeñas, para leerla de un vistazo.
+function dkStrip(){
+  const wd = DK.words[DK.w];
+  $('#dk-strip').innerHTML = wd ? wd.ch.map(ch => `<span class="dk-l">${signOf(ch)}<b>${esc(ch)}</b></span>`).join('') : '';
+  $('#dk-strip').scrollLeft = 0;
+}
+function dkPaint(){
+  const wd = DK.words[DK.w], ch = wd && !DK.gap ? wd.ch[DK.c] : '', sh = SIGNS[ch];
+  const hand = $('#dk-hand');
+  hand.innerHTML = ch ? signOf(ch) : handSVG(IDLE, true);
+  hand.classList.remove('pop'); void hand.offsetWidth; hand.classList.add('pop');
+  $('#dk-letter').textContent = !wd ? '—' : DK.gap ? '␣' : ch;
+  $('#dk-note').textContent = !wd ? 'No hay texto que deletrear.' : DK.gap ? 'Espacio entre palabras'
+    : sh ? (sh.motion ? 'Lleva movimiento' : '') : /\d/.test(ch) ? 'Número: se muestra tal cual' : 'Signo: se muestra tal cual';
+  const strip = $('#dk-strip');
+  [...strip.children].forEach((el, i) => { el.classList.toggle('on', !DK.gap && i === DK.c); el.classList.toggle('past', DK.gap || i < DK.c); });
+  const cur = strip.querySelector('.on');
+  if (cur && (cur.offsetLeft < strip.scrollLeft || cur.offsetLeft + cur.offsetWidth > strip.scrollLeft + strip.clientWidth)) {
+    strip.scrollLeft = cur.offsetLeft - (strip.clientWidth - cur.offsetWidth) / 2;
+  }
+  const n = DK.words.length;
+  $('#dk-count').textContent = n ? `Palabra ${DK.w + 1} de ${n}` : '';
+  $('#dk-bar').style.width = n ? ((DK.w + (DK.gap ? 1 : (DK.c + 1) / wd.ch.length)) / n * 100) + '%' : '0';
+  if (canMark) {
+    if (wd && wd.node.isConnected) {
+      const r = document.createRange(); r.setStart(wd.node, wd.s); r.setEnd(wd.node, wd.e);
+      CSS.highlights.set('dacti', new Highlight(r));
+    } else CSS.highlights.delete('dacti');
+  }
+}
+function dkSchedule(){
+  clearTimeout(DK.timer);
+  const ms = SPEEDS[DK.speed][1];
+  DK.timer = setTimeout(dkTick, DK.gap ? ms * 0.6 : ms);
+}
+function dkTick(){
+  const wd = DK.words[DK.w];
+  if (!wd) return dkStop(true);
+  if (DK.gap) { DK.gap = false; DK.w++; DK.c = 0; dkStrip(); }
+  else if (DK.c < wd.ch.length - 1) DK.c++;
+  else if (DK.w < DK.words.length - 1) DK.gap = true;
+  else return dkStop(true);   // Al terminar el texto se queda quieto en la última letra.
+  dkPaint(); dkSchedule();
+}
+function dkPlay(on){
+  clearTimeout(DK.timer);
+  DK.playing = on && DK.words.length > 0;
+  if (DK.playing) { DK.ended = false; dkSchedule(); }
+  dkButtons();
+}
+function dkStop(ended){ clearTimeout(DK.timer); DK.playing = false; DK.ended = ended; dkButtons(); }
+function dkJump(w){
+  if (!DK.words.length) return;
+  DK.w = Math.min(Math.max(0, w), DK.words.length - 1); DK.c = 0; DK.gap = false; DK.ended = false;
+  dkStrip(); dkPaint(); dkPlay(DK.playing);
+}
+function dkButtons(){
+  const b = $('#dk-play'), label = DK.ended ? 'Deletrear otra vez desde el principio' : DK.playing ? 'Pausar' : 'Seguir deletreando';
+  b.innerHTML = ic(DK.ended ? 'refresh' : DK.playing ? 'pause' : 'play');
+  b.setAttribute('aria-label', label); b.title = label;
+  const sp = $('#dk-speed'), name = SPEEDS[DK.speed][0];
+  sp.innerHTML = ic('gauge') + name;
+  sp.setAttribute('aria-label', `Velocidad: ${name.toLowerCase()}. Cambiar`); sp.title = 'Cambiar la velocidad';
+}
+
+// Con el lector abierto, cada paso nuevo se deletrea solo, como los subtítulos en la app.
+function dactiFollowStep(){
+  if (!DK.on) return;
+  const g = roleOf(state.role).guides.find(x => x.id === state.guide), st = g.steps[state.step];
+  const els = ['#player .copy h3', '#player .copy .txt', '#player .tip > div'].map(s => $(s)).filter(Boolean);
+  dkLoad(els, `Paso ${state.step + 1} de ${g.steps.length} · ${st.t}`, { step:true });
+}
+function dkSet(on){
+  DK.on = on; store.set('dacti', on);
+  $('#dk-toggle').setAttribute('aria-pressed', on);
+  $('#dock').hidden = !on;
+  document.body.classList.toggle('dk-on', on);
+  if (on) dactiFollowStep();
+  else {
+    dkStop(false);
+    if (canMark) CSS.highlights.delete('dacti');
+    $$('.dk-reading').forEach(el => el.classList.remove('dk-reading'));
+  }
+}
+function dkMin(min){
+  $('#dock').classList.toggle('min', min); store.set('dacti-min', min);
+  const b = $('#dk-min');
+  b.setAttribute('aria-expanded', !min);
+  b.setAttribute('aria-label', min ? 'Agrandar el lector' : 'Encoger el lector');
+  b.innerHTML = ic(min ? 'chevup' : 'chevdown');
+}
+
+$('#dk-toggle').addEventListener('click', () => { dkSet(!DK.on); say(DK.on ? 'Dactilología activada' : 'Dactilología desactivada'); });
+$('#dk-close').addEventListener('click', () => { dkSet(false); $('#dk-toggle').focus(); say('Dactilología desactivada'); });
+$('#dk-min').addEventListener('click', () => dkMin(!$('#dock').classList.contains('min')));
+$('#dk-play').addEventListener('click', () => {
+  if (!DK.ended) { dkPlay(!DK.playing); return; }
+  dkJump(0); dkPlay(true);
+});
+$('#dk-prev').addEventListener('click', () => dkJump(DK.w - 1));
+$('#dk-again').addEventListener('click', () => dkJump(DK.w));
+$('#dk-next').addEventListener('click', () => dkJump(DK.w + 1));
+$('#dk-speed').addEventListener('click', () => {
+  DK.speed = (DK.speed + 1) % SPEEDS.length; store.set('dacti-speed', DK.speed);
+  dkButtons(); if (DK.playing) dkSchedule();
+});
+$('#dk-back').addEventListener('click', () => { DK.on && dactiFollowStep(); });
+
+// Tocar un texto lo deletrea. Los botones siguen haciendo lo suyo: si cambian de paso, el lector sigue al paso nuevo.
+const SPELLABLE = 'p, .copy li, .mcard li, h1, h2, h3, .eyebrow, .tip > div, .pointer > span, .stepno, .keys, .caption';
+const preview = t => { t = t.trim().replace(/\s+/g, ' '); return t.length > 48 ? t.slice(0, 47) + '…' : t; };
+function spellTarget(t){
+  if (t.closest('.screen')) {
+    // En el teléfono se deletrea justo lo que se toca: un botón, un campo, un título.
+    let el = t.closest('svg')?.parentElement || t;
+    while (el && !el.textContent.trim()) el = el.parentElement;
+    return el && el.closest('.screen') && !el.matches('.screen, .scroll, .scroll-in, .m-body') ? el : null;
+  }
+  const el = t.closest(SPELLABLE);
+  return el && el.closest('.wrap') && el.textContent.trim() ? el : null;
+}
+document.addEventListener('click', e => {
+  if (!DK.on || !e.target.closest('.wrap') || e.target.closest('button, a, input, label, [role="option"]')) return;
+  const sel = getSelection();
+  if (sel && !sel.isCollapsed && sel.toString().trim()) return;   // Lo seleccionado lo deletrea selectionchange.
+  const el = spellTarget(e.target);
+  if (el) dkLoad([el], `${el.closest('.screen') ? 'Texto del teléfono' : 'Texto elegido'} · «${preview(el.innerText || el.textContent)}»`, { outline:true });
+});
+// Seleccionar un trozo de texto deletrea solo ese trozo.
+let selTimer = 0;
+document.addEventListener('selectionchange', () => {
+  if (!DK.on) return;
+  clearTimeout(selTimer);
+  selTimer = setTimeout(() => {
+    const sel = getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) { DK.sel = ''; return; }
+    const text = sel.toString().trim().replace(/\s+/g, ' ');
+    if (!text || text === DK.sel) return;
+    const r = sel.getRangeAt(0), host = r.commonAncestorContainer;
+    const el = host.nodeType === 1 ? host : host.parentElement;
+    if (!el.closest('.wrap')) return;
+    dkLoad([el], `Texto seleccionado · «${preview(text)}»`, { range:r.cloneRange() });
+    DK.sel = text;
+  }, 450);
+});
+// Deja sitio debajo del contenido para que el lector no tape el final de la página.
+if ('ResizeObserver' in window) new ResizeObserver(() => document.body.style.setProperty('--dock-h', $('#dock').offsetHeight + 'px')).observe($('#dock'));
+dkMin(!!store.get('dacti-min', false));
+dkButtons();
+
 /* Inicio: enlace directo (#docente o #docente-crear) o la última guía abierta */
 (function start(){
   const hsh = (location.hash||'').slice(1);
@@ -1266,6 +1775,8 @@ $('#mgrid').innerHTML = MODULES.map(([t,secs],i) => `<div class="mcard"><span cl
   if (last && roleOf(last.role)) { state = { role:last.role, guide:last.guide, step:0 }; }
   render();
 })();
+// Quien dejó la dactilología activada la encuentra activada al volver.
+dkSet(!!store.get('dacti', false));
 </script>
 
 </body>

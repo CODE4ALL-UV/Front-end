@@ -8,6 +8,10 @@
 /// extensión de cada dedo, que distingue bien la mayoría de las letras pero no
 /// todas (M, N, S y T se diferencian por detalles que este modelo no captura).
 /// No sustituye la validación de un intérprete de Lengua de Señas Colombiana.
+///
+/// `web/manual.html` lleva una copia en JavaScript para su lector de
+/// dactilología. Si cambia una letra aquí, hay que cambiarla también allí;
+/// `test/manual_alphabet_test.dart` falla mientras no coincidan.
 library;
 
 import 'package:flutter/foundation.dart';

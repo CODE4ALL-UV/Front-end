@@ -270,8 +270,12 @@ están en el README del [gateway](https://github.com/CODE4ALL-UV/Back-end).
   (HTML, CSS y JavaScript). Tiene pestañas por rol (primeros pasos, estudiante,
   docente y coordinación) y cada guía muestra los pasos sobre una maqueta de la
   pantalla. Se puede buscar un paso, escucharlo en voz alta, y recuerda qué
-  guías ya se completaron. La app lo abre desde el login y desde el menú de
-  perfil (`lib/ui/core/ui/user_manual.dart`).
+  guías ya se completaron. Tiene tema oscuro y claro, letra del 90 % al 200 %
+  y un lector de dactilología que deletrea el paso abierto o cualquier texto
+  que se toque o se seleccione, con las mismas manos que la app (lleva una
+  copia de la tabla del alfabeto; `test/manual_alphabet_test.dart` vigila que
+  coincida). La app lo abre desde el login y desde el menú de perfil
+  (`lib/ui/core/ui/user_manual.dart`).
 - **`assets/docs/guia_alfabeto_camara.pdf`** es la guía en PDF de las letras
   para la cámara. Se genera con el mismo dibujo de manos que usa la app:
 

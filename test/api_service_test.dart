@@ -90,7 +90,7 @@ void main() {
           jsonEncode({
             'access_token': 'token123',
             'token_type': 'Bearer',
-            'id': 1,
+            'user_id': 1,
             'email': 'juan@test.com',
             'nombre': 'Juan',
             'rol': 'estudiante',

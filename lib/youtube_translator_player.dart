@@ -261,6 +261,9 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
                 ),
                 alignment: Alignment.center,
                 child: AnimatedOpacity(
+                  key: const ValueKey(
+                    'caption_overlay_opacity',
+                  ), // 👈 Llave única para identificarlo
                   duration: const Duration(milliseconds: 200),
                   opacity: _currentCaption.isNotEmpty ? 1.0 : 0.0,
                   child: Container(

@@ -151,150 +151,157 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_error != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Text(_error!, style: const TextStyle(color: Colors.red)),
-              ),
-            Card(
-              clipBehavior: Clip.antiAlias,
-              child: Column(
-                children: [
-                  if (_showPlayer)
-                    AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: ypf.YoutubePlayer(
-                        controller: _controller,
-                        showVideoProgressIndicator: true,
-                      ),
-                    )
-                  else
-                    Stack(
-                      children: [
-                        SizedBox(
-                          height: 180,
-                          width: double.infinity,
-                          child: Image.network(
-                            'https://img.youtube.com/vi/${_videoId ?? "dQw4w9WgXcQ"}/hqdefault.jpg',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Center(
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                          ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+              Card(
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  children: [
+                    if (_showPlayer)
+                      AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: ypf.YoutubePlayer(
+                          controller: _controller,
+                          showVideoProgressIndicator: true,
                         ),
-                        Positioned.fill(
-                          child: Center(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                setState(() => _showPlayer = true);
-                              },
-                              icon: const Icon(Icons.play_arrow),
-                              label: const Text('Reproducir dentro de la app'),
+                      )
+                    else
+                      Stack(
+                        children: [
+                          SizedBox(
+                            height: 180,
+                            width: double.infinity,
+                            child: Image.network(
+                              'https://img.youtube.com/vi/${_videoId ?? "dQw4w9WgXcQ"}/hqdefault.jpg',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Center(
+                                    child: Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                          Positioned.fill(
+                            child: Center(
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  setState(() => _showPlayer = true);
+                                },
+                                icon: const Icon(Icons.play_arrow),
+                                label: const Text(
+                                  'Reproducir dentro de la app',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Controls for external playback + live subtitle sync
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      // Open external video in a new tab/window, ensure captions loaded, then start syncing
+                      final url = widget.videoUrl;
+                      await _openExternalUrl(url);
+                      // Ensure captions are loaded before starting sync (in case of slow network)
+                      if (_isLoading) {
+                        await _loadCaptions();
+                      }
+                      if (_cues.isNotEmpty) {
+                        _startExternalSync();
+                      } else {
+                        // still start sync but show empty state (user can re-sync later)
+                        _startExternalSync();
+                      }
+                    },
+                    icon: const Icon(Icons.open_in_new),
+                    label: const Text('Abrir y sincronizar'),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _externalStartedAt == null
+                        ? null
+                        : _stopExternalSync,
+                    child: const Text('Detener sincronía'),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _externalStartedAt == null
+                        ? null
+                        : _resetSyncToNow,
+                    child: const Text('Re-sincronizar ahora'),
+                  ),
                 ],
               ),
-            ),
-            const SizedBox(height: 12),
-            // Controls for external playback + live subtitle sync
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    // Open external video in a new tab/window, ensure captions loaded, then start syncing
-                    final url = widget.videoUrl;
-                    await _openExternalUrl(url);
-                    // Ensure captions are loaded before starting sync (in case of slow network)
-                    if (_isLoading) {
-                      await _loadCaptions();
-                    }
-                    if (_cues.isNotEmpty) {
-                      _startExternalSync();
-                    } else {
-                      // still start sync but show empty state (user can re-sync later)
-                      _startExternalSync();
-                    }
-                  },
-                  icon: const Icon(Icons.open_in_new),
-                  label: const Text('Abrir y sincronizar'),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _externalStartedAt == null
-                      ? null
-                      : _stopExternalSync,
-                  child: const Text('Detener sincronía'),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _externalStartedAt == null
-                      ? null
-                      : _resetSyncToNow,
-                  child: const Text('Re-sincronizar ahora'),
-                ),
-              ],
-            ),
 
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            // Live subtitle display
-            if (_externalStartedAt != null)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 18,
+              // Live subtitle display
+              if (_externalStartedAt != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 18,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    _currentSubtitleText(),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.black87,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  _currentSubtitleText(),
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
+
+              const SizedBox(height: 12),
+
+              // Full subtitle list below
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                        itemCount: _cues.length,
+                        itemBuilder: (context, index) {
+                          final cue = _cues[index];
+                          final isActive = index == _currentCueIndex;
+                          return Card(
+                            color: isActive ? Colors.yellow[100] : null,
+                            child: ListTile(
+                              title: Text(
+                                (cue['translated'] ?? cue['text']).toString(),
+                              ),
+                              subtitle: Text(
+                                'Seg: ${cue['start']} - dur: ${cue['duration']}',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
               ),
-
-            const SizedBox(height: 12),
-
-            // Full subtitle list below
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      itemCount: _cues.length,
-                      itemBuilder: (context, index) {
-                        final cue = _cues[index];
-                        final isActive = index == _currentCueIndex;
-                        return Card(
-                          color: isActive ? Colors.yellow[100] : null,
-                          child: ListTile(
-                            title: Text(
-                              (cue['translated'] ?? cue['text']).toString(),
-                            ),
-                            subtitle: Text(
-                              'Seg: ${cue['start']} - dur: ${cue['duration']}',
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

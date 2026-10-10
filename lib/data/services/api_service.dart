@@ -7,10 +7,12 @@ import 'package:http/http.dart' as http;
 import '../models/auth_models.dart';
 
 class ApiService {
-  ApiService({String? baseUrl})
-    : _baseUrl = (baseUrl ?? _defaultBaseUrl()).trim();
+  ApiService({String? baseUrl, http.Client? client})
+    : _baseUrl = (baseUrl ?? _defaultBaseUrl()).trim(),
+      _client = client ?? http.Client(); // <--- AGREGA ESTO;
 
   final String _baseUrl;
+  final http.Client _client; // <--- AGREGA ESTO
 
   /// La dirección del servidor, sin barra al final.
   String get baseUrl => _baseUrl;
@@ -65,7 +67,7 @@ class ApiService {
     );
 
     try {
-      final response = await http.post(
+      final response = await _client.post(
         Uri.parse('$_baseUrl/api/auth/register'),
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +100,7 @@ class ApiService {
     final request = LoginRequest(email: email, password: password);
 
     try {
-      final response = await http.post(
+      final response = await _client.post(
         Uri.parse('$_baseUrl/api/auth/login'),
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +127,7 @@ class ApiService {
   }
 
   Future<List<dynamic>> getStudents({required String bearerToken}) async {
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse('$_baseUrl/api/director/students'),
       headers: {
         'Accept': 'application/json',
@@ -144,7 +146,7 @@ class ApiService {
   }
 
   Future<List<dynamic>> getPerformances({required String bearerToken}) async {
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse('$_baseUrl/api/director/performances'),
       headers: {
         'Accept': 'application/json',
@@ -165,7 +167,7 @@ class ApiService {
   Future<List<dynamic>> getPerformancesAggregate({
     required String bearerToken,
   }) async {
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse('$_baseUrl/api/director/performances/aggregate'),
       headers: {
         'Accept': 'application/json',
@@ -186,7 +188,7 @@ class ApiService {
   Future<List<dynamic>> getPerformancesAverage({
     required String bearerToken,
   }) async {
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse('$_baseUrl/api/director/performances/average'),
       headers: {
         'Accept': 'application/json',
@@ -217,7 +219,7 @@ class ApiService {
         body['id_token'] = idToken;
       }
 
-      final response = await http.post(
+      final response = await _client.post(
         Uri.parse('$_baseUrl/api/auth/google'),
         headers: {
           'Content-Type': 'application/json',
@@ -296,7 +298,7 @@ class ApiService {
   }) async {
     final http.Response response;
     try {
-      response = await http.post(
+      response = await _client.post(
         Uri.parse(buildUrl(path)),
         headers: {
           'Content-Type': 'application/json',

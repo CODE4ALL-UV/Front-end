@@ -6,9 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart' as ypf;
 
-// IMPORTANTE: Ajusta esta ruta al nombre real de tu archivo
-// import 'package:flutter_code4all/ui/widgets/youtube_translator_player.dart';
-
 void main() {
   group('YoutubeTranslatorPlayer (Real File) Tests', () {
     test('extractVideoId extrae correctamente diferentes formatos', () {
@@ -247,11 +244,11 @@ void main() {
 
         // 2. Re-sincronizar ahora (resetea el tiempo)
         await tester.tap(resyncBtn);
-        await tester.pump();
+        await tester.pump(const Duration(seconds: 3));
 
         // 3. Detener sincronía (cancela el timer y oculta el subtítulo)
         await tester.tap(stopBtn);
-        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 3));
 
         // El contenedor del Live subtitle desaparece (ya solo queda el texto en la lista)
         expect(find.text('Sincronizado'), findsOneWidget);

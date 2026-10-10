@@ -5,9 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-// IMPORTANTE: Ajusta esta ruta a tu proyecto
-// import 'package:flutter_code4all/ui/widgets/youtube_translator_player.dart';
-
 void main() {
   group('YoutubeTranslatorPlayer Tests', () {
     testWidgets('Muestra error de UI si la URL o ID es inválido', (
@@ -70,7 +67,7 @@ void main() {
         );
 
         // Esperamos a que los Futures internos terminen
-        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 3));
 
         // Verificamos que parseó el array de 2 elementos
         expect(cuesCargados, 2);
@@ -99,7 +96,7 @@ void main() {
           ),
         );
 
-        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 3));
         // Si el backend falla, la lista de cues se limpia (queda en 0)
         expect(cuesCargados, 0);
       },
@@ -128,7 +125,7 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 3));
       // Al fallar por excepción, debe reportar 0 subtítulos
       expect(cuesCargados, 0);
     });
@@ -153,7 +150,7 @@ void main() {
           ),
         );
 
-        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 3));
 
         // Aseguramos que no renderice el overlay oscuro
         // Buscamos un Container que no debería estar si showOverlayCaption es false

@@ -24,11 +24,15 @@ class YoutubeTranslatorPlayer extends StatefulWidget {
   final String? backendUrl;
   final String targetLang;
 
+  /// Cliente HTTP opcional inyectado para pruebas.
+  final http.Client? httpClient; // <-- 1. AGREGA ESTO
+
   const YoutubeTranslatorPlayer({
     super.key,
     required this.videoUrl,
     this.backendUrl,
     this.targetLang = 'es',
+    this.httpClient, // <-- 2. AGREGA ESTO
   });
 
   @override
@@ -107,7 +111,8 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
       final uri = Uri.parse('$backendUrl/api/youtube/captions').replace(
         queryParameters: {'video_id': _videoId!, 'target': widget.targetLang},
       );
-      final response = await http.get(uri);
+      final client = widget.httpClient ?? http.Client();
+      final response = await client.get(uri);
       if (!mounted) return;
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);

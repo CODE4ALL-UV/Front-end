@@ -45,6 +45,8 @@ class YoutubeTranslatorPlayer extends StatefulWidget {
   /// para no repetir la misma frase dos veces.
   final bool showOverlayCaption;
 
+  final http.Client? httpClient; // <--- 1. AGREGA ESTO
+
   const YoutubeTranslatorPlayer({
     super.key,
     required this.videoUrl,
@@ -53,6 +55,7 @@ class YoutubeTranslatorPlayer extends StatefulWidget {
     this.onCaptionChanged,
     this.onCuesLoaded,
     this.showOverlayCaption = true,
+    this.httpClient, // <--- 2. AGREGA ESTO
   });
 
   @override
@@ -127,7 +130,8 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
       final uri = Uri.parse('$_backendUrl/api/youtube/captions').replace(
         queryParameters: {'video_id': videoId, 'target': widget.targetLang},
       );
-      final res = await http.get(uri).timeout(const Duration(seconds: 15));
+      final client = widget.httpClient ?? http.Client();
+      final res = await client.get(uri).timeout(const Duration(seconds: 15));
       if (res.statusCode != 200) {
         throw Exception('Backend error ${res.statusCode}');
       }

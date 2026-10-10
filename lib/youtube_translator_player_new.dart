@@ -152,7 +152,7 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,31 +221,22 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () async {
-                      // Open external video in a new tab/window, ensure captions loaded, then start syncing
                       final url = widget.videoUrl;
                       await _openExternalUrl(url);
-                      // Ensure captions are loaded before starting sync (in case of slow network)
                       if (_isLoading) {
                         await _loadCaptions();
                       }
-                      if (_cues.isNotEmpty) {
-                        _startExternalSync();
-                      } else {
-                        // still start sync but show empty state (user can re-sync later)
-                        _startExternalSync();
-                      }
+                      _startExternalSync();
                     },
                     icon: const Icon(Icons.open_in_new),
                     label: const Text('Abrir y sincronizar'),
                   ),
-                  const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: _externalStartedAt == null
                         ? null
                         : _stopExternalSync,
                     child: const Text('Detener sincronía'),
                   ),
-                  const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: _externalStartedAt == null
                         ? null
@@ -254,7 +245,6 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 12),
 
               // Live subtitle display
@@ -277,7 +267,7 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
 
               const SizedBox(height: 12),
 
-              // Full subtitle list below
+              // Full subtitle list below (Expanded funciona perfectamente aquí dentro de una Column sin SingleChildScrollView)
               Expanded(
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
@@ -293,7 +283,7 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
                                 (cue['translated'] ?? cue['text']).toString(),
                               ),
                               subtitle: Text(
-                                'Seg: ${cue['start']} - dur: ${cue['duration']}',
+                                'Seg: ${cue['start']} - Dur: ${cue['duration']}',
                               ),
                             ),
                           );

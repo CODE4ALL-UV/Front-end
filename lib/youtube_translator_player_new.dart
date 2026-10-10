@@ -182,6 +182,13 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
                           child: Image.network(
                             'https://img.youtube.com/vi/${_videoId ?? "dQw4w9WgXcQ"}/hqdefault.jpg',
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Center(
+                                  child: Icon(
+                                    Icons.image_not_supported,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                           ),
                         ),
                         Positioned.fill(
@@ -202,7 +209,9 @@ class _YoutubeTranslatorPlayerState extends State<YoutubeTranslatorPlayer> {
             ),
             const SizedBox(height: 12),
             // Controls for external playback + live subtitle sync
-            Row(
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 ElevatedButton.icon(
                   onPressed: () async {

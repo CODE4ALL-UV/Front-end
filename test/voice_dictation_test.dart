@@ -47,7 +47,6 @@ class FakeDictation implements VoiceDictation {
   Future<void> cue({required bool start}) async => cues.add(start);
 }
 
-/// Hablar en vez de escribir: limpiar lo que se oye y ponerlo donde toca.
 void main() {
   group('lo dictado se limpia según el campo', () {
     String email(String heard) =>
@@ -77,7 +76,7 @@ void main() {
 
     test('el texto libre se queda como está', () {
       expect(
-        VoiceDictation.normalize('  Hola, mundo ', DictationKind.text),
+        VoiceDictation.normalize('   Hola, mundo ', DictationKind.text),
         'Hola, mundo',
       );
     });
@@ -91,7 +90,6 @@ void main() {
       api: ApiService(baseUrl: 'http://servidor.test'),
       client: MockClient((request) async {
         final cells = jsonDecode(request.body)['cells'] as List;
-        // Sólo sabe la «a».
         final readings = [
           for (var i = 0; i < cells.length; i++)
             {
@@ -139,7 +137,6 @@ void main() {
     Offset zone(WidgetTester tester, int dot) =>
         tester.getCenter(find.byKey(ValueKey('braille-dot-$dot')));
 
-    /// Mantiene un dedo apoyado hasta que empieza a escuchar.
     Future<TestGesture> holdToTalk(WidgetTester tester) async {
       final finger = await tester.startGesture(zone(tester, 2));
       await tester.pump(
@@ -205,7 +202,6 @@ void main() {
       await tester.pumpAndSettle();
       expect(output(tester), 'a hola');
 
-      // Y se borra carácter a carácter.
       await tester.dragFrom(zone(tester, 2), const Offset(-200, 0));
       await tester.pumpAndSettle();
       expect(output(tester), 'a hol');
@@ -320,8 +316,6 @@ void main() {
       await tester.pump();
 
       await tester.tap(find.byTooltip('Dictar con el micrófono').first);
-      // Callar la voz pasa por el canal del motor de voz, que en pruebas
-      // responde de forma asíncrona de verdad.
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(milliseconds: 50)),
       );

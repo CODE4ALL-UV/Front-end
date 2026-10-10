@@ -142,7 +142,7 @@ void main() {
           MaterialApp(
             home: Scaffold(
               body: YoutubeTranslatorPlayer(
-                videoUrl: '12345678901', // Exactamente 11 caracteres (Regex)
+                videoUrl: '12345678901',
                 httpClient: mockClient,
                 showOverlayCaption: false, // Probamos la rama false del overlay
               ),
@@ -150,11 +150,13 @@ void main() {
           ),
         );
 
-        await tester.pump(const Duration(seconds: 3));
+        await tester.pump(const Duration(milliseconds: 500));
 
-        // Aseguramos que no renderice el overlay oscuro
-        // Buscamos un Container que no debería estar si showOverlayCaption es false
-        expect(find.byType(AnimatedOpacity), findsNothing);
+        // ✅ Buscamos por nuestra llave única, ignorando los AnimatedOpacity internos del reproductor
+        expect(
+          find.byKey(const ValueKey('caption_overlay_opacity')),
+          findsNothing,
+        );
       },
     );
   });

@@ -220,5 +220,54 @@ void main() {
         );
       },
     );
+
+    test(
+      'Lanza GoogleAuthException si idToken está vacío pero accessToken es válido',
+      () async {
+        dotenv.testLoad(fileInput: 'GOOGLE_CLIENT_ID=test_id');
+
+        final mockAuth = MockGoogleSignInAuthentication();
+        when(() => mockAuth.accessToken).thenReturn('token_valido');
+        when(
+          () => mockAuth.idToken,
+        ).thenReturn(''); // Forzamos el fallo en la segunda condición
+
+        final mockAccount = MockGoogleSignInAccount();
+        when(
+          () => mockAccount.authentication,
+        ).thenAnswer((_) async => mockAuth);
+
+        final mockGoogle = MockGoogleSignIn();
+        when(() => mockGoogle.signIn()).thenAnswer((_) async => mockAccount);
+
+        final service = GoogleAuthService(mockGoogleSignIn: mockGoogle);
+
+        await expectLater(
+          () => service.signIn(context: MockBuildContext()),
+          throwsA(isA<GoogleAuthException>()),
+        );
+      },
+    );
+
+    test(
+      'Instancia GoogleSignIn real si no se pasa el mock (cubre líneas de instanciación)',
+      () async {
+        dotenv.testLoad(fileInput: 'GOOGLE_CLIENT_ID=test_id');
+        // Al no pasar el mock, forzamos que pase por la línea 47-51 original.
+        // Inmediatamente lanzará la excepción final porque estamos en un entorno de pruebas sin interfaz nativa.
+        final service = GoogleAuthService();
+
+        await expectLater(
+          () => service.signIn(context: MockBuildContext()),
+          throwsA(
+            isA<GoogleAuthException>().having(
+              (e) => e.message,
+              'message',
+              contains('No se pudo abrir la autenticación real'),
+            ),
+          ),
+        );
+      },
+    );
   });
 }

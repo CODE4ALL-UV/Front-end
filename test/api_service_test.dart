@@ -197,5 +197,86 @@ void main() {
         ),
       );
     });
+
+    test('getPerformances retorna datos en 200', () async {
+      final mockClient = MockClient((request) async {
+        return http.Response(
+          jsonEncode([
+            {'data': 'ok'},
+          ]),
+          200,
+        );
+      });
+      final api = ApiService(baseUrl: testUrl, client: mockClient);
+      final list = await api.getPerformances(bearerToken: 'token');
+      expect(list.isNotEmpty, true);
+    });
+
+    test('getPerformancesAggregate retorna datos en 200', () async {
+      final mockClient = MockClient((request) async {
+        return http.Response(
+          jsonEncode([
+            {'data': 'ok'},
+          ]),
+          200,
+        );
+      });
+      final api = ApiService(baseUrl: testUrl, client: mockClient);
+      final list = await api.getPerformancesAggregate(bearerToken: 'token');
+      expect(list.isNotEmpty, true);
+    });
+
+    test('getPerformancesAverage retorna datos en 200', () async {
+      final mockClient = MockClient((request) async {
+        return http.Response(
+          jsonEncode([
+            {'data': 'ok'},
+          ]),
+          200,
+        );
+      });
+      final api = ApiService(baseUrl: testUrl, client: mockClient);
+      final list = await api.getPerformancesAverage(bearerToken: 'token');
+      expect(list.isNotEmpty, true);
+    });
+
+    test('signInWithGoogle retorna LoginResponse al recibir 200', () async {
+      final mockClient = MockClient((request) async {
+        return http.Response(
+          jsonEncode({
+            'access_token': 'token123',
+            'token_type': 'Bearer',
+            'user_id': 1,
+            'email': 'g@test.com',
+            'nombre': 'Google User',
+            'rol': 'estudiante',
+          }),
+          200,
+        );
+      });
+      final api = ApiService(baseUrl: testUrl, client: mockClient);
+      final response = await api.signInWithGoogle(
+        accessToken: 'a',
+        idToken: 'i',
+      );
+      expect(response.email, 'g@test.com');
+    });
+
+    test(
+      'Lanza ApiException genérica (captura catch y notFound ternario) en error de cliente no controlado',
+      () async {
+        final mockClient = MockClient((request) async {
+          throw const FormatException('Error de formato crudo');
+        });
+        final api = ApiService(baseUrl: testUrl, client: mockClient);
+
+        expect(
+          () => api.signInWithGoogle(accessToken: 'a', idToken: 'i'),
+          throwsA(
+            isA<ApiException>(),
+          ), // Esto cubre la línea throw ApiException(statusCode: null, message: _connectionErrorMessage())
+        );
+      },
+    );
   });
 }

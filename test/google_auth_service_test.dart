@@ -222,15 +222,13 @@ void main() {
     );
 
     test(
-      'Lanza GoogleAuthException si idToken está vacío pero accessToken es válido',
+      'Continúa el flujo si idToken está vacío pero accessToken es válido (cubre ramas del if)',
       () async {
         dotenv.testLoad(fileInput: 'GOOGLE_CLIENT_ID=test_id');
 
         final mockAuth = MockGoogleSignInAuthentication();
         when(() => mockAuth.accessToken).thenReturn('token_valido');
-        when(
-          () => mockAuth.idToken,
-        ).thenReturn(''); // Forzamos el fallo en la segunda condición
+        when(() => mockAuth.idToken).thenReturn(''); // idToken vacío
 
         final mockAccount = MockGoogleSignInAccount();
         when(
@@ -240,12 +238,73 @@ void main() {
         final mockGoogle = MockGoogleSignIn();
         when(() => mockGoogle.signIn()).thenAnswer((_) async => mockAccount);
 
-        final service = GoogleAuthService(mockGoogleSignIn: mockGoogle);
-
-        await expectLater(
-          () => service.signIn(context: MockBuildContext()),
-          throwsA(isA<GoogleAuthException>()),
+        final mockApi = MockApiService();
+        const mockResponse = LoginResponse(
+          accessToken: 'mi_jwt_token',
+          tokenType: 'Bearer',
+          userId: 1,
+          email: 'test@test.com',
+          nombre: 'Usuario Test',
+          rol: 'estudiante',
         );
+
+        // Al no cumplirse el &&, el flujo continúa y llama a la API. Simulamos el éxito:
+        when(
+          () => mockApi.signInWithGoogle(
+            accessToken: 'token_valido',
+            idToken: '',
+          ),
+        ).thenAnswer((_) async => mockResponse);
+
+        final service = GoogleAuthService(
+          apiService: mockApi,
+          mockGoogleSignIn: mockGoogle,
+        );
+
+        final result = await service.signIn(context: MockBuildContext());
+        expect(result.email, 'test@test.com');
+      },
+    );
+
+    test(
+      'Continúa el flujo si accessToken está vacío pero idToken es válido (cubre ramas del if)',
+      () async {
+        dotenv.testLoad(fileInput: 'GOOGLE_CLIENT_ID=test_id');
+
+        final mockAuth = MockGoogleSignInAuthentication();
+        when(() => mockAuth.accessToken).thenReturn(''); // accessToken vacío
+        when(() => mockAuth.idToken).thenReturn('id_valido');
+
+        final mockAccount = MockGoogleSignInAccount();
+        when(
+          () => mockAccount.authentication,
+        ).thenAnswer((_) async => mockAuth);
+
+        final mockGoogle = MockGoogleSignIn();
+        when(() => mockGoogle.signIn()).thenAnswer((_) async => mockAccount);
+
+        final mockApi = MockApiService();
+        const mockResponse = LoginResponse(
+          accessToken: 'mi_jwt_token',
+          tokenType: 'Bearer',
+          userId: 1,
+          email: 'test@test.com',
+          nombre: 'Usuario Test',
+          rol: 'estudiante',
+        );
+
+        // Simulamos la respuesta de la API
+        when(
+          () => mockApi.signInWithGoogle(accessToken: '', idToken: 'id_valido'),
+        ).thenAnswer((_) async => mockResponse);
+
+        final service = GoogleAuthService(
+          apiService: mockApi,
+          mockGoogleSignIn: mockGoogle,
+        );
+
+        final result = await service.signIn(context: MockBuildContext());
+        expect(result.email, 'test@test.com');
       },
     );
 

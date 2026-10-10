@@ -26,7 +26,7 @@ void main() {
             home: YoutubeTranslatorPlayer(videoUrl: 'https://google.com'),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 3));
 
         expect(
           find.text('No se pudo detectar el ID del video de YouTube.'),

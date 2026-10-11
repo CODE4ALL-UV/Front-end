@@ -36,6 +36,9 @@ void main() {
         );
 
         expect(find.byType(EmbeddedYoutubeWebPlayer), findsOneWidget);
+
+        // 3. Avanzamos el reloj 35 segundos para expirar y limpiar el timer de 30s de youtube_player_iframe
+        await tester.pump(const Duration(seconds: 35));
       },
     );
   });
@@ -64,11 +67,6 @@ class FakeWebViewPlatform extends WebViewPlatform
     return FakePlatformWebViewWidget();
   }
 }
-
-// =====================================================================
-// LA SOLUCIÓN: implements + with MockPlatformInterfaceMixin
-// Esto evita el problema de los constructores factory y satisface al framework
-// =====================================================================
 
 class FakePlatformNavigationDelegate
     with MockPlatformInterfaceMixin

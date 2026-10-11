@@ -36,6 +36,9 @@ void main() {
         );
 
         expect(find.byType(EmbeddedYoutubeWebPlayer), findsOneWidget);
+
+        // 3. Avanzamos el reloj virtual 35 segundos para expirar y limpiar el timer interno de youtube_player_iframe
+        await tester.pump(const Duration(seconds: 35));
       },
     );
   });
@@ -77,8 +80,8 @@ class FakePlatformWebViewController
     implements PlatformWebViewController {
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    // 💡 INTERCEPTAMOS LA RESPUESTA DE JS PARA QUE EL REPRODUCTOR IFRAME CREA QUE YA CARGÓ
-    if (invocation.memberName == #runJavaScriptReturningResult) {
+    if (invocation.memberName == #runJavaScriptReturningResult ||
+        invocation.memberName == #runJavaScript) {
       return Future<Object>.value('true');
     }
     return Future<void>.value();

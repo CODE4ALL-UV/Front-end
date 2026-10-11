@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_code4all/web_player_embedded.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -78,12 +79,39 @@ class FakePlatformNavigationDelegate
 class FakePlatformWebViewController
     with MockPlatformInterfaceMixin
     implements PlatformWebViewController {
+  final Map<String, JavaScriptChannelParams> _channels = {};
+
+  @override
+  Future<void> addJavaScriptChannel(
+    JavaScriptChannelParams javaScriptChannelParams,
+  ) async {
+    _channels[javaScriptChannelParams.name] = javaScriptChannelParams;
+  }
+
+  @override
+  Future<void> loadHtmlString(String html, {String? baseUrl}) async {
+    // Simula que YouTube terminó de inicializarse.
+    for (final channel in _channels.values) {
+      channel.onMessageReceived(
+        JavaScriptMessage(
+          message: jsonEncode({'playerId': channel.name, 'Ready': null}),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<void> removeJavaScriptChannel(String javaScriptChannelName) async {
+    _channels.remove(javaScriptChannelName);
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) {
     if (invocation.memberName == #runJavaScriptReturningResult ||
         invocation.memberName == #runJavaScript) {
       return Future<Object>.value('true');
     }
+
     return Future<void>.value();
   }
 }

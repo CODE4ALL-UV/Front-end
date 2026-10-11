@@ -1,1 +1,0 @@
-// este es un ejemplo de modulos page dart que sirve para mostrar como se pueden crear vistas en Dart

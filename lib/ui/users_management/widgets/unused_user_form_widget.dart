@@ -1,1 +1,0 @@
-// este es un ejempl ode usuario form que representa la interfaz de usuario para que los usuarios puedan ingresar y editar su información personal en la aplicación, interactuando con el usuario viewmodel para manejar la lógica de presentación y el estado del formulario de usuario en la aplicación.

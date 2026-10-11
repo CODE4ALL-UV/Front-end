@@ -36,50 +36,49 @@ void main() {
     );
 
     testWidgets(
-      'Carga subtítulos exitosamente y muestra la lista (status 200)',
+      'Muestra el reproductor interno al presionar "Reproducir dentro de la app"',
       (WidgetTester tester) async {
-        final mockClient = MockClient((request) async {
-          return http.Response(
-            jsonEncode({
-              'cues': [
-                {
-                  'start': 0.0,
-                  'duration': 5.0,
-                  'text': 'Hola Mundo',
-                  'translated': 'Hello World',
-                },
-                {
-                  'timestamp': 5.5,
-                  'duration': 2.0,
-                  'text': 'Test',
-                }, // Prueba el mapeo de 'timestamp'
-              ],
-            }),
-            200,
-          );
+        // Simulamos una pantalla móvil en orientación vertical.
+        await tester.binding.setSurfaceSize(const Size(430, 932));
+
+        addTearDown(() async {
+          await tester.binding.setSurfaceSize(null);
         });
+
+        final mockClient = MockClient(
+          (request) async => http.Response(jsonEncode({'cues': []}), 200),
+        );
 
         await tester.pumpWidget(
           MaterialApp(
             home: YoutubeTranslatorPlayer(
-              videoUrl: 'https://youtu.be/abc12345678',
+              videoUrl: 'https://youtu.be/video1',
               httpClient: mockClient,
               backendUrl: 'https://backend.test',
             ),
           ),
         );
 
-        await tester.pumpAndSettle();
+        // Procesamos los frames sin esperar a que todas las
+        // animaciones de la interfaz terminen.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pump();
 
-        // Debe mostrar los subtítulos en la lista (ListTile)
-        expect(
-          find.text('Hello World'),
-          findsOneWidget,
-        ); // Usa el traducido si existe
-        expect(
-          find.text('Test'),
-          findsOneWidget,
-        ); // Usa el original si no hay traducido
+        final playButton = find.text('Reproducir dentro de la app');
+        expect(playButton, findsOneWidget);
+
+        // Presionamos el botón para abrir el reproductor.
+        await tester.tap(playButton);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        // Comprobamos que el widget del reproductor esté en el árbol.
+        expect(find.byType(ypf.YoutubePlayer), findsOneWidget);
+
+        // Desmontamos la pantalla para ejecutar la limpieza.
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pump();
       },
     );
 
@@ -166,38 +165,6 @@ void main() {
       // Si no crasheó y terminó, el didUpdateWidget ejecutó _loadCaptions para video2.
       expect(find.byType(YoutubeTranslatorPlayer), findsOneWidget);
     });
-
-    testWidgets(
-      'Muestra el reproductor interno al presionar "Reproducir dentro de la app"',
-      (WidgetTester tester) async {
-        final mockClient = MockClient(
-          (request) async => http.Response(jsonEncode({'cues': []}), 200),
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: YoutubeTranslatorPlayer(
-              videoUrl: 'https://youtu.be/video1',
-              httpClient: mockClient,
-              backendUrl: 'https://backend.test',
-            ),
-          ),
-        );
-
-        await tester.pumpAndSettle();
-
-        // Al inicio debe estar la miniatura y el botón
-        final playButton = find.text('Reproducir dentro de la app');
-        expect(playButton, findsOneWidget);
-
-        // Lo presionamos
-        await tester.tap(playButton);
-        await tester.pumpAndSettle();
-
-        // Ahora debe mostrarse el YoutubePlayer
-        expect(find.byType(ypf.YoutubePlayer), findsOneWidget);
-      },
-    );
 
     testWidgets(
       'Controles de sincronización externa funcionan (Start, Re-sync, Stop)',

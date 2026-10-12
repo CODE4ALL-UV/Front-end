@@ -11,12 +11,7 @@ import 'package:flutter_code4all/data/services/sign_recognition_service.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/sign_camera_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/sign_guide.dart';
 
-/// Comprueba la pantalla de la cámara sin encender ninguna cámara.
-///
-/// Lo que se prueba es lo que pasa **antes** de pulsar el botón: que se avise
-/// cuando el servidor no está, que se explique qué es esto y qué no, y que
-/// quepa en una pantalla pequeña con el texto agrandado. Encender la cámara de
-/// verdad necesita un dispositivo y se comprueba a mano.
+/// Monta la pantalla respetando el escalado de texto solicitado por la prueba.
 Widget _app(Widget child, {double textScale = 1.0}) {
   return MaterialApp(
     home: MediaQuery(
@@ -27,14 +22,12 @@ Widget _app(Widget child, {double textScale = 1.0}) {
 }
 
 SignRecognitionService _service({required bool available, String? reason}) {
+  final body = <String, dynamic>{'available': available};
+  if (reason != null) body['reason'] = reason;
+
   return SignRecognitionService(
     api: ApiService(baseUrl: 'http://servidor.de.prueba'),
-    client: MockClient(
-      (request) async => http.Response(
-        jsonEncode({'available': available, 'reason': ?reason}),
-        200,
-      ),
-    ),
+    client: MockClient((request) async => http.Response(jsonEncode(body), 200)),
   );
 }
 
@@ -44,7 +37,7 @@ SignRecognitionService _offline() => SignRecognitionService(
   client: MockClient((request) async => throw http.ClientException('sin red')),
 );
 
-/// Recuerda si se ofreció la guía, sin tocar el almacenamiento de verdad.
+/// Evita tocar las preferencias persistentes que se usan para ofrecer la guía.
 class _FakePrompt extends SignGuidePrompt {
   _FakePrompt({required this.offer});
 
@@ -61,214 +54,388 @@ class _FakePrompt extends SignGuidePrompt {
   }
 }
 
+/// El servicio se inyecta para poder usar HTTP simulado; por tanto, la pantalla
+/// no es propietaria de él y la prueba debe cerrarlo después de desmontarla.
+void _cleanup(WidgetTester tester, SignRecognitionService service) {
+  addTearDown(() async {
+    await tester.pumpWidget(const SizedBox.shrink());
+    service.dispose();
+  });
+}
+
+/// Servicio controlable para verificar el reintento de disponibilidad sin
+/// depender de la caché o del tiempo de respuesta HTTP del servicio real.
+class _RetryableSignRecognitionService extends SignRecognitionService {
+  _RetryableSignRecognitionService()
+    : super(
+        api: ApiService(baseUrl: 'http://servidor.de.prueba'),
+        client: MockClient(
+          (request) async =>
+              http.Response(jsonEncode({'available': false}), 200),
+        ),
+      );
+
+  bool available = false;
+  int checkCount = 0;
+
+  @override
+  Future<bool> isAvailable({bool refresh = false}) async {
+    checkCount++;
+    return available;
+  }
+}
+
 void main() {
-  testWidgets('avisa cuando el servidor no puede reconocer señas', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      _app(SignCameraScreen(service: _service(available: false))),
-    );
-    await tester.pumpAndSettle();
+  group('SignCameraScreen: disponibilidad y contenido', () {
+    testWidgets('avisa cuando el servidor no puede reconocer señas', (
+      tester,
+    ) async {
+      final service = _service(available: false);
+      _cleanup(tester, service);
 
-    expect(
-      find.textContaining('no tiene activo el reconocimiento'),
-      findsOneWidget,
-    );
-    expect(find.text('Volver a intentarlo'), findsOneWidget);
-    // Sin servidor no se ofrece encender la cámara: pedir permiso para nada
-    // sería maltratar a quien lo concede.
-    expect(find.text('Encender la cámara'), findsNothing);
-  });
-
-  testWidgets('con el servidor listo ofrece encender la cámara', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      _app(SignCameraScreen(service: _service(available: true))),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Encender la cámara'), findsOneWidget);
-    expect(find.text('La cámara está apagada'), findsOneWidget);
-  });
-
-  testWidgets('deja claro que es dactilología y no Lengua de Señas', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      _app(SignCameraScreen(service: _service(available: true))),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.textContaining('dactilología'), findsOneWidget);
-    expect(find.textContaining('No es Lengua de Señas'), findsOneWidget);
-  });
-
-  testWidgets('dice que no se guarda ninguna imagen', (tester) async {
-    await tester.pumpWidget(
-      _app(SignCameraScreen(service: _service(available: true))),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.textContaining('se descartan'), findsOneWidget);
-  });
-
-  testWidgets('al practicar una letra lo dice desde el título', (tester) async {
-    await tester.pumpWidget(
-      _app(
-        SignCameraScreen(targetLetter: 'A', service: _service(available: true)),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Practica la A'), findsOneWidget);
-    expect(find.textContaining('haz la letra A'), findsOneWidget);
-  });
-
-  testWidgets('cabe en una pantalla de 320 px', (tester) async {
-    tester.view.physicalSize = const Size(320, 640);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-
-    await tester.pumpWidget(
-      _app(SignCameraScreen(service: _service(available: true))),
-    );
-    await tester.pumpAndSettle();
-
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('cabe con el texto al 200 por ciento', (tester) async {
-    tester.view.physicalSize = const Size(390, 844);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-
-    await tester.pumpWidget(
-      _app(
-        SignCameraScreen(service: _service(available: true)),
-        textScale: 2.0,
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('sin conexión lo dice así, y no que el servidor no puede', (
-    tester,
-  ) async {
-    await tester.pumpWidget(_app(SignCameraScreen(service: _offline())));
-    await tester.pumpAndSettle();
-
-    expect(find.textContaining('No se pudo conectar'), findsOneWidget);
-    expect(find.textContaining('no tiene activo'), findsNothing);
-  });
-
-  testWidgets('si el servidor explica por qué no puede, se ve el detalle', (
-    tester,
-  ) async {
-    // Como en un Windows con el Control inteligente de aplicaciones, que
-    // bloquea la librería de MediaPipe.
-    await tester.pumpWidget(
-      _app(
-        SignCameraScreen(
-          service: _service(
-            available: false,
-            reason: 'El servidor no puede crear el detector de manos',
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: _FakePrompt(offer: false),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(
-      find.text(
-        'Detalle técnico: El servidor no puede crear el detector de manos',
-      ),
-      findsOneWidget,
-    );
-    // La guía se puede leer aunque la cámara no funcione.
-    expect(find.text('Guía del alfabeto (PDF)'), findsOneWidget);
-  });
+      expect(
+        find.textContaining('no tiene activo el reconocimiento'),
+        findsOneWidget,
+      );
+      expect(find.text('Volver a intentarlo'), findsOneWidget);
+      // Sin servidor no se ofrece encender la cámara: no pedir permiso para nada.
+      expect(find.text('Encender la cámara'), findsNothing);
+    });
 
-  testWidgets('la primera vez ofrece la guía, y la abre si se acepta', (
-    tester,
-  ) async {
-    final prompt = _FakePrompt(offer: true);
-    var opened = 0;
-    await tester.pumpWidget(
-      _app(
-        SignCameraScreen(
-          service: _service(available: true),
-          guidePrompt: prompt,
-          openGuide: () async {
-            opened++;
-            return true;
-          },
+    testWidgets('con el servidor listo ofrece encender la cámara', (
+      tester,
+    ) async {
+      final service = _service(available: true);
+      _cleanup(tester, service);
+
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: _FakePrompt(offer: false),
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('Antes de empezar'), findsOneWidget);
-    expect(prompt.marked, isTrue);
+      expect(find.text('Encender la cámara'), findsOneWidget);
+      expect(find.text('La cámara está apagada'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
 
-    await tester.tap(find.text('Abrir la guía'));
-    await tester.pumpAndSettle();
+    testWidgets('deja claro que es dactilología y no Lengua de Señas', (
+      tester,
+    ) async {
+      final service = _service(available: true);
+      _cleanup(tester, service);
 
-    expect(opened, 1);
-    expect(find.text('Antes de empezar'), findsNothing);
-  });
-
-  testWidgets('después de la primera vez no vuelve a preguntar', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      _app(
-        SignCameraScreen(
-          service: _service(available: true),
-          guidePrompt: _FakePrompt(offer: false),
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: _FakePrompt(offer: false),
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('Antes de empezar'), findsNothing);
-    expect(find.text('Guía del alfabeto (PDF)'), findsOneWidget);
-  });
+      expect(find.textContaining('dactilología'), findsOneWidget);
+      expect(find.textContaining('No es Lengua de Señas'), findsOneWidget);
+    });
 
-  testWidgets('el botón de la guía la abre', (tester) async {
-    var opened = 0;
-    await tester.pumpWidget(
-      _app(
-        SignCameraScreen(
-          service: _service(available: true),
-          guidePrompt: _FakePrompt(offer: false),
-          openGuide: () async {
-            opened++;
-            return true;
-          },
+    testWidgets('explica que las fotos se descartan y no se guardan', (
+      tester,
+    ) async {
+      final service = _service(available: true);
+      _cleanup(tester, service);
+
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: _FakePrompt(offer: false),
+          ),
         ),
-      ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('se descartan'), findsOneWidget);
+      expect(find.textContaining('No se graba vídeo'), findsOneWidget);
+    });
+
+    testWidgets(
+      'al practicar una letra la muestra en el título e instrucciones',
+      (tester) async {
+        final service = _service(available: true);
+        _cleanup(tester, service);
+
+        await tester.pumpWidget(
+          _app(
+            SignCameraScreen(
+              targetLetter: 'A',
+              service: service,
+              guidePrompt: _FakePrompt(offer: false),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Practica la A'), findsOneWidget);
+        expect(find.textContaining('haz la letra A'), findsOneWidget);
+        // En modo práctica no se ofrece el texto libre del dictado.
+        expect(find.text('Empezar de nuevo'), findsNothing);
+      },
     );
-    await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Guía del alfabeto (PDF)'));
-    await tester.pump();
+    testWidgets('cabe en una pantalla pequeña de 320 x 640', (tester) async {
+      tester.view.physicalSize = const Size(320, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
 
-    expect(opened, 1);
+      final service = _service(available: true);
+      _cleanup(tester, service);
+
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: _FakePrompt(offer: false),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('cabe con el texto al 200 por ciento', (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final service = _service(available: true);
+      _cleanup(tester, service);
+
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: _FakePrompt(offer: false),
+          ),
+          textScale: 2.0,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      'si se pausa la app antes de iniciar no intenta encender cámara',
+      (tester) async {
+        final service = _service(available: true);
+        _cleanup(tester, service);
+
+        await tester.pumpWidget(
+          _app(
+            SignCameraScreen(
+              service: service,
+              guidePrompt: _FakePrompt(offer: false),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        await tester.pump();
+
+        expect(find.text('Encender la cámara'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets('al reintentar consulta de nuevo y actualiza el estado', (
+      tester,
+    ) async {
+      final service = _RetryableSignRecognitionService();
+      _cleanup(tester, service);
+
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: _FakePrompt(offer: false),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(service.checkCount, 1);
+      expect(find.text('Volver a intentarlo'), findsOneWidget);
+      expect(find.text('Encender la cámara'), findsNothing);
+
+      // Se cambia el resultado del servicio simulado. La prueba no depende
+      // de cachés, tiempos de espera ni de una respuesta HTTP real.
+      service.available = true;
+      await tester.tap(find.text('Volver a intentarlo'));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(service.checkCount, 2);
+      expect(find.text('Encender la cámara'), findsOneWidget);
+      expect(find.text('Volver a intentarlo'), findsNothing);
+    });
   });
 
-  test('la guía en PDF existe y está declarada en la app', () {
-    expect(File(signGuideAsset).existsSync(), isTrue);
-    expect(File('pubspec.yaml').readAsStringSync(), contains('assets/docs/'));
+  group('SignCameraScreen: errores del servicio', () {
+    testWidgets('sin conexión muestra un mensaje específico', (tester) async {
+      final service = _offline();
+      _cleanup(tester, service);
+
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: _FakePrompt(offer: false),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('No se pudo conectar'), findsOneWidget);
+      expect(find.textContaining('no tiene activo'), findsNothing);
+    });
+
+    testWidgets('muestra el detalle técnico que devuelve el servidor', (
+      tester,
+    ) async {
+      final service = _service(
+        available: false,
+        reason: 'El servidor no puede crear el detector de manos',
+      );
+      _cleanup(tester, service);
+
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: _FakePrompt(offer: false),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          'Detalle técnico: El servidor no puede crear el detector de manos',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Guía del alfabeto (PDF)'), findsOneWidget);
+    });
   });
 
-  test('no se ofrece practicar una letra que nunca se dará por buena', () {
-    // La J, la Z y la Ñ llevan movimiento: desde una foto no hay forma.
-    expect(practicableLetters(), isNot(contains('J')));
-    expect(practicableLetters(), isNot(contains('Z')));
-    expect(practicableLetters(), isNot(contains('Ñ')));
-    expect(practicableLetters(), contains('A'));
+  group('SignCameraScreen: guía del alfabeto', () {
+    testWidgets('la primera vez ofrece la guía y la abre si se acepta', (
+      tester,
+    ) async {
+      final prompt = _FakePrompt(offer: true);
+      var opened = 0;
+      final service = _service(available: true);
+      _cleanup(tester, service);
+
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: prompt,
+            openGuide: () async {
+              opened++;
+              return true;
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Antes de empezar'), findsOneWidget);
+      expect(prompt.marked, isTrue);
+
+      await tester.tap(find.text('Abrir la guía'));
+      await tester.pumpAndSettle();
+
+      expect(opened, 1);
+      expect(find.text('Antes de empezar'), findsNothing);
+    });
+
+    testWidgets('si ya se ofreció, no vuelve a preguntar al entrar', (
+      tester,
+    ) async {
+      final prompt = _FakePrompt(offer: false);
+      final service = _service(available: true);
+      _cleanup(tester, service);
+
+      await tester.pumpWidget(
+        _app(SignCameraScreen(service: service, guidePrompt: prompt)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Antes de empezar'), findsNothing);
+      expect(find.text('Guía del alfabeto (PDF)'), findsOneWidget);
+      expect(prompt.marked, isFalse);
+    });
+
+    testWidgets('el botón de la guía la abre', (tester) async {
+      var opened = 0;
+      final service = _service(available: true);
+      _cleanup(tester, service);
+
+      await tester.pumpWidget(
+        _app(
+          SignCameraScreen(
+            service: service,
+            guidePrompt: _FakePrompt(offer: false),
+            openGuide: () async {
+              opened++;
+              return true;
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Guía del alfabeto (PDF)'));
+      await tester.pump();
+
+      expect(opened, 1);
+    });
+
+    test('el PDF existe y está declarado como recurso de la aplicación', () {
+      expect(File(signGuideAsset).existsSync(), isTrue);
+      expect(File('pubspec.yaml').readAsStringSync(), contains('assets/docs/'));
+    });
+  });
+
+  group('practicableLetters', () {
+    test('excluye letras con movimiento y conserva letras estáticas', () {
+      final letters = practicableLetters();
+
+      // J, Z y Ñ necesitan movimiento y no se pueden verificar con una foto.
+      expect(letters, isNot(contains('J')));
+      expect(letters, isNot(contains('Z')));
+      expect(letters, isNot(contains('Ñ')));
+      expect(letters, contains('A'));
+      expect(letters, isNotEmpty);
+    });
   });
 }

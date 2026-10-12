@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 ///
 /// El manual abre las guías del rol según el ancla de la dirección. Si el
 /// ancla no coincide con la que entiende `web/manual.html`, la persona cae en
-/// «Primeros pasos» sin saber dónde buscar lo suyo.
+/// «Primeros pasos» sin saber dónde buscar lo suyo..
 void main() {
   group('la dirección', () {
     test('fuera del navegador apunta a la página publicada', () {

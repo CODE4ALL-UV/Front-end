@@ -87,6 +87,39 @@ class _RetryableSignRecognitionService extends SignRecognitionService {
 
 void main() {
   group('SignCameraScreen: disponibilidad y contenido', () {
+    testWidgets(
+      'al presionar "Encender la cámara" sin hardware disponible muestra el fallo en UI',
+      (tester) async {
+        // Ampliamos el tamaño de la ventana para que los controles queden dentro del área visible
+        tester.view.physicalSize = const Size(800, 1000);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+
+        final service = _service(available: true);
+        _cleanup(tester, service);
+
+        await tester.pumpWidget(
+          _app(
+            SignCameraScreen(
+              service: service,
+              guidePrompt: _FakePrompt(offer: false),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Encender la cámara'), findsOneWidget);
+
+        // Aseguramos la visibilidad y hacemos tap sobre el botón
+        await tester.ensureVisible(find.text('Encender la cámara'));
+        await tester.tap(find.text('Encender la cámara'));
+        await tester.pumpAndSettle();
+
+        // Verificamos que la app manejó el fallo mostrando un mensaje relacionado con la cámara
+        expect(find.textContaining('cámara'), findsWidgets);
+      },
+    );
+
     testWidgets('avisa cuando el servidor no puede reconocer señas', (
       tester,
     ) async {

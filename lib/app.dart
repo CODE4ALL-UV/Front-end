@@ -202,41 +202,72 @@ class _AppState extends State<App> {
       context: context,
       builder: (ctx) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.light_mode),
-                title: const Text('Claro'),
-                onTap: () => Navigator.of(ctx).pop(AppThemeMode.light),
-              ),
-              ListTile(
-                leading: const Icon(Icons.dark_mode),
-                title: const Text('Oscuro'),
-                onTap: () => Navigator.of(ctx).pop(AppThemeMode.dark),
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.visibility),
-                title: const Text('Deuteranopia (No distintición del Verde)'),
-                onTap: () => Navigator.of(ctx).pop(AppThemeMode.deuteranopia),
-              ),
-              ListTile(
-                leading: const Icon(Icons.visibility),
-                title: const Text('Protanopía (No distintición del Rojo)'),
-                onTap: () => Navigator.of(ctx).pop(AppThemeMode.protanopia),
-              ),
-              ListTile(
-                leading: const Icon(Icons.visibility),
-                title: const Text('Tritanopía (No distintición del Azul)'),
-                onTap: () => Navigator.of(ctx).pop(AppThemeMode.tritanopia),
-              ),
-              ListTile(
-                leading: const Icon(Icons.visibility),
-                title: const Text('Acromatopsia (Monocromático)'),
-                onTap: () => Navigator.of(ctx).pop(AppThemeMode.achromatopsia),
-              ),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.light_mode),
+                  title: const Text('Claro'),
+                  onTap: () => Navigator.of(ctx).pop(AppThemeMode.light),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.dark_mode),
+                  title: const Text('Oscuro'),
+                  onTap: () => Navigator.of(ctx).pop(AppThemeMode.dark),
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.visibility),
+                  title: const Text(
+                    'Deuteranopía (Ausencia de percepción del verde)',
+                  ),
+                  onTap: () => Navigator.of(ctx).pop(AppThemeMode.deuteranopia),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.visibility),
+                  title: const Text(
+                    'Deuteranomalía (Sensibilidad reducida al verde)',
+                  ),
+                  onTap: () =>
+                      Navigator.of(ctx).pop(AppThemeMode.deuteranomalia),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.visibility),
+                  title: const Text(
+                    'Protanopía (Ausencia de percepción del rojo)',
+                  ),
+                  onTap: () => Navigator.of(ctx).pop(AppThemeMode.protanopia),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.visibility),
+                  title: const Text(
+                    'Protanomalía (Sensibilidad reducida al rojo)',
+                  ),
+                  onTap: () => Navigator.of(ctx).pop(AppThemeMode.protanomalia),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.visibility),
+                  title: const Text(
+                    'Tritanopía (Ausencia de percepción del azul)',
+                  ),
+                  onTap: () => Navigator.of(ctx).pop(AppThemeMode.tritanopia),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.visibility),
+                  title: const Text(
+                    'Tritanomalía (Sensibilidad reducida al azul)',
+                  ),
+                  onTap: () => Navigator.of(ctx).pop(AppThemeMode.tritanomalia),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.visibility),
+                  title: const Text('Acromatopsia (Monocromático)'),
+                  onTap: () =>
+                      Navigator.of(ctx).pop(AppThemeMode.achromatopsia),
+                ),
+              ],
+            ),
           ),
         );
       },

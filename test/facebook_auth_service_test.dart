@@ -5,11 +5,6 @@ import 'package:flutter_code4all/utils/browser_port.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-// Ajusta estas rutas según tu proyecto
-// import 'package:flutter_code4all/data/services/api_service.dart';
-// import 'package:flutter_code4all/utils/browser_port.dart';
-// import 'package:flutter_code4all/data/services/facebook_auth_service.dart';
-
 class MockApiService extends Mock implements ApiService {}
 
 class MockBrowserPort extends Mock implements BrowserPort {}

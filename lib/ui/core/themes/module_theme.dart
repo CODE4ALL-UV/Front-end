@@ -139,7 +139,7 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
         const Color(0xFF5D4037),
       ),
       AppThemeMode.deuteranopia || AppThemeMode.deuteranomalia => (
-        const Color(0xFFEF6C00),
+        const Color(0xFFB45309),
         const Color(0xFF1565C0),
         const Color(0xFF00838F),
       ),

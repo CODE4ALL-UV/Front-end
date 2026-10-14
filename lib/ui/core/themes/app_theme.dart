@@ -941,7 +941,7 @@ class AppTheme {
           colorScheme: const ColorScheme.light(
             primary: Color(0xFFAD1457), // Rosa/Magenta adaptado
             onPrimary: Colors.white,
-            secondary: Color(0xFF00838F), // Cian/Teal oscuro accesible
+            secondary: Color(0xFF00695C), // Cian/Teal oscuro accesible
             onSecondary: Colors.white,
             tertiary: Color(
               0xFFFFCC80,
@@ -959,7 +959,7 @@ class AppTheme {
             background: Color(0xFFFAFAFA),
             border: Color(0xFFB0BEC5),
             text: Color(0xFF263238),
-            prompt: Color(0xFF00838F),
+            prompt: Color(0xFF00695C),
             keyword: Color(0xFFC62828),
             string: Color(0xFF880E4F),
             comment: Color(0xFF6E6E6E),
@@ -967,11 +967,11 @@ class AppTheme {
           ),
           messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE0F2F1),
-            infoForeground: Color(0xFF00838F),
+            infoForeground: Color(0xFF00695C),
             successBackground: Color(0xFFE8F5E9),
             successForeground: Color(0xFF1B5E20),
             warningBackground: Color(0xFFFFF3E0),
-            warningForeground: Color(0xFFEF6C00),
+            warningForeground: Color(0xFF8A5000),
             dangerBackground: Color(0xFFFFEBEE),
             dangerForeground: Color(0xFFC62828),
           ),
@@ -981,7 +981,7 @@ class AppTheme {
             nuggetBackground: Color(0xFFF1F8E9),
             nuggetForeground: Color(0xFF33691E),
             exampleBackground: Color(0xFFFFF3E0),
-            exampleForeground: Color(0xFFEF6C00),
+            exampleForeground: Color(0xFF8A5000),
             exerciseBackground: Color(0xFFF3E5F5),
             exerciseForeground: Color(0xFF6A1B9A),
             videoBackground: Color(0xFFFFEBEE),

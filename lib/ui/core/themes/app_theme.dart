@@ -57,11 +57,14 @@ final ThemeData _fallbackTheme = AppTheme.getTheme(mode: AppThemeMode.light);
           AppMetrics.minTapTarget / etc.
 
   MODOS DE TEMA
-  AppThemeMode → Define los 6 modos visuales disponibles:
+  AppThemeMode → Define los 9 modos visuales disponibles:
   light, dark, protanopia, deuteranopia, tritanopia y achromatopsia.
   Acceso: AppThemeMode.light / AppThemeMode.dark
   AppThemeMode.protanopia / AppThemeMode.deuteranopia
-  AppThemeMode.tritanopia / AppThemeMode.achromatopsia.
+  AppThemeMode.tritanopia / AppThemeMode.tritanomalía
+  AppThemeMode.protanomalía / AppThemeMode.deuteranomalía
+  AppThemeMode.achromatopsia
+
 
   TONOS SEMÁNTICOS
   AppThemeTone → Identifica la intención visual: info, success, warning o danger.
@@ -146,6 +149,9 @@ enum AppThemeMode {
   deuteranopia, // Deficiencia Rojo-Verde (Énfasis en Azules y Amarillos)
   protanopia, // Insensibilidad al Rojo (Azul profundo y Dorado)
   tritanopia, // Deficiencia Azul-Amarillo (Rojo/Rosa y Cian/Verde)
+  tritanomalia, // Deficiencia Azul-Amarillo (Rojo/Rosa y Cian/Verde)
+  protanomalia, // Insensibilidad al Rojo (Azul profundo y Dorado)
+  deuteranomalia, // Deficiencia Rojo-Verde (Énfasis en Azules y Amarillos)
 }
 
 /// Cuentas de contraste (WCAG 2.1) para elegir colores que se puedan leer.
@@ -822,6 +828,160 @@ class AppTheme {
             nuggetForeground: Color(0xFF33691E),
             exampleBackground: Color(0xFFFCE4EC),
             exampleForeground: Color(0xFFAD1457),
+            exerciseBackground: Color(0xFFF3E5F5),
+            exerciseForeground: Color(0xFF6A1B9A),
+            videoBackground: Color(0xFFFFEBEE),
+            videoForeground: Color(0xFFC62828),
+            quizBackground: Color(0xFFEFEBE9),
+            quizForeground: Color(0xFF5D4037),
+            labBackground: Color(0xFFE0F2F1),
+            labForeground: Color(0xFF00796B),
+            finalEvaluationBackground: Color(0xFFFBE9E7),
+            finalEvaluationForeground: Color(0xFFB71C1C),
+          ),
+          themeMode: mode,
+          currentModuleId: moduleId,
+        );
+      case AppThemeMode.protanomalia:
+        // Sensibilidad reducida al rojo: tonos equilibrados entre el tema claro y la protanopía.
+        return _buildTheme(
+          brightness: Brightness.light,
+          scaffoldBackgroundColor: const Color(0xFFF4F6F9),
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF1976D2), // Azul intermedio seguro
+            onPrimary: Colors.white,
+            secondary: Color(0xFF8D6E63), // Marrón/Dorado suave
+            onSecondary: Colors.white,
+            tertiary: Color(0xFFFFD43B), // Amarillo Python
+            onTertiary: Color(0xFF212121),
+            surface: Colors.white,
+            onSurface: Color(0xFF1A252C),
+            onSurfaceVariant: Color(0xFF3D4A55),
+            outline: Color(0xFF6B7785),
+            outlineVariant: Color(0xFFDCE3EC),
+            error: Color(0xFFC62828),
+            onError: Colors.white,
+          ),
+          codeConsoleTheme: const CodeConsoleTheme(
+            background: Color(0xFFF8FBFF),
+            border: Color(0xFFB0BEC5),
+            text: Color(0xFF263238),
+            prompt: Color(0xFF3776AB),
+            keyword: Color(0xFFB33939),
+            string: Color(0xFF032F62),
+            comment: Color(0xFF5F6670),
+            error: Color(0xFFC62828),
+          ),
+          messageTheme: const MessageTheme(
+            infoBackground: Color(0xFFE3F2FD),
+            infoForeground: Color(0xFF1976D2),
+            successBackground: Color(0xFFE8F5E9),
+            successForeground: Color(0xFF1B5E20),
+            warningBackground: Color(0xFFFFF8E1),
+            warningForeground: Color(0xFF8D6E63),
+            dangerBackground: Color(0xFFFFEBEE),
+            dangerForeground: Color(0xFFC62828),
+          ),
+          activityTheme:
+              _colorBlindActivities, // Reutiliza la paleta segura de daltonism,
+          themeMode: mode,
+          currentModuleId: moduleId,
+        );
+
+      case AppThemeMode.deuteranomalia:
+        // Sensibilidad reducida al verde: tonos optimizados para deficiencia leve/moderada de verde.
+        return _buildTheme(
+          brightness: Brightness.light,
+          scaffoldBackgroundColor: const Color(0xFFF4F6F9),
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF1565C0), // Azul principal seguro
+            onPrimary: Colors.white,
+            secondary: Color(0xFFEF6C00), // Naranja accesible
+            onSecondary: Colors.white,
+            tertiary: Color(0xFFFFD43B), // Amarillo Pytho,
+            onTertiary: Color(0xFF212121),
+            surface: Colors.white,
+            onSurface: Color(0xFF0D1B2A),
+            onSurfaceVariant: Color(0xFF3D4A5C),
+            outline: Color(0xFF6B7785),
+            outlineVariant: Color(0xFFDCE3EC),
+            error: Color(0xFFD32F2F),
+            onError: Colors.white,
+          ),
+          codeConsoleTheme: const CodeConsoleTheme(
+            background: Color(0xFFF8FBFF),
+            border: Color(0xFFB0BEC5),
+            text: Color(0xFF263238),
+            prompt: Color(0xFF3776AB),
+            keyword: Color(0xFFE65100), // Naranja fuerte para comandos
+            string: Color(0xFF032F62),
+            comment: Color(0xFF5F6670),
+            error: Color(0xFFD32F2F),
+          ),
+          messageTheme: const MessageTheme(
+            infoBackground: Color(0xFFE3F2FD),
+            infoForeground: Color(0xFF1565C0),
+            successBackground: Color(0xFFE0F7FA), // Cian claro accesible
+            successForeground: Color(0xFF00607A),
+            warningBackground: Color(0xFFFFF3E0),
+            warningForeground: Color(0xFFEF6C00),
+            dangerBackground: Color(0xFFFFEBEE),
+            dangerForeground: Color(0xFFD32F2F),
+          ),
+          activityTheme: _colorBlindActivities,
+          themeMode: mode,
+          currentModuleId: moduleId,
+        );
+
+      case AppThemeMode.tritanomalia:
+        // Sensibilidad reducida al azul y amarillo: adaptado con tonos rosados, cianes y naranjas suaves.
+        return _buildTheme(
+          brightness: Brightness.light,
+          scaffoldBackgroundColor: const Color(0xFFFDF7F9),
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFFAD1457), // Rosa/Magenta adaptado
+            onPrimary: Colors.white,
+            secondary: Color(0xFF00838F), // Cian/Teal oscuro accesible
+            onSecondary: Colors.white,
+            tertiary: Color(
+              0xFFFFCC80,
+            ), // Naranja suave en lugar de amarillo puro
+            onTertiary: Color(0xFF212121),
+            surface: Colors.white,
+            onSurface: Color(0xFF2C001E),
+            onSurfaceVariant: Color(0xFF5A3D4C),
+            outline: Color(0xFF7D6470),
+            outlineVariant: Color(0xFFEBDDE3),
+            error: Color(0xFFC62828),
+            onError: Colors.white,
+          ),
+          codeConsoleTheme: const CodeConsoleTheme(
+            background: Color(0xFFFAFAFA),
+            border: Color(0xFFB0BEC5),
+            text: Color(0xFF263238),
+            prompt: Color(0xFF00838F),
+            keyword: Color(0xFFC62828),
+            string: Color(0xFF880E4F),
+            comment: Color(0xFF6E6E6E),
+            error: Color(0xFFB71C1C),
+          ),
+          messageTheme: const MessageTheme(
+            infoBackground: Color(0xFFE0F2F1),
+            infoForeground: Color(0xFF00838F),
+            successBackground: Color(0xFFE8F5E9),
+            successForeground: Color(0xFF1B5E20),
+            warningBackground: Color(0xFFFFF3E0),
+            warningForeground: Color(0xFFEF6C00),
+            dangerBackground: Color(0xFFFFEBEE),
+            dangerForeground: Color(0xFFC62828),
+          ),
+          activityTheme: const ActivityTheme(
+            readingBackground: Color(0xFFE0F2F1),
+            readingForeground: Color(0xFF00838F),
+            nuggetBackground: Color(0xFFF1F8E9),
+            nuggetForeground: Color(0xFF33691E),
+            exampleBackground: Color(0xFFFFF3E0),
+            exampleForeground: Color(0xFFEF6C00),
             exerciseBackground: Color(0xFFF3E5F5),
             exerciseForeground: Color(0xFF6A1B9A),
             videoBackground: Color(0xFFFFEBEE),

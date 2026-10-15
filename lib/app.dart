@@ -197,9 +197,11 @@ class _AppState extends State<App> {
 
   // Mostrar selector con tres opciones y actualizar etiquetas
   // MODIFICADO: Descomentamos las variantes de daltonismo para que puedas probarlas
-  void _showThemeOptions(BuildContext context) async {
+  void _showThemeOptions() async {
     final choice = await showModalBottomSheet<AppThemeMode>(
-      context: context,
+      // El contexto de este State está por encima del MaterialApp: ahí no hay
+      // Navigator ni MaterialLocalizations. El del Navigator sí los tiene.
+      context: _navigatorKey.currentContext!,
       builder: (ctx) {
         return SafeArea(
           child: SingleChildScrollView(
@@ -400,7 +402,7 @@ class _AppState extends State<App> {
                   child: FloatingActionButton(
                     heroTag: 'theme-toggle',
                     backgroundColor: activeTheme.colorScheme.primary,
-                    onPressed: () => _showThemeOptions(context),
+                    onPressed: _showThemeOptions,
                     child: const Icon(Icons.palette, color: Colors.white),
                   ),
                 ),

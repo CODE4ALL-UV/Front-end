@@ -527,15 +527,12 @@ void main() {
     testWidgets('el selector de colores aplica el tema elegido', (
       tester,
     ) async {
-      // La hoja se abre con el contexto de la raíz (`_showThemeOptions` en
-      // app.dart), que está por encima del MaterialApp de la app. Arrancada
-      // tal cual, como en main(), ahí no hay Navigator ni MaterialLocalizations
-      // y pulsar el botón lanza «No MaterialLocalizations found» sin abrir
-      // nada: es un fallo pendiente de corregir en app.dart. Mientras tanto se
-      // le pone un MaterialApp encima para poder comprobar la hoja en sí: qué
-      // ofrece y qué tema aplica cada opción.
+      // Arrancada tal cual, como en main(): sin un MaterialApp encima. La
+      // hoja se abría con el contexto de la raíz, que está por encima del
+      // MaterialApp de la app, y pulsar el botón lanzaba «No
+      // MaterialLocalizations found» sin abrir nada.
       await withServer(() async {
-        await pumpApp(tester, app: const MaterialApp(home: App()));
+        await pumpApp(tester);
 
         final register = find.text('REGISTRARSE');
         await tester.ensureVisible(register);
@@ -543,7 +540,7 @@ void main() {
         await settle(tester);
 
         ThemeData appTheme() =>
-            tester.widget<MaterialApp>(find.byType(MaterialApp).last).theme!;
+            tester.widget<MaterialApp>(find.byType(MaterialApp)).theme!;
 
         const options = {
           'Oscuro': AppThemeMode.dark,

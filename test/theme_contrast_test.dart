@@ -6,7 +6,7 @@ import 'package:flutter_code4all/ui/core/themes/ide_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/module_theme.dart';
 
-/// Comprueba que los seis temas se puedan leer.
+/// Comprueba que todos los temas se puedan leer.
 ///
 /// Los temas existen para personas con baja visión o con daltonismo, así que
 /// un color bonito que no contrasta es peor que no tener tema: quien lo elige

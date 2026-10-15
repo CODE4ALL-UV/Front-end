@@ -848,9 +848,9 @@ class AppTheme {
           brightness: Brightness.light,
           scaffoldBackgroundColor: const Color(0xFFF4F6F9),
           colorScheme: const ColorScheme.light(
-            primary: Color(0xFF1976D2), // Azul intermedio seguro
+            primary: Color(0xFF1565C0), // Azul intermedio seguro
             onPrimary: Colors.white,
-            secondary: Color(0xFF8D6E63), // Marrón/Dorado suave
+            secondary: Color(0xFF795548), // Marrón/Dorado suave
             onSecondary: Colors.white,
             tertiary: Color(0xFFFFD43B), // Amarillo Python
             onTertiary: Color(0xFF212121),
@@ -874,11 +874,11 @@ class AppTheme {
           ),
           messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE3F2FD),
-            infoForeground: Color(0xFF1976D2),
+            infoForeground: Color(0xFF1565C0),
             successBackground: Color(0xFFE8F5E9),
             successForeground: Color(0xFF1B5E20),
             warningBackground: Color(0xFFFFF8E1),
-            warningForeground: Color(0xFF8D6E63),
+            warningForeground: Color(0xFF795548),
             dangerBackground: Color(0xFFFFEBEE),
             dangerForeground: Color(0xFFC62828),
           ),
@@ -896,7 +896,7 @@ class AppTheme {
           colorScheme: const ColorScheme.light(
             primary: Color(0xFF1565C0), // Azul principal seguro
             onPrimary: Colors.white,
-            secondary: Color(0xFFEF6C00), // Naranja accesible
+            secondary: Color(0xFFBF360C), // Naranja accesible
             onSecondary: Colors.white,
             tertiary: Color(0xFFFFD43B), // Amarillo Pytho,
             onTertiary: Color(0xFF212121),
@@ -905,7 +905,7 @@ class AppTheme {
             onSurfaceVariant: Color(0xFF3D4A5C),
             outline: Color(0xFF6B7785),
             outlineVariant: Color(0xFFDCE3EC),
-            error: Color(0xFFD32F2F),
+            error: Color(0xFFC62828),
             onError: Colors.white,
           ),
           codeConsoleTheme: const CodeConsoleTheme(
@@ -913,10 +913,10 @@ class AppTheme {
             border: Color(0xFFB0BEC5),
             text: Color(0xFF263238),
             prompt: Color(0xFF3776AB),
-            keyword: Color(0xFFE65100), // Naranja fuerte para comandos
+            keyword: Color(0xFFB34700), // Naranja fuerte para comandos
             string: Color(0xFF032F62),
             comment: Color(0xFF5F6670),
-            error: Color(0xFFD32F2F),
+            error: Color(0xFFC62828),
           ),
           messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE3F2FD),
@@ -924,9 +924,9 @@ class AppTheme {
             successBackground: Color(0xFFE0F7FA), // Cian claro accesible
             successForeground: Color(0xFF00607A),
             warningBackground: Color(0xFFFFF3E0),
-            warningForeground: Color(0xFFEF6C00),
+            warningForeground: Color(0xFFBF360C),
             dangerBackground: Color(0xFFFFEBEE),
-            dangerForeground: Color(0xFFD32F2F),
+            dangerForeground: Color(0xFFC62828),
           ),
           activityTheme: _colorBlindActivities,
           themeMode: mode,
@@ -941,7 +941,7 @@ class AppTheme {
           colorScheme: const ColorScheme.light(
             primary: Color(0xFFAD1457), // Rosa/Magenta adaptado
             onPrimary: Colors.white,
-            secondary: Color(0xFF00838F), // Cian/Teal oscuro accesible
+            secondary: Color(0xFF00727C), // Cian/Teal oscuro accesible
             onSecondary: Colors.white,
             tertiary: Color(
               0xFFFFCC80,
@@ -959,7 +959,7 @@ class AppTheme {
             background: Color(0xFFFAFAFA),
             border: Color(0xFFB0BEC5),
             text: Color(0xFF263238),
-            prompt: Color(0xFF00838F),
+            prompt: Color(0xFF00727C),
             keyword: Color(0xFFC62828),
             string: Color(0xFF880E4F),
             comment: Color(0xFF6E6E6E),
@@ -967,21 +967,21 @@ class AppTheme {
           ),
           messageTheme: const MessageTheme(
             infoBackground: Color(0xFFE0F2F1),
-            infoForeground: Color(0xFF00838F),
+            infoForeground: Color(0xFF00727C),
             successBackground: Color(0xFFE8F5E9),
             successForeground: Color(0xFF1B5E20),
             warningBackground: Color(0xFFFFF3E0),
-            warningForeground: Color(0xFFEF6C00),
+            warningForeground: Color(0xFFBF360C),
             dangerBackground: Color(0xFFFFEBEE),
             dangerForeground: Color(0xFFC62828),
           ),
           activityTheme: const ActivityTheme(
             readingBackground: Color(0xFFE0F2F1),
-            readingForeground: Color(0xFF00838F),
+            readingForeground: Color(0xFF00727C),
             nuggetBackground: Color(0xFFF1F8E9),
             nuggetForeground: Color(0xFF33691E),
             exampleBackground: Color(0xFFFFF3E0),
-            exampleForeground: Color(0xFFEF6C00),
+            exampleForeground: Color(0xFFBF360C),
             exerciseBackground: Color(0xFFF3E5F5),
             exerciseForeground: Color(0xFF6A1B9A),
             videoBackground: Color(0xFFFFEBEE),

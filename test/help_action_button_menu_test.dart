@@ -186,6 +186,51 @@ void main() {
       expect(find.byIcon(Icons.help), findsNothing);
     });
 
+    testWidgets('cerrar la página con el menú abierto no lo deja flotando', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1200, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final navigator = GlobalKey<NavigatorState>();
+      await tester.pumpWidget(
+        MaterialApp(
+          navigatorKey: navigator,
+          home: const Scaffold(body: Text('Inicio')),
+        ),
+      );
+      navigator.currentState!.push(
+        MaterialPageRoute<void>(
+          builder: (_) => const Scaffold(
+            body: Align(
+              alignment: Alignment.bottomLeft,
+              child: HelpActionButton(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await openMenu(tester);
+      expect(
+        find.bySemanticsLabel('Cerrar el menú de accesibilidad'),
+        findsOneWidget,
+      );
+
+      // Como el botón atrás del sistema o un cierre de sesión: la página se
+      // va sin pasar por el menú.
+      navigator.currentState!.pop();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HelpActionButton), findsNothing);
+      expect(
+        find.bySemanticsLabel('Cerrar el menú de accesibilidad'),
+        findsNothing,
+      );
+      expect(find.byIcon(Icons.close), findsNothing);
+      expect(find.text('Inicio'), findsOneWidget);
+    });
+
     testWidgets('cerrar a media animación deja el menú cerrado del todo', (
       tester,
     ) async {

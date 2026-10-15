@@ -231,6 +231,36 @@ void main() {
       expect(recovered.reading?.pages.length, original.reading?.pages.length);
     });
 
+    test('un recuadro conserva su intención al recargar', () {
+      // Un aviso de peligro que volviera como información dejaría de
+      // advertir de nada al estudiante.
+      for (final tone in CalloutTone.values) {
+        final block = ReadingBlock.callout(
+          title: 'Ojo',
+          body: 'Cuidado con esto',
+          items: const ['uno'],
+          tone: tone,
+        );
+
+        final recovered = readingBlockFromJson(readingBlockToJson(block));
+
+        expect(recovered.kind, ReadingBlockKind.callout);
+        expect(recovered.tone, tone, reason: tone.name);
+        expect(recovered.items, ['uno']);
+      }
+    });
+
+    test('un tono desconocido vuelve como información', () {
+      final recovered = readingBlockFromJson({
+        'kind': 'callout',
+        'title': 'Ojo',
+        'body': 'Cuidado',
+        'tone': 'rarísimo',
+      });
+
+      expect(recovered.tone, CalloutTone.info);
+    });
+
     test('quitar la lectura no la resucita al recargar', () {
       final original = sectionOf(2, 1);
       final edited = original.copyWith(reading: null);

@@ -274,6 +274,46 @@ void main() {
 
       await _drain(tester);
     });
+
+    testWidgets('un segundo dictado también se entera de cómo termina', (
+      tester,
+    ) async {
+      // El login y el teclado Braille tienen cada uno su dictado, pero el
+      // reconocedor es el mismo para toda la app.
+      final other = SpeechToTextDictation();
+
+      var finished = false;
+      String? result = 'sin terminar';
+      unawaited(
+        other.listen().then((value) {
+          finished = true;
+          result = value;
+        }),
+      );
+      await tester.pump();
+
+      speech.status('doneNoResult');
+      await tester.pump();
+      expect(finished, isTrue, reason: 'no oyó nada y no terminó nunca');
+      expect(result, isNull);
+
+      final refused = expectLater(
+        other.listen(),
+        throwsA(isA<DictationUnavailableException>()),
+      );
+      await tester.pump();
+      speech.fail('not-allowed', permanent: true);
+      await tester.pump();
+      await refused;
+
+      // Y el primero vuelve a enterarse cuando le toca escuchar a él.
+      final heard = dictation.listen();
+      await tester.pump();
+      speech.status('doneNoResult');
+      expect(await heard, isNull);
+
+      await _drain(tester);
+    });
   });
 
   group('pitidos de aviso', () {

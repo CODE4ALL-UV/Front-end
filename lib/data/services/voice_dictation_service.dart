@@ -134,6 +134,14 @@ class SpeechToTextDictation implements VoiceDictation {
       );
     }
 
+    // SpeechToText es único para toda la app y solo apunta los oyentes la
+    // primera vez que se prepara. Con dos dictados (el login y el teclado
+    // Braille) el segundo nunca se enteraba de que había terminado, así que se
+    // reclaman en cada escucha.
+    _speech
+      ..errorListener = _onError
+      ..statusListener = _onStatus;
+
     final pending = _pending = Completer<String?>();
     _heard = '';
     _error = null;

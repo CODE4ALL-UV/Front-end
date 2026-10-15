@@ -255,10 +255,9 @@ void main() {
     await tester.pumpAndSettle();
     await done(tester);
 
-    expect(
-      find.text('${pairs + 1} parejas · $questions preguntas'),
-      findsOneWidget,
-    );
+    // La sección no traía parejas: la nueva es la primera, en singular.
+    expect(pairs, isZero);
+    expect(find.text('1 pareja · $questions preguntas'), findsOneWidget);
   });
 
   testWidgets('una página nueva en la lectura suma en la tarjeta', (
@@ -338,7 +337,7 @@ void main() {
       await tap(tester, find.text('Crear la lectura'));
       await done(tester);
 
-      expect(find.text('1 páginas · 0 bloques'), findsOneWidget);
+      expect(find.text('1 página · 0 bloques'), findsOneWidget);
       expect(find.text('Tienes cambios sin guardar'), findsOneWidget);
     });
 
@@ -350,19 +349,49 @@ void main() {
       await tester.enterText(field('Título').last, 'Primer consejo');
       await tester.pumpAndSettle();
       await done(tester);
-      expect(find.text('1 consejos'), findsOneWidget);
+      expect(find.text('1 consejo'), findsOneWidget);
 
       await tap(tester, find.text('Ejemplo comentado'));
       await tap(tester, find.text('Crear el ejemplo'));
       await done(tester);
       expect(find.text('0 pasos explicados'), findsOneWidget);
 
+      await tap(tester, find.text('Ejemplo comentado'));
+      await tap(tester, find.text('Añadir paso'));
+      await tester.enterText(field('Trozo de código').last, 'print(x)');
+      await tester.enterText(field('Qué hace').last, 'Muestra x.');
+      await tester.pumpAndSettle();
+      await done(tester);
+      expect(find.text('1 paso explicado'), findsOneWidget);
+
       await tap(tester, find.text('Ejercicio'));
       await tap(tester, find.text('Crear el ejercicio'));
       await tester.enterText(field('Concepto').last, 'str');
       await tester.pumpAndSettle();
       await done(tester);
-      expect(find.text('1 parejas · 0 preguntas'), findsOneWidget);
+      expect(find.text('1 pareja · 0 preguntas'), findsOneWidget);
+    });
+
+    testWidgets('la primera pregunta de la evaluación va en singular', (
+      tester,
+    ) async {
+      await mount(tester, module: 6, section: 1);
+
+      await tap(tester, find.text('Evaluación final'));
+      await tap(tester, find.text('Añadir la primera pregunta'));
+      await tester.enterText(field('Enunciado'), '¿Qué hace print?');
+      final options = find.descendant(
+        of: find.byType(RadioGroup<int>),
+        matching: find.byType(TextField),
+      );
+      await tester.enterText(options.at(0), 'Muestra un texto');
+      await tester.enterText(options.at(1), 'Borra un texto');
+      await tester.pumpAndSettle();
+      await tap(tester, find.byType(Radio<int>).at(0));
+      await done(tester);
+      await done(tester);
+
+      expect(find.text('1 pregunta'), findsOneWidget);
     });
 
     testWidgets('el primer video se cuenta en singular', (tester) async {

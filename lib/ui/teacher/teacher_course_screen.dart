@@ -4,6 +4,7 @@ import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_info.dart';
+import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_quick_button.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
@@ -443,8 +444,10 @@ class _ModuleTileState extends State<_ModuleTile> {
 /// tres preguntas o quince, y siete seguidos se vuelven indescifrables. Un
 /// distintivo con su número se entiende de un vistazo y además se puede leer
 /// en voz alta.
-List<(String, IconData)> _sectionBadges(CourseSection section) {
-  final badges = <(String, IconData)>[];
+List<(String, IconData, ActivityThemeTone)> _sectionBadges(
+  CourseSection section,
+) {
+  final badges = <(String, IconData, ActivityThemeTone)>[];
 
   final reading = section.reading;
   if (reading != null) {
@@ -452,6 +455,7 @@ List<(String, IconData)> _sectionBadges(CourseSection section) {
     badges.add((
       '$pages ${pages == 1 ? "página" : "páginas"}',
       Icons.menu_book,
+      ActivityThemeTone.reading,
     ));
   }
   if (section.videos.isNotEmpty) {
@@ -459,6 +463,7 @@ List<(String, IconData)> _sectionBadges(CourseSection section) {
       '${section.videos.length} '
           '${section.videos.length == 1 ? "video" : "videos"}',
       Icons.play_circle_outline,
+      ActivityThemeTone.video,
     ));
   }
 
@@ -469,40 +474,50 @@ List<(String, IconData)> _sectionBadges(CourseSection section) {
     badges.add((
       '$questions ${questions == 1 ? "pregunta" : "preguntas"}',
       Icons.quiz_outlined,
+      ActivityThemeTone.quiz,
     ));
   }
 
-  if (section.capsule != null) badges.add(('Cápsula', Icons.lightbulb_outline));
-  if (section.example != null) badges.add(('Ejemplo', Icons.code));
+  if (section.capsule != null)
+    badges.add(('Cápsula', Icons.lightbulb_outline, ActivityThemeTone.nugget));
+  if (section.example != null)
+    badges.add(('Ejemplo', Icons.code, ActivityThemeTone.example));
   if (section.exercise != null && !section.exercise!.isEmpty) {
-    badges.add(('Ejercicio', Icons.edit_note));
+    badges.add(('Ejercicio', Icons.edit_note, ActivityThemeTone.exercise));
   }
-  if (section.hasLaboratory) badges.add(('Laboratorio', Icons.terminal));
+  if (section.hasLaboratory)
+    badges.add(('Laboratorio', Icons.terminal, ActivityThemeTone.lab));
 
   return badges;
 }
 
 /// Un distintivo suelto: icono pequeño y su texto.
 class _Badge extends StatelessWidget {
-  const _Badge({required this.label, required this.icon});
+  const _Badge({
+    required this.label,
+    required this.icon,
+    required this.backgroundColor,
+    required this.foregroundColor,
+  });
 
   final String label;
   final IconData icon;
+  final Color backgroundColor;
+  final Color foregroundColor;
 
   @override
   Widget build(BuildContext context) {
-    final appColorScheme = context.colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
-        border: Border.all(color: appColorScheme.outlineVariant),
+        border: Border.all(color: foregroundColor),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: appColorScheme.onSurfaceVariant),
+          Icon(icon, size: 12, color: foregroundColor),
           const SizedBox(width: 4),
           // Flexible: con la letra al doble, en la columna de 300 px del
           // temario, una etiqueta larga no cabía y se salía del distintivo.
@@ -513,7 +528,7 @@ class _Badge extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w600,
-                color: appColorScheme.onSurfaceVariant,
+                color: foregroundColor,
               ),
             ),
           ),
@@ -540,6 +555,8 @@ class _SectionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final badges = _sectionBadges(section);
     final appColorScheme = context.colorScheme;
+    // Obtenemos el tema de actividades para aplicar los colores correspondientes[cite: 8]
+    final activityTheme = context.activityColors;
     // El secundario: se lee como texto en los seis temas.
     final accent = appColorScheme.secondary;
 
@@ -638,6 +655,8 @@ class _SectionRow extends StatelessWidget {
                       _Badge(
                         label: 'Sin contenido',
                         icon: Icons.hourglass_empty,
+                        backgroundColor: appColorScheme.onSurface,
+                        foregroundColor: appColorScheme.onSurfaceVariant,
                       )
                     else
                       // Los distintivos dicen qué tiene la sección y con
@@ -648,7 +667,15 @@ class _SectionRow extends StatelessWidget {
                         runSpacing: 5,
                         children: [
                           for (final badge in badges)
-                            _Badge(label: badge.$1, icon: badge.$2),
+                            (() {
+                              final pair = activityTheme.tone(badge.$3);
+                              return _Badge(
+                                label: badge.$1,
+                                icon: badge.$2,
+                                backgroundColor: pair.background,
+                                foregroundColor: pair.foreground,
+                              );
+                            })(),
                         ],
                       ),
                   ],

@@ -14,11 +14,17 @@ class ScreenContentExtractor {
   /// Límite de caracteres que se envían al motor de voz de una sola vez.
   static const int maxLength = 2000;
 
-  static String extractFromContext(BuildContext context) {
+  /// Lo que cuelga de [exclude] no se lee: así la franja de «Escuchar» no se
+  /// lee a sí misma.
+  static String extractFromContext(
+    BuildContext context, {
+    BuildContext? exclude,
+  }) {
     final buffer = StringBuffer();
     final seen = <Element>{};
 
     void visit(Element element) {
+      if (identical(element, exclude)) return;
       if (!seen.add(element)) return;
 
       final widget = element.widget;

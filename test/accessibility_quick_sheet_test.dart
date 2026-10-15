@@ -155,6 +155,29 @@ void main() {
       // Solo hay un tema marcado a la vez.
       expect(find.byIcon(Icons.check_circle), findsOneWidget);
     });
+
+    testWidgets('ofrece todos los temas, también los de anomalía', (
+      tester,
+    ) async {
+      await openSheet(tester);
+
+      // Los mismos que el menú «?» y el registro: si la hoja rápida se queda
+      // corta, quien entra como docente no puede elegirlos.
+      const anomalies = {
+        'Protanomalía': AppThemeMode.protanomalia,
+        'Deuteranomalía': AppThemeMode.deuteranomalia,
+        'Tritanomalía': AppThemeMode.tritanomalia,
+      };
+      for (final MapEntry(key: name, value: mode) in anomalies.entries) {
+        final option = find.text(name);
+        await tester.ensureVisible(option);
+        await tester.tap(option);
+        await tester.pumpAndSettle();
+
+        expect(ThemeManager.themeNotifier.value, mode, reason: name);
+        expect(announced(tester), contains('Tema $name activado'));
+      }
+    });
   });
 
   group('franja «Escuchar»', () {

@@ -68,6 +68,7 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
         break;
 
       case AppThemeMode.deuteranopia:
+      case AppThemeMode.deuteranomalia:
         // Baja sensibilidad al verde: el módulo verde pasa a ámbar.
         if (moduleId == 3 || moduleId == 4) {
           primaryColor = const Color(0xFFFF8F00);
@@ -75,6 +76,7 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
         break;
 
       case AppThemeMode.protanopia:
+      case AppThemeMode.protanomalia:
         // Baja sensibilidad al rojo: el módulo rojo pasa a azul.
         if (moduleId == 6) {
           primaryColor = const Color(0xFF0D47A1);
@@ -82,6 +84,7 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
         break;
 
       case AppThemeMode.tritanopia:
+      case AppThemeMode.tritanomalia:
         // Baja sensibilidad al azul y al amarillo.
         if (moduleId == 1 || moduleId == 2) {
           primaryColor = const Color(0xFFC2185B); // Rojo/Rosa accesible
@@ -130,12 +133,22 @@ class ModuleTheme extends ThemeExtension<ModuleTheme> {
         const Color(0xFF9FA8DA),
         const Color(0xFF90CAF9),
       ),
-      AppThemeMode.tritanopia => (
+      AppThemeMode.tritanopia || AppThemeMode.tritanomalia => (
         const Color(0xFFAD1457),
         const Color(0xFF00796B),
         const Color(0xFF5D4037),
       ),
-      _ => (
+      AppThemeMode.deuteranopia || AppThemeMode.deuteranomalia => (
+        const Color(0xFFEF6C00),
+        const Color(0xFF1565C0),
+        const Color(0xFF00838F),
+      ),
+      AppThemeMode.protanopia || AppThemeMode.protanomalia => (
+        const Color(0xFF7B1FA2),
+        const Color(0xFF1565C0),
+        const Color(0xFF0288D1),
+      ),
+      AppThemeMode.light => (
         const Color(0xFF8E24AA),
         const Color(0xFF5C6BC0),
         const Color(0xFF1976D2),

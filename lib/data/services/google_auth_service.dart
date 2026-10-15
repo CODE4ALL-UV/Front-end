@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:meta/meta.dart'; // <-- 1. Importa esto
 
 import '../models/auth_models.dart';
 import 'api_service.dart';
@@ -20,10 +21,13 @@ class GoogleAuthCanceledException implements Exception {
 }
 
 class GoogleAuthService {
-  GoogleAuthService({ApiService? apiService})
-    : _apiService = apiService ?? ApiService();
+  GoogleAuthService({
+    ApiService? apiService,
+    @visibleForTesting this.mockGoogleSignIn, // <-- 2. Agrega este parámetro})
+  }) : _apiService = apiService ?? ApiService();
 
   final ApiService _apiService;
+  final GoogleSignIn? mockGoogleSignIn; // <-- 3. Agrega esta propiedad
 
   Future<LoginResponse> signIn({required BuildContext context}) async {
     final googleClientId =
@@ -38,11 +42,13 @@ class GoogleAuthService {
     }
 
     try {
-      final googleSignIn = GoogleSignIn(
-        clientId: kIsWeb ? googleClientId : null,
-        serverClientId: !kIsWeb ? googleClientId : null,
-        scopes: const ['email', 'profile'],
-      );
+      final googleSignIn =
+          mockGoogleSignIn ??
+          GoogleSignIn(
+            clientId: kIsWeb ? googleClientId : null,
+            serverClientId: !kIsWeb ? googleClientId : null,
+            scopes: const ['email', 'profile'],
+          );
 
       final account = await googleSignIn.signIn();
       if (account == null) {

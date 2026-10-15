@@ -972,14 +972,29 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                 'sub': 'Rojo-Verde',
               },
               {
+                'mode': AppThemeMode.protanomalia,
+                'label': 'Protanomalía',
+                'sub': 'Sensibilidad al rojo',
+              },
+              {
                 'mode': AppThemeMode.deuteranopia,
                 'label': 'Deuteranopía',
                 'sub': 'Verde-Rojo',
               },
               {
+                'mode': AppThemeMode.deuteranomalia,
+                'label': 'Deuteranomalía',
+                'sub': 'Sensibilidad al verde',
+              },
+              {
                 'mode': AppThemeMode.tritanopia,
                 'label': 'Tritanopía',
                 'sub': 'Azul-Amarillo',
+              },
+              {
+                'mode': AppThemeMode.tritanomalia,
+                'label': 'Tritanomalía',
+                'sub': 'Sensibilidad al azul',
               },
               {
                 'mode': AppThemeMode.achromatopsia,

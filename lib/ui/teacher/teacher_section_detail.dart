@@ -87,6 +87,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
     return now.title != _saved.title ||
         now.shortTitle != _saved.shortTitle ||
         now.summary != _saved.summary ||
+        now.hasLaboratory != _saved.hasLaboratory ||
         !identical(now.reading, _saved.reading) ||
         !identical(now.capsule, _saved.capsule) ||
         !identical(now.example, _saved.example) ||

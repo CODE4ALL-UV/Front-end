@@ -168,10 +168,7 @@ class CourseProgressStore extends ChangeNotifier {
 
   Future<void> _persist() async {
     try {
-      await _storage.write(
-        key: _key,
-        value: jsonEncode(_completed.toList()),
-      );
+      await _storage.write(key: _key, value: jsonEncode(_completed.toList()));
     } catch (e) {
       debugPrint('No se pudo guardar el progreso del curso: $e');
     }

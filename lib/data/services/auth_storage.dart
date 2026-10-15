@@ -72,7 +72,8 @@ class AuthStorage {
   /// igualmente.
   Future<void> clear() async {
     try {
-      final keys = (await _storage.readAll()).keys;
+      final keys = (await _storage.readAll()).keys
+          .toList(); // <--- Agrega .toList()
       for (final key in keys) {
         if (!key.startsWith(DisplayPreferences.prefix)) {
           await _storage.delete(key: key);

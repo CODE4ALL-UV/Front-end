@@ -32,11 +32,15 @@ class BrailleCellIcon extends StatelessWidget {
     required this.dots,
     this.size = 24,
     this.color,
+    this.dictation,
   });
 
   final Set<int> dots;
   final double size;
   final Color? color;
+
+  /// Para las pruebas. Sin él se dicta con el micrófono de verdad.
+  final VoiceDictation? dictation;
 
   @override
   Widget build(BuildContext context) {

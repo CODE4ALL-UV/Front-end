@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/core/themes/activity_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
@@ -363,127 +364,162 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   List<Widget> _activityCards(CourseSection section) {
-    final activityColors = context.activityColors;
+    final activityTheme = Theme.of(context).extension<ActivityTheme>()!;
+
     return [
-      _ActivityCard(
-        icon: Icons.menu_book,
-        color: activityColors.readingForeground,
-        title: 'Lectura',
-        detail: section.reading == null
-            ? 'Sin lectura'
-            : '${section.reading!.pages.length} páginas · '
-                  '${section.reading!.pages.fold<int>(0, (n, p) => n + p.blocks.length)} bloques',
-        empty: section.reading == null,
-        onTap: () async {
-          final result = await _open<SectionReading?>(
-            ReadingEditorScreen(reading: section.reading, section: section),
-          );
-          if (result != null) _update(_draft.copyWith(reading: result));
-        },
-      ),
-      _ActivityCard(
-        icon: Icons.lightbulb_outline,
-        color: activityColors.nuggetForeground,
-        title: 'Cápsula de conocimiento',
-        detail: section.capsule == null
-            ? 'Sin cápsula'
-            : '${section.capsule!.tips.length} consejos',
-        empty: section.capsule == null,
-        onTap: () async {
-          final result = await _open<KnowledgeCapsule?>(
-            CapsuleEditorScreen(capsule: section.capsule),
-          );
-          if (result != null) _update(_draft.copyWith(capsule: result));
-        },
-      ),
-      _ActivityCard(
-        icon: Icons.play_circle_outline,
-        color: activityColors.videoForeground,
-        title: 'Videos',
-        detail: section.videos.isEmpty
-            ? 'Sin videos'
-            : '${section.videos.length} '
-                  '${section.videos.length == 1 ? "video" : "videos"}',
-        empty: section.videos.isEmpty,
-        onTap: () async {
-          final result = await _open<List<SectionVideo>?>(
-            VideosEditorScreen(videos: section.videos),
-          );
-          if (result != null) _update(_draft.copyWith(videos: result));
-        },
-      ),
-      _ActivityCard(
-        icon: Icons.quiz_outlined,
-        color: activityColors.quizForeground,
-        title: 'Quiz',
-        detail: section.quiz.isEmpty
-            ? 'Sin preguntas'
-            : '${section.quiz.length} '
-                  '${section.quiz.length == 1 ? "pregunta" : "preguntas"}',
-        empty: section.quiz.isEmpty,
-        onTap: () async {
-          final result = await _open<List<QuizQuestion>?>(
-            QuizEditorScreen(
-              questions: section.quiz,
-              title: 'Quiz de la sección',
-            ),
-          );
-          if (result != null) _update(_draft.copyWith(quiz: result));
-        },
-      ),
-      _ActivityCard(
-        icon: Icons.fact_check_outlined,
-        color: activityColors.finalEvaluationForeground,
-        title: 'Evaluación final',
-        detail: section.finalEvaluation.isEmpty
-            ? 'Sin preguntas'
-            : '${section.finalEvaluation.length} preguntas',
-        empty: section.finalEvaluation.isEmpty,
-        onTap: () async {
-          final result = await _open<List<QuizQuestion>?>(
-            QuizEditorScreen(
-              questions: section.finalEvaluation,
-              title: 'Evaluación final',
-            ),
-          );
-          if (result != null) _update(_draft.copyWith(finalEvaluation: result));
-        },
-      ),
-      _ActivityCard(
-        icon: Icons.code,
-        color: activityColors.exampleForeground,
-        title: 'Ejemplo comentado',
-        detail: section.example == null
-            ? 'Sin ejemplo'
-            : '${section.example!.steps.length} pasos explicados',
-        empty: section.example == null,
-        onTap: () async {
-          final result = await _open<CodeExample?>(
-            ExampleEditorScreen(example: section.example),
-          );
-          if (result != null) _update(_draft.copyWith(example: result));
-        },
-      ),
-      _ActivityCard(
-        icon: Icons.edit_note,
-        color: activityColors.exerciseForeground,
-        title: 'Ejercicio',
-        detail: section.exercise == null || section.exercise!.isEmpty
-            ? 'Sin ejercicio'
-            : '${section.exercise!.pairs.length} parejas · '
-                  '${section.exercise!.questions.length} preguntas',
-        empty: section.exercise == null || section.exercise!.isEmpty,
-        onTap: () async {
-          final result = await _open<SectionExercise?>(
-            ExerciseEditorScreen(exercise: section.exercise),
-          );
-          if (result != null) _update(_draft.copyWith(exercise: result));
-        },
-      ),
-      _LaboratoryCard(
-        enabled: section.hasLaboratory,
-        onChanged: (value) => _update(_draft.copyWith(hasLaboratory: value)),
-      ),
+      (() {
+        final tone = activityTheme.tone(ActivityThemeTone.reading);
+        return _ActivityCard(
+          icon: Icons.menu_book,
+          backgroundColor: tone.background,
+          foregroundColor: tone.foreground,
+          title: 'Lectura',
+          detail: section.reading == null
+              ? 'Sin lectura'
+              : '${section.reading!.pages.length} páginas · '
+                    '${section.reading!.pages.fold<int>(0, (n, p) => n + p.blocks.length)} bloques',
+          empty: section.reading == null,
+          onTap: () async {
+            final result = await _open<SectionReading?>(
+              ReadingEditorScreen(reading: section.reading, section: section),
+            );
+            if (result != null) _update(_draft.copyWith(reading: result));
+          },
+        );
+      })(),
+      (() {
+        final tone = activityTheme.tone(ActivityThemeTone.nugget);
+        return _ActivityCard(
+          icon: Icons.lightbulb_outline,
+          backgroundColor: tone.background,
+          foregroundColor: tone.foreground,
+          title: 'Cápsula de conocimiento',
+          detail: section.capsule == null
+              ? 'Sin cápsula'
+              : '${section.capsule!.tips.length} consejos',
+          empty: section.capsule == null,
+          onTap: () async {
+            final result = await _open<KnowledgeCapsule?>(
+              CapsuleEditorScreen(capsule: section.capsule),
+            );
+            if (result != null) _update(_draft.copyWith(capsule: result));
+          },
+        );
+      })(),
+      (() {
+        final tone = activityTheme.tone(ActivityThemeTone.video);
+        return _ActivityCard(
+          icon: Icons.play_circle_outline,
+          backgroundColor: tone.background,
+          foregroundColor: tone.foreground,
+          title: 'Videos',
+          detail: section.videos.isEmpty
+              ? 'Sin videos'
+              : '${section.videos.length} '
+                    '${section.videos.length == 1 ? "video" : "videos"}',
+          empty: section.videos.isEmpty,
+          onTap: () async {
+            final result = await _open<List<SectionVideo>?>(
+              VideosEditorScreen(videos: section.videos),
+            );
+            if (result != null) _update(_draft.copyWith(videos: result));
+          },
+        );
+      })(),
+      (() {
+        final tone = activityTheme.tone(ActivityThemeTone.quiz);
+        return _ActivityCard(
+          icon: Icons.quiz_outlined,
+          backgroundColor: tone.background,
+          foregroundColor: tone.foreground,
+          title: 'Quiz',
+          detail: section.quiz.isEmpty
+              ? 'Sin preguntas'
+              : '${section.quiz.length} '
+                    '${section.quiz.length == 1 ? "pregunta" : "preguntas"}',
+          empty: section.quiz.isEmpty,
+          onTap: () async {
+            final result = await _open<List<QuizQuestion>?>(
+              QuizEditorScreen(
+                questions: section.quiz,
+                title: 'Quiz de la sección',
+              ),
+            );
+            if (result != null) _update(_draft.copyWith(quiz: result));
+          },
+        );
+      })(),
+      (() {
+        final tone = activityTheme.tone(ActivityThemeTone.finalEvaluation);
+        return _ActivityCard(
+          icon: Icons.fact_check_outlined,
+          backgroundColor: tone.background,
+          foregroundColor: tone.foreground,
+          title: 'Evaluación final',
+          detail: section.finalEvaluation.isEmpty
+              ? 'Sin preguntas'
+              : '${section.finalEvaluation.length} preguntas',
+          empty: section.finalEvaluation.isEmpty,
+          onTap: () async {
+            final result = await _open<List<QuizQuestion>?>(
+              QuizEditorScreen(
+                questions: section.finalEvaluation,
+                title: 'Evaluación final',
+              ),
+            );
+            if (result != null)
+              _update(_draft.copyWith(finalEvaluation: result));
+          },
+        );
+      })(),
+      (() {
+        final tone = activityTheme.tone(ActivityThemeTone.example);
+        return _ActivityCard(
+          icon: Icons.code,
+          backgroundColor: tone.background,
+          foregroundColor: tone.foreground,
+          title: 'Ejemplo comentado',
+          detail: section.example == null
+              ? 'Sin ejemplo'
+              : '${section.example!.steps.length} pasos explicados',
+          empty: section.example == null,
+          onTap: () async {
+            final result = await _open<CodeExample?>(
+              ExampleEditorScreen(example: section.example),
+            );
+            if (result != null) _update(_draft.copyWith(example: result));
+          },
+        );
+      })(),
+      (() {
+        final tone = activityTheme.tone(ActivityThemeTone.exercise);
+        return _ActivityCard(
+          icon: Icons.edit_note,
+          backgroundColor: tone.background,
+          foregroundColor: tone.foreground,
+          title: 'Ejercicio',
+          detail: section.exercise == null || section.exercise!.isEmpty
+              ? 'Sin ejercicio'
+              : '${section.exercise!.pairs.length} parejas · '
+                    '${section.exercise!.questions.length} preguntas',
+          empty: section.exercise == null || section.exercise!.isEmpty,
+          onTap: () async {
+            final result = await _open<SectionExercise?>(
+              ExerciseEditorScreen(exercise: section.exercise),
+            );
+            if (result != null) _update(_draft.copyWith(exercise: result));
+          },
+        );
+      })(),
+      (() {
+        final tone = activityTheme.tone(ActivityThemeTone.lab);
+        return _LaboratoryCard(
+          enabled: section.hasLaboratory,
+          backgroundColor: tone.background,
+          foregroundColor: tone.foreground,
+          onChanged: (value) => _update(_draft.copyWith(hasLaboratory: value)),
+        );
+      })(),
     ];
   }
 
@@ -584,7 +620,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
 class _ActivityCard extends StatelessWidget {
   const _ActivityCard({
     required this.icon,
-    required this.color,
+    required this.backgroundColor,
+    required this.foregroundColor,
     required this.title,
     required this.detail,
     required this.empty,
@@ -592,7 +629,8 @@ class _ActivityCard extends StatelessWidget {
   });
 
   final IconData icon;
-  final Color color;
+  final Color backgroundColor;
+  final Color foregroundColor;
   final String title;
   final String detail;
   final bool empty;
@@ -619,15 +657,29 @@ class _ActivityCard extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
-                  border: Border.all(color: appColorScheme.outlineVariant),
+                  border: Border.all(color: foregroundColor),
                   borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      icon,
-                      size: 22,
-                      color: empty ? appColorScheme.onSurfaceVariant : color,
+                    // Contenedor temático para el icono de la actividad
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: empty
+                            ? appColorScheme.surfaceContainerHighest
+                            : backgroundColor,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        icon,
+                        size: 20,
+                        color: empty
+                            ? appColorScheme.onSurfaceVariant
+                            : foregroundColor,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -670,44 +722,72 @@ class _ActivityCard extends StatelessWidget {
 
 /// El laboratorio no tiene contenido que editar: se enciende o se apaga.
 class _LaboratoryCard extends StatelessWidget {
-  const _LaboratoryCard({required this.enabled, required this.onChanged});
+  const _LaboratoryCard({
+    required this.enabled,
+    required this.backgroundColor,
+    required this.foregroundColor,
+    required this.onChanged,
+  });
 
   final bool enabled;
+  final Color backgroundColor;
+  final Color foregroundColor;
   final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
     final appColorScheme = context.colorScheme;
-    // El fondo va en el Material y no en la decoración: si no, el interruptor
-    // pinta su pulsación por debajo y no se ve.
-    return Material(
-      color: appColorScheme.surface,
-      borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
-        decoration: BoxDecoration(
-          border: Border.all(color: appColorScheme.outlineVariant),
-          borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-        ),
-        child: SwitchListTile(
-          value: enabled,
-          onChanged: onChanged,
-          contentPadding: EdgeInsets.zero,
-          title: Text(
-            'Laboratorio',
-            style: TextStyle(
-              fontSize: 14.5,
-              fontWeight: FontWeight.w700,
-              color: appColorScheme.onSurface,
-            ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: appColorScheme.surface,
+        borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: AppMetrics.minTapTarget),
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
+          decoration: BoxDecoration(
+            border: Border.all(color: foregroundColor),
+            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
           ),
-          subtitle: Text(
-            enabled
-                ? 'El estudiante puede escribir y ejecutar código'
-                : 'Esta sección no ofrece laboratorio',
-            style: TextStyle(
-              fontSize: 12.5,
-              color: appColorScheme.onSurfaceVariant,
+          child: SwitchListTile(
+            value: enabled,
+            onChanged: onChanged,
+            contentPadding: EdgeInsets.zero,
+            // Integrando un icono con los colores del laboratorio en el switch
+            secondary: Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: enabled
+                    ? backgroundColor
+                    : appColorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                Icons.terminal,
+                size: 20,
+                color: enabled
+                    ? foregroundColor
+                    : appColorScheme.onSurfaceVariant,
+              ),
+            ),
+            title: Text(
+              'Laboratorio',
+              style: TextStyle(
+                fontSize: 14.5,
+                fontWeight: FontWeight.w700,
+                color: appColorScheme.onSurface,
+              ),
+            ),
+            subtitle: Text(
+              enabled
+                  ? 'El estudiante puede escribir y ejecutar código'
+                  : 'Esta sección no ofrece laboratorio',
+              style: TextStyle(
+                fontSize: 12.5,
+                color: appColorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ),

@@ -116,7 +116,8 @@ class _CapsuleEditorScreenState extends State<CapsuleEditorScreen> {
               );
               if (sure && context.mounted) setState(() => _capsule = null);
             },
-      onDone: () => Navigator.of(context).pop(_result),
+      onDone: () =>
+          Navigator.of(context).pop(EditorResult<KnowledgeCapsule>(_result)),
       child: _capsule == null
           ? EditorEmptyState(
               icon: Icons.lightbulb_outline,

@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/teacher/editors/capsule_editor_screen.dart';
+import 'package:flutter_code4all/ui/teacher/editors/editor_scaffold.dart';
 import 'package:flutter_code4all/ui/teacher/editors/example_editor_screen.dart';
 import 'package:flutter_code4all/ui/teacher/editors/exercise_editor_screen.dart';
 import 'package:flutter_code4all/ui/teacher/editors/quiz_editor_screen.dart';
@@ -21,6 +22,13 @@ import 'package:flutter_code4all/ui/teacher/teacher_widgets.dart';
 void main() {
   late Object? result;
   late bool returned;
+
+  /// Lo que trae el resultado. La lectura, la cápsula, el ejemplo y el
+  /// ejercicio lo devuelven envuelto en un [EditorResult].
+  Object? value() => switch (result) {
+    final EditorResult<Object> wrapped => wrapped.value,
+    final other => other,
+  };
 
   /// Abre [editor] desde una pantalla de partida para recoger lo que
   /// devuelve al cerrarse.
@@ -404,7 +412,7 @@ void main() {
       await tap(tester, find.text('Añadir pareja'));
       await done(tester);
 
-      final edited = result! as SectionExercise;
+      final edited = value()! as SectionExercise;
       expect(edited.pairs.map((p) => p.concept), [
         exercise.pairs[0].concept,
         exercise.pairs[2].concept,
@@ -434,7 +442,7 @@ void main() {
       expect(find.text('1 pregunta'), findsOneWidget);
       await done(tester);
 
-      final edited = result! as SectionExercise;
+      final edited = value()! as SectionExercise;
       expect(edited.questions.single.prompt, '¿Qué es una lista?');
       expect(edited.questions.single.correctOption, 'Una colección');
       // Las parejas siguen ahí.
@@ -454,7 +462,9 @@ void main() {
       await done(tester);
 
       expect(returned, isTrue);
-      expect(result, isNull);
+      // Vuelve un resultado vacío, no un nulo: el nulo es salir sin «Listo».
+      expect(result, isA<EditorResult<SectionExercise>>());
+      expect(value(), isNull);
     });
   });
 
@@ -480,7 +490,7 @@ void main() {
       await tap(tester, find.text('Añadir consejo'));
       await done(tester);
 
-      final edited = result! as KnowledgeCapsule;
+      final edited = value()! as KnowledgeCapsule;
       expect(edited.badCode, isNull);
       expect(edited.badCodeCaption, isNull);
       expect(edited.goodCode, 'edad = 1');
@@ -509,7 +519,9 @@ void main() {
       await done(tester);
 
       expect(returned, isTrue);
-      expect(result, isNull);
+      // Vuelve un resultado vacío, no un nulo: el nulo es salir sin «Listo».
+      expect(result, isA<EditorResult<KnowledgeCapsule>>());
+      expect(value(), isNull);
     });
   });
 
@@ -535,7 +547,7 @@ void main() {
       await tap(tester, find.text('Añadir paso'));
       await done(tester);
 
-      final edited = result! as CodeExample;
+      final edited = value()! as CodeExample;
       expect(edited.code, 'if x:\n    print(x)\n');
       expect(edited.output, '5\n');
       expect(edited.codeCaption, 'Muestra x');
@@ -560,7 +572,9 @@ void main() {
       await done(tester);
 
       expect(returned, isTrue);
-      expect(result, isNull);
+      // Vuelve un resultado vacío, no un nulo: el nulo es salir sin «Listo».
+      expect(result, isA<EditorResult<CodeExample>>());
+      expect(value(), isNull);
     });
   });
 }

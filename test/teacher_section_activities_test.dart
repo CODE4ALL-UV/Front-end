@@ -278,6 +278,43 @@ void main() {
     );
   });
 
+  testWidgets('quitar una actividad desde su editor la quita de la sección', (
+    tester,
+  ) async {
+    await mount(tester);
+
+    /// Abre la tarjeta, quita la actividad, confirma y pulsa «Listo».
+    Future<void> remove(String card, String tooltip) async {
+      await tap(tester, find.text(card));
+      await tap(tester, find.byTooltip(tooltip));
+      await tap(tester, find.widgetWithText(FilledButton, 'Borrar'));
+      await done(tester);
+    }
+
+    await remove('Cápsula de conocimiento', 'Quitar de la sección');
+    expect(find.text('Sin cápsula'), findsOneWidget);
+    expect(find.text('Tienes cambios sin guardar'), findsOneWidget);
+
+    await remove('Ejemplo comentado', 'Quitar de la sección');
+    expect(find.text('Sin ejemplo'), findsOneWidget);
+
+    await remove('Ejercicio', 'Quitar de la sección');
+    expect(find.text('Sin ejercicio'), findsOneWidget);
+
+    await remove('Lectura', 'Quitar la lectura de la sección');
+    expect(find.text('Sin lectura'), findsOneWidget);
+
+    await tap(tester, find.text('Guardar'));
+
+    // Lo quitado viaja en nulo: si no, volvería a aparecer al recargar.
+    final put = sent.singleWhere((r) => r.method == 'PUT');
+    final content = jsonDecode(put.body)['content'] as Map<String, dynamic>;
+    expect(content['capsule'], isNull);
+    expect(content['example'], isNull);
+    expect(content['exercise'], isNull);
+    expect(content['reading'], isNull);
+  });
+
   group('una sección sin contenido', () {
     // El módulo 6 todavía no tiene material: sus secciones están vacías.
     testWidgets('cada tarjeta dice qué le falta', (tester) async {

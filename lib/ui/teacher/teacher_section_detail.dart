@@ -8,6 +8,7 @@ import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart'
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/chapter_section_screen.dart';
 import 'course_section_edits.dart';
 import 'editors/capsule_editor_screen.dart';
+import 'editors/editor_scaffold.dart';
 import 'editors/example_editor_screen.dart';
 import 'editors/exercise_editor_screen.dart';
 import 'editors/quiz_editor_screen.dart';
@@ -375,10 +376,10 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                   '${section.reading!.pages.fold<int>(0, (n, p) => n + p.blocks.length)} bloques',
         empty: section.reading == null,
         onTap: () async {
-          final result = await _open<SectionReading?>(
+          final result = await _open<EditorResult<SectionReading>>(
             ReadingEditorScreen(reading: section.reading, section: section),
           );
-          if (result != null) _update(_draft.copyWith(reading: result));
+          if (result != null) _update(_draft.copyWith(reading: result.value));
         },
       ),
       _ActivityCard(
@@ -390,10 +391,10 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
             : '${section.capsule!.tips.length} consejos',
         empty: section.capsule == null,
         onTap: () async {
-          final result = await _open<KnowledgeCapsule?>(
+          final result = await _open<EditorResult<KnowledgeCapsule>>(
             CapsuleEditorScreen(capsule: section.capsule),
           );
-          if (result != null) _update(_draft.copyWith(capsule: result));
+          if (result != null) _update(_draft.copyWith(capsule: result.value));
         },
       ),
       _ActivityCard(
@@ -458,10 +459,10 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
             : '${section.example!.steps.length} pasos explicados',
         empty: section.example == null,
         onTap: () async {
-          final result = await _open<CodeExample?>(
+          final result = await _open<EditorResult<CodeExample>>(
             ExampleEditorScreen(example: section.example),
           );
-          if (result != null) _update(_draft.copyWith(example: result));
+          if (result != null) _update(_draft.copyWith(example: result.value));
         },
       ),
       _ActivityCard(
@@ -474,10 +475,10 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
                   '${section.exercise!.questions.length} preguntas',
         empty: section.exercise == null || section.exercise!.isEmpty,
         onTap: () async {
-          final result = await _open<SectionExercise?>(
+          final result = await _open<EditorResult<SectionExercise>>(
             ExerciseEditorScreen(exercise: section.exercise),
           );
-          if (result != null) _update(_draft.copyWith(exercise: result));
+          if (result != null) _update(_draft.copyWith(exercise: result.value));
         },
       ),
       _LaboratoryCard(

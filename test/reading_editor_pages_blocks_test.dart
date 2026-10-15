@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
+import 'package:flutter_code4all/ui/teacher/editors/editor_scaffold.dart';
 import 'package:flutter_code4all/ui/teacher/editors/reading_editor_screen.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_widgets.dart';
 
@@ -17,6 +18,8 @@ void main() {
   final section = PythonCourseCatalog.section(1, 1)!;
 
   late SectionReading? result;
+
+  /// Si se salió con «Listo». La flecha de atrás no devuelve nada.
   late bool returned;
 
   /// Abre el editor desde una pantalla de partida para recoger lo que
@@ -36,15 +39,17 @@ void main() {
             body: Center(
               child: TextButton(
                 onPressed: () async {
-                  result = await Navigator.of(context).push<SectionReading?>(
-                    MaterialPageRoute(
-                      builder: (_) => ReadingEditorScreen(
-                        reading: reading,
-                        section: section,
-                      ),
-                    ),
-                  );
-                  returned = true;
+                  final popped = await Navigator.of(context)
+                      .push<EditorResult<SectionReading>>(
+                        MaterialPageRoute(
+                          builder: (_) => ReadingEditorScreen(
+                            reading: reading,
+                            section: section,
+                          ),
+                        ),
+                      );
+                  result = popped?.value;
+                  returned = popped != null;
                 },
                 child: const Text('Abrir el editor'),
               ),

@@ -273,7 +273,7 @@ void main() {
         find.bySemanticsLabel(
           RegExp(
             r'^Sección 1, Diseño de interfaces de usuario\. '
-            r'Sin contenido todavía\.',
+            r'Sin contenido todavía\.$',
           ),
         ),
         findsOneWidget,

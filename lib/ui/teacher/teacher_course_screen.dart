@@ -550,7 +550,7 @@ class _SectionRow extends StatelessWidget {
       // la tarjeta leídos uno detrás de otro.
       label:
           'Sección ${section.number}, ${section.title}. '
-          '${section.isPlaceholder ? "Sin contenido todavía." : badges.map((b) => b.$1).join(", ")}.'
+          '${section.isPlaceholder ? "Sin contenido todavía" : badges.map((b) => b.$1).join(", ")}.'
           '${edited ? " Con cambios tuyos." : ""}',
       child: ExcludeSemantics(
         child: Padding(

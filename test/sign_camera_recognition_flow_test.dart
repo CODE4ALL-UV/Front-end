@@ -195,6 +195,81 @@ void main() {
       await _leave(tester);
     });
 
+    testWidgets('cambiar de cámara a mitad de sesión no usa la ya soltada', (
+      tester,
+    ) async {
+      camera.cameras = const [_front, _back];
+      await _open(tester, service: _ScriptedService());
+      await _turnOn(tester);
+
+      // La trasera tarda en encenderse y, mientras, el bucle sigue: no puede
+      // pedirle la foto a la frontal, que ya se soltó.
+      final slow = Completer<void>();
+      camera.initializeGate = slow;
+      await _tapButton(tester, 'Cambiar de cámara');
+      expect(camera.disposed, [1]);
+      final before = camera.pictures;
+      await _nextFrames(tester, 2);
+
+      expect(camera.pictures, before);
+      expect(find.textContaining('La cámara dio un problema'), findsNothing);
+      expect(find.text('Apagar la cámara'), findsOneWidget);
+
+      // Ya encendida, las fotos siguen con la nueva.
+      slow.complete();
+      await tester.pump();
+      await _nextFrames(tester, 2);
+
+      expect(camera.pictures, greaterThan(before));
+      expect(find.byKey(const ValueKey('vista-camara-2')), findsOneWidget);
+      expect(find.text('Apagar la cámara'), findsOneWidget);
+
+      await _leave(tester);
+    });
+
+    testWidgets('si la otra cámara no enciende se explica y se para', (
+      tester,
+    ) async {
+      camera.cameras = const [_front, _back];
+      await _open(tester, service: _ScriptedService());
+      await _turnOn(tester);
+
+      camera.createError = CameraException('CameraAccessDenied', 'sin permiso');
+      await _tapButton(tester, 'Cambiar de cámara');
+      await _nextFrames(tester, 1);
+
+      expect(
+        find.text(
+          'Hace falta permiso para usar la cámara. Puedes dárselo desde '
+          'los ajustes del dispositivo y volver a intentarlo.',
+        ),
+        findsWidgets,
+      );
+      expect(find.text('Apagar la cámara'), findsNothing);
+
+      await _leave(tester);
+    });
+
+    testWidgets(
+      'cualquier otro fallo al cambiar de cámara se cuenta tal cual',
+      (tester) async {
+        camera.cameras = const [_front, _back];
+        await _open(tester, service: _ScriptedService());
+        await _turnOn(tester);
+
+        camera.createError = StateError('la cámara se colgó');
+        await _tapButton(tester, 'Cambiar de cámara');
+
+        expect(
+          find.textContaining('No se pudo cambiar de cámara'),
+          findsWidgets,
+        );
+        expect(find.text('Apagar la cámara'), findsNothing);
+
+        await _leave(tester);
+      },
+    );
+
     testWidgets('con una sola cámara no se ofrece cambiarla', (tester) async {
       camera.cameras = const [_back];
       await _open(tester, service: _ScriptedService());
@@ -673,6 +748,9 @@ class _FakeCameraPlatform extends CameraPlatform {
   /// Se lanza al crear la cámara, que es donde el sistema pide permiso.
   Object? createError;
 
+  /// Si está puesta, encender la cámara espera a que se complete.
+  Completer<void>? initializeGate;
+
   /// Fallos de las próximas fotos, en orden.
   final List<Object> pictureErrors = [];
 
@@ -710,7 +788,10 @@ class _FakeCameraPlatform extends CameraPlatform {
   Future<void> initializeCamera(
     int cameraId, {
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
-  }) async {}
+  }) async {
+    final gate = initializeGate;
+    if (gate != null) await gate.future;
+  }
 
   @override
   Stream<CameraInitializedEvent> onCameraInitialized(int cameraId) =>

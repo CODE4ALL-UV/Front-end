@@ -6,10 +6,21 @@
 <title>Privacidad de Code4All</title>
 <meta name="description" content="Qué datos guarda Code4All, para qué los usa y cómo pedir que se borren.">
 <link rel="icon" type="image/png" href="favicon.png">
+<script>
+/* El tema antes de pintar, para que la página no parpadee. La elección se
+   comparte con el manual (misma clave): quien elige el claro en uno lo tiene
+   también en el otro. Sin elección guardada, sigue al sistema. */
+(function(){
+  try {
+    var t = JSON.parse(localStorage.getItem('c4a-manual:theme'));
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch(e){}
+})();
+</script>
 <style>
 /* Página estática que Meta y Google piden para publicar el inicio de sesión.
-   Sin fuentes ni scripts externos: la política de privacidad no debería
-   avisar a terceros de que alguien la está leyendo. */
+   Sin fuentes ni scripts externos —solo el del tema, aquí mismo—: la política
+   de privacidad no debería avisar a terceros de que alguien la está leyendo. */
 :root{
   --bg:#F2F5F8; --surface:#FFFFFF; --fg:#18202A; --muted:#55606C; --line:#D3DAE2;
   --red:#C62828; --blue:#306998; --yellow:#FFD43B; --on-yellow:#161616;
@@ -56,6 +67,17 @@ a:focus-visible, .skip:focus-visible{outline:3px solid var(--yellow); outline-of
 .callout p:last-child{margin-bottom:0}
 footer{border-top:1px solid var(--line); color:var(--muted); font-size:.9375rem}
 footer .wrap{padding-top:20px; padding-bottom:28px}
+/* Selector de tema, igual que el del manual */
+.top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; margin:0 0 6px}
+.top .brand{margin:0}
+.seg{display:flex; border:1.5px solid var(--line); border-radius:12px; background:var(--bg); overflow:hidden}
+.seg button{display:inline-flex; align-items:center; justify-content:center; gap:7px; min-width:44px; min-height:44px; padding:0 14px; border:0; background:none; color:var(--fg); cursor:pointer; font:inherit; font-weight:700; font-size:.9375rem; white-space:nowrap}
+.seg button + button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--fg); color:var(--bg)}
+.seg button:focus-visible{outline:3px solid var(--yellow); outline-offset:-4px}
+.seg svg{width:18px; height:18px; flex:none}
+.sr{position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -63,7 +85,15 @@ footer .wrap{padding-top:20px; padding-bottom:28px}
 
 <header>
   <div class="wrap">
-    <p class="brand">Code4All</p>
+    <div class="top">
+      <p class="brand">Code4All</p>
+      <!-- Oculto sin JavaScript: sin él los botones no harían nada y la página
+           sigue el tema del sistema. -->
+      <div class="seg" id="theme" role="group" aria-label="Tema" hidden>
+        <button type="button" data-set="dark" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>Oscuro</button>
+        <button type="button" data-set="light" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Claro</button>
+      </div>
+    </div>
     <h1>Política de privacidad y tratamiento de datos</h1>
     <p class="updated">Última actualización: 14 de octubre de 2026</p>
   </div>
@@ -188,5 +218,32 @@ footer .wrap{padding-top:20px; padding-bottom:28px}
     <p>Code4All · <a href="/">Volver a la aplicación</a></p>
   </div>
 </footer>
+<p class="sr" id="live" aria-live="polite"></p>
+<script>
+/* Tema claro u oscuro. Marca el que se ve: el elegido o, si no hay, el del
+   sistema, y lo sigue si el sistema cambia mientras no se haya elegido. */
+(function(){
+  var root = document.documentElement;
+  var group = document.getElementById('theme');
+  var live = document.getElementById('live');
+  var system = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  var current = function(){ return root.dataset.theme || (system && system.matches ? 'dark' : 'light'); };
+  var mark = function(){
+    var t = current();
+    group.querySelectorAll('[data-set]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.set === t)); });
+  };
+  group.addEventListener('click', function(e){
+    var b = e.target.closest('[data-set]');
+    if (!b) return;
+    root.dataset.theme = b.dataset.set;
+    try { localStorage.setItem('c4a-manual:theme', JSON.stringify(b.dataset.set)); } catch(err){}
+    mark();
+    live.textContent = b.dataset.set === 'light' ? 'Tema claro' : 'Tema oscuro';
+  });
+  if (system && system.addEventListener) system.addEventListener('change', mark);
+  group.hidden = false;
+  mark();
+})();
+</script>
 </body>
 </html>

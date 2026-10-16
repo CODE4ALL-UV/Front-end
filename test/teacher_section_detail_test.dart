@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
-import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 
 // TeacherField dibuja la etiqueta fuera de la decoración del TextField; por eso

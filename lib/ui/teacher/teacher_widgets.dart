@@ -134,7 +134,7 @@ class TeacherField extends StatelessWidget {
               fontSize: 14,
             ),
             filled: true,
-            fillColor: colorsTheme.surface,
+            fillColor: colorsTheme.tertiary.withValues(alpha: 0.05),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 12,
@@ -177,7 +177,7 @@ class TeacherCard extends StatelessWidget {
     // que permite meter dentro cosas que se pulsan —un ListTile, un
     // interruptor— sin que su efecto de pulsación quede tapado.
     return Material(
-      color: appColorScheme.surface,
+      color: appColorScheme.secondary.withValues(alpha: 0.15),
       borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
       child: Container(
         padding: const EdgeInsets.all(14),

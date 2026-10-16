@@ -268,9 +268,10 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
 
   Widget _header(bool edited) {
     final appColorScheme = context.colorScheme;
+    final moduleTheme = context.moduleColors;
     final where = Text(
       'Módulo ${widget.moduleNumber} · Sección ${widget.sectionNumber}',
-      style: TextStyle(fontSize: 12.5, color: appColorScheme.onSurfaceVariant),
+      style: TextStyle(fontSize: 12.5, color: appColorScheme.onPrimary),
     );
 
     final badge = edited

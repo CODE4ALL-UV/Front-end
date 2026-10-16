@@ -4,6 +4,7 @@ import 'package:flutter_code4all/data/models/auth_models.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/privacy_policy.dart';
 
 class FormScreen extends StatefulWidget {
   final VoidCallback? onBack;
@@ -60,7 +61,7 @@ class _FormScreenState extends State<FormScreen> {
     }
 
     if (!_acceptTerms) {
-      _showMessage('Debes aceptar los términos y condiciones');
+      _showMessage('Debes aceptar la política de tratamiento de datos');
       return;
     }
 
@@ -98,6 +99,18 @@ class _FormScreenState extends State<FormScreen> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// Abre la política que se acepta con la casilla. Va directo desde el
+  /// toque: el navegador solo deja abrir pestañas en respuesta a un gesto.
+  Future<void> _openPrivacyPolicy() async {
+    final opened = await openPrivacyPolicy();
+    if (!opened && mounted) {
+      _showMessage(
+        'No se pudo abrir la política de tratamiento de datos. Está en '
+        'code4all-web.onrender.com/privacidad.html',
+      );
+    }
   }
 
   @override
@@ -344,7 +357,8 @@ class _FormScreenState extends State<FormScreen> {
                                               ),
                                             ),
                                             Text(
-                                              'Acepto términos y condiciones',
+                                              'He leído y acepto la política '
+                                              'de tratamiento de datos',
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Color(0xFF616161),
@@ -354,6 +368,28 @@ class _FormScreenState extends State<FormScreen> {
                                         ),
                                       ),
                                     ],
+                                  ),
+                                ),
+                              ),
+                              // Fuera de la fila de la casilla: así el lector
+                              // de pantalla lo anuncia como un enlace aparte y
+                              // tocarlo abre la política, no marca la casilla.
+                              Align(
+                                alignment: AlignmentDirectional.centerStart,
+                                child: TextButton.icon(
+                                  key: const ValueKey(
+                                    'register-privacy-policy',
+                                  ),
+                                  onPressed: _openPrivacyPolicy,
+                                  style: TextButton.styleFrom(
+                                    minimumSize: const Size(48, 48),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.privacy_tip_outlined,
+                                    size: 18,
+                                  ),
+                                  label: const Text(
+                                    'Leer la política de tratamiento de datos',
                                   ),
                                 ),
                               ),

@@ -86,7 +86,9 @@ void main() {
   }
 
   Future<void> acceptTerms(WidgetTester tester) async {
-    await tester.tap(find.text('Acepto términos y condiciones'));
+    await tester.tap(
+      find.text('He leído y acepto la política de tratamiento de datos'),
+    );
     await tester.pump();
   }
 
@@ -165,7 +167,7 @@ void main() {
         await submit(tester);
 
         expect(
-          find.text('Debes aceptar los términos y condiciones'),
+          find.text('Debes aceptar la política de tratamiento de datos'),
           findsOneWidget,
         );
         expect(requests, isEmpty);

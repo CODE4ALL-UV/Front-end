@@ -663,6 +663,66 @@ void main() {
     });
   });
 
+  group('la política de tratamiento de datos', () {
+    late List<String> opened;
+    late bool canOpen;
+
+    setUp(() {
+      opened = [];
+      canOpen = true;
+      messenger.setMockMethodCallHandler(launcherChannel, (call) async {
+        if (call.method != 'launch') return null;
+        opened.add((call.arguments as Map)['url'] as String);
+        return canOpen;
+      });
+    });
+
+    Future<void> tapPolicy(WidgetTester tester) async {
+      final policy = find.byKey(const ValueKey('privacy-policy'));
+      await tester.ensureVisible(policy);
+      await tester.tap(policy);
+      await settle(tester);
+    }
+
+    testWidgets('el enlace del login la abre', (tester) async {
+      await pumpLogin(tester);
+      await tapPolicy(tester);
+
+      expect(opened.single, contains('privacidad.html'));
+      expect(find.textContaining('No se pudo abrir la política'), findsNothing);
+      await unmount(tester);
+    });
+
+    testWidgets('el aviso de Google y Facebook la enlaza', (tester) async {
+      await pumpLogin(tester);
+
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('social-privacy-consent')),
+      );
+      // Solo la parte subrayada es enlace; en minúscula, para no dar con el
+      // botón «Política de tratamiento de datos».
+      await tester.tapOnText(
+        find.textRange.ofSubstring('política de tratamiento de datos'),
+      );
+      await settle(tester);
+
+      expect(opened.single, contains('privacidad.html'));
+      await unmount(tester);
+    });
+
+    testWidgets('si no se puede abrir, dice dónde está', (tester) async {
+      canOpen = false;
+      await pumpLogin(tester);
+      await tapPolicy(tester);
+
+      expect(
+        find.textContaining('code4all-web.onrender.com/privacidad.html'),
+        findsOneWidget,
+      );
+      await unmount(tester);
+    });
+  });
+
   group('dictar con el micrófono', () {
     testWidgets('sin micrófono lo dice', (tester) async {
       final mic = _FakeDictation()..unavailable = true;

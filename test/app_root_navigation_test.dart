@@ -507,7 +507,9 @@ void main() {
         await tester.enterText(fields.at(0), 'Ana');
         await tester.enterText(fields.at(1), 'ana@example.com');
         await tester.enterText(fields.at(2), 'clave-de-prueba');
-        final terms = find.text('Acepto términos y condiciones');
+        final terms = find.text(
+          'He leído y acepto la política de tratamiento de datos',
+        );
         await tester.ensureVisible(terms);
         await tester.tap(terms);
         await tester.pump();

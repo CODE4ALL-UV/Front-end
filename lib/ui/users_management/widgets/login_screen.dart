@@ -11,6 +11,7 @@ import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/braille_keyboard_screen.dart';
+import 'package:flutter_code4all/ui/core/ui/privacy_policy.dart';
 import 'package:flutter_code4all/ui/core/ui/social_auth_block.dart';
 import 'package:flutter_code4all/ui/core/ui/user_manual.dart';
 import 'package:flutter_code4all/data/services/facebook_auth_service.dart';
@@ -64,6 +65,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   late final VoiceDictation _dictation =
       widget.dictation ?? SpeechToTextDictation();
+
+  /// El enlace a la política dentro del aviso de Google y Facebook.
+  late final TapGestureRecognizer _privacyPolicyTap = TapGestureRecognizer()
+    ..onTap = _openPrivacyPolicy;
 
   /// Qué campo está escuchando el micrófono ahora mismo, si alguno.
   TextEditingController? _listeningTo;
@@ -362,8 +367,21 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Abre la política de tratamiento de datos. Como el manual, va directo
+  /// desde el toque.
+  Future<void> _openPrivacyPolicy() async {
+    final opened = await openPrivacyPolicy();
+    if (!opened && mounted) {
+      _showMessage(
+        'No se pudo abrir la política de tratamiento de datos. Está en '
+        'code4all-web.onrender.com/privacidad.html',
+      );
+    }
+  }
+
   @override
   void dispose() {
+    _privacyPolicyTap.dispose();
     HardwareKeyboard.instance.removeHandler(_onAnyKey);
     if (_listeningTo != null) unawaited(_dictation.stop());
     _pressTimer?.cancel();
@@ -452,8 +470,62 @@ class _LoginScreenState extends State<LoginScreen> {
     ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
   );
 
+  /// Quien entra con Google o Facebook no pasa por la casilla del registro:
+  /// aquí ve qué acepta y puede leerlo antes de tocar el botón.
+  Widget _socialConsent(BuildContext context) {
+    final theme = Theme.of(context);
+    final style = theme.textTheme.bodySmall?.copyWith(height: 1.4);
+    return Text.rich(
+      TextSpan(
+        text: 'Al entrar con Google o Facebook aceptas la ',
+        children: [
+          TextSpan(
+            text: 'política de tratamiento de datos',
+            recognizer: _privacyPolicyTap,
+            // El color de los botones de texto («¿Olvidaste tu contraseña?»):
+            // el primario del tema oscuro es gris sobre gris (2,2:1).
+            style: TextStyle(
+              color: theme.colorScheme.secondary,
+              fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+          const TextSpan(text: '.'),
+        ],
+      ),
+      key: const ValueKey('social-privacy-consent'),
+      textAlign: TextAlign.center,
+      style: style,
+    );
+  }
+
+  /// El manual y la política de datos. En una columna van debajo de
+  /// «Registrarse»; en portátil, bajo el logo, para que el formulario quepa
+  /// entero sin desplazarse.
+  Widget _helpLinks() => Wrap(
+    alignment: WrapAlignment.center,
+    children: [
+      // Antes de tener cuenta: abre las guías para entrar y registrarse. Ya
+      // dentro, el manual está en el menú de perfil, en la parte de cada rol.
+      TextButton.icon(
+        key: const ValueKey('user-manual'),
+        onPressed: _openManual,
+        style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+        icon: const Icon(Icons.menu_book_outlined),
+        label: const Text('¿Cómo se usa Code4All? Ver el manual'),
+      ),
+      TextButton.icon(
+        key: const ValueKey('privacy-policy'),
+        onPressed: _openPrivacyPolicy,
+        style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+        icon: const Icon(Icons.privacy_tip_outlined),
+        label: const Text('Política de tratamiento de datos'),
+      ),
+    ],
+  );
+
   /// Correo, contraseña y todas las formas de entrar o registrarse.
-  Widget _form() => Column(
+  Widget _form(BuildContext context, {required bool withLinks}) => Column(
     mainAxisSize: MainAxisSize.min,
     children: [
       TextField(
@@ -516,7 +588,9 @@ class _LoginScreenState extends State<LoginScreen> {
         },
         onFacebookTap: _handleFacebookSignIn,
       ),
-      const SizedBox(height: 20),
+      const SizedBox(height: 8),
+      _socialConsent(context),
+      const SizedBox(height: 16),
       SizedBox(
         width: double.infinity,
         height: 52,
@@ -556,16 +630,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-      const SizedBox(height: 8),
-      // Antes de tener cuenta: abre las guías para entrar y registrarse. Ya
-      // dentro, el manual está en el menú de perfil, en la parte de cada rol.
-      TextButton.icon(
-        key: const ValueKey('user-manual'),
-        onPressed: _openManual,
-        style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
-        icon: const Icon(Icons.menu_book_outlined),
-        label: const Text('¿Cómo se usa Code4All? Ver el manual'),
-      ),
+      if (withLinks) ...[const SizedBox(height: 8), _helpLinks()],
     ],
   );
 
@@ -591,7 +656,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 8),
               _brailleHint(context),
               const SizedBox(height: 12),
-              _form(),
+              _form(context, withLinks: true),
             ],
           ),
         ),
@@ -622,11 +687,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     _logo(logoHeight),
                     const SizedBox(height: 16),
                     _brailleHint(context),
+                    const SizedBox(height: 16),
+                    _helpLinks(),
                   ],
                 ),
               ),
               const SizedBox(width: 56),
-              Expanded(child: _form()),
+              Expanded(child: _form(context, withLinks: false)),
             ],
           ),
         ),

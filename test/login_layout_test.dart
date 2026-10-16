@@ -52,16 +52,27 @@ void main() {
     await tester.pump();
   }
 
-  void expectFullyVisible(WidgetTester tester, String text, Size size) {
-    final rect = tester.getRect(find.text(text));
+  void expectFinderVisible(
+    WidgetTester tester,
+    Finder finder,
+    String what,
+    Size size,
+  ) {
+    final rect = tester.getRect(finder);
     expect(
-      rect.top >= 0 && rect.bottom <= size.height,
+      rect.top >= 0 &&
+          rect.bottom <= size.height &&
+          rect.left >= 0 &&
+          rect.right <= size.width,
       isTrue,
       reason:
-          '«$text» va de ${rect.top} a ${rect.bottom}; la ventana mide '
-          '${size.height} de alto',
+          '«$what» ocupa $rect; la ventana mide ${size.width} × '
+          '${size.height}',
     );
   }
+
+  void expectFullyVisible(WidgetTester tester, String text, Size size) =>
+      expectFinderVisible(tester, find.text(text), text, size);
 
   for (final entry in laptops.entries) {
     for (final scale in [0.9, 1.0]) {
@@ -77,6 +88,38 @@ void main() {
           '¿Cómo se usa Code4All? Ver el manual',
           entry.value,
         );
+        expectFullyVisible(
+          tester,
+          'Política de tratamiento de datos',
+          entry.value,
+        );
+        expectFinderVisible(
+          tester,
+          find.byKey(const ValueKey('social-privacy-consent')),
+          'aviso de Google y Facebook',
+          entry.value,
+        );
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
+  // En celular el login se desplaza: lo que importa es que la política y el
+  // aviso existan, quepan de ancho y no desborden con la letra grande.
+  for (final entry in phones.entries) {
+    for (final scale in [1.0, 2.0]) {
+      testWidgets('${entry.key}, letra al ${(scale * 100).round()} %: '
+          'la política y el aviso se leen enteros', (tester) async {
+        await pumpLogin(tester, entry.value, textScale: scale);
+
+        for (final finder in [
+          find.byKey(const ValueKey('privacy-policy')),
+          find.byKey(const ValueKey('social-privacy-consent')),
+        ]) {
+          await tester.ensureVisible(finder);
+          await tester.pump();
+          expectFinderVisible(tester, finder, finder.toString(), entry.value);
+        }
         expect(tester.takeException(), isNull);
       });
     }

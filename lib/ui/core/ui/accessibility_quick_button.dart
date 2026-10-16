@@ -32,7 +32,7 @@ Future<void> showAccessibilitySheet(BuildContext context) {
   );
 }
 
-/// Los seis temas, con un nombre que se entiende sin saber qué es cada
+/// Los nueve temas, con un nombre que se entiende sin saber qué es cada
 /// daltonismo.
 const List<(AppThemeMode, String, String, IconData)> _themes = [
   (
@@ -60,15 +60,33 @@ const List<(AppThemeMode, String, String, IconData)> _themes = [
     Icons.visibility,
   ),
   (
+    AppThemeMode.deuteranomalia,
+    'Deuteranomalía',
+    'Veo el verde, pero apagado',
+    Icons.visibility,
+  ),
+  (
     AppThemeMode.protanopia,
     'Protanopía',
     'No distingo bien el rojo',
     Icons.visibility,
   ),
   (
+    AppThemeMode.protanomalia,
+    'Protanomalía',
+    'Veo el rojo, pero apagado',
+    Icons.visibility,
+  ),
+  (
     AppThemeMode.tritanopia,
     'Tritanopía',
     'No distingo bien el azul ni el amarillo',
+    Icons.visibility,
+  ),
+  (
+    AppThemeMode.tritanomalia,
+    'Tritanomalía',
+    'Veo el azul y el amarillo, pero apagados',
     Icons.visibility,
   ),
 ];

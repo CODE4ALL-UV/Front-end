@@ -89,7 +89,8 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
               final sure = await confirmDelete(context, what: 'el ejercicio');
               if (sure && context.mounted) setState(() => _exercise = null);
             },
-      onDone: () => Navigator.of(context).pop(_result),
+      onDone: () =>
+          Navigator.of(context).pop(EditorResult<SectionExercise>(_result)),
       child: _exercise == null
           ? EditorEmptyState(
               icon: Icons.edit_note,

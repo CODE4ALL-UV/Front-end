@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacidad de Code4All</title>
+<meta name="description" content="Qué datos guarda Code4All, para qué los usa y cómo pedir que se borren.">
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+/* Página estática que Meta y Google piden para publicar el inicio de sesión.
+   Sin fuentes ni scripts externos: la política de privacidad no debería
+   avisar a terceros de que alguien la está leyendo. */
+:root{
+  --bg:#F2F5F8; --surface:#FFFFFF; --fg:#18202A; --muted:#55606C; --line:#D3DAE2;
+  --red:#C62828; --blue:#306998; --yellow:#FFD43B; --on-yellow:#161616;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1318; --surface:#171C23; --fg:#E6EAF0; --muted:#9FA9B4; --line:#2D3540;
+    --red:#F26B60; --blue:#8DBBE3;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1318; --surface:#171C23; --fg:#E6EAF0; --muted:#9FA9B4; --line:#2D3540;
+  --red:#F26B60; --blue:#8DBBE3;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--fg); font-family:var(--body); font-size:1.0625rem; line-height:1.6; overflow-wrap:break-word}
+.skip{position:absolute; left:16px; top:-48px; background:var(--yellow); color:var(--on-yellow); padding:8px 12px; border-radius:6px; font-weight:700; z-index:1}
+.skip:focus{top:12px}
+header{border-top:6px solid var(--red); background:var(--surface); border-bottom:1px solid var(--line)}
+.wrap{max-width:46rem; margin:0 auto; padding:0 16px}
+header .wrap{padding-top:28px; padding-bottom:24px}
+.brand{font-weight:700; letter-spacing:.02em; color:var(--muted); margin:0 0 6px; font-size:.9375rem}
+h1{font-size:clamp(1.75rem, 5vw, 2.375rem); line-height:1.15; margin:0}
+.updated{color:var(--muted); margin:10px 0 0; font-size:.9375rem}
+main .wrap{padding-top:8px; padding-bottom:56px}
+h2{font-size:1.3125rem; line-height:1.25; margin:2.25rem 0 .5rem; scroll-margin-top:16px}
+h3{font-size:1.0625rem; margin:1.25rem 0 .25rem}
+p, ul, ol{margin:.5rem 0}
+ul, ol{padding-left:1.25rem}
+li{margin:.25rem 0}
+a{color:var(--blue); text-underline-offset:2px}
+a:focus-visible, .skip:focus-visible{outline:3px solid var(--yellow); outline-offset:2px; border-radius:3px}
+.summary{background:var(--surface); border:1px solid var(--line); border-left:6px solid var(--blue); border-radius:8px; padding:14px 18px; margin:24px 0 8px}
+.summary p{margin:0}
+.toc{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:12px 18px; margin:16px 0 0}
+.toc h2{font-size:1rem; margin:0 0 4px}
+.toc ol{margin:0}
+.callout{background:var(--surface); border:2px solid var(--red); border-radius:8px; padding:14px 18px; margin:12px 0}
+.callout p:first-child{margin-top:0}
+.callout p:last-child{margin-bottom:0}
+footer{border-top:1px solid var(--line); color:var(--muted); font-size:.9375rem}
+footer .wrap{padding-top:20px; padding-bottom:28px}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<header>
+  <div class="wrap">
+    <p class="brand">Code4All</p>
+    <h1>Política de privacidad y tratamiento de datos</h1>
+    <p class="updated">Última actualización: 14 de octubre de 2026</p>
+  </div>
+</header>
+
+<main id="contenido">
+  <div class="wrap">
+    <div class="summary">
+      <p><strong>En resumen:</strong> guardamos lo necesario para que tengas una cuenta y conserves tu progreso en el curso. No vendemos tus datos, no mostramos publicidad y no usamos herramientas de seguimiento. Las fotos de la cámara se analizan y se descartan sin guardarse. Puedes pedir en cualquier momento que borremos tu cuenta.</p>
+    </div>
+
+    <nav class="toc" aria-labelledby="toc-title">
+      <h2 id="toc-title">Contenido</h2>
+      <ol>
+        <li><a href="#responsable">Quién es responsable</a></li>
+        <li><a href="#datos">Qué datos guardamos</a></li>
+        <li><a href="#no-guardamos">Lo que no guardamos</a></li>
+        <li><a href="#para-que">Para qué los usamos</a></li>
+        <li><a href="#quien-ve">Quién puede verlos</a></li>
+        <li><a href="#terceros">Servicios de terceros</a></li>
+        <li><a href="#conservacion">Cuánto tiempo los guardamos</a></li>
+        <li><a href="#derechos">Tus derechos</a></li>
+        <li><a href="#eliminar-datos">Cómo borrar tu cuenta y tus datos</a></li>
+        <li><a href="#menores">Menores de edad</a></li>
+        <li><a href="#cambios">Cambios en esta política</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="responsable">1. Quién es responsable</h2>
+    <p>El responsable del tratamiento de tus datos es el <strong>Equipo Code4All</strong>. Para cualquier consulta, corrección o solicitud de eliminación, escríbenos a <a href="mailto:sebasdevsaavedra@gmail.com">sebasdevsaavedra@gmail.com</a>.</p>
+
+    <h2 id="datos">2. Qué datos guardamos</h2>
+    <h3>Tu cuenta</h3>
+    <ul>
+      <li>Nombre y correo electrónico.</li>
+      <li>Contraseña, guardada cifrada: nadie, ni siquiera nosotros, puede leerla.</li>
+      <li>Tu papel en la plataforma (estudiante, docente o director) y la fecha de registro.</li>
+      <li>La foto de perfil, solo si decides subirla.</li>
+      <li>El tipo de discapacidad, solo si decides indicarlo. Es un <strong>dato sensible</strong>: es opcional, no tienes ninguna obligación de darlo y no se muestra a docentes ni al director.</li>
+    </ul>
+    <h3>Si entras con Google o Facebook</h3>
+    <p>Recibimos únicamente tu <strong>nombre y tu correo</strong>. No recibimos tu contraseña de Google ni de Facebook, no publicamos nada en tu nombre y no accedemos a tus contactos, amigos, fotos ni publicaciones.</p>
+    <h3>Tu progreso en el curso</h3>
+    <ul>
+      <li>Las respuestas a ejercicios y cuestionarios: qué pregunta respondiste, si acertaste y cuánto tardaste.</li>
+      <li>Las actividades que completaste y tus puntuaciones.</li>
+      <li>Los cursos en los que estás inscrito.</li>
+    </ul>
+    <h3>Si eres docente o director</h3>
+    <ul>
+      <li>Los cambios que haces al contenido de un curso quedan registrados con tu correo y la fecha.</li>
+      <li>El director puede dejar valoraciones y comentarios sobre el trabajo de cada docente y sobre las secciones del curso.</li>
+    </ul>
+    <h3>En tu navegador</h3>
+    <p>La aplicación guarda en tu dispositivo la sesión iniciada, tus preferencias de visualización y aprendizaje, y una copia de tu avance para no perderlo si se corta la conexión. No usamos cookies de publicidad ni de analítica.</p>
+
+    <h2 id="no-guardamos">3. Lo que no guardamos</h2>
+    <ul>
+      <li><strong>Cámara (alfabeto en señas):</strong> la cámara solo se enciende cuando pulsas el botón. Cada foto se envía a nuestro servidor, se analiza en memoria para encontrar la posición de la mano y se descarta en ese momento. No grabamos vídeo, no guardamos ninguna imagen y no las enviamos a nadie más.</li>
+      <li><strong>Dictado por voz:</strong> el reconocimiento lo hace tu navegador o tu teléfono, no Code4All. En Chrome y en muchos móviles, ese servicio envía el audio a los servidores de Google para convertirlo en texto. Nosotros no recibimos el audio. Si no quieres que tu voz salga del dispositivo, escribe en lugar de dictar.</li>
+    </ul>
+
+    <h2 id="para-que">4. Para qué los usamos</h2>
+    <ul>
+      <li>Darte acceso a tu cuenta y mantener tu sesión.</li>
+      <li>Guardar tu progreso para que puedas continuar donde lo dejaste.</li>
+      <li>Que tus docentes puedan seguir el avance de su curso y apoyarte, y que el director pueda supervisar los cursos.</li>
+      <li>Enviarte el enlace para cambiar la contraseña cuando lo pides.</li>
+    </ul>
+    <p>No vendemos ni alquilamos tus datos, no mostramos publicidad y no los usamos para nada distinto de lo que se describe aquí.</p>
+
+    <h2 id="quien-ve">5. Quién puede verlos</h2>
+    <ul>
+      <li><strong>Tú</strong> ves tu cuenta y tu progreso.</li>
+      <li><strong>Los docentes</strong> de los cursos en los que estás inscrito ven tu nombre, tu correo y tu progreso en esos cursos.</li>
+      <li><strong>El director</strong> ve el avance de los estudiantes y la actividad de los docentes.</li>
+    </ul>
+
+    <h2 id="terceros">6. Servicios de terceros</h2>
+    <p>Para funcionar, Code4All usa estos proveedores. Solo tratan los datos necesarios para prestar su servicio:</p>
+    <ul>
+      <li><strong>Render</strong>: aloja la aplicación y el servidor.</li>
+      <li><strong>Neon</strong>: aloja la base de datos.</li>
+      <li><strong>Google</strong> y <strong>Meta (Facebook)</strong>: solo si eliges entrar con ellos, para confirmar quién eres.</li>
+      <li><strong>YouTube</strong>: algunos temas incluyen vídeos de YouTube. Al reproducirlos, YouTube puede aplicar sus propias cookies y su política de privacidad.</li>
+      <li><strong>Brevo</strong>: envía el correo para recuperar la contraseña.</li>
+    </ul>
+    <p>Los servidores de Render y Neon que usamos están en Estados Unidos, así que tus datos se guardan allí.</p>
+
+    <h2 id="conservacion">7. Cuánto tiempo los guardamos</h2>
+    <p>Mientras tengas una cuenta. Cuando nos pides borrarla, eliminamos tus datos como se explica en el <a href="#eliminar-datos">punto 9</a>.</p>
+
+    <h2 id="derechos">8. Tus derechos</h2>
+    <p>De acuerdo con la Ley 1581 de 2012 de Colombia (habeas data), puedes:</p>
+    <ul>
+      <li>Conocer qué datos tuyos tenemos.</li>
+      <li>Pedir que los actualicemos o corrijamos.</li>
+      <li>Pedir que los borremos y retirar la autorización para tratarlos.</li>
+      <li>Presentar una queja ante la Superintendencia de Industria y Comercio si consideras que no hemos atendido tu solicitud.</li>
+    </ul>
+    <p>Para ejercerlos, escríbenos a <a href="mailto:sebasdevsaavedra@gmail.com">sebasdevsaavedra@gmail.com</a>. Respondemos las consultas en un máximo de 10 días hábiles y las solicitudes de corrección o eliminación en un máximo de 15 días hábiles.</p>
+
+    <h2 id="eliminar-datos">9. Cómo borrar tu cuenta y tus datos</h2>
+    <div class="callout">
+      <p>Escribe a <a href="mailto:sebasdevsaavedra@gmail.com?subject=Eliminar%20mi%20cuenta%20de%20Code4All">sebasdevsaavedra@gmail.com</a> <strong>desde el correo de tu cuenta</strong>, con el asunto «Eliminar mi cuenta de Code4All».</p>
+      <p>Borraremos tu cuenta, tu foto de perfil, tu progreso y tus inscripciones en un máximo de 15 días hábiles, y te confirmaremos por correo cuando esté hecho.</p>
+    </div>
+    <p>Pedimos que escribas desde el correo de tu cuenta para comprobar que eres tú y que nadie pueda borrar la cuenta de otra persona.</p>
+    <p><strong>Si entraste con Facebook</strong>, también puedes quitarle el acceso a Code4All desde Facebook: Configuración y privacidad → Configuración → Apps y sitios web → Code4All → Eliminar. Eso impide que Code4All vuelva a recibir tus datos de Facebook; para borrar los que ya guardamos, escríbenos como se indica arriba.</p>
+    <p><strong>Si entraste con Google</strong>, puedes quitarle el acceso en <a href="https://myaccount.google.com/connections">myaccount.google.com/connections</a>. Igual que con Facebook, para borrar los datos que ya guardamos, escríbenos.</p>
+
+    <h2 id="menores">10. Menores de edad</h2>
+    <p>Si eres menor de edad, usa Code4All con la autorización de tu madre, padre o acudiente. Ellos pueden ejercer en tu nombre los derechos del <a href="#derechos">punto 8</a>.</p>
+
+    <h2 id="cambios">11. Cambios en esta política</h2>
+    <p>Si cambiamos algo importante, actualizaremos esta página y la fecha del principio.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Code4All · <a href="/">Volver a la aplicación</a></p>
+  </div>
+</footer>
+</body>
+</html>

@@ -85,7 +85,8 @@ class _ExampleEditorScreenState extends State<ExampleEditorScreen> {
               final sure = await confirmDelete(context, what: 'el ejemplo');
               if (sure && context.mounted) setState(() => _example = null);
             },
-      onDone: () => Navigator.of(context).pop(_result),
+      onDone: () =>
+          Navigator.of(context).pop(EditorResult<CodeExample>(_result)),
       child: _example == null
           ? EditorEmptyState(
               icon: Icons.code,

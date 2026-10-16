@@ -39,9 +39,14 @@ class AccessibilityToolbar extends StatelessWidget {
 
       case ReadingStatus.idle:
         final explicit = spokenText?.trim();
+        // La franja no se lee a sí misma: «Escuchar 100 %» no es texto de la
+        // pantalla, y en una pantalla vacía impedía decir que no hay nada.
         final text = (explicit != null && explicit.isNotEmpty)
             ? explicit
-            : ScreenContentExtractor.extractFromContext(context);
+            : ScreenContentExtractor.extractFromContext(
+                context,
+                exclude: context,
+              );
 
         if (text.trim().isEmpty) {
           announceForAccessibility(
@@ -82,7 +87,9 @@ class AccessibilityToolbar extends StatelessWidget {
               Expanded(
                 child: ValueListenableBuilder<ReadingStatus>(
                   valueListenable: accessibilityReadingState.status,
-                  builder: (context, status, _) {
+                  // Sin nombrar el contexto del builder: «Escuchar» trabaja
+                  // con el de la franja entera, que es lo que no debe leerse.
+                  builder: (_, status, _) {
                     final isSpeaking = status == ReadingStatus.speaking;
                     final isPaused = status == ReadingStatus.paused;
 

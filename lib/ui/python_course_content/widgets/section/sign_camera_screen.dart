@@ -188,7 +188,11 @@ class _SignCameraScreenState extends State<SignCameraScreen>
   }
 
   Future<void> _openCamera() async {
-    await _camera?.dispose();
+    // Se suelta antes de esperar a la nueva: mientras se enciende, el bucle
+    // de fotos no puede pedírsela a una cámara ya liberada.
+    final previous = _camera;
+    _camera = null;
+    await previous?.dispose();
 
     final controller = CameraController(
       _cameras[_cameraIndex],
@@ -206,7 +210,15 @@ class _SignCameraScreenState extends State<SignCameraScreen>
     if (_cameras.length < 2) return;
 
     _cameraIndex = (_cameraIndex + 1) % _cameras.length;
-    await _openCamera();
+    try {
+      await _openCamera();
+    } on CameraException catch (error) {
+      _fail(_explain(error));
+      return;
+    } catch (error) {
+      _fail('No se pudo cambiar de cámara: $error');
+      return;
+    }
     if (mounted) setState(() {});
   }
 
@@ -248,7 +260,9 @@ class _SignCameraScreenState extends State<SignCameraScreen>
   /// Devuelve falso si hay que parar del todo.
   Future<bool> _readFrame() async {
     final camera = _camera;
-    if (camera == null || !camera.value.isInitialized) return false;
+    // Sin cámara a mano es que se está cambiando por la otra: se espera a la
+    // siguiente vuelta. Apagar o salir ya paran el bucle por su cuenta.
+    if (camera == null || !camera.value.isInitialized) return true;
 
     try {
       final shot = await camera.takePicture();

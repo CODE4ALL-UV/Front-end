@@ -3,6 +3,18 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 
+/// Lo que devuelve un editor al pulsar «Listo».
+///
+/// Hace falta envolverlo porque salir con la flecha de atrás también devuelve
+/// `null`. Sin el envoltorio, «quité la actividad» y «salí sin tocar nada» se
+/// verían igual, y quitar una actividad no la quitaba. Aquí [value] en nulo
+/// significa «la sección se queda sin esta actividad».
+class EditorResult<T> {
+  const EditorResult(this.value);
+
+  final T? value;
+}
+
 /// El armazón común de todos los editores del docente.
 /// Todos funcionan igual a propósito: se escribe, se pulsa «Listo» y el
 /// resultado vuelve a la sección; se sale sin guardar y no cambia nada. Que la

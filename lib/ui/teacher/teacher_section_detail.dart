@@ -9,6 +9,7 @@ import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart'
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/chapter_section_screen.dart';
 import 'course_section_edits.dart';
 import 'editors/capsule_editor_screen.dart';
+import 'editors/editor_scaffold.dart';
 import 'editors/example_editor_screen.dart';
 import 'editors/exercise_editor_screen.dart';
 import 'editors/quiz_editor_screen.dart';
@@ -377,14 +378,14 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
           title: 'Lectura',
           detail: section.reading == null
               ? 'Sin lectura'
-              : '${section.reading!.pages.length} páginas · '
-                    '${section.reading!.pages.fold<int>(0, (n, p) => n + p.blocks.length)} bloques',
+              : '${_count(section.reading!.pages.length, 'página', 'páginas')} · '
+                    '${_count(section.reading!.pages.fold<int>(0, (n, p) => n + p.blocks.length), 'bloque', 'bloques')}',
           empty: section.reading == null,
           onTap: () async {
-            final result = await _open<SectionReading?>(
+            final result = await _open<EditorResult<SectionReading>>(
               ReadingEditorScreen(reading: section.reading, section: section),
             );
-            if (result != null) _update(_draft.copyWith(reading: result));
+            if (result != null) _update(_draft.copyWith(reading: result.value));
           },
         );
       })(),
@@ -397,13 +398,13 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
           title: 'Cápsula de conocimiento',
           detail: section.capsule == null
               ? 'Sin cápsula'
-              : '${section.capsule!.tips.length} consejos',
+              : _count(section.capsule!.tips.length, 'consejo', 'consejos'),
           empty: section.capsule == null,
           onTap: () async {
-            final result = await _open<KnowledgeCapsule?>(
+            final result = await _open<EditorResult<KnowledgeCapsule>>(
               CapsuleEditorScreen(capsule: section.capsule),
             );
-            if (result != null) _update(_draft.copyWith(capsule: result));
+            if (result != null) _update(_draft.copyWith(capsule: result.value));
           },
         );
       })(),
@@ -416,8 +417,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
           title: 'Videos',
           detail: section.videos.isEmpty
               ? 'Sin videos'
-              : '${section.videos.length} '
-                    '${section.videos.length == 1 ? "video" : "videos"}',
+              : _count(section.videos.length, 'video', 'videos'),
           empty: section.videos.isEmpty,
           onTap: () async {
             final result = await _open<List<SectionVideo>?>(
@@ -436,8 +436,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
           title: 'Quiz',
           detail: section.quiz.isEmpty
               ? 'Sin preguntas'
-              : '${section.quiz.length} '
-                    '${section.quiz.length == 1 ? "pregunta" : "preguntas"}',
+              : _count(section.quiz.length, 'pregunta', 'preguntas'),
           empty: section.quiz.isEmpty,
           onTap: () async {
             final result = await _open<List<QuizQuestion>?>(
@@ -459,7 +458,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
           title: 'Evaluación final',
           detail: section.finalEvaluation.isEmpty
               ? 'Sin preguntas'
-              : '${section.finalEvaluation.length} preguntas',
+              : _count(section.finalEvaluation.length, 'pregunta', 'preguntas'),
           empty: section.finalEvaluation.isEmpty,
           onTap: () async {
             final result = await _open<List<QuizQuestion>?>(
@@ -482,13 +481,17 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
           title: 'Ejemplo comentado',
           detail: section.example == null
               ? 'Sin ejemplo'
-              : '${section.example!.steps.length} pasos explicados',
+              : _count(
+                  section.example!.steps.length,
+                  'paso explicado',
+                  'pasos explicados',
+                ),
           empty: section.example == null,
           onTap: () async {
-            final result = await _open<CodeExample?>(
+            final result = await _open<EditorResult<CodeExample>>(
               ExampleEditorScreen(example: section.example),
             );
-            if (result != null) _update(_draft.copyWith(example: result));
+            if (result != null) _update(_draft.copyWith(example: result.value));
           },
         );
       })(),
@@ -501,14 +504,15 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
           title: 'Ejercicio',
           detail: section.exercise == null || section.exercise!.isEmpty
               ? 'Sin ejercicio'
-              : '${section.exercise!.pairs.length} parejas · '
-                    '${section.exercise!.questions.length} preguntas',
+              : '${_count(section.exercise!.pairs.length, 'pareja', 'parejas')} · '
+                    '${_count(section.exercise!.questions.length, 'pregunta', 'preguntas')}',
           empty: section.exercise == null || section.exercise!.isEmpty,
           onTap: () async {
-            final result = await _open<SectionExercise?>(
+            final result = await _open<EditorResult<SectionExercise>>(
               ExerciseEditorScreen(exercise: section.exercise),
             );
-            if (result != null) _update(_draft.copyWith(exercise: result));
+            if (result != null)
+              _update(_draft.copyWith(exercise: result.value));
           },
         );
       })(),
@@ -616,6 +620,9 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
     );
   }
 }
+
+/// «1 pregunta», «3 preguntas»: la cuenta con la palabra que le toca.
+String _count(int n, String one, String many) => '$n ${n == 1 ? one : many}';
 
 /// Una actividad de la sección, con lo que contiene de un vistazo.
 class _ActivityCard extends StatelessWidget {

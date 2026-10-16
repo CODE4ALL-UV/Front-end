@@ -105,6 +105,49 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
     });
 
+    testWidgets('En una pantalla sin texto avisa de que no hay nada que leer', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(buildTestApp());
+      tester.takeAnnouncements();
+
+      await tester.tap(find.text('Escuchar'));
+      await tester.pump();
+
+      // Los botones de la propia franja no cuentan como texto de la pantalla.
+      expect(
+        tester.takeAnnouncements().map((a) => a.message),
+        contains('Esta pantalla no tiene texto que leer.'),
+      );
+      expect(accessibilityReadingState.status.value, ReadingStatus.idle);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('Escuchar lee la pantalla sin los textos de la franja', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[_TestModuleCardThemeColors()],
+          ),
+          home: const Scaffold(
+            body: Column(
+              children: [AccessibilityToolbar(), Text('Hola mundo')],
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Escuchar'));
+      await tester.pump();
+
+      expect(accessibilityReadingState.currentText.value, 'Hola mundo');
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
     testWidgets('Cambia a Pausar cuando la lectura está hablando', (
       WidgetTester tester,
     ) async {

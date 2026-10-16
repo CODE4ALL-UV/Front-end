@@ -699,9 +699,9 @@ void main() {
 
   // Que el texto se lea. Un botón con la letra del mismo color que el fondo
   // pasa todas las pruebas de tamaño: no se sale de nada, simplemente no se
-  // ve. Se mira en los seis temas, porque cada uno tiene sus colores.
+  // ve. Se mira en todos los temas, porque cada uno tiene sus colores.
   for (final entry in cases.entries) {
-    testWidgets('${entry.key}: el texto se lee en los seis temas', (
+    testWidgets('${entry.key}: el texto se lee en todos los temas', (
       tester,
     ) async {
       final problems = <String>[];

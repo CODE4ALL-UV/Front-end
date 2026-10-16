@@ -123,7 +123,8 @@ class _ReadingEditorScreenState extends State<ReadingEditorScreen> {
               }
             },
       deleteLabel: 'Quitar la lectura de la sección',
-      onDone: () => Navigator.of(context).pop(_result),
+      onDone: () =>
+          Navigator.of(context).pop(EditorResult<SectionReading>(_result)),
       child: reading == null
           ? EditorEmptyState(
               icon: Icons.menu_book,

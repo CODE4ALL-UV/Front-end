@@ -1,0 +1,9 @@
+---
+# Configuración de Codacy.
+# Las pruebas repiten a propósito la misma preparación (servidor falso,
+# tamaño de pantalla, canales de plugins) para que cada archivo se entienda
+# solo, así que no cuentan como código duplicado. lib/ se sigue revisando entero.
+engines:
+  duplication:
+    exclude_paths:
+      - "test/**"

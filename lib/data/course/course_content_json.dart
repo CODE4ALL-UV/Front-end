@@ -93,7 +93,12 @@ ReadingBlock readingBlockFromJson(Map<String, dynamic> json) {
         codeCaption: _strOrNull(json['codeCaption']),
       );
     case ReadingBlockKind.callout:
-      return ReadingBlock.callout(title: title, body: body, items: items);
+      return ReadingBlock.callout(
+        title: title,
+        body: body,
+        items: items,
+        tone: _enumOf(json['tone'], CalloutTone.values, CalloutTone.info),
+      );
     case ReadingBlockKind.paragraph:
       return ReadingBlock.paragraph(title: title, body: body);
   }

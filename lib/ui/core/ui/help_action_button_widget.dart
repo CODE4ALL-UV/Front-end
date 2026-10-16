@@ -105,6 +105,12 @@ class _HelpActionButtonState extends State<HelpActionButton>
 
   @override
   void dispose() {
+    // El menú vive en el Overlay, no debajo de este botón: si la página se
+    // cierra con el menú abierto, hay que quitarlo a mano o se queda flotando.
+    _overlayEntry
+      ?..remove()
+      ..dispose();
+    _overlayEntry = null;
     _textScaleController.removeListener(_handleTextScaleChanged);
     _controller.dispose();
     super.dispose();

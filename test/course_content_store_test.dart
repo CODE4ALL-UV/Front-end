@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -318,6 +319,67 @@ void main() {
       await store.refreshIfStale();
 
       expect(requests, 2);
+    });
+
+    test('volver a abrir el curso que ya se está cargando no lo pide dos '
+        'veces', () async {
+      countingServer(200);
+
+      final first = store.useCourse(7);
+      await store.useCourse(7);
+      await first;
+
+      expect(requests, 1);
+    });
+  });
+
+  group('cambiar de curso a mitad de carga', () {
+    test('se pide lo del curso nuevo y no se mezcla con el anterior', () async {
+      // El curso 1 tarda en contestar; el 2 contesta al momento.
+      final slow = Completer<void>();
+      addTearDown(() {
+        if (!slow.isCompleted) slow.complete();
+      });
+      store.debugUse(
+        api: ApiService(baseUrl: 'http://servidor.de.prueba'),
+        auth: _FakeAuth(),
+        client: MockClient((request) async {
+          // /api/courses/<id>/overrides
+          final course = request.url.pathSegments[2];
+          if (course == '1') await slow.future;
+          return http.Response(
+            jsonEncode({
+              'items': [
+                {
+                  'scope': 'module',
+                  'target_id': '1',
+                  'content': {'title': 'Del curso $course'},
+                },
+              ],
+            }),
+            200,
+          );
+        }),
+      );
+
+      final first = store.useCourse(1);
+      await Future<void>.delayed(Duration.zero);
+      expect(store.isLoading, isTrue);
+
+      // Se cambia de curso antes de que llegue lo del 1: hay que poder pedir
+      // lo del 2 sin esperar a que termine aquella carga.
+      await store.useCourse(2);
+
+      expect(store.moduleTitle(1, 'Preparación'), 'Del curso 2');
+
+      // Y cuando por fin llega la respuesta del curso 1, no se aplica.
+      slow.complete();
+      await first;
+
+      expect(store.courseId, 2);
+      expect(store.moduleTitle(1, 'Preparación'), 'Del curso 2');
+      expect(store.isLoaded, isTrue);
+      expect(store.isLoading, isFalse);
     });
   });
 

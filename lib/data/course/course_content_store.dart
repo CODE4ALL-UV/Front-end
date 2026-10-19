@@ -54,6 +54,10 @@ class CourseContentStore extends ChangeNotifier {
 
   int? _courseId;
 
+  /// Cuenta las cargas pedidas. Una respuesta que llega cuando ya se pidió
+  /// otra cosa (porque se cambió de curso) no vale y no se aplica.
+  int _request = 0;
+
   /// El curso cuyo temario se está mostrando. Null es el Curso general.
   int? get courseId => _courseId;
 
@@ -63,9 +67,16 @@ class CourseContentStore extends ChangeNotifier {
       : '/api/courses/$_courseId/overrides';
 
   /// Cambia de curso: se olvida lo editado del anterior y se pide lo del nuevo.
+  ///
+  /// Si había una carga en marcha de otro curso se deja de esperar: su
+  /// respuesta será la del anterior, y mientras tanto ya se puede pedir lo del
+  /// nuevo. Si la que está en marcha es la de este mismo curso, se la deja
+  /// terminar en vez de pedirlo dos veces.
   Future<void> useCourse(int? courseId) async {
-    if (courseId == _courseId && _loaded) return;
+    if (courseId == _courseId && (_loaded || _loading)) return;
     _courseId = courseId;
+    _request++;
+    _loading = false;
     _edits.clear();
     _loaded = false;
     _problem = null;
@@ -101,11 +112,14 @@ class CourseContentStore extends ChangeNotifier {
     _loading = true;
     notifyListeners();
 
-    final requested = _courseId;
+    final requested = ++_request;
     try {
       // Los cursos de un docente piden sesión: solo los ven él, sus
       // estudiantes y la coordinación.
-      final token = requested == null ? null : await _auth.getToken();
+      final token = _courseId == null ? null : await _auth.getToken();
+      // Se cambió de curso mientras tanto: esto ya no vale.
+      if (requested != _request) return;
+
       final response = await _client
           .get(
             Uri.parse(_api.buildUrl(_base)),
@@ -116,9 +130,11 @@ class CourseContentStore extends ChangeNotifier {
           )
           .timeout(_timeout);
 
-      if (requested != _courseId) {
-        // Mientras llegaba la respuesta se cambió de curso: esto ya no vale.
-      } else if (response.statusCode != 200) {
+      // Mientras llegaba la respuesta se cambió de curso: es la del anterior,
+      // y la carga del nuevo ya es otra.
+      if (requested != _request) return;
+
+      if (response.statusCode != 200) {
         _problem = 'El servidor respondió ${response.statusCode}.';
       } else {
         _apply(responseText(response));
@@ -126,6 +142,7 @@ class CourseContentStore extends ChangeNotifier {
         _syncedAt = DateTime.now();
       }
     } catch (e) {
+      if (requested != _request) return;
       // Sin servidor se sigue viendo el curso de fábrica, que es justo el
       // motivo de guardar solo los cambios y no el curso entero.
       _problem = 'No se pudo consultar el contenido editado.';
@@ -333,6 +350,8 @@ class CourseContentStore extends ChangeNotifier {
   void debugReset() {
     _edits.clear();
     _courseId = null;
+    // Lo que siga en camino de una prueba anterior no debe aplicarse.
+    _request++;
     _loaded = false;
     _loading = false;
     _problem = null;

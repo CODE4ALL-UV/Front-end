@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:meta/meta.dart'; // <-- 1. Importa esto
 
 import '../models/auth_models.dart';
 import 'api_service.dart';

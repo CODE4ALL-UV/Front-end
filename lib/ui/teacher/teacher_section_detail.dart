@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
@@ -27,10 +28,17 @@ class TeacherSectionDetail extends StatefulWidget {
     super.key,
     required this.moduleNumber,
     required this.sectionNumber,
+    this.onUnsavedChanges,
   });
 
   final int moduleNumber;
   final int sectionNumber;
+
+  /// Avisa cada vez que pasa a haber, o deja de haber, cambios sin guardar.
+  ///
+  /// Lo usa el temario en pantalla ancha: al elegir otra sección este editor
+  /// se rehace, y sin saberlo tiraba lo escrito sin preguntar.
+  final ValueChanged<bool>? onUnsavedChanges;
 
   @override
   State<TeacherSectionDetail> createState() => _TeacherSectionDetailState();
@@ -49,13 +57,14 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   bool _saving = false;
   String? _error;
 
+  /// Lo último que se avisó por [TeacherSectionDetail.onUnsavedChanges].
+  bool _reportedChanges = false;
+
   @override
   void initState() {
     super.initState();
 
-    final section =
-        _content.section(widget.moduleNumber, widget.sectionNumber) ??
-        PythonCourseCatalog.section(widget.moduleNumber, widget.sectionNumber)!;
+    final section = _stored;
 
     _saved = section;
     _draft = section;
@@ -63,14 +72,73 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
     _title = TextEditingController(text: section.title);
     _shortTitle = TextEditingController(text: section.shortTitle ?? '');
     _summary = TextEditingController(text: section.summary);
+
+    _content.addListener(_onContentChanged);
   }
 
   @override
   void dispose() {
+    _content.removeListener(_onContentChanged);
     _title.dispose();
     _shortTitle.dispose();
     _summary.dispose();
     super.dispose();
+  }
+
+  /// La sección tal y como está guardada: la de fábrica con lo editado encima.
+  CourseSection get _stored =>
+      _content.section(widget.moduleNumber, widget.sectionNumber) ??
+      PythonCourseCatalog.section(widget.moduleNumber, widget.sectionNumber)!;
+
+  /// Lo editado puede llegar del servidor después de abrir la sección.
+  ///
+  /// Antes la sección se tomaba una sola vez al abrir: si en ese momento aún
+  /// no había llegado lo guardado, el editor enseñaba la versión de fábrica y
+  /// «Guardar» la escribía encima de lo que el docente ya tenía. Si hay
+  /// cambios sin guardar no se toca nada: manda lo que está escribiendo.
+  void _onContentChanged() {
+    if (!mounted || _saving || _hasChanges) return;
+
+    final section = _stored;
+    _changed(() {
+      _saved = section;
+      _draft = section;
+      _setText(_title, section.title);
+      _setText(_shortTitle, section.shortTitle ?? '');
+      _setText(_summary, section.summary);
+    });
+  }
+
+  /// Sin tocar el campo si ya dice lo mismo: reescribirlo movería el cursor.
+  static void _setText(TextEditingController controller, String text) {
+    if (controller.text != text) controller.text = text;
+  }
+
+  /// Redibuja y avisa si cambió que haya o no cambios sin guardar.
+  void _changed([VoidCallback? apply]) {
+    setState(apply ?? () {});
+
+    final changed = _hasChanges;
+    if (changed == _reportedChanges) return;
+    _reportedChanges = changed;
+    widget.onUnsavedChanges?.call(changed);
+  }
+
+  /// Salir con cambios sin guardar los tiraba sin avisar: con la flecha de
+  /// atrás, con el gesto del sistema o volviendo a la lista de cursos.
+  Future<void> _confirmLeave(bool didPop) async {
+    if (didPop) return;
+
+    final navigator = Navigator.of(context);
+    if (!await confirmDiscardChanges(context) || !mounted) return;
+
+    // `pop` no vuelve a preguntar: ya se dijo que sí.
+    if (navigator.canPop()) {
+      navigator.pop();
+    } else {
+      // Era la primera pantalla: atrás cerraba la aplicación.
+      await SystemNavigator.pop();
+    }
   }
 
   /// Recoge lo escrito en los campos sueltos al borrador.
@@ -99,7 +167,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
   }
 
   void _update(CourseSection next) {
-    setState(() {
+    _changed(() {
       _draft = next;
       _error = null;
     });
@@ -116,7 +184,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       await _content.saveSection(section);
       if (!mounted) return;
 
-      setState(() {
+      _changed(() {
         _saved = section;
         _draft = section;
         _saving = false;
@@ -157,7 +225,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
       await _content.revertSection(original.id);
       if (!mounted) return;
 
-      setState(() {
+      _changed(() {
         _saved = original;
         _draft = original;
         _title.text = original.title;
@@ -201,6 +269,8 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
             sections: module.sections,
           ),
           section: _current,
+          // Lo que el docente haga aquí no cuenta como de un estudiante.
+          preview: true,
         ),
       ),
     );
@@ -216,53 +286,57 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
     final section = _current;
     final edited = _content.isSectionEdited(section.id);
 
-    return Column(
-      children: [
-        Expanded(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                padding: AppMetrics.pagePadding(constraints.maxWidth),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: AppMetrics.maxContentWidth,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _header(edited),
-                        const SizedBox(height: AppMetrics.gap),
-                        _identityCard(),
-                        const SizedBox(height: AppMetrics.sectionGap),
-                        Text(
-                          'Actividades',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: appColorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: AppMetrics.gap),
-                        ..._activityCards(section),
-                        if (_error != null) ...[
+    return PopScope(
+      canPop: !_hasChanges,
+      onPopInvokedWithResult: (didPop, _) => _confirmLeave(didPop),
+      child: Column(
+        children: [
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: AppMetrics.pagePadding(constraints.maxWidth),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: AppMetrics.maxContentWidth,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _header(edited),
                           const SizedBox(height: AppMetrics.gap),
-                          TeacherBanner(
-                            icon: Icons.error_outline,
-                            text: _error!,
+                          _identityCard(),
+                          const SizedBox(height: AppMetrics.sectionGap),
+                          Text(
+                            'Actividades',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: appColorScheme.onSurface,
+                            ),
                           ),
+                          const SizedBox(height: AppMetrics.gap),
+                          ..._activityCards(section),
+                          if (_error != null) ...[
+                            const SizedBox(height: AppMetrics.gap),
+                            TeacherBanner(
+                              icon: Icons.error_outline,
+                              text: _error!,
+                            ),
+                          ],
+                          const SizedBox(height: 90),
                         ],
-                        const SizedBox(height: 90),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
-        _saveBar(edited),
-      ],
+          _saveBar(edited),
+        ],
+      ),
     );
   }
 
@@ -338,7 +412,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
           TeacherField(
             label: 'Título de la sección',
             controller: _title,
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => _changed(),
           ),
           const SizedBox(height: AppMetrics.gap),
           TeacherField(
@@ -348,7 +422,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
             helper:
                 'Es el que aparece en la tarjeta del mapa. Un título largo se '
                 'encoge hasta volverse ilegible.',
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => _changed(),
           ),
           const SizedBox(height: AppMetrics.gap),
           TeacherField(
@@ -356,7 +430,7 @@ class _TeacherSectionDetailState extends State<TeacherSectionDetail> {
             controller: _summary,
             maxLines: 3,
             helper: 'Lo que el estudiante lee antes de entrar.',
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => _changed(),
           ),
         ],
       ),

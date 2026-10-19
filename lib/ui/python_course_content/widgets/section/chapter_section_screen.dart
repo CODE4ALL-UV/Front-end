@@ -5,6 +5,7 @@ import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart'
 import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
+import 'package:flutter_code4all/data/services/learning_analytics_service.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/ui/help_action_button_widget.dart';
 import 'section_activity_launcher.dart';
@@ -22,6 +23,7 @@ class ChapterSectionScreen extends StatefulWidget {
     this.onPreviousChapter,
     this.onNextChapter,
     this.trailingAction,
+    this.preview = false,
   });
 
   final CourseModule module;
@@ -33,33 +35,61 @@ class ChapterSectionScreen extends StatefulWidget {
   /// Acción extra en la cabecera, por ejemplo el lápiz de edición docente.
   final Widget? trailingAction;
 
+  /// Es la vista previa del docente («Ver como estudiante»).
+  ///
+  /// Mientras esté abierta, nada de lo que se haga en ella ni en sus
+  /// actividades llega a las estadísticas del curso.
+  final bool preview;
+
   @override
   State<ChapterSectionScreen> createState() => _ChapterSectionScreenState();
 }
 
 class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
   final CourseProgressStore _progress = CourseProgressStore.instance;
+  final LearningPreferences _preferences = LearningPreferences.instance;
   final ScrollController _scrollController = ScrollController();
 
-  late final List<CourseActivityKind> _activities;
+  late List<CourseActivityKind> _activities;
 
   @override
   void initState() {
     super.initState();
+    if (widget.preview) LearningAnalyticsService.beginPreview();
     _activities = SectionActivityLauncher.activitiesFor(widget.section);
     _progress.addListener(_onProgressChanged);
+    _preferences.addListener(_onPreferencesChanged);
     _progress.load();
   }
 
   @override
+  void didUpdateWidget(ChapterSectionScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // La sección puede llegar de nuevo con lo que editó el docente.
+    _activities = SectionActivityLauncher.activitiesFor(widget.section);
+  }
+
+  @override
   void dispose() {
+    if (widget.preview) LearningAnalyticsService.endPreview();
     _progress.removeListener(_onProgressChanged);
+    _preferences.removeListener(_onPreferencesChanged);
     _scrollController.dispose();
     super.dispose();
   }
 
   void _onProgressChanged() {
     if (mounted) setState(() {});
+  }
+
+  /// La preferencia de contenido cambia el orden de la ruta y el nivel decide
+  /// si se ven los objetivos. Se cambian desde el menú de ayuda de esta misma
+  /// pantalla, así que tienen que notarse sin salir y volver a entrar.
+  void _onPreferencesChanged() {
+    if (!mounted) return;
+    setState(() {
+      _activities = SectionActivityLauncher.activitiesFor(widget.section);
+    });
   }
 
   int get _completedCount =>
@@ -189,7 +219,7 @@ class _ChapterSectionScreenState extends State<ChapterSectionScreen> {
           // ruta de actividades. En básico y medio se ven, y medio es el nivel
           // de partida: un ajuste que nadie ha tocado no cambia lo que se ve.
           if (widget.section.objectives.isNotEmpty &&
-              !LearningPreferences.instance.hidesScaffolding) ...[
+              !_preferences.hidesScaffolding) ...[
             const SizedBox(height: 18),
             Text(
               'Objetivos de la sección',

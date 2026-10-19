@@ -148,6 +148,50 @@ void main() {
       },
     );
 
+    test('en la vista previa del docente no se manda nada', () async {
+      when(() => mockAuth.getToken()).thenAnswer((_) async => 'token123');
+      final sent = <http.Request>[];
+      final service = LearningAnalyticsService(
+        api: mockApi,
+        auth: mockAuth,
+        client: MockClient((request) async {
+          sent.add(request);
+          return http.Response('', 201);
+        }),
+      );
+      addTearDown(LearningAnalyticsService.endPreview);
+
+      LearningAnalyticsService.beginPreview();
+      expect(LearningAnalyticsService.isPreviewing, isTrue);
+
+      final attempt = await service.recordAttempt(
+        sectionId: 'sec1',
+        kind: CourseActivityKind.quiz,
+        prompts: ['P1'],
+        results: [true],
+      );
+      final completion = await service.recordCompletion(
+        sectionId: 'sec1',
+        kind: CourseActivityKind.lectura,
+      );
+
+      expect(attempt, isFalse);
+      expect(completion, isFalse);
+      expect(sent, isEmpty);
+
+      // Al cerrar la vista previa todo vuelve a contar.
+      LearningAnalyticsService.endPreview();
+      expect(LearningAnalyticsService.isPreviewing, isFalse);
+      expect(
+        await service.recordCompletion(
+          sectionId: 'sec1',
+          kind: CourseActivityKind.lectura,
+        ),
+        isTrue,
+      );
+      expect(sent, hasLength(1));
+    });
+
     test(
       'recordCompletion envía datos correctamente y retorna true (200 OK)',
       () async {

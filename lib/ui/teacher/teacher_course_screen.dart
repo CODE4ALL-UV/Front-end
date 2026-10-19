@@ -53,6 +53,10 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
   int _moduleNumber = 1;
   int _sectionNumber = 1;
 
+  /// Si la sección abierta al lado, en pantalla ancha, tiene cambios sin
+  /// guardar.
+  bool _sectionHasChanges = false;
+
   @override
   void initState() {
     super.initState();
@@ -71,11 +75,25 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
     if (mounted) setState(() {});
   }
 
-  void _select(int moduleNumber, int sectionNumber, {required bool isWide}) {
+  Future<void> _select(
+    int moduleNumber,
+    int sectionNumber, {
+    required bool isWide,
+  }) async {
+    final sameSection =
+        moduleNumber == _moduleNumber && sectionNumber == _sectionNumber;
+
+    // En pantalla ancha elegir otra sección rehace el editor de al lado, y
+    // lo escrito sin guardar se perdía sin aviso.
+    if (isWide && !sameSection && _sectionHasChanges) {
+      if (!await confirmDiscardChanges(context) || !mounted) return;
+    }
+
     final appColorScheme = context.colorScheme;
     setState(() {
       _moduleNumber = moduleNumber;
       _sectionNumber = sectionNumber;
+      if (!sameSection) _sectionHasChanges = false;
     });
 
     if (!isWide) {
@@ -243,6 +261,9 @@ class _TeacherCourseScreenState extends State<TeacherCourseScreen>
                       key: ValueKey('$_moduleNumber-$_sectionNumber'),
                       moduleNumber: _moduleNumber,
                       sectionNumber: _sectionNumber,
+                      // Solo se apunta: no cambia nada de lo que se ve aquí.
+                      onUnsavedChanges: (changed) =>
+                          _sectionHasChanges = changed,
                     ),
                   ),
                 ],
@@ -307,15 +328,17 @@ class _ModuleTree extends StatelessWidget {
           startsExpanded: module.number == selectedModule,
           child: Column(
             children: [
-              for (final section in module.sections)
+              // Con lo editado encima: el título que puso el docente y
+              // cuántas preguntas o videos le quedan de verdad.
+              for (final base in module.sections)
                 _SectionRow(
-                  section: section,
-                  edited: content.isSectionEdited(section.id),
+                  section: content.section(module.number, base.number) ?? base,
+                  edited: content.isSectionEdited(base.id),
                   selected:
                       highlightSelection &&
                       module.number == selectedModule &&
-                      section.number == selectedSection,
-                  onTap: () => onSelect(module.number, section.number),
+                      base.number == selectedSection,
+                  onTap: () => onSelect(module.number, base.number),
                 ),
             ],
           ),

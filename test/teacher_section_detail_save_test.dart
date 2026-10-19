@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -9,6 +11,8 @@ import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
+import 'package:flutter_code4all/data/services/course_progress_store.dart';
+import 'package:flutter_code4all/data/services/learning_analytics_service.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/chapter_section_screen.dart';
 import 'package:flutter_code4all/ui/teacher/teacher_section_detail.dart';
 
@@ -240,6 +244,58 @@ void main() {
     );
   });
 
+  group('lo guardado que llega después de abrir la sección', () {
+    testWidgets('se ve en el editor y «Guardar» no lo pisa con lo de fábrica', (
+      tester,
+    ) async {
+      await mount(tester);
+      expect(titleText(tester), original.title);
+
+      // Lo que el docente ya tenía guardado llega cuando el editor ya está
+      // abierto, como pasa al entrar con la red lenta.
+      store.debugSeed({
+        CourseContentStore.sectionKey(original.id): {
+          'title': 'Versión del profe',
+          'summary': 'Resumen del profe',
+        },
+      });
+      await tester.pumpAndSettle();
+
+      expect(titleText(tester), 'Versión del profe');
+      expect(find.text('Editada'), findsOneWidget);
+      expect(find.text('Tienes cambios sin guardar'), findsNothing);
+
+      await tester.enterText(find.byType(TextField).at(1), 'Primeros pasos');
+      await tester.pumpAndSettle();
+      await tapSave(tester);
+
+      final put = sent.singleWhere((r) => r.method == 'PUT');
+      final content = jsonDecode(put.body)['content'] as Map;
+      expect(content['title'], 'Versión del profe');
+      expect(content['summary'], 'Resumen del profe');
+      expect(content['shortTitle'], 'Primeros pasos');
+    });
+
+    testWidgets('si ya hay cambios sin guardar, lo escrito no se toca', (
+      tester,
+    ) async {
+      await mount(tester);
+
+      await tester.enterText(titleField(), 'Lo que estoy escribiendo');
+      await tester.pumpAndSettle();
+
+      store.debugSeed({
+        CourseContentStore.sectionKey(original.id): {
+          'title': 'Versión del profe',
+        },
+      });
+      await tester.pumpAndSettle();
+
+      expect(titleText(tester), 'Lo que estoy escribiendo');
+      expect(find.text('Tienes cambios sin guardar'), findsOneWidget);
+    });
+  });
+
   group('volver a la versión original', () {
     void seedEdited() {
       store.debugSeed({
@@ -355,6 +411,86 @@ void main() {
       expect(preview.module.title, 'Primeros pasos del profe');
       // Previsualizar no guarda nada.
       expect(sent, isEmpty);
+    });
+
+    group('lo que se hace dentro', () {
+      const ttsChannel = MethodChannel('flutter_tts');
+      final progress = CourseProgressStore.instance;
+      late List<http.Request> reported;
+
+      setUp(() {
+        FlutterSecureStorage.setMockInitialValues({});
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(ttsChannel, (call) async => 1);
+
+        // Igual que en la aplicación: cada actividad terminada se avisa al
+        // servicio de estadísticas, aquí con un servidor que lo apunta todo.
+        reported = [];
+        final analytics = LearningAnalyticsService(
+          api: ApiService(baseUrl: 'http://servidor.de.prueba'),
+          auth: _FakeAuth(),
+          client: MockClient((request) async {
+            reported.add(request);
+            return http.Response('', 201);
+          }),
+        );
+        progress.reportCompletionsTo(
+          (sectionId, kind) =>
+              analytics.recordCompletion(sectionId: sectionId, kind: kind),
+        );
+      });
+
+      tearDown(() async {
+        progress.reportCompletionsTo(null);
+        await progress.resetSection(original.id, CourseActivityKind.values);
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(ttsChannel, null);
+      });
+
+      Future<void> completeCapsule(WidgetTester tester) async {
+        final capsule = find.textContaining('Cápsula de conocimiento').first;
+        await tester.ensureVisible(capsule);
+        await tester.pumpAndSettle();
+        await tester.tap(capsule);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Entendido, marcar como vista'));
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('no cuenta en las estadísticas del curso', (tester) async {
+        await mount(tester);
+
+        await tester.tap(find.text('Ver como estudiante'));
+        await tester.pumpAndSettle();
+        await completeCapsule(tester);
+
+        // En la vista previa se ve como hecha, igual que la vería el
+        // estudiante, pero no viaja nada: no la terminó ningún estudiante.
+        expect(find.byType(ChapterSectionScreen), findsOneWidget);
+        expect(find.text('Hecho'), findsOneWidget);
+        expect(reported, isEmpty);
+      });
+
+      testWidgets('lo del estudiante sí cuenta', (tester) async {
+        tester.view.physicalSize = const Size(800, 1600);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ChapterSectionScreen(
+              module: PythonCourseCatalog.moduleByNumber(1)!,
+              section: original,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await completeCapsule(tester);
+
+        final completion = reported.single;
+        expect(completion.url.path, '/api/analytics/completions');
+        expect(jsonDecode(completion.body)['activity'], 'capsula');
+      });
     });
   });
 }

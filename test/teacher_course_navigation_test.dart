@@ -235,6 +235,29 @@ void main() {
       );
     });
 
+    testWidgets('cada sección enseña lo que editó el docente', (tester) async {
+      serve(
+        items: [
+          {
+            'scope': 'section',
+            'target_id': 'm1-s1',
+            'content': {'title': 'Hola, Python', 'videos': <Object>[]},
+          },
+        ],
+      );
+      await mount(tester);
+
+      expect(find.text('Hola, Python'), findsOneWidget);
+      // Sin el video que quitó, y con su título nuevo también por voz.
+      expect(
+        find.bySemanticsLabel(
+          'Sección 1, Hola, Python. 4 páginas, 6 preguntas, '
+          'Cápsula, Ejemplo, Ejercicio, Laboratorio. Con cambios tuyos.',
+        ),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('cada sección dice qué contiene y cuánto', (tester) async {
       serve();
       await mount(tester);
@@ -314,6 +337,81 @@ void main() {
             .moduleNumber,
         2,
       );
+    });
+  });
+
+  group('salir con cambios sin guardar', () {
+    String titleText(WidgetTester tester) =>
+        tester.widget<TextField>(find.byType(TextField).first).controller!.text;
+
+    testWidgets('en pantalla estrecha la flecha de atrás pide confirmar', (
+      tester,
+    ) async {
+      serve();
+      await mount(tester);
+
+      await tester.tap(find.text('Conociendo Python'));
+      await settle(tester);
+
+      // Sin cambios se vuelve sin preguntar nada.
+      await tester.tap(find.byTooltip('Volver'));
+      await settle(tester);
+      expect(find.byType(TeacherSectionDetail), findsNothing);
+      expect(find.text('¿Salir sin guardar?'), findsNothing);
+
+      await tester.tap(find.text('Conociendo Python'));
+      await settle(tester);
+      await tester.enterText(find.byType(TextField).first, 'Mi borrador');
+      await settle(tester);
+
+      await tester.tap(find.byTooltip('Volver'));
+      await settle(tester);
+      expect(find.text('¿Salir sin guardar?'), findsOneWidget);
+
+      await tester.tap(find.text('Seguir editando'));
+      await settle(tester);
+      expect(find.byType(TeacherSectionDetail), findsOneWidget);
+      expect(titleText(tester), 'Mi borrador');
+
+      await tester.tap(find.byTooltip('Volver'));
+      await settle(tester);
+      await tester.tap(find.text('Salir sin guardar'));
+      await settle(tester);
+      expect(find.byType(TeacherSectionDetail), findsNothing);
+      expect(find.text('Preparación'), findsOneWidget);
+    });
+
+    testWidgets('en pantalla ancha cambiar de sección pide confirmar', (
+      tester,
+    ) async {
+      serve();
+      await mount(tester, width: 1300);
+
+      await tester.enterText(find.byType(TextField).first, 'Mi borrador');
+      await settle(tester);
+
+      await tester.tap(find.text('Fundamentos de Python'));
+      await settle(tester);
+      await tester.tap(find.text('Sintaxis').first);
+      await settle(tester);
+      expect(find.text('¿Salir sin guardar?'), findsOneWidget);
+
+      await tester.tap(find.text('Seguir editando'));
+      await settle(tester);
+      expect(find.text('Módulo 1 · Sección 1'), findsOneWidget);
+      expect(titleText(tester), 'Mi borrador');
+
+      await tester.tap(find.text('Sintaxis').first);
+      await settle(tester);
+      await tester.tap(find.text('Salir sin guardar'));
+      await settle(tester);
+      expect(find.text('Módulo 2 · Sección 1'), findsOneWidget);
+
+      // La sección nueva empieza limpia: elegir otra no vuelve a preguntar.
+      await tester.tap(find.text('Conociendo Python'));
+      await settle(tester);
+      expect(find.text('¿Salir sin guardar?'), findsNothing);
+      expect(find.text('Módulo 1 · Sección 1'), findsOneWidget);
     });
   });
 

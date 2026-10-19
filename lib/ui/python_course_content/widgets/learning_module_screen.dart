@@ -33,6 +33,13 @@ class LearningModuleScreen extends StatefulWidget {
   // NUEVO: Añadimos un callback para avisarle a app.dart que cambiamos de módulo
   final ValueChanged<int>? onModuleChanged;
 
+  /// Si esta pantalla se abrió desde la del módulo anterior, que sigue debajo.
+  ///
+  /// Entonces volver a ese módulo es cerrar esta pantalla, no abrir otra
+  /// encima: ir y volver unas cuantas veces apilaba una copia de cada módulo,
+  /// y la flecha de atrás había que pulsarla otras tantas.
+  final bool openedFromPrevious;
+
   const LearningModuleScreen({
     super.key,
     this.moduleId = 1,
@@ -41,6 +48,7 @@ class LearningModuleScreen extends StatefulWidget {
     this.onLogout,
     this.bottomLabels,
     this.onModuleChanged, // NUEVO
+    this.openedFromPrevious = false,
   });
 
   @override
@@ -83,7 +91,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
 
   String get _dactylologyText {
     final sectionTitles = List.generate(3, (index) {
-      final section = PythonCourseCatalog.section(widget.moduleId, index + 1);
+      final section = _content.section(widget.moduleId, index + 1);
       return section?.boxTitle ?? 'Sección ${index + 1}';
     });
     return '$_moduleTitle. ${sectionTitles.join('. ')}.';
@@ -276,6 +284,7 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
           bottomLabels: widget.bottomLabels,
           onModuleChanged: widget
               .onModuleChanged, // NUEVO: Pasamos el callback a la siguiente pantalla
+          openedFromPrevious: true,
         ),
       ),
     ).then((_) {
@@ -293,6 +302,15 @@ class _LearningModuleScreenState extends State<LearningModuleScreen> {
     _isNavigating = true;
     _stopSpeechBeforeLeaving();
 
+    // El módulo anterior está justo debajo: se vuelve a él. Al cerrarse esta
+    // pantalla, la de abajo avisa ella misma de que vuelve a ser la activa.
+    if (widget.openedFromPrevious) {
+      Navigator.pop(context);
+      return;
+    }
+
+    // Solo si se entró directamente a este módulo no hay nada debajo a lo
+    // que volver, y hay que abrir el anterior.
     Navigator.push(
       context,
       MaterialPageRoute(

@@ -53,7 +53,9 @@ class GlobalAppBarWidget extends StatelessWidget
       // 2. Si la pantalla fue "empujada" (push) sobre otra, muestra la flecha de atrás
       if (Navigator.canPop(context)) {
         return IconButton(
-          onPressed: () => Navigator.pop(context),
+          // `maybePop` y no `pop`: así una pantalla que pide confirmar antes
+          // de salir (un editor con cambios sin guardar) puede hacerlo.
+          onPressed: () => Navigator.maybePop(context),
           icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
           tooltip: 'Volver',
         );

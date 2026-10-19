@@ -350,8 +350,9 @@ class CourseSection {
 
   /// Título tal y como se muestra en la tarjeta de la portada del módulo.
   ///
-  /// Siempre sale del catálogo, nunca del backend: así el título que ve el
-  /// estudiante y el contenido que abre no pueden desincronizarse.
+  /// La tarjeta lo toma de la misma sección que abre —la de fábrica con lo
+  /// editado por el docente encima—: así el título que ve el estudiante y el
+  /// contenido que abre no pueden desincronizarse.
   String get boxTitle => shortTitle ?? title;
 
   /// `true` cuando la sección todavía no tiene material cargado.

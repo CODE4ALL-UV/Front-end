@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_code4all/data/course/python_course_catalog.dart';
+import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/circle_progress_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/lesson_box_widget.dart';
@@ -87,8 +87,12 @@ class ModuleRowWidget extends StatelessWidget {
 
         final boxWidget = LessonBoxWidget(
           number: sectionNumber,
+          // Con el título corto que haya puesto el docente: es justo el que
+          // existe para esta tarjeta.
           title:
-              PythonCourseCatalog.section(moduleId, sectionNumber)?.boxTitle ??
+              CourseContentStore.instance
+                  .section(moduleId, sectionNumber)
+                  ?.boxTitle ??
               'Sección $sectionNumber',
           onTap: navigateToSection,
           backgroundColor: appModuleTheme.lessonCardBackground,

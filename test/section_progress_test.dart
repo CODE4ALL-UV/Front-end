@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_activity_launcher.dart';
@@ -117,6 +118,43 @@ void main() {
     test('dos secciones distintas no suenan igual', () {
       expect(sectionProgressLabel(2, 1), isNot(sectionProgressLabel(2, 2)));
     });
+  });
+
+  group('con lo que editó el docente', () {
+    tearDown(() async {
+      CourseContentStore.instance.debugReset();
+      await reset(1, 1);
+    });
+
+    test(
+      'cuenta las actividades que quedan y dice el título corto nuevo',
+      () async {
+        await reset(1, 1);
+        // El docente quitó el video y el laboratorio y le puso título corto.
+        CourseContentStore.instance.debugSeed({
+          CourseContentStore.sectionKey(idOf(1, 1)): {
+            'shortTitle': 'Hola, Python',
+            'videos': <Object>[],
+            'hasLaboratory': false,
+          },
+        });
+        final remaining = SectionActivityLauncher.activitiesFor(
+          CourseContentStore.instance.section(1, 1)!,
+        );
+        expect(remaining.length, activitiesOf(1, 1).length - 2);
+
+        await store.markCompleted(idOf(1, 1), CourseActivityKind.lectura);
+
+        expect(sectionProgress(1, 1), closeTo(1 / remaining.length, 0.0001));
+        expect(
+          sectionProgressLabel(1, 1),
+          startsWith(
+            'Sección 1, Hola, Python. 1 de ${remaining.length} actividades '
+            'completadas',
+          ),
+        );
+      },
+    );
   });
 
   group('la circunferencia se entera sola', () {

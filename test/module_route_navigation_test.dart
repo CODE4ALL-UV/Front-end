@@ -142,6 +142,42 @@ void main() {
       expect(changes, [5, 6, 5]);
     });
 
+    testWidgets('ir y volver no apila una copia de cada módulo', (
+      tester,
+    ) async {
+      phone(tester);
+      final changes = <int>[];
+
+      await tester.pumpWidget(
+        host(LearningModuleScreen(moduleId: 1, onModuleChanged: changes.add)),
+      );
+      await tester.pumpAndSettle();
+
+      for (var i = 0; i < 3; i++) {
+        await tester.tap(find.text('Desliza hacia arriba para ir al Módulo 2'));
+        await tester.pumpAndSettle();
+        expect(find.text(titleOf(2)), findsOneWidget);
+
+        await tester.tap(
+          find.text('Desliza hacia abajo para volver al Módulo 1'),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text(titleOf(1)), findsOneWidget);
+      }
+
+      // Se volvió al módulo 1 de verdad: debajo no queda nada.
+      expect(
+        find.byType(LearningModuleScreen, skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(
+        Navigator.of(tester.element(find.text(titleOf(1)))).canPop(),
+        isFalse,
+      );
+      // Y la paleta siguió al módulo en cada paso.
+      expect(changes, [1, 2, 1, 2, 1, 2, 1]);
+    });
+
     testWidgets('deslizar hacia abajo desde arriba vuelve al módulo anterior', (
       tester,
     ) async {
@@ -242,6 +278,39 @@ void main() {
       expect(chapter.moduleId, 1);
       expect(chapter.sectionNumber, 2);
       expect(find.text(section.displayTitle), findsOneWidget);
+    });
+
+    testWidgets('la tarjeta lleva el título corto que puso el docente', (
+      tester,
+    ) async {
+      phone(tester);
+      content.debugUse(
+        api: ApiService(baseUrl: 'http://servidor.de.prueba'),
+        client: MockClient(
+          (request) async => http.Response(
+            jsonEncode({
+              'version': '',
+              'count': 1,
+              'items': [
+                {
+                  'scope': 'section',
+                  'target_id': PythonCourseCatalog.section(1, 2)!.id,
+                  'content': {'shortTitle': 'Variables al vuelo'},
+                },
+              ],
+            }),
+            200,
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(host(const LearningModuleScreen(moduleId: 1)));
+      await tester.pumpAndSettle();
+
+      final box = find.byWidgetPredicate(
+        (w) => w is LessonBoxWidget && w.number == 2,
+      );
+      expect(tester.widget<LessonBoxWidget>(box).title, 'Variables al vuelo');
     });
 
     testWidgets('con apoyo en señas se puede deletrear la portada', (

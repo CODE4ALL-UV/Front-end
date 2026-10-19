@@ -8,6 +8,7 @@ import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/chapter_section_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/dactylology_floating_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_activity_scaffold.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_quiz_screen.dart';
@@ -340,6 +341,39 @@ void main() {
       await pumpQuiz(tester, const [withExplanation]);
 
       expect(find.text('Ver una pista'), findsNothing);
+    });
+  });
+
+  group('la pantalla de la sección', () {
+    testWidgets('cambia la ruta y los objetivos sin salir de ella', (
+      tester,
+    ) async {
+      bigScreen(tester);
+      addTearDown(() => prefs.setLevel(LearningLevel.medium));
+      final section = PythonCourseCatalog.section(1, 1)!;
+      expect(section.objectives, isNotEmpty);
+
+      await tester.pumpWidget(
+        app(
+          ChapterSectionScreen(
+            module: PythonCourseCatalog.moduleByNumber(1)!,
+            section: section,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Paso 1 · Lectura'), findsOneWidget);
+      expect(find.text('Objetivos de la sección'), findsOneWidget);
+
+      // Se cambian desde el menú de ayuda, con la sección abierta.
+      await prefs.setContentPreference(ContentPreference.videos);
+      await prefs.setLevel(LearningLevel.advanced);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Paso 1 · Video'), findsOneWidget);
+      expect(find.text('Paso 1 · Lectura'), findsNothing);
+      expect(find.text('Objetivos de la sección'), findsNothing);
     });
   });
 }

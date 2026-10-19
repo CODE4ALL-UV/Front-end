@@ -1,4 +1,4 @@
-import 'package:flutter_code4all/data/course/python_course_catalog.dart';
+import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/services/course_progress_store.dart';
 
 import 'section_activity_launcher.dart';
@@ -17,8 +17,14 @@ import 'section_activity_launcher.dart';
 ///
 /// Devuelve 0 si la sección todavía no tiene contenido, en lugar de fingir un
 /// avance sobre algo que no se puede hacer.
+///
+/// La sección es la que ve el estudiante, con lo que editó el docente: si
+/// quitó el video, el mapa no puede seguir esperando a que se vea.
 double sectionProgress(int moduleNumber, int sectionNumber) {
-  final section = PythonCourseCatalog.section(moduleNumber, sectionNumber);
+  final section = CourseContentStore.instance.section(
+    moduleNumber,
+    sectionNumber,
+  );
   if (section == null) return 0;
 
   final activities = SectionActivityLauncher.activitiesFor(section);
@@ -37,7 +43,10 @@ double sectionProgress(int moduleNumber, int sectionNumber) {
 /// —«Lección con 33% de progreso»— y quien navega por voz no sabe cuál está
 /// tocando. Con el número y el título de la sección sí.
 String sectionProgressLabel(int moduleNumber, int sectionNumber) {
-  final section = PythonCourseCatalog.section(moduleNumber, sectionNumber);
+  final section = CourseContentStore.instance.section(
+    moduleNumber,
+    sectionNumber,
+  );
   final percentage = (sectionProgress(moduleNumber, sectionNumber) * 100)
       .round();
 

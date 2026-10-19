@@ -243,6 +243,32 @@ Future<bool> confirmDelete(
   BuildContext context, {
   required String what,
   String? detail,
+}) => _confirmLoss(
+  context,
+  title: '¿Borrar $what?',
+  body: detail ?? 'Esto no se puede deshacer una vez guardes la sección.',
+  keepLabel: 'Cancelar',
+  loseLabel: 'Borrar',
+);
+
+/// Pide confirmación antes de salir de una sección con cambios sin guardar.
+Future<bool> confirmDiscardChanges(BuildContext context) => _confirmLoss(
+  context,
+  title: '¿Salir sin guardar?',
+  body:
+      'Tienes cambios sin guardar en esta sección. Si sales ahora se pierden '
+      'y el estudiante seguirá viendo lo de antes.',
+  keepLabel: 'Seguir editando',
+  loseLabel: 'Salir sin guardar',
+);
+
+/// El diálogo de las dos de arriba: quedarse, o perder lo escrito.
+Future<bool> _confirmLoss(
+  BuildContext context, {
+  required String title,
+  required String body,
+  required String keepLabel,
+  required String loseLabel,
 }) async {
   final appColorScheme = context.colorScheme;
 
@@ -250,18 +276,15 @@ Future<bool> confirmDelete(
     context: context,
     builder: (context) => AlertDialog(
       backgroundColor: appColorScheme.surface,
-      title: Text(
-        '¿Borrar $what?',
-        style: TextStyle(color: appColorScheme.onSurface),
-      ),
+      title: Text(title, style: TextStyle(color: appColorScheme.onSurface)),
       content: Text(
-        detail ?? 'Esto no se puede deshacer una vez guardes la sección.',
+        body,
         style: TextStyle(color: appColorScheme.onSurface, height: 1.4),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Cancelar'),
+          child: Text(keepLabel),
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
@@ -269,7 +292,7 @@ Future<bool> confirmDelete(
             backgroundColor: appColorScheme.error,
             foregroundColor: appColorScheme.onError,
           ),
-          child: const Text('Borrar'),
+          child: Text(loseLabel),
         ),
       ],
     ),

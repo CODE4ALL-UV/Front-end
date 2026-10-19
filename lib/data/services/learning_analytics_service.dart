@@ -39,6 +39,23 @@ class LearningAnalyticsService {
   /// no debe hacerle esperar.
   static const Duration timeout = Duration(seconds: 6);
 
+  /// Cuántas vistas previas del docente («Ver como estudiante») hay abiertas.
+  static int _previews = 0;
+
+  /// Si ahora mismo se está en la vista previa del docente.
+  ///
+  /// Lo que se hace ahí no lo hizo ningún estudiante: contarlo llenaba las
+  /// estadísticas del curso con las pruebas del docente. Mientras dure no se
+  /// manda nada, ni respuestas ni actividades terminadas.
+  static bool get isPreviewing => _previews > 0;
+
+  /// La pantalla de la vista previa avisa al abrirse y al cerrarse.
+  static void beginPreview() => _previews++;
+
+  static void endPreview() {
+    if (_previews > 0) _previews--;
+  }
+
   /// Qué nombre tiene cada actividad para el servidor.
   static String? activityName(CourseActivityKind kind) => switch (kind) {
     CourseActivityKind.quiz => 'quiz',
@@ -64,7 +81,7 @@ class LearningAnalyticsService {
     List<int?> elapsedMs = const [],
   }) async {
     final activity = activityName(kind);
-    if (activity == null || results.isEmpty) return false;
+    if (activity == null || results.isEmpty || isPreviewing) return false;
 
     try {
       final token = await _auth.getToken();
@@ -119,6 +136,8 @@ class LearningAnalyticsService {
     required String sectionId,
     required CourseActivityKind kind,
   }) async {
+    if (isPreviewing) return false;
+
     try {
       final token = await _auth.getToken();
       if (token == null || token.isEmpty) return false;

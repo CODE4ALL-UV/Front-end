@@ -710,4 +710,57 @@ void main() {
       await dismissToast(tester);
     });
   });
+
+  group('tamaño y sitio del panel', () {
+    testWidgets('cada panel mide lo que su contenido, sin hueco al final', (
+      tester,
+    ) async {
+      await pumpMenu(tester);
+
+      await openPanel(
+        tester,
+        category: Icons.volunteer_activism,
+        option: Icons.saved_search,
+      );
+      final hints = tester.getRect(optionPanel());
+      // Antes todos medían lo mismo (hasta 520 px): a «Pistas», con un solo
+      // botón, le sobraba media tarjeta en blanco.
+      expect(hints.height, lessThan(300));
+
+      await tester.tap(panelCloseButton());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.help));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.brightness_4));
+      await tester.pumpAndSettle();
+
+      // «Modo visual» trae mucho más y por eso es más alto.
+      expect(tester.getRect(optionPanel()).height, greaterThan(hints.height));
+    });
+
+    testWidgets('el panel no tapa la fila de categorías ni se sale', (
+      tester,
+    ) async {
+      // Bajo, para que el panel más largo no quepa entero.
+      await pumpMenu(tester, size: const Size(1200, 600));
+      await openPanel(tester, category: Icons.help, option: Icons.brightness_4);
+
+      final panel = tester.getRect(optionPanel());
+      // La X grande del menú, en la misma fila que las categorías.
+      final row = tester.getRect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Icon && widget.icon == Icons.close && widget.size != 22,
+        ),
+      );
+      expect(panel.top, greaterThanOrEqualTo(12));
+      expect(panel.bottom, lessThanOrEqualTo(row.top));
+
+      // Las categorías siguen a mano con el panel abierto.
+      await tester.tap(find.byIcon(Icons.psychology));
+      await tester.pumpAndSettle();
+      expect(optionPanel(), findsNothing);
+      expect(find.byIcon(Icons.build_circle), findsOneWidget);
+    });
+  });
 }

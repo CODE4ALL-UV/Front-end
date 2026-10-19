@@ -146,12 +146,11 @@ class _HelpActionButtonState extends State<HelpActionButton>
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
 
-    // Calculate the exact bottom and left coordinates based on the real button
-    // We subtract 56 (the button height) to get the distance from the bottom edge
-    final double exactBottom =
-        screenHeight -
-        buttonPosition.dy -
-        44; // Same as Vertical and Horizontal Buttons
+    // La distancia del borde de abajo del botón al de la pantalla. Se usa su
+    // alto real: con la letra agrandada el botón mide 44 × escala, y restando
+    // 44 fijos la fila del menú abierto quedaba más abajo que el botón.
+    final double buttonHeight = renderBox?.size.height ?? 44;
+    final double exactBottom = screenHeight - buttonPosition.dy - buttonHeight;
     final double exactLeft = buttonPosition.dx;
 
     _overlayEntry = OverlayEntry(
@@ -183,54 +182,48 @@ class _HelpActionButtonState extends State<HelpActionButton>
         var overlayPanelLeft = buttonWidth + (overlayWidth > 360 ? 28.0 : 12.0);
         var overlayPanelWidth = (available - overlayPanelLeft).clamp(
           0.0,
-          260.0 * scale,
+          340.0 * scale,
         );
-        if (overlayPanelWidth < 260.0) {
+        final fullWidthPanel = overlayPanelWidth < 260.0;
+        if (fullWidthPanel) {
           overlayPanelLeft = 12.0 - exactLeft;
           overlayPanelWidth = overlayWidth - 24.0;
         }
         final panelHeight = (overlayHeight - 24.0).clamp(280.0, 520.0);
 
-        // Calculate vertical alignment so the modal's TOP aligns with the vertical button's TOP
-        double panelBottomPosition = 62.0;
+        // El panel mide lo que mida su contenido. Antes tenía un alto fijo
+        // (hasta 520 px): «Pistas», con un solo botón, salía igual de alto
+        // que «Modo visual» y le sobraba media tarjeta en blanco. Solo se
+        // limita a lo que cabe en pantalla; si no cabe, se desplaza dentro.
+        final safe = overlayMediaQuery.padding;
+        final minTop = safe.top + 12.0;
+        // El panel vive por encima de la fila de categorías: si la tapara, no
+        // se podría cambiar de categoría ni cerrar el menú sin cerrarlo antes.
+        // Solo si encima no queda sitio razonable (el botón muy arriba en la
+        // pantalla) se le deja bajar hasta el borde.
+        final rowTop = overlayHeight - exactBottom - buttonWidth;
+        final aboveRow = rowTop - 12.0;
+        final maxBottom = aboveRow - minTop >= 220.0
+            ? aboveRow
+            : overlayHeight - safe.bottom - 12.0;
+        final panelMaxHeight = (maxBottom - minTop).clamp(0.0, 560.0);
 
-        if (_selectedOption != null && _activeCategory != null) {
-          final options = categoryOptions[_activeCategory!] ?? [];
+        // A la derecha de los botones, el panel arranca a la altura de la
+        // opción tocada, para que se vea de qué botón sale. A todo lo ancho,
+        // queda justo encima de la fila de categorías.
+        double? panelTop;
+        if (!fullWidthPanel) {
+          final options = categoryOptions[_activeCategory] ?? const [];
           final index = options.indexWhere(
             (opt) => opt['label'] == _selectedOption,
           );
-
           if (index != -1) {
-            // Reversing the index because the options map renders top-to-bottom,
-            // but we calculate position from bottom-to-top
-            final int reversedIndex = options.length - 1 - index;
-
-            // Distance from the bottom of the Stack to the bottom of the LOWEST vertical button.
-            // 6px (bottom padding) + 44px (horizontal button) + 12px (SizedBox) = 62.0
-            final double optionHeight = 62.0;
-
-            // FIX 3: STEP HEIGHT
-            // This is the exact distance from the bottom of one vertical button to the bottom of the next.
-            // If your _buildAnimatedOption is 44px tall and has 12px of spacing between them, this is 56.0.
-            // If the modal is still falling below the UPPER buttons, INCREASE this number (e.g. 60.0 or 64.0)
-            final double stepHeight = 56.0;
-
-            // 50.0 is the horizontal button height (44) + bottom padding (6)
-            // This perfectly calculates where the BOTTOM of the clicked button is.
-            final calculatedPosition =
-                optionHeight + (reversedIndex * stepHeight);
-            // MAGIA AQUÍ: Limitamos la posición para que el panel NUNCA
-            // rebase la pantalla por la parte superior (dejando un margen de seguridad de 20px)
-            final maxAllowedBottom = overlayHeight - panelHeight - 20.0;
-            panelBottomPosition = calculatedPosition
-                .clamp(62.0, maxAllowedBottom > 62.0 ? maxAllowedBottom : 62.0)
-                .toDouble();
+            // Las opciones se apilan sobre la fila: cada una mide el botón
+            // más 10 px de separación, y entre la última y la fila hay 12.
+            final fromBelow = options.length - 1 - index;
+            panelTop = rowTop - 12.0 - (fromBelow + 1) * (buttonWidth + 10.0);
           }
         }
-
-        // Calculate the absolute position after applying the selected option's
-        // vertical offset so every modal button remains in the hit-test area.
-        final double absoluteBottom = exactBottom + panelBottomPosition;
         final double absoluteLeft = exactLeft + overlayPanelLeft;
 
         return _HelpButtonScale(
@@ -450,19 +443,41 @@ class _HelpActionButtonState extends State<HelpActionButton>
                 ),
               ),
               if (_selectedOption != null)
-                Positioned(
-                  left: absoluteLeft,
-                  bottom: absoluteBottom,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: SizedBox(
+                // Ocupa toda la capa solo para poder colocar el panel una vez
+                // medido; fuera del panel los toques siguen pasando a los
+                // botones y al fondo de debajo.
+                Positioned.fill(
+                  child: CustomSingleChildLayout(
+                    delegate: _PanelLayout(
+                      left: absoluteLeft,
                       width: overlayPanelWidth,
-                      child: _OptionPanel(
-                        option: _selectedOption!,
-                        onClose: _closePanel,
-                        width: overlayPanelWidth,
-                        height: panelHeight,
-                        onRefresh: _refreshOverlay,
+                      maxHeight: panelMaxHeight,
+                      minTop: minTop,
+                      maxBottom: maxBottom,
+                      top: panelTop,
+                      bottom: aboveRow,
+                    ),
+                    child: TweenAnimationBuilder<double>(
+                      // Una animación por opción: al cambiar de una a otra el
+                      // panel nuevo entra en lugar de aparecer de golpe.
+                      key: ValueKey(_selectedOption),
+                      tween: Tween(begin: 0, end: 1),
+                      duration: const Duration(milliseconds: 180),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, t, child) => Opacity(
+                        opacity: t,
+                        child: Transform.translate(
+                          offset: Offset(0, 8 * (1 - t)),
+                          child: child,
+                        ),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: _OptionPanel(
+                          option: _selectedOption!,
+                          onClose: _closePanel,
+                          onRefresh: _refreshOverlay,
+                        ),
                       ),
                     ),
                   ),
@@ -490,7 +505,11 @@ class _HelpActionButtonState extends State<HelpActionButton>
     final entry = _overlayEntry;
     _overlayEntry = null;
     if (entry != null) {
-      entry.remove();
+      // Cada apertura crea una entrada nueva: sin dispose, todas las que se
+      // cerraban seguían ocupando memoria.
+      entry
+        ..remove()
+        ..dispose();
     }
     _runAnimation(forward: false);
     if (mounted) {
@@ -620,6 +639,93 @@ class _HelpActionButtonState extends State<HelpActionButton>
   }
 }
 
+/// Coloca el panel de una opción una vez medido.
+///
+/// Con [top] el panel arranca a esa altura y crece hacia abajo; sin él, su
+/// borde de abajo queda en [bottom] y crece hacia arriba. En los dos casos se
+/// empuja lo justo para que no se salga entre [minTop] y [maxBottom].
+class _PanelLayout extends SingleChildLayoutDelegate {
+  const _PanelLayout({
+    required this.left,
+    required this.width,
+    required this.maxHeight,
+    required this.minTop,
+    required this.maxBottom,
+    required this.bottom,
+    this.top,
+  });
+
+  final double left;
+  final double width;
+  final double maxHeight;
+  final double minTop;
+  final double maxBottom;
+  final double bottom;
+  final double? top;
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
+      BoxConstraints(minWidth: width, maxWidth: width, maxHeight: maxHeight);
+
+  @override
+  Offset getPositionForChild(Size size, Size childSize) {
+    final wanted = top ?? bottom - childSize.height;
+    final lowest = maxBottom - childSize.height;
+    final y = lowest < minTop ? minTop : wanted.clamp(minTop, lowest);
+    return Offset(left, y);
+  }
+
+  @override
+  bool shouldRelayout(_PanelLayout old) =>
+      old.left != left ||
+      old.width != width ||
+      old.maxHeight != maxHeight ||
+      old.minTop != minTop ||
+      old.maxBottom != maxBottom ||
+      old.bottom != bottom ||
+      old.top != top;
+}
+
+/// Icono y para qué sirve cada panel, en la cabecera.
+///
+/// El icono es el mismo del botón que lo abre: así se ve de dónde salió. Antes
+/// cinco paneles llevaban el de lengua de señas aunque no tuvieran nada que
+/// ver con ella.
+const Map<String, (IconData, String)> _panelInfo = {
+  'Tamaño de texto': (
+    Icons.text_fields,
+    'Ajusta la lectura sin perder la vista del contenido.',
+  ),
+  'Modo visual': (
+    Icons.brightness_4,
+    'Elige el contraste y los colores que mejor veas.',
+  ),
+  'Asistencia auditiva': (
+    Icons.hearing,
+    'Ajusta la voz para que sea más clara y comprensible.',
+  ),
+  'Lengua de señas': (
+    Icons.language,
+    'Ayudas visuales en señas para comprender mejor el contenido.',
+  ),
+  'Preferencias de aprendizaje': (
+    Icons.build_circle,
+    'Qué tipo de actividad aparece primero en cada capítulo.',
+  ),
+  'Nivel de aprendizaje': (
+    Icons.stars,
+    'Cuánto acompañamiento ves alrededor del contenido.',
+  ),
+  'Pistas': (
+    Icons.saved_search,
+    'Una ayuda para guiarte antes de responder en los quiz.',
+  ),
+  'Manual interactivo': (
+    Icons.menu_book,
+    'Una guía de cada pantalla y sus controles.',
+  ),
+};
+
 /// El tamaño de los botones del menú abierto, ya ajustado a lo que cabe.
 class _HelpButtonScale extends InheritedWidget {
   const _HelpButtonScale({required this.scale, required super.child});
@@ -697,15 +803,11 @@ class _OptionPanel extends StatefulWidget {
   */
   final String option;
   final VoidCallback onClose;
-  final double width;
-  final double height;
   final VoidCallback onRefresh;
 
   const _OptionPanel({
     required this.option,
     required this.onClose,
-    required this.width,
-    required this.height,
     required this.onRefresh,
   });
 
@@ -739,13 +841,6 @@ class _OptionPanelState extends State<_OptionPanel> {
     CenteredToast.show(context, message);
   }
 
-  /*
-  This _OptionPanelState is the core brain of the white modal card. Your classmate used a very clean switch(widget.option) statement to dynamically render different UI layouts (the font size slider, the visual mode toggles, the sign language buttons) depending on which vertical button was tapped. It also properly connects to the AccessibilityTextScaleScope and app_theme.dart to actually apply the changes to the app.
-
-Handling the UI states for these accessibility toggles this way is a very solid approach for this stage of your TG.
-
-I assume the final parts of the file contain the small helper widgets mentioned here (like _buildInfoBanner, _ModeButton, _LevelButton, and _buildSpeedPill).
-  */
   AccessibilityTextScaleController? _textScaleController;
 
   @override
@@ -796,72 +891,102 @@ I assume the final parts of the file contain the small helper widgets mentioned 
     );
   }
 
+  /// La tarjeta: cabecera con icono, nombre y para qué sirve, y debajo los
+  /// controles.
+  ///
+  /// Mide lo que mide su contenido (`MainAxisSize.min`); el alto máximo lo
+  /// pone quien la coloca y, si no cabe, el contenido se desplaza. Antes cada
+  /// panel repetía su nombre en una segunda tarjeta y añadía otra con una
+  /// frase de relleno: tres cajas para un solo botón.
   Widget _panel(BuildContext context) {
-    return SizedBox(
-      width: widget.width,
-      height: widget.height,
-      child: Container(
-        width: widget.width,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFFF4EDFF), Color(0xFFE8E4F3)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    final (icon, purpose) =
+        _panelInfo[widget.option] ??
+        (Icons.settings, 'Ajustes rápidos para una mejor experiencia.');
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2D8F7)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.22),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
           ),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFD8C8F5), width: 1.2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 24,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.option,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF2F1F56),
+            Material(
+              color: _panelHeaderColor,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 6, 14),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ExcludeSemantics(
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: _panelAccent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(icon, color: Colors.white, size: 20),
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: widget.onClose,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      child: const Icon(
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Semantics(
+                            header: true,
+                            child: Text(
+                              widget.option,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
+                                height: 1.2,
+                                color: _panelTitleColor,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            purpose,
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              height: 1.35,
+                              color: _panelTextColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Cerrar ${widget.option}',
+                      onPressed: widget.onClose,
+                      icon: const Icon(
                         Icons.close,
                         color: Color(0xFF6B5D83),
                         size: 22,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-            Expanded(
+            Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
                 child: _buildOptionContent(),
               ),
             ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -874,30 +999,18 @@ I assume the final parts of the file contain the small helper widgets mentioned 
       case 'Tamaño de texto':
         final controller = AccessibilityTextScaleScope.of(context);
         final activeScale = controller.scale;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoBanner(
-              icon: Icons.text_fields,
-              title: 'Tamaño de texto',
-              subtitle: 'Ajusta la lectura sin perder la vista del contenido.',
-            ),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2D8F7)),
-              ),
-              child: Row(
+        return _PanelTile(
+          child: Column(
+            children: [
+              Row(
                 children: [
                   Expanded(
                     child: Text(
                       'Texto grande ${activeScale != 1.0 ? 'activado' : 'desactivado'}',
                       style: const TextStyle(
-                        fontSize: 12.5,
-                        color: Color(0xFF6A5B7D),
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        color: _panelTitleColor,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -913,58 +1026,50 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                         controller.reset();
                       }
                     },
-                    activeThumbColor: const Color(0xFF9575CD),
+                    activeThumbColor: const Color(0xFF7E57C2),
                     activeTrackColor: const Color(0xFFD8C8F5),
-                    inactiveThumbColor: const Color(0xFFBDBDBD),
+                    inactiveThumbColor: const Color(0xFF8D8D8D),
                     inactiveTrackColor: const Color(0xFFE0E0E0),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                IconButton(
-                  padding: const EdgeInsets.all(6),
-                  constraints: const BoxConstraints(
-                    minWidth: 36,
-                    minHeight: 36,
+              const Divider(height: 16, color: _panelBorderColor),
+              Row(
+                children: [
+                  IconButton(
+                    tooltip: 'Reducir el texto',
+                    onPressed: () {
+                      if (!mounted) return;
+                      controller.decrease();
+                    },
+                    icon: const Icon(Icons.remove_circle_outline, size: 26),
+                    color: _panelAccent,
                   ),
-                  onPressed: () {
-                    if (!mounted) return;
-                    controller.decrease();
-                  },
-                  icon: const Icon(Icons.remove_circle_outline, size: 22),
-                  color: const Color(0xFF7E57C2),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      '${controller.scale.toStringAsFixed(2)}x',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF2F1F56),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        '${controller.scale.toStringAsFixed(2)}x',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: _panelTitleColor,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                IconButton(
-                  padding: const EdgeInsets.all(6),
-                  constraints: const BoxConstraints(
-                    minWidth: 36,
-                    minHeight: 36,
+                  IconButton(
+                    tooltip: 'Agrandar el texto',
+                    onPressed: () {
+                      if (!mounted) return;
+                      controller.increase();
+                    },
+                    icon: const Icon(Icons.add_circle_outline, size: 26),
+                    color: _panelAccent,
                   ),
-                  onPressed: () {
-                    if (!mounted) return;
-                    controller.increase();
-                  },
-                  icon: const Icon(Icons.add_circle_outline, size: 22),
-                  color: const Color(0xFF7E57C2),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         );
       case 'Modo visual':
         return ValueListenableBuilder<AppThemeMode>(
@@ -1010,21 +1115,9 @@ I assume the final parts of the file contain the small helper widgets mentioned 
             ];
 
             return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // _buildInfoBanner(
-                //   icon: Icons.visibility,
-                //   title: 'Modo visual',
-                //   subtitle:
-                //       'Elige el contraste que prefieras para la interfaz.',
-                // ),
-                const SizedBox(height: 10),
-                // 1. MODOS PRINCIPALES CON CHOICECHIP
-                const Text(
-                  'Apariencia',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
+                const _PanelLabel('Apariencia'),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -1064,24 +1157,15 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                const Divider(), // Una pequeña línea divisoria ayuda mucho a la UI
-                const SizedBox(height: 10),
-
-                // 2. NUEVA SECCIÓN: Select (Dropdown) para Daltonismo
-                const Text(
-                  'Filtro de color (Daltonismo)',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                const Divider(height: 28, color: _panelBorderColor),
+                const _PanelLabel('Filtro de color (Daltonismo)'),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'Ajusta los colores si tienes alguna dificultad visual.',
+                    style: TextStyle(fontSize: 12.5, color: _panelTextColor),
+                  ),
                 ),
-                const SizedBox(height: 5),
-                const Text(
-                  'Ajusta los colores si tienes alguna dificultad visual.',
-                  // Colors.grey sobre el lila: 2,3:1.
-                  style: TextStyle(fontSize: 13, color: Color(0xFF5F5F5F)),
-                ),
-                const SizedBox(height: 12),
-
-                // El "Select" estilizado en Dropdown con AppThemeMode directamente
                 // Chips de Selección Integrados (Sin riesgo de quedar debajo del modal)
                 Wrap(
                   spacing: 8,
@@ -1140,33 +1224,18 @@ I assume the final parts of the file contain the small helper widgets mentioned 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInfoBanner(
-              icon: Icons.hearing,
-              title: 'Asistencia auditiva',
-              subtitle: 'Ajusta la voz para que sea más clara y comprensible.',
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2D8F7)),
-              ),
+            _PanelTile(
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.volume_up,
-                    color: Color(0xFF7E57C2),
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.volume_up, color: _panelAccent, size: 22),
+                  const SizedBox(width: 10),
                   const Expanded(
                     child: Text(
-                      'La voz del asistente será más clara y pausada.',
+                      'Voz más clara y pausada',
                       style: TextStyle(
-                        fontSize: 12.5,
-                        color: Color(0xFF6A5B7D),
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        color: _panelTitleColor,
                       ),
                     ),
                   ),
@@ -1181,15 +1250,16 @@ I assume the final parts of the file contain the small helper widgets mentioned 
                           : 'Voz más pausada desactivada.\n'
                                 'La voz vuelve a su ritmo normal.',
                     ),
-                    activeThumbColor: const Color(0xFF9575CD),
+                    activeThumbColor: const Color(0xFF7E57C2),
                     activeTrackColor: const Color(0xFFD8C8F5),
-                    inactiveThumbColor: const Color(0xFFBDBDBD),
+                    inactiveThumbColor: const Color(0xFF8D8D8D),
                     inactiveTrackColor: const Color(0xFFE0E0E0),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
+            const _PanelLabel('Velocidad de la voz'),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -1210,330 +1280,265 @@ I assume the final parts of the file contain the small helper widgets mentioned 
           ],
         );
       case 'Lengua de señas':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoBanner(
-              icon: Icons.sign_language,
-              title: 'Lengua de señas',
-              subtitle:
-                  'Activa ayudas visuales para comprender mejor el contenido.',
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2D8F7)),
+        return _ChoicesWithNote(
+          title: 'Nivel de apoyo',
+          note: switch (_prefs.signSupport) {
+            SignSupportLevel.off =>
+              'Ahora no se muestra ningún apoyo en señas.',
+            SignSupportLevel.basic =>
+              'En los videos, un panel deletrea con el alfabeto manual lo que '
+                  'se dice.',
+            SignSupportLevel.advanced =>
+              'Además del deletreo, verás la seña de la palabra completa '
+                  'cuando exista grabada.',
+          },
+          choices: [
+            for (final level in SignSupportLevel.values)
+              _LevelButton(
+                label: level.label,
+                selected: _prefs.signSupport == level,
+                onTap: () =>
+                    _apply(() => _prefs.setSignSupport(level), switch (level) {
+                      SignSupportLevel.off =>
+                        'Apoyo en señas desactivado.\n'
+                            'El panel de señas deja de aparecer en los '
+                            'videos.',
+                      SignSupportLevel.basic =>
+                        'Apoyo en señas: básico.\n'
+                            'En las actividades de video verás un panel que '
+                            'deletrea con el alfabeto manual lo que se está '
+                            'diciendo.',
+                      SignSupportLevel.advanced =>
+                        'Apoyo en señas: avanzado.\n'
+                            'Además del deletreo, verás la seña de la '
+                            'palabra completa cuando exista grabada.',
+                    }),
               ),
-              child: const Text(
-                'Se mostrarán apoyos visuales y señales de contexto para facilitar la comprensión.',
-                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final level in SignSupportLevel.values)
-                  _LevelButton(
-                    label: level.label,
-                    selected: _prefs.signSupport == level,
-                    onTap: () => _apply(
-                      () => _prefs.setSignSupport(level),
-                      switch (level) {
-                        SignSupportLevel.off =>
-                          'Apoyo en señas desactivado.\n'
-                              'El panel de señas deja de aparecer en los '
-                              'videos.',
-                        SignSupportLevel.basic =>
-                          'Apoyo en señas: básico.\n'
-                              'En las actividades de video verás un panel que '
-                              'deletrea con el alfabeto manual lo que se está '
-                              'diciendo.',
-                        SignSupportLevel.advanced =>
-                          'Apoyo en señas: avanzado.\n'
-                              'Además del deletreo, verás la seña de la '
-                              'palabra completa cuando exista grabada.',
-                      },
-                    ),
-                  ),
-              ],
-            ),
           ],
         );
       //Dialogs or modals for accesibility horizontal button
       case 'Preferencias de aprendizaje':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoBanner(
-              icon: Icons.sign_language,
-              title: 'Preferencias de aprendizaje',
-              subtitle:
-                  'Que tipo de contenido predomina para el proceso de aprendizaje.',
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2D8F7)),
+        return _ChoicesWithNote(
+          title: 'Prefiero empezar por',
+          note: switch (_prefs.contentPreference) {
+            ContentPreference.none =>
+              'Las actividades siguen el orden normal del capítulo.',
+            ContentPreference.readings =>
+              'Cada capítulo empieza por la lectura.',
+            ContentPreference.videos => 'Cada capítulo empieza por el video.',
+            ContentPreference.audios =>
+              'La lectura en voz alta empieza sola al abrir una actividad.',
+          },
+          choices: [
+            for (final preference in ContentPreference.values)
+              _LevelButton(
+                label: preference.label,
+                selected: _prefs.contentPreference == preference,
+                onTap: () => _apply(
+                  () => _prefs.setContentPreference(preference),
+                  switch (preference) {
+                    ContentPreference.none =>
+                      'Sin preferencia.\n'
+                          'En cada capítulo, la ruta de actividades vuelve '
+                          'a su orden normal.',
+                    ContentPreference.readings =>
+                      'Lecturas primero.\n'
+                          'En cada capítulo, la ruta de actividades '
+                          'empezará por la lectura.',
+                    ContentPreference.videos =>
+                      'Videos primero.\n'
+                          'En cada capítulo, la ruta de actividades '
+                          'empezará por el video.',
+                    ContentPreference.audios =>
+                      'Audios.\n'
+                          'Al abrir una actividad, la lectura en voz alta '
+                          'empezará sola.',
+                  },
+                ),
               ),
-              child: const Text(
-                'Estas preferencias te ayudarán a personalizar tu experiencia de aprendizaje.',
-                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final preference in ContentPreference.values)
-                  _LevelButton(
-                    label: preference.label,
-                    selected: _prefs.contentPreference == preference,
-                    onTap: () => _apply(
-                      () => _prefs.setContentPreference(preference),
-                      switch (preference) {
-                        ContentPreference.none =>
-                          'Sin preferencia.\n'
-                              'En cada capítulo, la ruta de actividades vuelve '
-                              'a su orden normal.',
-                        ContentPreference.readings =>
-                          'Lecturas primero.\n'
-                              'En cada capítulo, la ruta de actividades '
-                              'empezará por la lectura.',
-                        ContentPreference.videos =>
-                          'Videos primero.\n'
-                              'En cada capítulo, la ruta de actividades '
-                              'empezará por el video.',
-                        ContentPreference.audios =>
-                          'Audios.\n'
-                              'Al abrir una actividad, la lectura en voz alta '
-                              'empezará sola.',
-                      },
-                    ),
-                  ),
-              ],
-            ),
           ],
         );
       case 'Nivel de aprendizaje':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoBanner(
-              icon: Icons.sign_language,
-              title: 'Nivel de aprendizaje',
-              subtitle:
-                  'Cual es el nivel de dificultad para el proceso de aprendizaje.',
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2D8F7)),
+        return _ChoicesWithNote(
+          title: 'Mi nivel',
+          note: switch (_prefs.level) {
+            LearningLevel.basic =>
+              'Los objetivos de cada sección se ven desplegados.',
+            LearningLevel.medium =>
+              'El apoyo de siempre: los objetivos siguen a la vista.',
+            LearningLevel.advanced =>
+              'Sin objetivos desplegados: solo la ruta de actividades.',
+          },
+          choices: [
+            for (final level in LearningLevel.values)
+              _LevelButton(
+                label: level.label,
+                selected: _prefs.level == level,
+                onTap: () =>
+                    _apply(() => _prefs.setLevel(level), switch (level) {
+                      LearningLevel.basic =>
+                        'Nivel básico.\n'
+                            'En cada capítulo verás desplegados los '
+                            'objetivos de la sección.',
+                      LearningLevel.medium =>
+                        'Nivel medio.\n'
+                            'El apoyo de siempre: los objetivos siguen a la '
+                            'vista en cada capítulo.',
+                      LearningLevel.advanced =>
+                        'Nivel avanzado.\n'
+                            'Se retiran los objetivos de cada capítulo para '
+                            'dejar sitio a la ruta de actividades.',
+                    }),
               ),
-              child: const Text(
-                'Estas preferencias te ayudarán a personalizar tu experiencia de aprendizaje.',
-                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final level in LearningLevel.values)
-                  _LevelButton(
-                    label: level.label,
-                    selected: _prefs.level == level,
-                    onTap: () => _apply(
-                      () => _prefs.setLevel(level),
-                      switch (level) {
-                        LearningLevel.basic =>
-                          'Nivel básico.\n'
-                              'En cada capítulo verás desplegados los '
-                              'objetivos de la sección.',
-                        LearningLevel.medium =>
-                          'Nivel medio.\n'
-                              'El apoyo de siempre: los objetivos siguen a la '
-                              'vista en cada capítulo.',
-                        LearningLevel.advanced =>
-                          'Nivel avanzado.\n'
-                              'Se retiran los objetivos de cada capítulo para '
-                              'dejar sitio a la ruta de actividades.',
-                      },
-                    ),
-                  ),
-              ],
-            ),
           ],
         );
       //Dialogs or modals for support horizontal button
       case 'Pistas':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoBanner(
-              icon: Icons.sign_language,
-              title: 'Pistas',
-              subtitle:
-                  'Sirven para guiar al usuario en su proceso de aprendizaje.',
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2D8F7)),
+        return _ChoicesWithNote(
+          note: _prefs.hintsEnabled
+              ? 'Las pistas están activas en los quiz.'
+              : 'Ahora los quiz se responden sin pistas.',
+          choices: [
+            _LevelButton(
+              label: _prefs.hintsEnabled
+                  ? 'Desactivar pistas'
+                  : 'Activar pistas',
+              selected: _prefs.hintsEnabled,
+              onTap: () => _apply(
+                () => _prefs.setHintsEnabled(!_prefs.hintsEnabled),
+                _prefs.hintsEnabled
+                    ? 'Pistas desactivadas.'
+                    : 'Pistas activadas: aparecerán en los quiz.',
               ),
-              child: const Text(
-                'Estas pistas te ayudarán para avanzar en tu proceso de aprendizaje.',
-                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _LevelButton(
-                  label: _prefs.hintsEnabled
-                      ? 'Desactivar pistas'
-                      : 'Activar pistas',
-                  selected: _prefs.hintsEnabled,
-                  onTap: () => _apply(
-                    () => _prefs.setHintsEnabled(!_prefs.hintsEnabled),
-                    _prefs.hintsEnabled
-                        ? 'Pistas desactivadas.'
-                        : 'Pistas activadas: aparecerán en los quiz.',
-                  ),
-                ),
-              ],
             ),
           ],
         );
       case 'Manual interactivo':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoBanner(
-              icon: Icons.sign_language,
-              title: 'Manual interactivo',
-              subtitle:
-                  'Guía interactiva para facilitar el proceso de aprendizaje.',
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2D8F7)),
+        return _ChoicesWithNote(
+          note: _prefs.manualEnabled
+              ? 'Al abrir una actividad verás la guía de esa pantalla.'
+              : 'Ahora las actividades se abren sin la guía.',
+          choices: [
+            _LevelButton(
+              label: _prefs.manualEnabled
+                  ? 'Desactivar manual interactivo'
+                  : 'Activar manual interactivo',
+              selected: _prefs.manualEnabled,
+              onTap: () => _apply(
+                () => _prefs.setManualEnabled(!_prefs.manualEnabled),
+                _prefs.manualEnabled
+                    ? 'Manual interactivo desactivado.\n'
+                          'Deja de salir la guía al abrir una actividad.'
+                    : 'Manual interactivo activado.\n'
+                          'Al abrir una actividad verás una guía de esa '
+                          'pantalla concreta y sus controles.',
               ),
-              child: const Text(
-                'Esta guía interactiva te ayudará a personalizar tu experiencia de aprendizaje.',
-                style: TextStyle(fontSize: 12.5, color: Color(0xFF6A5B7D)),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _LevelButton(
-                  label: _prefs.manualEnabled
-                      ? 'Desactivar manual interactivo'
-                      : 'Activar manual interactivo',
-                  selected: _prefs.manualEnabled,
-                  onTap: () => _apply(
-                    () => _prefs.setManualEnabled(!_prefs.manualEnabled),
-                    _prefs.manualEnabled
-                        ? 'Manual interactivo desactivado.\n'
-                              'Deja de salir la guía al abrir una actividad.'
-                        : 'Manual interactivo activado.\n'
-                              'Al abrir una actividad verás una guía de esa '
-                              'pantalla concreta y sus controles.',
-                  ),
-                ),
-              ],
             ),
           ],
         );
       default:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoBanner(
-              icon: Icons.settings,
-              title: widget.option,
-              subtitle:
-                  'Ajustes rápidos y accesibles para una mejor experiencia.',
-            ),
-          ],
-        );
+        return const SizedBox.shrink();
     }
   }
 }
 
-Widget _buildInfoBanner({
-  required IconData icon,
-  required String title,
-  required String subtitle,
-}) {
-  return Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: const Color(0xFF7E57C2).withValues(alpha: 0.1),
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: const Color(0xFFD8C8F5)),
-    ),
-    child: Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFF7E57C2),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: Colors.white, size: 18),
+// Los colores del panel. Es siempre claro (ver _OptionPanelState.build), así
+// que van fijos; todos pasan de 4,5:1 sobre el blanco y el lila de la cabecera.
+const Color _panelAccent = Color(0xFF7E57C2);
+const Color _panelHeaderColor = Color(0xFFF4EDFF);
+const Color _panelTileColor = Color(0xFFF8F5FD);
+const Color _panelBorderColor = Color(0xFFE6DDF7);
+const Color _panelTitleColor = Color(0xFF2F1F56);
+const Color _panelTextColor = Color(0xFF5B4B72);
+
+/// Un recuadro suave que agrupa un interruptor con lo que controla.
+class _PanelTile extends StatelessWidget {
+  const _PanelTile({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
+      decoration: BoxDecoration(
+        color: _panelTileColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _panelBorderColor),
+      ),
+      child: child,
+    );
+  }
+}
+
+/// El nombre de un grupo de opciones dentro del panel.
+class _PanelLabel extends StatelessWidget {
+  const _PanelLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 13.5,
+          fontWeight: FontWeight.w700,
+          color: _panelTitleColor,
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
+      ),
+    );
+  }
+}
+
+/// Las opciones de un ajuste y, debajo, qué cambia con la que está puesta.
+///
+/// La nota sustituye a la frase de relleno que llevaba cada panel («Estas
+/// preferencias te ayudarán…»): ocupaba lo mismo y no decía nada.
+class _ChoicesWithNote extends StatelessWidget {
+  const _ChoicesWithNote({
+    required this.choices,
+    required this.note,
+    this.title,
+  });
+
+  final String? title;
+  final List<Widget> choices;
+  final String note;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (title != null) _PanelLabel(title!),
+        Wrap(spacing: 8, runSpacing: 8, children: choices),
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(top: 1),
+              child: Icon(Icons.info_outline, size: 16, color: _panelAccent),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                note,
                 style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF2F1F56),
+                  fontSize: 12.5,
+                  height: 1.35,
+                  color: _panelTextColor,
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontSize: 12.2,
-                  color: Color(0xFF4A3B5E),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
-    ),
-  );
+    );
+  }
 }
 
 /// Una de las velocidades de la voz.

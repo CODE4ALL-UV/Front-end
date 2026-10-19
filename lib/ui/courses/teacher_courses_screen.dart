@@ -6,6 +6,7 @@ import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_announcer_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_quick_button.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
+import 'course_list_widgets.dart';
 
 /// Los cursos del docente.
 ///
@@ -56,14 +57,24 @@ class _TeacherCoursesScreenState extends State<TeacherCoursesScreen> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  /// Mientras se abre un curso: `select` espera al servidor y un segundo
+  /// toque en ese rato abría el editor dos veces.
+  bool _opening = false;
+
   Future<void> _open(CourseInfo course) async {
-    await _store.select(course);
-    if (!mounted) return;
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => widget.courseEditor(context, course),
-      ),
-    );
+    if (_opening) return;
+    _opening = true;
+    try {
+      await _store.select(course);
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => widget.courseEditor(context, course),
+        ),
+      );
+    } finally {
+      _opening = false;
+    }
     if (mounted) _store.refresh();
   }
 
@@ -165,6 +176,8 @@ class _TeacherCoursesScreenState extends State<TeacherCoursesScreen> {
   Widget build(BuildContext context) {
     final colors = context.colorScheme;
     final courses = _store.courses;
+    final students = courses.fold<int>(0, (sum, c) => sum + (c.students ?? 0));
+    final firstName = firstNameOf(widget.userName);
 
     return Scaffold(
       appBar: GlobalAppBarWidget(
@@ -182,68 +195,67 @@ class _TeacherCoursesScreenState extends State<TeacherCoursesScreen> {
               Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: AppMetrics.maxContentWidth,
+                    maxWidth: kCourseListMaxWidth,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Semantics(
-                        header: true,
-                        child: Text(
-                          'Mis cursos',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            color: colors.onSurface,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Cada curso tiene su propio temario editado y sus propios '
-                        'estudiantes. Lo que cambies en uno no toca a los demás. '
-                        'Comparte el código para que tus estudiantes entren.',
-                        style: TextStyle(
-                          fontSize: 14.5,
-                          height: 1.45,
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: AppMetrics.gap),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: FilledButton.icon(
+                      CoursesHero(
+                        overline: firstName == null ? null : 'Hola, $firstName',
+                        title: 'Mis cursos',
+                        description:
+                            'Cada curso tiene su propio temario editado y sus '
+                            'propios estudiantes. Lo que cambies en uno no toca '
+                            'a los demás. Comparte el código para que tus '
+                            'estudiantes entren.',
+                        action: FilledButton.icon(
                           onPressed: _create,
                           style: FilledButton.styleFrom(
-                            backgroundColor: colors.primary,
-                            foregroundColor: colors.onPrimary,
+                            backgroundColor: colors.onPrimary,
+                            foregroundColor: colors.primary,
                             minimumSize: const Size(0, AppMetrics.minTapTarget),
+                            padding: const EdgeInsets.symmetric(horizontal: 18),
                           ),
                           icon: const Icon(Icons.add),
                           label: const Text('Crear curso'),
                         ),
-                      ),
-                      const SizedBox(height: AppMetrics.sectionGap),
-                      if (courses.isEmpty)
-                        Text(
-                          'Todavía no tienes cursos. Crea el primero: empieza con '
-                          'el temario de Code4All y lo cambias a tu manera.',
-                          style: TextStyle(
-                            fontSize: 15,
-                            height: 1.5,
-                            color: colors.onSurfaceVariant,
+                        stats: [
+                          HeroStat(
+                            value: '${courses.length}',
+                            label: courses.length == 1 ? 'Curso' : 'Cursos',
+                            icon: Icons.collections_bookmark_outlined,
                           ),
-                        ),
-                      for (final course in courses)
-                        _TeacherCourseCard(
-                          course: course,
-                          onOpen: () => _open(course),
-                          onRename: () => _rename(course),
-                          onCopyCode: () => _copyCode(course),
-                          onRenewCode: () => _renewCode(course),
-                          onDelete: (course.students ?? 0) == 0
-                              ? () => _delete(course)
-                              : null,
+                          HeroStat(
+                            value: '$students',
+                            label: students == 1 ? 'Estudiante' : 'Estudiantes',
+                            icon: Icons.groups_outlined,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppMetrics.sectionGap + 4),
+                      if (courses.isEmpty)
+                        const CoursesEmptyState(
+                          title: 'Todavía no tienes cursos',
+                          message:
+                              'Crea el primero: empieza con el temario de '
+                              'Code4All y lo cambias a tu manera.',
+                        )
+                      else
+                        CourseGrid(
+                          columns: courseColumnsFor(constraints.maxWidth),
+                          children: [
+                            for (final course in courses)
+                              _TeacherCourseCard(
+                                course: course,
+                                onOpen: () => _open(course),
+                                onRename: () => _rename(course),
+                                onCopyCode: () => _copyCode(course),
+                                onRenewCode: () => _renewCode(course),
+                                onDelete: (course.students ?? 0) == 0
+                                    ? () => _delete(course)
+                                    : null,
+                              ),
+                          ],
                         ),
                       const SizedBox(height: 30),
                     ],
@@ -283,129 +295,198 @@ class _TeacherCourseCard extends StatelessWidget {
     final students = course.students ?? 0;
     final code = course.joinCode ?? '';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-        border: Border.all(color: colors.outline),
-      ),
+    return CourseCardFrame(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        // Arriba qué curso es; abajo el código y las acciones. En una fila de
+        // dos tarjetas, los botones quedan a la misma altura en las dos.
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            course.title,
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w800,
-              color: colors.onSurface,
-            ),
-          ),
-          if (course.description.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              course.description,
-              style: TextStyle(
-                fontSize: 13.5,
-                height: 1.4,
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-          ],
-          const SizedBox(height: 6),
-          Text(
-            students == 1 ? '1 estudiante' : '$students estudiantes',
-            style: TextStyle(fontSize: 13, color: colors.onSurfaceVariant),
-          ),
-          const SizedBox(height: 10),
-          // El código va grande y espaciado: se dicta en clase o se copia de
-          // la pizarra, y una letra confundida deja a alguien fuera.
-          Semantics(
-            label: 'Código para inscribirse: ${code.split('').join(' ')}',
-            excludeSemantics: true,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: colors.outlineVariant),
-              ),
-              // Wrap y no Row: con la letra grande o en un celular estrecho
-              // el código baja a su propia línea en vez de salirse.
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Código: ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                  SelectableText(
-                    code,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 4,
-                      color: colors.onSurface,
+                  const CourseIconTile(icon: Icons.school_outlined),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          course.title,
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            height: 1.25,
+                            color: colors.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.groups_outlined,
+                              size: 17,
+                              color: colors.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 5),
+                            Flexible(
+                              child: Text(
+                                students == 1
+                                    ? '1 estudiante'
+                                    : '$students estudiantes',
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
+              if (course.description.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  course.description,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    height: 1.4,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ],
           ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          const SizedBox(height: 14),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // El código va grande y espaciado: se dicta en clase o se copia
+              // de la pizarra, y una letra confundida deja a alguien fuera.
+              Container(
+                padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: colors.outlineVariant),
+                ),
+                // Wrap y no Row: con la letra grande o en un celular estrecho
+                // el botón baja a su propia línea en vez de salirse.
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    Semantics(
+                      label: code.isEmpty
+                          ? 'Este curso no tiene código para inscribirse'
+                          : 'Código para inscribirse: ${code.split('').join(' ')}',
+                      excludeSemantics: true,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Código para inscribirse',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                          if (code.isEmpty)
+                            // Sin código no hay nada que copiar: se dice en
+                            // vez de dejar el recuadro en blanco.
+                            Text(
+                              'Sin código. Pulsa «Nuevo código».',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: colors.onSurface,
+                              ),
+                            )
+                          else
+                            SelectableText(
+                              code,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 4,
+                                color: colors.onSurface,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: code.isEmpty ? null : onCopyCode,
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(0, AppMetrics.minTapTarget),
+                      ),
+                      icon: const Icon(Icons.copy, size: 18),
+                      label: const Text('Copiar código'),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
               FilledButton.icon(
                 onPressed: onOpen,
                 style: FilledButton.styleFrom(
                   backgroundColor: colors.primary,
                   foregroundColor: colors.onPrimary,
                   minimumSize: const Size(0, AppMetrics.minTapTarget),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 icon: const Icon(Icons.edit_note),
                 label: const Text('Abrir y editar'),
               ),
-              OutlinedButton.icon(
-                onPressed: onCopyCode,
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(0, AppMetrics.minTapTarget),
-                ),
-                icon: const Icon(Icons.copy, size: 18),
-                label: const Text('Copiar código'),
-              ),
-              TextButton.icon(
-                onPressed: onRename,
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(0, AppMetrics.minTapTarget),
-                ),
-                icon: const Icon(Icons.drive_file_rename_outline, size: 18),
-                label: const Text('Renombrar'),
-              ),
-              TextButton.icon(
-                onPressed: onRenewCode,
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(0, AppMetrics.minTapTarget),
-                ),
-                icon: const Icon(Icons.autorenew, size: 18),
-                label: const Text('Nuevo código'),
-              ),
-              if (onDelete != null)
-                TextButton.icon(
-                  onPressed: onDelete,
-                  style: TextButton.styleFrom(
-                    foregroundColor: colors.error,
-                    minimumSize: const Size(0, AppMetrics.minTapTarget),
+              const SizedBox(height: 6),
+              // Lo que se usa de vez en cuando, más discreto que lo principal.
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 4,
+                runSpacing: 0,
+                children: [
+                  TextButton.icon(
+                    onPressed: onRename,
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(0, AppMetrics.minTapTarget),
+                    ),
+                    icon: const Icon(Icons.drive_file_rename_outline, size: 18),
+                    label: const Text('Renombrar'),
                   ),
-                  icon: const Icon(Icons.delete_outline, size: 18),
-                  label: const Text('Borrar'),
-                ),
+                  TextButton.icon(
+                    onPressed: onRenewCode,
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(0, AppMetrics.minTapTarget),
+                    ),
+                    icon: const Icon(Icons.autorenew, size: 18),
+                    label: const Text('Nuevo código'),
+                  ),
+                  if (onDelete != null)
+                    TextButton.icon(
+                      onPressed: onDelete,
+                      style: TextButton.styleFrom(
+                        foregroundColor: colors.error,
+                        minimumSize: const Size(0, AppMetrics.minTapTarget),
+                      ),
+                      icon: const Icon(Icons.delete_outline, size: 18),
+                      label: const Text('Borrar'),
+                    ),
+                ],
+              ),
             ],
           ),
         ],

@@ -341,6 +341,10 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
                               controller: _outputController,
                               maxLines: 6,
                               readOnly: true,
+                              // El fondo es blanco fijo: sin color propio el
+                              // texto tomaba el claro del tema oscuro y el
+                              // resultado no se veía.
+                              style: const TextStyle(color: Color(0xFF0F172A)),
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 filled: true,

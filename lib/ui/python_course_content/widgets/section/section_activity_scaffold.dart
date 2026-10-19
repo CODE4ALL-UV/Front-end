@@ -395,7 +395,7 @@ class _ManualDialog extends StatelessWidget {
           'el botón «Ver una pista».',
       'Se aprueba con el 60 % de aciertos, y puedes repetir el intento.',
     ],
-    'Evaluación': [
+    'Evaluación final': [
       'Funciona como el quiz, pero cuenta para cerrar la sección.',
       'Responde con calma: se guarda cuánto tardas, y sirve para que el docente '
           'sepa qué pregunta está costando.',
@@ -412,7 +412,7 @@ class _ManualDialog extends StatelessWidget {
       'Si activaste «Lengua de señas» en el menú de ayuda, verás el panel que '
           'deletrea lo que se está diciendo.',
     ],
-    'Cápsula': [
+    'Cápsula de conocimiento': [
       'Son consejos cortos sobre el tema de la sección.',
       'Léelos antes de pasar al ejercicio: resuelven los errores más comunes.',
     ],

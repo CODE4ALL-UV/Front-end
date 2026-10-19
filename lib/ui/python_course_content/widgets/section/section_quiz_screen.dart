@@ -86,7 +86,9 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
   QuizQuestion get _question => _questions[_index];
   bool get _isLast => _index == _questions.length - 1;
 
-  static const List<String> _letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  /// A, B, C… para cualquier número de opciones. Con una lista fija de seis
+  /// letras, una pregunta con siete opciones tumbaba el quiz (RangeError).
+  static String _letter(int index) => String.fromCharCode(65 + index);
 
   void _select(int optionIndex) {
     if (_answered) return;
@@ -108,7 +110,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
       isCorrect
           ? 'Respuesta correcta. ${_question.explanation}'
           : 'Respuesta incorrecta. La correcta es la opción '
-                '${_letters[_question.correctIndex]}: '
+                '${_letter(_question.correctIndex)}: '
                 '${_question.correctOption}. ${_question.explanation}',
     );
   }
@@ -193,7 +195,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
       ..writeln('Pregunta ${_index + 1} de ${_questions.length}.')
       ..writeln(_question.prompt);
     for (var i = 0; i < _question.options.length; i++) {
-      buffer.writeln('Opción ${_letters[i]}: ${_question.options[i]}');
+      buffer.writeln('Opción ${_letter(i)}: ${_question.options[i]}');
     }
     return buffer.toString();
   }
@@ -295,7 +297,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: _OptionTile(
-              letter: _letters[i],
+              letter: _letter(i),
               text: _question.options[i],
               isSelected: _selected == i,
               isCorrect: i == _question.correctIndex,
@@ -314,7 +316,7 @@ class _SectionQuizScreenState extends State<SectionQuizScreen> {
                       ? _question.explanation
                       : '¡Bien! Puedes continuar con la siguiente pregunta.')
                 : 'La respuesta correcta es la opción '
-                      '${_letters[_question.correctIndex]}: '
+                      '${_letter(_question.correctIndex)}: '
                       '${_question.correctOption}.'
                       '${_question.explanation.isNotEmpty ? ' ${_question.explanation}' : ''}',
           ),

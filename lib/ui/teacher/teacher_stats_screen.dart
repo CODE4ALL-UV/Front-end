@@ -275,18 +275,28 @@ class _TeacherStatsScreenState extends State<TeacherStatsScreen> {
   /// Se ordenan por el temario y no por cantidad: el docente quiere ver el
   /// recorrido del curso, que es donde se nota el abandono.
   List<(String, Map<String, int>)> _sectionsWithCompletions() {
-    final ids = <String>{for (final item in _stats.completions) item.sectionId};
+    final ids = <String>{
+      for (final item in _stats.completions) item.sectionId,
+    }.toList();
 
-    final out = <(String, Map<String, int>)>[];
-    for (final id in ids) {
-      out.add((
-        PythonCourseCatalog.sectionById(id)?.title ?? id,
-        _stats.completionsOf(id),
-      ));
+    // En el orden del temario, no por título: por orden alfabético las
+    // secciones de distintos módulos se mezclaban y no se veía dónde se
+    // abandona. Lo que no está en el catálogo va al final.
+    int order(String id) {
+      final section = PythonCourseCatalog.sectionById(id);
+      if (section == null) return 1 << 30;
+      return section.moduleNumber * 1000 + section.number;
     }
 
-    out.sort((a, b) => a.$1.compareTo(b.$1));
-    return out;
+    ids.sort((a, b) => order(a).compareTo(order(b)));
+
+    return [
+      for (final id in ids)
+        (
+          PythonCourseCatalog.sectionById(id)?.title ?? id,
+          _stats.completionsOf(id),
+        ),
+    ];
   }
 
   Widget _note(String text) => Text(

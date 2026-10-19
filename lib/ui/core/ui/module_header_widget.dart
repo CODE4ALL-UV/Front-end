@@ -105,7 +105,12 @@ class ModuleHeaderWidget extends StatelessWidget {
                       );
                       onEditCompleted(result as String?);
                     },
-                    icon: const Icon(Icons.edit, color: Colors.white),
+                    // El color del texto de la cabecera y no blanco: la del
+                    // módulo 5 es amarilla y el blanco no se veía encima.
+                    icon: Icon(
+                      Icons.edit,
+                      color: appModuleTheme.headerForeground,
+                    ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
@@ -116,12 +121,16 @@ class ModuleHeaderWidget extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: appModuleTheme.headerForeground.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Padding(
               padding: const EdgeInsets.all(6.0),
-              child: Icon(iconHeader, color: Colors.white, size: 32),
+              child: Icon(
+                iconHeader,
+                color: appModuleTheme.headerForeground,
+                size: 32,
+              ),
             ),
           ),
         ],

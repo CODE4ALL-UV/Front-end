@@ -522,17 +522,20 @@ class _TrailingAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isCompleted) {
+      // El verde del tema y no Colors.green: sobre el fondo verde claro de
+      // la fila quedaba a 2,3:1 y no seguía los temas de daltonismo.
+      final done = context.messageColors.successForeground;
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.check_circle, size: 26, color: Colors.green),
+          Icon(Icons.check_circle, size: 26, color: done),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Hecho',
             style: TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w700,
-              color: Colors.green,
+              color: done,
             ),
           ),
         ],

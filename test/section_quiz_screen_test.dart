@@ -131,6 +131,32 @@ void main() {
   }
 
   group('SectionQuizScreen', () {
+    testWidgets('una pregunta con más de seis opciones no rompe el quiz', (
+      tester,
+    ) async {
+      // El editor del docente deja añadir todas las opciones que quiera; la
+      // lista fija de seis letras lanzaba un RangeError con la séptima.
+      questions = const [
+        QuizQuestion(
+          prompt: '¿Cuál es par?',
+          options: ['1', '3', '5', '7', '9', '11', '12'],
+          correctIndex: 6,
+          explanation: 'El 12 es divisible entre 2.',
+        ),
+      ];
+      await pumpQuiz(tester);
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('G'), findsOneWidget);
+
+      await tester.ensureVisible(find.text('1'));
+      await tester.tap(find.text('1'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.textContaining('G: 12'), findsWidgets);
+    });
+
     testWidgets('muestra la primera pregunta y sus opciones', (tester) async {
       await pumpQuiz(tester);
 

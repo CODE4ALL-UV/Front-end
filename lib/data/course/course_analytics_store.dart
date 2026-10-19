@@ -200,14 +200,23 @@ class CourseAnalyticsStore extends ChangeNotifier {
 
   int? _courseId;
 
+  /// Cuenta las cargas pedidas. Una respuesta que llega cuando ya se pidió
+  /// otra cosa (porque se cambió de curso) no vale y no se aplica.
+  int _request = 0;
+
   /// De qué curso son las cifras. Null: el Curso general, o todo junto si
   /// quien mira es la coordinación.
   int? get courseId => _courseId;
 
   /// Cambia de curso. Las cifras del anterior se olvidan para no mezclarlas.
+  ///
+  /// Si había una carga en marcha se deja de esperar: su respuesta será del
+  /// curso anterior, y mientras tanto ya se pueden pedir las del nuevo.
   void useCourse(int? courseId) {
     if (courseId == _courseId) return;
     _courseId = courseId;
+    _request++;
+    _loading = false;
     _sections = const [];
     _questions = const [];
     _students = const [];
@@ -303,8 +312,12 @@ class CourseAnalyticsStore extends ChangeNotifier {
     _loading = true;
     notifyListeners();
 
+    final requested = ++_request;
     try {
       final token = await _auth.getToken();
+      // Se cambió de curso mientras tanto: esto ya no vale.
+      if (requested != _request) return;
+
       if (token == null || token.isEmpty) {
         _problem = 'Tu sesión no está iniciada. Vuelve a entrar.';
       } else {
@@ -324,6 +337,10 @@ class CourseAnalyticsStore extends ChangeNotifier {
             )
             .timeout(_timeout);
 
+        // Mientras llegaban las respuestas se cambió de curso: son las del
+        // anterior, y aplicarlas mezclaría las cifras de dos cursos.
+        if (requested != _request) return;
+
         if (summary.statusCode == 403 || students.statusCode == 403) {
           _problem = 'Tu cuenta no tiene permiso para ver estos datos.';
         } else if (summary.statusCode != 200 || students.statusCode != 200) {
@@ -336,6 +353,7 @@ class CourseAnalyticsStore extends ChangeNotifier {
         }
       }
     } catch (e) {
+      if (requested != _request) return;
       _problem = 'No se pudo consultar el servidor.';
       debugPrint('Analítica del curso: $e');
     }
@@ -418,6 +436,8 @@ class CourseAnalyticsStore extends ChangeNotifier {
     _completions = const [];
     _totalAnswers = 0;
     _totalCompletions = 0;
+    // Lo que siga en camino de una prueba anterior no debe aplicarse.
+    _request++;
     _loading = false;
     _loaded = false;
     _problem = null;

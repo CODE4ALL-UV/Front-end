@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter_code4all/data/course/course_analytics_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -296,6 +299,53 @@ void main() {
       // Comprobación de funciones derivadas usando los datos de la red
       expect(store.completionsOf('intro')['quiz'], 5);
       expect(store.students.first.name, 'Ana');
+    });
+
+    test('cambiar de curso a mitad de carga no mezcla las cifras', () async {
+      addTearDown(() => store.useCourse(null));
+
+      // El curso 1 tarda en contestar; el 2 contesta al momento.
+      final slow = Completer<void>();
+      final mockClient = MockClient((request) async {
+        final course = request.url.queryParameters['course_id'];
+        if (course == '1') await slow.future;
+        final answers = course == '1' ? 111 : 222;
+        if (request.url.path.endsWith('summary')) {
+          return http.Response(jsonEncode({'total_answers': answers}), 200);
+        }
+        return http.Response(
+          jsonEncode({
+            'students': [
+              {'user_id': answers, 'nombre': 'Del curso $course'},
+            ],
+          }),
+          200,
+        );
+      });
+      store.debugUse(api: fakeApi, client: mockClient, auth: fakeAuth);
+
+      store.useCourse(1);
+      final first = store.refresh();
+      await Future<void>.delayed(Duration.zero);
+      expect(store.isLoading, isTrue);
+
+      // Se cambia de curso antes de que llegue lo del 1: hay que poder pedir
+      // las cifras del 2 sin esperar a que termine aquella carga.
+      store.useCourse(2);
+      await store.refresh();
+
+      expect(store.totalAnswers, 222);
+      expect(store.students.single.name, 'Del curso 2');
+
+      // Y cuando por fin llega la respuesta del curso 1, no se aplica.
+      slow.complete();
+      await first;
+
+      expect(store.courseId, 2);
+      expect(store.totalAnswers, 222);
+      expect(store.students.single.name, 'Del curso 2');
+      expect(store.isLoaded, isTrue);
+      expect(store.isLoading, isFalse);
     });
   });
 }

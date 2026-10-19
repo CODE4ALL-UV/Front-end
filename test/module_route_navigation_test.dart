@@ -17,10 +17,10 @@ import 'package:flutter_code4all/ui/python_course_content/widgets/circle_progres
 import 'package:flutter_code4all/ui/python_course_content/widgets/learning_module_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/lesson_box_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/module_row_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/dactylology_floating_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/module_chapters_screen.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_activity_launcher.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/sign_asset_index.dart';
-import 'package:flutter_code4all/ui/python_course_content/widgets/section/sign_language_panel.dart';
 import 'package:flutter_code4all/ui/users_management/widgets/teacher_module_editor_screen.dart';
 
 /// Moverse por el mapa del curso: de un módulo a otro, de la portada del
@@ -329,11 +329,12 @@ void main() {
         for (var number = 1; number <= 3; number++)
           PythonCourseCatalog.section(1, number)!.boxTitle,
       ];
-      final panel = tester.widget<SignLanguagePanel>(
-        find.byType(SignLanguagePanel),
+      final reader = tester.widget<DactylologyFloatingWidget>(
+        find.byType(DactylologyFloatingWidget),
       );
-      expect(panel.text, '${titleOf(1)}. ${titles.join('. ')}.');
-      expect(panel.showWordSigns, isFalse);
+      expect(reader.text, '${titleOf(1)}. ${titles.join('. ')}.');
+      expect(reader.showWordSigns, isFalse);
+      expect(find.textContaining('Palabra 1 de '), findsOneWidget);
 
       await tester.pumpWidget(host(const SizedBox.shrink()));
     });

@@ -217,15 +217,24 @@ void main() {
       expect(find.text('Lengua de señas'), findsOneWidget);
       expect(find.text('HOLA'), findsOneWidget);
 
-      // Al desplegar el lector flotante aparece un segundo panel.
+      // Al desplegar el lector flotante aparece el lector del manual, que
+      // recibe el mismo nivel que el panel.
       await tester.tap(find.byTooltip('Mostrar lector de dactilología'));
       await tester.pump();
-      expect(find.byType(SignLanguagePanel), findsNWidgets(2));
+      expect(find.text('Palabra 1 de 1'), findsOneWidget);
       expect(
-        tester
-            .widgetList<SignLanguagePanel>(find.byType(SignLanguagePanel))
-            .every((panel) => panel.showWordSigns),
-        isTrue,
+        tester.widget<SignLanguagePanel>(find.byType(SignLanguagePanel)),
+        isA<SignLanguagePanel>().having((p) => p.showWordSigns, 'seña', true),
+      );
+      expect(
+        tester.widget<DactylologyFloatingWidget>(
+          find.byType(DactylologyFloatingWidget),
+        ),
+        isA<DactylologyFloatingWidget>().having(
+          (w) => w.showWordSigns,
+          'seña',
+          true,
+        ),
       );
 
       await tester.pumpWidget(app(const SizedBox.shrink()));

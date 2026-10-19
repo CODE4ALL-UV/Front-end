@@ -12,7 +12,10 @@ import 'sign_asset_index.dart';
 /// simple vista.
 
 /// Quita tildes y pasa a mayúscula, que es como se deletrea.
-String _normalize(String input) {
+///
+/// La Ñ es una letra propia y se queda. La usa también el lector flotante de
+/// dactilología, para que los dos deletreen igual.
+String normalizeForSpelling(String input) {
   const from = 'áàäâéèëêíìïîóòöôúùüûÁÀÄÂÉÈËÊÍÌÏÎÓÒÖÔÚÙÜÛ';
   const to = 'aaaaeeeeiiiioooouuuuAAAAEEEEIIIIOOOOUUUU';
 
@@ -107,7 +110,7 @@ class _SignLanguagePanelState extends State<SignLanguagePanel> {
 
   void _loadText(String text) {
     _timer?.cancel();
-    _letters = _normalize(text).split('');
+    _letters = normalizeForSpelling(text).split('');
     _index = 0;
     if (widget.isPlaying && _letters.isNotEmpty) _start();
     if (mounted) setState(() {});

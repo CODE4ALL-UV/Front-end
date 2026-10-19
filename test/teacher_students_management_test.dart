@@ -110,6 +110,91 @@ void main() {
     expect(find.textContaining('ningún estudiante'), findsNothing);
   });
 
+  group('volver a pedir la lista', () {
+    /// Un servidor que falla con [status] hasta que se le pide que conteste
+    /// con [students].
+    late int status;
+    late List<Map<String, Object>> students;
+
+    void serve() {
+      stats.debugUse(
+        api: ApiService(baseUrl: 'http://servidor.de.prueba'),
+        client: MockClient((request) async {
+          if (status != 200) return http.Response('fallo', status);
+          if (request.url.path.endsWith('/students')) {
+            return http.Response(jsonEncode({'students': students}), 200);
+          }
+          return http.Response(jsonEncode({'total_answers': 0}), 200);
+        }),
+        auth: _FakeAuth(),
+      );
+    }
+
+    const ana = {
+      'user_id': 3,
+      'nombre': 'Ana',
+      'correo': 'ana@uv.edu.co',
+      'answered': 0,
+      'correct': 0,
+      'sections_touched': 0,
+      'activities_done': 0,
+    };
+
+    testWidgets('tras un error se puede volver a intentar', (tester) async {
+      status = 500;
+      students = [ana];
+      serve();
+      await mount(tester);
+
+      expect(find.textContaining('El servidor no devolvió'), findsOneWidget);
+
+      status = 200;
+      await tester.tap(find.text('Volver a intentarlo'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.textContaining('El servidor no devolvió'), findsNothing);
+      expect(find.text('Ana'), findsOneWidget);
+    });
+
+    testWidgets('sin estudiantes todavía se puede volver a consultar', (
+      tester,
+    ) async {
+      status = 200;
+      students = [];
+      serve();
+      await mount(tester);
+
+      expect(find.textContaining('ningún estudiante'), findsOneWidget);
+
+      // Mientras tanto alguien entró con el código.
+      students = [ana];
+      await tester.tap(find.text('Volver a consultar'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.textContaining('ningún estudiante'), findsNothing);
+      expect(find.text('Ana'), findsOneWidget);
+    });
+
+    testWidgets('también arrastrando hacia abajo', (tester) async {
+      status = 200;
+      students = [];
+      serve();
+      await mount(tester);
+
+      students = [ana];
+      await tester.fling(
+        find.textContaining('ningún estudiante'),
+        const Offset(0, 400),
+        1000,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ana'), findsOneWidget);
+    });
+  });
+
   testWidgets('primero quien no empezó y quien peor va; luego por nombre', (
     tester,
   ) async {

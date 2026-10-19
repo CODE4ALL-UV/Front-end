@@ -261,7 +261,7 @@ void main() {
       );
     });
 
-    testWidgets('el laboratorio cuenta como hecho al volver de él', (
+    testWidgets('salir del laboratorio sin ejecutar nada no cuenta', (
       tester,
     ) async {
       bigScreen(tester);
@@ -271,15 +271,30 @@ void main() {
       );
 
       expect(find.byType(LaboratoryConsoleScreen), findsOneWidget);
+
+      // Entrar y volver no es hacer el laboratorio.
+      goBack(tester, LaboratoryConsoleScreen);
+      await tester.pumpAndSettle();
+
+      expect(results, [false]);
       expect(
         progress.isCompleted(_section.id, CourseActivityKind.laboratorio),
         isFalse,
       );
+    });
 
-      // Es una consola libre: no hay respuesta que comprobar, así que se da
-      // por hecha al salir, aunque no se pulse «Terminar».
-      goBack(tester, LaboratoryConsoleScreen);
-      await tester.pumpAndSettle();
+    testWidgets('el laboratorio cuenta al terminarlo con la salida correcta', (
+      tester,
+    ) async {
+      bigScreen(tester);
+      final results = await pumpLauncher(
+        tester,
+        CourseActivityKind.laboratorio,
+      );
+
+      // El código de ejemplo ya imprime lo que se pide.
+      await tapText(tester, 'Ejecutar');
+      await tapText(tester, 'Terminar');
 
       expect(results, [true]);
       expect(

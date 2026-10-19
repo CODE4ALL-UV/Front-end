@@ -96,6 +96,18 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
     }
   }
 
+  /// Un aviso que se puede recargar arrastrando hacia abajo, como la lista.
+  Widget _reloadable(List<Widget> children) {
+    return RefreshIndicator(
+      onRefresh: _stats.refresh,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(AppMetrics.gap),
+        children: children,
+      ),
+    );
+  }
+
   List<StudentStats> get _ordered {
     final list = [..._stats.students];
     if (!_strugglingFirst) {
@@ -119,30 +131,55 @@ class _TeacherStudentsScreenState extends State<TeacherStudentsScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    // Con error o sin estudiantes también se puede volver a pedir la lista:
+    // antes solo se podía con la lista llena, así que un fallo de red o un
+    // curso recién creado dejaban la pestaña así hasta salir y volver.
     if (_stats.problem != null) {
-      return Padding(
-        padding: const EdgeInsets.all(AppMetrics.gap),
-        child: TeacherBanner(icon: Icons.cloud_off, text: _stats.problem!),
-      );
+      return _reloadable([
+        TeacherBanner(icon: Icons.cloud_off, text: _stats.problem!),
+        const SizedBox(height: AppMetrics.gap),
+        Center(
+          child: FilledButton.icon(
+            onPressed: _stats.isLoading ? null : _stats.refresh,
+            style: FilledButton.styleFrom(
+              backgroundColor: appColorScheme.primary,
+              foregroundColor: appColorScheme.onPrimary,
+              minimumSize: const Size(0, AppMetrics.minTapTarget),
+            ),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Volver a intentarlo'),
+          ),
+        ),
+      ]);
     }
 
     final students = _ordered;
 
     if (students.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppMetrics.sectionGap),
-          child: Text(
-            'Todavía no hay ningún estudiante registrado en el curso.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14.5,
-              height: 1.5,
-              color: appColorScheme.onSurfaceVariant,
-            ),
+      return _reloadable([
+        const SizedBox(height: AppMetrics.sectionGap),
+        Text(
+          'Todavía no hay ningún estudiante registrado en el curso.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14.5,
+            height: 1.5,
+            color: appColorScheme.onSurfaceVariant,
           ),
         ),
-      );
+        const SizedBox(height: AppMetrics.gap),
+        // El gesto de arrastrar no le sirve a todo el mundo: también botón.
+        Center(
+          child: OutlinedButton.icon(
+            onPressed: _stats.isLoading ? null : _stats.refresh,
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(0, AppMetrics.minTapTarget),
+            ),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Volver a consultar'),
+          ),
+        ),
+      ]);
     }
 
     final sinEmpezar = students.where((s) => s.hasNotStarted).length;

@@ -236,6 +236,28 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
     });
 
+    testWidgets('Terminar sin haber ejecutado nada explica por qué no sale', (
+      tester,
+    ) async {
+      await _pumpScreen(tester);
+
+      final finishButton = find.text('Terminar');
+      await tester.ensureVisible(finishButton);
+      await tester.pumpAndSettle();
+      await tester.tap(finishButton);
+      await tester.pump();
+
+      expect(find.byType(LaboratoryConsoleScreen), findsOneWidget);
+      expect(
+        find.text(
+          '⚠️ Completa el laboratorio con una salida correcta para terminar.',
+        ),
+        findsOneWidget,
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
     testWidgets('Terminar devuelve true después de una salida correcta', (
       tester,
     ) async {

@@ -18,7 +18,6 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
 
   final String _expectedOutput = 'Hola Code4All';
   String? _feedback;
-  bool _hasRun = false;
 
   @override
   void dispose() {
@@ -31,7 +30,6 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
     final source = _codeController.text.trim();
     if (source.isEmpty) {
       setState(() {
-        _hasRun = true;
         _feedback = '❌ Escribe un código para ejecutarlo.';
         _outputController.text = '';
       });
@@ -42,7 +40,6 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
       final output = _evaluateSource(source);
       final isCorrect = output.trim() == _expectedOutput.trim();
       setState(() {
-        _hasRun = true;
         _feedback = isCorrect
             ? '✅ Tu salida coincide con la esperada.'
             : '⚠️ Revisa el código, la salida no coincide todavía.';
@@ -50,7 +47,6 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
       });
     } catch (error) {
       setState(() {
-        _hasRun = true;
         _feedback = '❌ Ocurrió un error: $error';
         _outputController.text = '';
       });
@@ -62,7 +58,6 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
       _codeController.text = 'print("Hola Code4All")';
       _outputController.text = '';
       _feedback = null;
-      _hasRun = false;
     });
   }
 
@@ -354,7 +349,11 @@ class _LaboratoryConsoleScreenState extends State<LaboratoryConsoleScreen> {
                               ),
                             ),
                             const SizedBox(height: 10),
-                            if (_hasRun)
+                            // Con el aviso y no solo tras ejecutar: pulsar
+                            // «Terminar» sin haber ejecutado nada dejaba el
+                            // aviso escrito pero sin mostrar, y parecía que
+                            // el botón no hacía nada.
+                            if (_feedback != null)
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,

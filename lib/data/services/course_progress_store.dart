@@ -95,6 +95,19 @@ class CourseProgressStore extends ChangeNotifier {
     await load();
   }
 
+  /// Al cerrar sesión: se olvida en memoria el avance de quien salió.
+  ///
+  /// No basta con volver al Curso general: si ya era el abierto, [useCourse]
+  /// no hace nada y el siguiente que entrara vería lo que llevaba el
+  /// anterior. Lo guardado en el disco lo borra el cierre de sesión; aquí
+  /// solo se vacía lo que hay en memoria, para que se vuelva a leer.
+  void reset() {
+    _courseId = null;
+    _completed.clear();
+    _loaded = false;
+    notifyListeners();
+  }
+
   /// Carga el progreso guardado. Es seguro llamarlo varias veces.
   Future<void> load() async {
     if (_loaded) return;

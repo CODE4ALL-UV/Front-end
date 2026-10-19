@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'ui/core/themes/app_theme.dart';
 import 'ui/core/ui/accessibility_text_scale_widget.dart';
 import 'ui/core/ui/display_preferences.dart';
+import 'ui/core/ui/learning_preferences.dart';
 import 'data/course/my_courses_store.dart';
 import 'data/services/course_progress_store.dart';
 import 'data/services/session_controller.dart';
@@ -132,6 +133,10 @@ class _AppState extends State<App> {
   void _goToLogin() {
     // Los cursos son de quien entró: el siguiente no debe heredarlos.
     MyCoursesStore.instance.clear();
+    // Ni su avance ni sus ajustes. Va aparte y siempre: si el curso abierto
+    // ya era el general, vaciar los cursos no toca el avance.
+    CourseProgressStore.instance.reset();
+    LearningPreferences.instance.reset();
     setState(() => _currentScreen = AppScreen.login);
   }
 

@@ -195,6 +195,24 @@ class LearningPreferences extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Al cerrar sesión: vuelven los valores de partida.
+  ///
+  /// Los ajustes son de quien los eligió. Sin esto el siguiente que entrara en
+  /// el mismo dispositivo heredaría el nivel, la voz y las preferencias del
+  /// anterior. Lo guardado lo borra el cierre de sesión; aquí se olvida lo
+  /// que hay en memoria para que se vuelva a leer.
+  void reset() {
+    _pace = SpeechPace.medium;
+    _clearSpeech = false;
+    _signSupport = SignSupportLevel.off;
+    _contentPreference = ContentPreference.none;
+    _level = LearningLevel.medium;
+    _hintsEnabled = false;
+    _manualEnabled = false;
+    _loaded = false;
+    notifyListeners();
+  }
+
   Future<void> setPace(SpeechPace value) =>
       _update(_paceKey, value.label, () => _pace = value);
 

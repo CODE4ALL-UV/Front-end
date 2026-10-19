@@ -20,6 +20,7 @@ import 'package:flutter_code4all/data/services/session_controller.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_reading_state_widget.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_text_scale_widget.dart';
+import 'package:flutter_code4all/ui/core/ui/learning_preferences.dart';
 import 'package:flutter_code4all/ui/courses/student_courses_screen.dart';
 import 'package:flutter_code4all/ui/courses/teacher_courses_screen.dart';
 import 'package:flutter_code4all/ui/director/director_home_screen.dart';
@@ -162,7 +163,10 @@ void main() {
     DirectorOversightStore.instance.debugReset();
     CourseAnalyticsStore.instance.debugReset();
     CourseContentStore.instance.debugReset();
-    CourseProgressStore.instance.reportCompletionsTo(null);
+    CourseProgressStore.instance
+      ..reportCompletionsTo(null)
+      ..reset();
+    LearningPreferences.instance.reset();
     AccessibilityTextScaleController.global.setScale(1.0);
     ThemeManager.changeTheme(AppThemeMode.light);
     accessibilityReadingState.clearHighlight();
@@ -483,6 +487,43 @@ void main() {
         await unmount(tester);
       });
     });
+
+    testWidgets(
+      'el siguiente no hereda el avance ni los ajustes del anterior',
+      (tester) async {
+        _server.courses = [
+          {'id': 1, 'title': 'Curso general', 'is_general': true},
+        ];
+
+        await withServer(() async {
+          await pumpApp(tester);
+          await signIn(tester);
+
+          // Quien estaba dentro estudiaba en el Curso general: vaciar los
+          // cursos lo deja donde estaba, así que no basta para olvidar nada.
+          final progress = CourseProgressStore.instance;
+          final preferences = LearningPreferences.instance;
+          expect(progress.courseId, isNull);
+          await progress.markCompleted('m1-s1', CourseActivityKind.lectura);
+          await preferences.setLevel(LearningLevel.advanced);
+          await preferences.setContentPreference(ContentPreference.videos);
+
+          expect(SessionController.instance.logout(), isTrue);
+          await settle(tester);
+
+          expect(
+            progress.isCompleted('m1-s1', CourseActivityKind.lectura),
+            isFalse,
+          );
+          // Se volverá a leer al entrar el siguiente.
+          expect(progress.isLoaded, isFalse);
+          expect(preferences.level, LearningLevel.medium);
+          expect(preferences.contentPreference, ContentPreference.none);
+          expect(preferences.isLoaded, isFalse);
+          await unmount(tester);
+        });
+      },
+    );
   });
 
   group('registro', () {

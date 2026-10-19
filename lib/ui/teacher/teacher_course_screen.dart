@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_code4all/data/course/course_content_store.dart';
 import 'package:flutter_code4all/data/course/python_course_catalog.dart';
+import 'package:flutter_code4all/data/services/course_progress_store.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_catalog_models.dart';
 import 'package:flutter_code4all/domain/models/python_course_content/course_info.dart';
 import 'package:flutter_code4all/ui/core/themes/app_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/accessibility_quick_button.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
+import 'package:flutter_code4all/ui/python_course_content/widgets/section/section_activity_launcher.dart';
 import 'teacher_section_detail.dart';
 import 'teacher_stats_screen.dart';
 import 'teacher_students_screen.dart';
@@ -330,7 +332,7 @@ class _ModuleTree extends StatelessWidget {
             children: [
               // Con lo editado encima: el título que puso el docente y
               // cuántas preguntas o videos le quedan de verdad.
-              for (final base in module.sections)
+              for (final (i, base) in module.sections.indexed)
                 _SectionRow(
                   section: content.section(module.number, base.number) ?? base,
                   edited: content.isSectionEdited(base.id),
@@ -338,8 +340,11 @@ class _ModuleTree extends StatelessWidget {
                       highlightSelection &&
                       module.number == selectedModule &&
                       base.number == selectedSection,
+                  isFirst: i == 0,
+                  isLast: i == module.sections.length - 1,
                   onTap: () => onSelect(module.number, base.number),
                 ),
+              const SizedBox(height: 8),
             ],
           ),
         );
@@ -460,90 +465,162 @@ class _ModuleTileState extends State<_ModuleTile> {
   }
 }
 
-/// Lo que contiene una sección, en distintivos legibles.
+/// Lo que contiene una sección: cuánto de cada cosa y qué tipos de actividad.
 ///
-/// Antes esto era una fila de iconos pequeños. Un icono suelto no dice si hay
-/// tres preguntas o quince, y siete seguidos se vuelven indescifrables. Un
-/// distintivo con su número se entiende de un vistazo y además se puede leer
-/// en voz alta.
-List<(String, IconData)> _sectionBadges(CourseSection section) {
-  final badges = <(String, IconData)>[];
+/// Primero fue una fila de iconos sueltos, que no decían si había tres
+/// preguntas o quince; después, una fila de distintivos que pesaba más que el
+/// propio título. Ahora cada dato es un icono con su texto, sin cajas: el
+/// icono y el color son los de la ruta del estudiante, así que el docente
+/// reconoce de un vistazo lo mismo que encontrará su grupo.
+class _SectionContents {
+  _SectionContents(CourseSection section) {
+    final reading = section.reading;
+    if (reading != null) {
+      final pages = reading.pages.length;
+      counts.add((
+        pages,
+        pages == 1 ? 'página' : 'páginas',
+        CourseActivityKind.lectura,
+      ));
+    }
+    final videos = section.videos.length;
+    if (videos > 0) {
+      counts.add((
+        videos,
+        videos == 1 ? 'video' : 'videos',
+        CourseActivityKind.video,
+      ));
+    }
 
-  final reading = section.reading;
-  if (reading != null) {
-    final pages = reading.pages.length;
-    badges.add((
-      '$pages ${pages == 1 ? "página" : "páginas"}',
-      Icons.menu_book,
-    ));
-  }
-  if (section.videos.isNotEmpty) {
-    badges.add((
-      '${section.videos.length} '
-          '${section.videos.length == 1 ? "video" : "videos"}',
-      Icons.play_circle_outline,
-    ));
+    // Quiz y evaluación se juntan: al docente le importa cuántas preguntas
+    // hay que responder en total, no en qué cajón están.
+    final questions = section.quiz.length + section.finalEvaluation.length;
+    if (questions > 0) {
+      counts.add((
+        questions,
+        questions == 1 ? 'pregunta' : 'preguntas',
+        CourseActivityKind.quiz,
+      ));
+    }
+
+    if (section.capsule != null) {
+      kinds.add(('Cápsula', CourseActivityKind.capsula));
+    }
+    if (section.example != null) {
+      kinds.add(('Ejemplo', CourseActivityKind.ejemplo));
+    }
+    if (section.exercise != null && !section.exercise!.isEmpty) {
+      kinds.add(('Ejercicio', CourseActivityKind.ejercicio));
+    }
+    if (section.hasLaboratory) {
+      kinds.add(('Laboratorio', CourseActivityKind.laboratorio));
+    }
   }
 
-  // Quiz y evaluación se juntan: al docente le importa cuántas preguntas hay
-  // que responder en total, no en qué cajón están.
-  final questions = section.quiz.length + section.finalEvaluation.length;
-  if (questions > 0) {
-    badges.add((
-      '$questions ${questions == 1 ? "pregunta" : "preguntas"}',
-      Icons.quiz_outlined,
-    ));
-  }
+  /// «4 páginas», «1 video», «6 preguntas».
+  final List<(int, String, CourseActivityKind)> counts = [];
 
-  if (section.capsule != null) badges.add(('Cápsula', Icons.lightbulb_outline));
-  if (section.example != null) badges.add(('Ejemplo', Icons.code));
-  if (section.exercise != null && !section.exercise!.isEmpty) {
-    badges.add(('Ejercicio', Icons.edit_note));
-  }
-  if (section.hasLaboratory) badges.add(('Laboratorio', Icons.terminal));
+  /// Cápsula, ejemplo, ejercicio y laboratorio, si los tiene.
+  final List<(String, CourseActivityKind)> kinds = [];
 
-  return badges;
+  /// Por voz se dice lo mismo que se ve, en el mismo orden.
+  String get spoken => [
+    for (final (n, word, _) in counts) '$n $word',
+    for (final (label, _) in kinds) label,
+  ].join(', ');
 }
 
-/// Un distintivo suelto: icono pequeño y su texto.
-class _Badge extends StatelessWidget {
-  const _Badge({required this.label, required this.icon});
+/// Un dato de la sección: el icono de su actividad y su texto, sin caja.
+class _Fact extends StatelessWidget {
+  const _Fact({
+    required this.kind,
+    required this.text,
+    required this.textColor,
+    this.number,
+    this.numberColor,
+  });
 
-  final String label;
-  final IconData icon;
+  final CourseActivityKind kind;
+  final String text;
+  final Color textColor;
+
+  /// La cantidad, que va destacada delante del texto.
+  final int? number;
+  final Color? numberColor;
 
   @override
   Widget build(BuildContext context) {
-    final appColorScheme = context.colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(AppMetrics.pillRadius),
-        border: Border.all(color: appColorScheme.outlineVariant),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: appColorScheme.onSurfaceVariant),
-          const SizedBox(width: 4),
-          // Flexible: con la letra al doble, en la columna de 300 px del
-          // temario, una etiqueta larga no cabía y se salía del distintivo.
-          Flexible(
-            child: Text(
-              label,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w600,
-                color: appColorScheme.onSurfaceVariant,
-              ),
+    final iconColor = SectionActivityLauncher.colorsFor(
+      context,
+      kind,
+    ).foreground;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(SectionActivityLauncher.iconFor(kind), size: 16, color: iconColor),
+        const SizedBox(width: 5),
+        // Flexible: con la letra al doble, en la columna de 300 px del
+        // temario, un dato largo parte el renglón en vez de salirse.
+        Flexible(
+          child: Text.rich(
+            TextSpan(
+              children: [
+                if (number != null)
+                  TextSpan(
+                    text: '$number ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: numberColor,
+                    ),
+                  ),
+                TextSpan(text: text),
+              ],
             ),
+            style: TextStyle(fontSize: 12.5, height: 1.3, color: textColor),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
+}
+
+/// El tramo de la línea de tiempo que toca a una sección.
+///
+/// La línea une los círculos de las secciones de un módulo: sube hasta el
+/// círculo si hay una sección antes y baja desde él si hay otra después.
+class _RailPainter extends CustomPainter {
+  const _RailPainter({
+    required this.color,
+    required this.center,
+    required this.up,
+    required this.down,
+  });
+
+  final Color color;
+
+  /// A qué altura queda el centro del círculo.
+  final double center;
+  final bool up;
+  final bool down;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    final x = size.width / 2;
+    if (up) canvas.drawLine(Offset(x, 0), Offset(x, center), paint);
+    if (down) canvas.drawLine(Offset(x, center), Offset(x, size.height), paint);
+  }
+
+  @override
+  bool shouldRepaint(_RailPainter old) =>
+      old.color != color ||
+      old.center != center ||
+      old.up != up ||
+      old.down != down;
 }
 
 class _SectionRow extends StatelessWidget {
@@ -551,130 +628,254 @@ class _SectionRow extends StatelessWidget {
     required this.section,
     required this.edited,
     required this.selected,
+    required this.isFirst,
+    required this.isLast,
     required this.onTap,
   });
 
   final CourseSection section;
   final bool edited;
   final bool selected;
+
+  /// Para saber si la línea de tiempo sigue por arriba o por abajo.
+  final bool isFirst;
+  final bool isLast;
+
   final VoidCallback onTap;
+
+  /// Margen hasta la línea: así queda justo debajo del icono del módulo, y
+  /// las secciones se ven colgando de él.
+  static const double _railInset = 23;
+  static const double _railWidth = 32;
+  static const double _circle = 28;
+  static const double _top = 12;
 
   @override
   Widget build(BuildContext context) {
-    final badges = _sectionBadges(section);
+    final contents = _SectionContents(section);
     final appColorScheme = context.colorScheme;
     // El secundario: se lee como texto en los seis temas.
     final accent = appColorScheme.secondary;
+    final background = selected
+        ? Color.alphaBlend(
+            accent.withValues(alpha: 0.09),
+            appColorScheme.surface,
+          )
+        : appColorScheme.surface;
+    final muted = AppContrast.readableOn(
+      appColorScheme.onSurfaceVariant,
+      background,
+      AppContrast.text,
+    );
+    final accentText = AppContrast.readableOn(
+      accent,
+      background,
+      AppContrast.text,
+    );
+
+    // El círculo de la sección: hueco, con el número en el color de acento;
+    // lleno cuando es la que está abierta al lado. Una sección sin material
+    // se queda en gris, como un hueco por llenar.
+    final circle = Container(
+      width: _circle,
+      height: _circle,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: selected ? accent : background,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: selected
+              ? accent
+              : (section.isPlaceholder
+                    ? appColorScheme.outlineVariant
+                    : accent),
+          width: 1.5,
+        ),
+      ),
+      child: Text(
+        '${section.number}',
+        style: TextStyle(
+          fontSize: 12.5,
+          fontWeight: FontWeight.w800,
+          color: selected
+              ? appColorScheme.onSecondary
+              : (section.isPlaceholder ? muted : accentText),
+        ),
+      ),
+    );
+
+    final rail = SizedBox(
+      width: _railWidth,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _RailPainter(
+                color: appColorScheme.outlineVariant,
+                center: _top + _circle / 2,
+                up: !isFirst,
+                down: !isLast,
+              ),
+            ),
+          ),
+          Positioned(
+            top: _top,
+            left: (_railWidth - _circle) / 2,
+            child: circle,
+          ),
+        ],
+      ),
+    );
+
+    // Primero las cantidades, con su número destacado; debajo, los tipos de
+    // actividad que tiene. Una sección sin material lo dice en vez de dejar
+    // el hueco en blanco.
+    final List<Widget> facts = section.isPlaceholder
+        ? [
+            Row(
+              children: [
+                Icon(Icons.hourglass_empty, size: 16, color: muted),
+                const SizedBox(width: 5),
+                Flexible(
+                  child: Text(
+                    'Sin contenido',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontStyle: FontStyle.italic,
+                      color: muted,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ]
+        : [
+            if (contents.counts.isNotEmpty)
+              Wrap(
+                spacing: 16,
+                runSpacing: 6,
+                children: [
+                  for (final (n, word, kind) in contents.counts)
+                    _Fact(
+                      kind: kind,
+                      number: n,
+                      numberColor: appColorScheme.onSurface,
+                      text: word,
+                      textColor: muted,
+                    ),
+                ],
+              ),
+            if (contents.counts.isNotEmpty && contents.kinds.isNotEmpty)
+              const SizedBox(height: 6),
+            if (contents.kinds.isNotEmpty)
+              Wrap(
+                spacing: 16,
+                runSpacing: 6,
+                children: [
+                  for (final (label, kind) in contents.kinds)
+                    _Fact(kind: kind, text: label, textColor: muted),
+                ],
+              ),
+          ];
+
+    final title = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            section.title,
+            style: TextStyle(
+              fontSize: 14.5,
+              height: 1.3,
+              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+              color: selected ? accentText : appColorScheme.onSurface,
+            ),
+          ),
+        ),
+        if (edited) ...[
+          const SizedBox(width: 8),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.edit_outlined, size: 14, color: accentText),
+                const SizedBox(width: 3),
+                Text(
+                  'Editada',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: accentText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
 
     return Semantics(
       button: true,
       selected: selected,
-      // Por voz se dice lo mismo que se ve, en palabras: los distintivos de
-      // la tarjeta leídos uno detrás de otro.
       label:
           'Sección ${section.number}, ${section.title}. '
-          '${section.isPlaceholder ? "Sin contenido todavía" : badges.map((b) => b.$1).join(", ")}.'
+          '${section.isPlaceholder ? "Sin contenido todavía" : contents.spoken}.'
           '${edited ? " Con cambios tuyos." : ""}',
       child: ExcludeSemantics(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Material(
-            color: selected
-                ? Color.alphaBlend(
-                    accent.withValues(alpha: 0.12),
-                    appColorScheme.surface,
-                  )
-                : appColorScheme.surface,
-            borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
+            color: background,
+            borderRadius: BorderRadius.circular(14),
             child: InkWell(
               onTap: onTap,
-              borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-              child: Container(
-                constraints: const BoxConstraints(
-                  minHeight: AppMetrics.minTapTarget,
-                ),
-                padding: const EdgeInsets.all(11),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(AppMetrics.cardRadius),
-                  border: Border.all(
-                    color: selected ? accent : appColorScheme.outlineVariant,
-                    width: selected ? 2 : 1,
+              borderRadius: BorderRadius.circular(14),
+              // IntrinsicHeight: la línea de tiempo mide lo mismo que la fila,
+              // también cuando el título ocupa dos renglones.
+              child: IntrinsicHeight(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minHeight: AppMetrics.minTapTarget + 12,
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        // El número, no un icono: aquí lo que hace falta es
-                        // saber en qué orden van.
-                        Container(
-                          width: 22,
-                          height: 22,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: selected
-                                ? accent
-                                : Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(7),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(width: _railInset),
+                      rail,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: _top + 4,
+                            bottom: _top + 4,
                           ),
-                          child: Text(
-                            '${section.number}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: selected
-                                  ? appColorScheme.onSecondary
-                                  : appColorScheme.onSurfaceVariant,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              title,
+                              const SizedBox(height: 8),
+                              ...facts,
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 9),
-                        Expanded(
-                          child: Text(
-                            section.title,
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              height: 1.25,
-                              fontWeight: selected
-                                  ? FontWeight.w700
-                                  : FontWeight.w600,
-                              color: selected
-                                  ? AppContrast.readableOn(
-                                      accent,
-                                      Color.alphaBlend(
-                                        accent.withValues(alpha: 0.12),
-                                        appColorScheme.surface,
-                                      ),
-                                      AppContrast.text,
-                                    )
-                                  : appColorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        if (edited) EditedDot(label: 'Editada'),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    if (section.isPlaceholder)
-                      _Badge(
-                        label: 'Sin contenido',
-                        icon: Icons.hourglass_empty,
-                      )
-                    else
-                      // Los distintivos dicen qué tiene la sección y con
-                      // cuánto, sin abrirla: si le falta el video, o si el
-                      // quiz solo tiene dos preguntas, se ve desde aquí.
-                      Wrap(
-                        spacing: 5,
-                        runSpacing: 5,
-                        children: [
-                          for (final badge in badges)
-                            _Badge(label: badge.$1, icon: badge.$2),
-                        ],
                       ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: _top + 4,
+                          left: 4,
+                          right: 8,
+                        ),
+                        child: Icon(
+                          Icons.chevron_right,
+                          size: 20,
+                          color: selected ? accentText : muted,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

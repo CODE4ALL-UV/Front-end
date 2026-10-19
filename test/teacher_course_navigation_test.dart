@@ -219,7 +219,9 @@ void main() {
       await mount(tester);
 
       expect(find.text('Primeros pasos con Laura'), findsOneWidget);
-      expect(find.byType(EditedDot), findsNWidgets(2));
+      // El módulo lleva su punto; la sección lo dice con palabras.
+      expect(find.byType(EditedDot), findsOneWidget);
+      expect(find.textContaining('Editada'), findsOneWidget);
       expect(
         find.bySemanticsLabel(
           'Módulo 1, Primeros pasos con Laura, 3 secciones',

@@ -12,6 +12,8 @@ import 'package:flutter_code4all/ui/core/ui/accessibility_toolbar_widget.dart';
 import 'package:flutter_code4all/ui/core/themes/message_theme.dart';
 import 'package:flutter_code4all/ui/core/ui/appbar_widget.dart';
 import 'package:flutter_code4all/ui/python_course_content/widgets/section/sign_guide.dart';
+import 'package:flutter_code4all/utils/camera_photo_cleanup_io.dart'
+    if (dart.library.js_interop) 'package:flutter_code4all/utils/camera_photo_cleanup_web.dart';
 
 /// En qué punto está la pantalla.
 enum _Stage { checking, unavailable, ready, running, failed }
@@ -267,6 +269,7 @@ class _SignCameraScreenState extends State<SignCameraScreen>
     try {
       final shot = await camera.takePicture();
       final bytes = await shot.readAsBytes();
+      unawaited(discardCameraPhoto(shot));
       if (!mounted || _stage != _Stage.running) return false;
 
       final reading = await _service.read(bytes);

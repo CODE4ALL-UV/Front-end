@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 // La interfaz de plataforma de la cámara llega con el paquete camera; se
 // importa directamente para poder sustituir la cámara real por una simulada.
@@ -7,6 +8,7 @@ import 'dart:convert';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -40,6 +42,8 @@ void main() {
     originalCamera = CameraPlatform.instance;
     camera = _FakeCameraPlatform();
     CameraPlatform.instance = camera;
+    // El menú de la barra superior lee la sesión guardada.
+    FlutterSecureStorage.setMockInitialValues({});
   });
 
   tearDown(() {
@@ -300,6 +304,35 @@ void main() {
       expect(service.frames, hasLength(1));
       expect(camera.pictures, 1);
 
+      await _leave(tester);
+    });
+
+    testWidgets('borra cada foto en cuanto la lee', (tester) async {
+      camera.pictureFile = File(
+        '${Directory.systemTemp.createTempSync('code4all_senas_').path}'
+        '${Platform.pathSeparator}foto.jpg',
+      );
+      await _open(tester, service: _ScriptedService());
+      await _turnOn(tester);
+      expect(camera.pictures, 1);
+      expect(camera.pictureFile!.existsSync(), isTrue);
+
+      // Se apaga para que no llegue otra foto justo antes de comprobarlo.
+      await _tapButton(tester, 'Apagar la cámara');
+
+      // Leer y borrar un archivo es E/S de verdad: no avanza con el reloj
+      // simulado, así que se le deja tiempo real a trozos.
+      for (var i = 0; i < 250 && camera.pictureFile!.existsSync(); i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 20)),
+        );
+        await tester.pump();
+      }
+
+      expect(camera.pictureFile!.existsSync(), isFalse);
+
+      camera.pictureFile!.parent.deleteSync(recursive: true);
+      camera.pictureFile = null;
       await _leave(tester);
     });
 
@@ -754,6 +787,9 @@ class _FakeCameraPlatform extends CameraPlatform {
   /// Fallos de las próximas fotos, en orden.
   final List<Object> pictureErrors = [];
 
+  /// Si está puesto, cada foto queda en este archivo, como en un móvil.
+  File? pictureFile;
+
   final List<CameraDescription> opened = [];
   final List<int> disposed = [];
   int pictures = 0;
@@ -818,6 +854,11 @@ class _FakeCameraPlatform extends CameraPlatform {
   Future<XFile> takePicture(int cameraId) async {
     pictures++;
     if (pictureErrors.isNotEmpty) throw pictureErrors.removeAt(0);
+    final file = pictureFile;
+    if (file != null) {
+      file.writeAsBytesSync(pictureBytes);
+      return XFile(file.path);
+    }
     return XFile.fromData(pictureBytes, name: 'foto.jpg');
   }
 

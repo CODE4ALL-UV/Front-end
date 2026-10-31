@@ -27,6 +27,38 @@ Path _contourPath(Iterable<Offset> points) {
   return path..close();
 }
 
+/// Dónde cae, dentro de la vista previa, un punto de la foto.
+///
+/// La foto y la vista previa no siempre tienen la misma forma. En un celular en
+/// vertical la cámara suele dar vídeo apaisado, y la vista previa, que es
+/// vertical, lo agranda hasta llenarse y recorta lo que sobra por los lados
+/// (`object-fit: cover`). Repartir los puntos sobre el ancho de la vista previa
+/// dibujaba los labios a la mitad de su tamaño y fuera de sitio.
+///
+/// Sin [photoAspect] se supone que tienen la misma forma.
+Offset lipPointOnPreview(
+  LipPoint point,
+  Size preview, {
+  double? photoAspect,
+  bool mirror = false,
+}) {
+  final previewAspect = preview.width / preview.height;
+  final aspect = photoAspect ?? previewAspect;
+
+  final shownWidth = aspect > previewAspect
+      ? preview.height * aspect
+      : preview.width;
+  final shownHeight = aspect > previewAspect
+      ? preview.height
+      : preview.width / aspect;
+
+  final x = mirror ? 1 - point.x : point.x;
+  return Offset(
+    (preview.width - shownWidth) / 2 + x * shownWidth,
+    (preview.height - shownHeight) / 2 + point.y * shownHeight,
+  );
+}
+
 /// El contorno de los labios encima de la imagen de la cámara.
 class LipOverlayPainter extends CustomPainter {
   const LipOverlayPainter({required this.frame, this.mirror = false});
@@ -47,9 +79,11 @@ class LipOverlayPainter extends CustomPainter {
     final current = frame;
     if (current == null) return;
 
-    Offset place(LipPoint point) => Offset(
-      (mirror ? 1 - point.x : point.x) * size.width,
-      point.y * size.height,
+    Offset place(LipPoint point) => lipPointOnPreview(
+      point,
+      size,
+      photoAspect: current.photoAspect,
+      mirror: mirror,
     );
 
     final outer = _contourPath(current.outer.map(place));
@@ -80,13 +114,18 @@ class LipOverlayPainter extends CustomPainter {
 
 /// Solo la boca, ampliada, para ver bien cómo se mueve.
 class MouthZoomPainter extends CustomPainter {
-  const MouthZoomPainter({required this.frame, required this.aspectRatio});
+  const MouthZoomPainter({required this.frame});
 
   final LipFrame? frame;
 
-  /// Ancho entre alto de la foto. Las coordenadas son relativas a cada lado, y
-  /// sin esto una boca en una foto apaisada saldría aplastada.
-  final double aspectRatio;
+  /// Cuántas distancias entre ojos tienen que caber a lo alto: una boca muy
+  /// abierta, con los dos labios. Sin este tope, en un celular ancho la boca
+  /// abierta se salía del recuadro.
+  static const double _tallestMouth = 0.75;
+
+  /// A qué tamaño se dibuja la distancia entre ojos en un recuadro.
+  static double pixelsPerEyeDistance(Size size) =>
+      math.min(size.width * 0.8, size.height / _tallestMouth);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -95,7 +134,10 @@ class MouthZoomPainter extends CustomPainter {
       return;
     }
 
-    Offset raw(LipPoint point) => Offset(point.x * aspectRatio, point.y);
+    // Las coordenadas son relativas a cada lado de la foto: sin su proporción,
+    // una boca en una foto apaisada saldría aplastada.
+    final aspect = current.photoAspect ?? 4 / 3;
+    Offset raw(LipPoint point) => Offset(point.x * aspect, point.y);
 
     final outerRaw = current.outer.map(raw).toList();
     // Los puntos 0 y 10 son las comisuras. Se escala con la distancia entre
@@ -103,7 +145,7 @@ class MouthZoomPainter extends CustomPainter {
     final mouthSpan = (outerRaw[0] - outerRaw[10]).distance;
     final betweenEyes = mouthSpan / current.width;
     if (betweenEyes <= 0) return;
-    final scale = size.width * 0.8 / betweenEyes;
+    final scale = pixelsPerEyeDistance(size) / betweenEyes;
 
     final xs = outerRaw.map((point) => point.dx);
     final ys = outerRaw.map((point) => point.dy);
@@ -120,6 +162,7 @@ class MouthZoomPainter extends CustomPainter {
 
     // Los labios enteros y encima el interior de la boca, en ese orden.
     canvas
+      ..clipRect(Offset.zero & size)
       ..drawPath(outer, Paint()..color = _lipColor)
       ..drawPath(inner, Paint()..color = _insideColor)
       ..drawPath(
@@ -132,8 +175,7 @@ class MouthZoomPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(MouthZoomPainter oldDelegate) =>
-      oldDelegate.frame != frame || oldDelegate.aspectRatio != aspectRatio;
+  bool shouldRepaint(MouthZoomPainter oldDelegate) => oldDelegate.frame != frame;
 }
 
 /// Cómo se ha movido la boca en los últimos segundos.

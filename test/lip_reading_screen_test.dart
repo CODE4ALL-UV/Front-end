@@ -723,6 +723,130 @@ void main() {
     });
   });
 
+  group('dónde se dibujan los labios sobre la vista previa', () {
+    // Medido en una captura real de un celular: el vídeo apaisado se recorta
+    // para llenar una vista previa vertical de 141 x 209 px, y los labios se
+    // ven de 87,7 a 122,4 px, con la vista previa empezando en 44 px.
+    const preview = Size(141, 209);
+    const photoAspect = 1.5;
+    final shownWidth = preview.height * photoAspect;
+    double photoX(double screenX) =>
+        (screenX - 44 - preview.width / 2) / shownWidth + 0.5;
+
+    test('con vídeo apaisado en vertical coinciden con los labios reales', () {
+      final left = lipPointOnPreview(
+        LipPoint(photoX(87.7), 0.77),
+        preview,
+        photoAspect: photoAspect,
+      );
+      final right = lipPointOnPreview(
+        LipPoint(photoX(122.4), 0.77),
+        preview,
+        photoAspect: photoAspect,
+      );
+
+      expect(left.dx + 44, closeTo(87.7, 0.01));
+      expect(right.dx + 44, closeTo(122.4, 0.01));
+      expect(left.dy, closeTo(0.77 * preview.height, 0.01));
+    });
+
+    test('el centro de la foto cae en el centro, se recorte como se recorte', () {
+      for (final aspect in [0.5, 2 / 3, 1.0, 1.5, 16 / 9]) {
+        expect(
+          lipPointOnPreview(
+            const LipPoint(0.5, 0.5),
+            preview,
+            photoAspect: aspect,
+          ),
+          const Offset(70.5, 104.5),
+          reason: 'proporción $aspect',
+        );
+      }
+    });
+
+    test('si la foto y la vista previa tienen la misma forma, no hay recorte', () {
+      const size = Size(400, 300);
+
+      expect(
+        lipPointOnPreview(
+          const LipPoint(0.25, 0.75),
+          size,
+          photoAspect: 4 / 3,
+        ),
+        const Offset(100, 225),
+      );
+      expect(
+        lipPointOnPreview(const LipPoint(0.25, 0.75), size),
+        const Offset(100, 225),
+      );
+    });
+
+    test('una foto vertical en una vista previa apaisada se recorta arriba y '
+        'abajo', () {
+      final point = lipPointOnPreview(
+        const LipPoint(0.5, 0.25),
+        const Size(300, 200),
+        photoAspect: 0.75,
+      );
+
+      // Se agranda a 300 x 400: la mitad de arriba de la foto mide 200.
+      expect(point, const Offset(150, 0));
+    });
+
+    test('en espejo, la izquierda de la foto cae a la derecha', () {
+      expect(
+        lipPointOnPreview(
+          const LipPoint(0.25, 0.5),
+          const Size(400, 300),
+          photoAspect: 4 / 3,
+          mirror: true,
+        ).dx,
+        300,
+      );
+    });
+  });
+
+  group('la proporción de la foto', () {
+    test('sale del tamaño que dice el servidor', () {
+      final frame = LipFrame.fromJson(const {
+        'image': {'width': 720, 'height': 480},
+      });
+
+      expect(frame.photoAspect, 1.5);
+    });
+
+    test('sin tamaño, o con uno que no vale, no se inventa', () {
+      for (final json in <Map<String, dynamic>>[
+        const {},
+        const {'image': 'no'},
+        const {
+          'image': {'width': 720},
+        },
+        const {
+          'image': {'width': 720, 'height': 0},
+        },
+      ]) {
+        expect(LipFrame.fromJson(json).photoAspect, isNull, reason: '$json');
+      }
+    });
+  });
+
+  group('la boca ampliada', () {
+    test('una boca muy abierta cabe, también en un celular ancho', () {
+      for (final panel in const [
+        Size(400, 130),
+        Size(300, 130),
+        Size(180, 130),
+      ]) {
+        final perEyeDistance = MouthZoomPainter.pixelsPerEyeDistance(panel);
+
+        // Una boca de 0,6 de ancho y, muy abierta y con los labios, 0,75 de alto.
+        expect(perEyeDistance * 0.75, lessThanOrEqualTo(panel.height));
+        expect(perEyeDistance * 0.6, lessThanOrEqualTo(panel.width));
+      }
+    });
+  });
+
   group('los dibujos de la boca', () {
     final frame = LipFrame(
       outer: [
@@ -742,8 +866,19 @@ void main() {
         LipOverlayPainter(frame: frame),
         LipOverlayPainter(frame: frame, mirror: true),
         const LipOverlayPainter(frame: null),
-        MouthZoomPainter(frame: frame, aspectRatio: 4 / 3),
-        const MouthZoomPainter(frame: null, aspectRatio: 4 / 3),
+        MouthZoomPainter(frame: frame),
+        MouthZoomPainter(
+          frame: LipFrame(
+            outer: frame.outer,
+            inner: frame.inner,
+            opening: frame.opening,
+            width: frame.width,
+            rounding: frame.rounding,
+            shape: frame.shape,
+            photoAspect: 1.5,
+          ),
+        ),
+        const MouthZoomPainter(frame: null),
         LipMovementPainter(
           history: [frame, frame, frame],
           neutralWidth: 0.6,
@@ -784,15 +919,9 @@ void main() {
         isTrue,
       );
 
-      final zoom = MouthZoomPainter(frame: frame, aspectRatio: 1);
-      expect(
-        zoom.shouldRepaint(MouthZoomPainter(frame: frame, aspectRatio: 1)),
-        isFalse,
-      );
-      expect(
-        zoom.shouldRepaint(const MouthZoomPainter(frame: null, aspectRatio: 1)),
-        isTrue,
-      );
+      final zoom = MouthZoomPainter(frame: frame);
+      expect(zoom.shouldRepaint(MouthZoomPainter(frame: frame)), isFalse);
+      expect(zoom.shouldRepaint(const MouthZoomPainter(frame: null)), isTrue);
     });
 
     testWidgets('el icono de labios no le dice nada al lector de pantalla', (

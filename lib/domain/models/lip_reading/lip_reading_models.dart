@@ -56,6 +56,7 @@ class LipFrame {
     required this.width,
     required this.rounding,
     required this.shape,
+    this.photoAspect,
   });
 
   factory LipFrame.fromJson(Map<String, dynamic> json) {
@@ -66,7 +67,15 @@ class LipFrame {
         if (point is Map<String, dynamic>) LipPoint.fromJson(point),
     ];
 
+    final image = json['image'];
+    final photoWidth = image is Map ? image['width'] : null;
+    final photoHeight = image is Map ? image['height'] : null;
+
     return LipFrame(
+      photoAspect:
+          photoWidth is num && photoHeight is num && photoHeight > 0
+          ? photoWidth / photoHeight
+          : null,
       outer: contour('outer'),
       inner: contour('inner'),
       opening: (json['opening'] as num?)?.toDouble() ?? 0,
@@ -78,6 +87,12 @@ class LipFrame {
 
   final List<LipPoint> outer;
   final List<LipPoint> inner;
+
+  /// Ancho entre alto de la foto que se analizó, si el servidor lo dijo.
+  ///
+  /// No sale de la cámara: su proporción depende de la plataforma y de cómo se
+  /// sostenga el celular, y la de la foto es la única segura.
+  final double? photoAspect;
 
   /// Lo que se separan los labios, en distancias entre ojos.
   final double opening;

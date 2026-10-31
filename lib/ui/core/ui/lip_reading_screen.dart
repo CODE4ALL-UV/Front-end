@@ -585,9 +585,6 @@ class _LipReadingScreenState extends State<LipReadingScreen>
     final running = _stage == _Stage.running;
     final neutral = _calibration.neutralWidth ?? _defaultNeutralWidth;
     final camera = _camera;
-    final aspectRatio = camera != null && camera.value.isInitialized
-        ? camera.value.aspectRatio
-        : 4 / 3;
 
     return [
       const _Explanation(),
@@ -614,7 +611,6 @@ class _LipReadingScreenState extends State<LipReadingScreen>
           frame: _frame,
           history: _history,
           neutralWidth: neutral,
-          aspectRatio: aspectRatio,
         ),
         const SizedBox(height: AppMetrics.sectionGap),
         _recordControl(),
@@ -725,7 +721,9 @@ class _LipReadingScreenState extends State<LipReadingScreen>
         const SizedBox(height: 6),
         Text(
           _recording
-              ? 'Di la palabra despacio, exagerando un poco la boca.'
+              ? 'Di la palabra despacio, exagerando un poco la boca, y pulsa '
+                    '«Terminar». La barra es el tiempo máximo: no hace falta '
+                    'llenarla.'
               : 'Pulsa, di una palabra de la lista despacio y vuelve a pulsar.',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 14, color: colors.onSurfaceVariant),
@@ -1052,13 +1050,11 @@ class _MovementBox extends StatelessWidget {
     required this.frame,
     required this.history,
     required this.neutralWidth,
-    required this.aspectRatio,
   });
 
   final LipFrame? frame;
   final List<LipFrame> history;
   final double neutralWidth;
-  final double aspectRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -1093,12 +1089,7 @@ class _MovementBox extends StatelessWidget {
                   color: messages.infoBackground,
                   borderRadius: BorderRadius.circular(AppMetrics.radius),
                 ),
-                child: CustomPaint(
-                  painter: MouthZoomPainter(
-                    frame: frame,
-                    aspectRatio: aspectRatio,
-                  ),
-                ),
+                child: CustomPaint(painter: MouthZoomPainter(frame: frame)),
               );
               final chart = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

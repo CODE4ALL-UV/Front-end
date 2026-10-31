@@ -8,6 +8,8 @@ import 'package:flutter_code4all/data/services/api_service.dart';
 import 'package:flutter_code4all/data/services/session_controller.dart';
 import 'package:flutter_code4all/data/services/auth_storage.dart';
 import 'package:flutter_code4all/ui/core/ui/braille_keyboard_screen.dart';
+import 'package:flutter_code4all/ui/core/ui/lip_painters.dart';
+import 'package:flutter_code4all/ui/core/ui/lip_reading_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/sign_keyboard_settings.dart';
 import 'package:flutter_code4all/ui/core/ui/user_manual.dart';
 import 'package:http/http.dart' as http;
@@ -445,6 +447,8 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
           _toggleSignKeyboard();
         } else if (value == 'braille_keyboard') {
           Navigator.of(context).push(BrailleKeyboardScreen.route());
+        } else if (value == 'lip_reading') {
+          Navigator.of(context).push(LipReadingScreen.route());
         }
       },
       // El color va explicito. Sin el, los iconos heredan el blanco de la
@@ -478,6 +482,27 @@ class _UserProfileMenuState extends State<UserProfileMenu> {
                     ),
                   ),
                 ],
+              ),
+            ),
+          // Sólo para el estudiante, como la dactilología: es una práctica
+          // para quien está aprendiendo.
+          if (isStudent)
+            PopupMenuItem<String>(
+              value: 'lip_reading',
+              child: Semantics(
+                hint: 'Abre la cámara para leer tus labios',
+                child: Row(
+                  children: [
+                    LipsIcon(color: onMenu),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        'Lectura de labios',
+                        style: TextStyle(color: onMenu),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           // Para todos los roles, no sólo el estudiante: quien no ve

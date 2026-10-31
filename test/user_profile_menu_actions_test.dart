@@ -17,6 +17,8 @@ import 'package:url_launcher_platform_interface/url_launcher_platform_interface.
 
 import 'package:flutter_code4all/data/services/session_controller.dart';
 import 'package:flutter_code4all/ui/core/ui/braille_keyboard_screen.dart';
+import 'package:flutter_code4all/ui/core/ui/lip_painters.dart';
+import 'package:flutter_code4all/ui/core/ui/lip_reading_screen.dart';
 import 'package:flutter_code4all/ui/core/ui/sign_keyboard_settings.dart';
 import 'package:flutter_code4all/ui/core/ui/user_profile_menu.dart';
 
@@ -199,6 +201,48 @@ void main() {
         find.text('Teclado con dactilología desactivado.'),
         findsOneWidget,
       );
+    });
+  });
+
+  group('lectura de labios', () {
+    testWidgets('solo el estudiante la ve en el menú', (tester) async {
+      for (final role in ['docente', 'director']) {
+        signedInAs(role: role);
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpWidget(menuApp());
+        await openMenu(tester);
+
+        expect(find.text('Lectura de labios'), findsNothing, reason: role);
+
+        await tester.tapAt(Offset.zero); // Cierra el menú.
+        await tester.pumpAndSettle();
+      }
+
+      signedInAs(role: 'estudiante');
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(menuApp());
+      await openMenu(tester);
+
+      expect(find.text('Lectura de labios'), findsOneWidget);
+      expect(find.byType(LipsIcon), findsOneWidget);
+    });
+
+    testWidgets('abre la pantalla de la cámara, sin encenderla', (
+      tester,
+    ) async {
+      signedInAs(role: 'estudiante');
+      await tester.pumpWidget(menuApp());
+      await openMenu(tester);
+
+      await tester.tap(find.text('Lectura de labios'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.byType(LipReadingScreen), findsOneWidget);
+      expect(find.text('Lectura de labios'), findsWidgets);
+
+      // Quita la pantalla antes de que llegue la respuesta del servidor.
+      await tester.pumpWidget(const SizedBox.shrink());
     });
   });
 

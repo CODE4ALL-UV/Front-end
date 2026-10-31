@@ -77,6 +77,8 @@ quien a su pantalla.
 | **Subtítulos** | Los videos muestran los subtítulos reales de YouTube, sincronizados y traducidos al español si el servidor lo tiene configurado. Si no hay, va mostrando la transcripción escrita. Debajo del video está la transcripción completa. | `lib/ui/python_course_content/widgets/section/section_video_screen.dart` |
 | **Alfabeto manual (dactilología)** | Un panel que deletrea los subtítulos con una mano dibujada, un lector flotante y un teclado de dactilología que reemplaza al del sistema. | `lib/ui/core/ui/hand_sign_painter_widget.dart` |
 | **Práctica con la cámara** | El estudiante hace una letra con la mano y la app le dice qué letra ve o qué dedo le falta estirar. El servidor encuentra los puntos de la mano con MediaPipe ([multimodal](https://github.com/CODE4ALL-UV/multimodal-interaction-backend-service)) y la app decide la letra. La primera vez ofrece una guía en PDF con todas las letras. | `lib/ui/python_course_content/widgets/section/sign_camera_screen.dart` |
+| **Lectura de labios** | Solo para estudiantes, desde el menú de perfil. La cámara dibuja los labios sobre la imagen, amplía la boca y grafica cómo se mueve. Con «Leer una palabra» toma las fotos de una palabra y el servidor la busca en una lista cerrada; si duda, deja elegir entre las candidatas. Todo el reconocimiento está en Python ([multimodal](https://github.com/CODE4ALL-UV/multimodal-interaction-backend-service)). | `lib/ui/core/ui/lip_reading_screen.dart` |
+| **Las letras con la boca** | Manual con las 27 letras del abecedario: un dibujo de la boca, cómo se hace cada una y cuánto se ve. Se abre desde la lectura de labios y funciona sin cámara ni servidor. | `lib/ui/core/ui/lip_alphabet_guide_screen.dart` |
 | **Lector de pantalla** | Etiquetas en todos los controles y avisos (por ejemplo, el código del curso se lee letra por letra). | En toda la app |
 
 Sobre las señas: es una **aproximación a la dactilología** dibujada en código,
@@ -84,6 +86,13 @@ no una interpretación en Lengua de Señas Colombiana, y no reemplaza a un
 intérprete. La cámara no reconoce J, Z ni Ñ (se hacen con movimiento) y
 confunde algunas letras parecidas, como H y U, o M, N, S y T; en esos casos
 muestra las alternativas.
+
+Sobre la lectura de labios: es una **ayuda para practicar**, no un dictado. Los
+labios no dejan ver la mayoría de las consonantes, así que solo reconoce las
+vocales, los labios que se juntan y las palabras de una lista corta. Se probó
+con el modelo real y una foto real con la boca abierta a mano, y las palabras
+con bocas simuladas, pero **no se ha medido cuánto acierta con personas
+hablando**.
 
 Las preferencias de pantalla (tema y tamaño de texto) se guardan en el
 dispositivo y se mantienen aunque se cierre sesión.

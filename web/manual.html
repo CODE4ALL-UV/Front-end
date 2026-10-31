@@ -628,6 +628,7 @@ const P = {
   person:'<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>',
   logout:'<path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/>',
   braille:'<circle cx="8" cy="6" r="1.8" fill="currentColor"/><circle cx="8" cy="12" r="1.8" fill="currentColor"/><circle cx="8" cy="18" r="1.8"/><circle cx="16" cy="6" r="1.8" fill="currentColor"/><circle cx="16" cy="12" r="1.8"/><circle cx="16" cy="18" r="1.8"/>',
+  lips:'<path d="M2 12c3.5-3.5 6-5.5 8-4.5 1.3.6 2.7.6 4 0 2-1 4.5 1 8 4.5-3 4.5-6.5 6.5-10 6.5S5 16.5 2 12z"/><path d="M2 12c6.5 1.6 13.5 1.6 20 0"/>',
   palette:'<circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1.3" fill="currentColor"/><circle cx="12" cy="7.5" r="1.3" fill="currentColor"/><circle cx="16" cy="10" r="1.3" fill="currentColor"/><path d="M12 21a2 2 0 0 1 0-4h2a3 3 0 0 0 3-3"/>',
   chevron:'<path d="M15 5l-7 7 7 7"/>',
   info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
@@ -734,7 +735,7 @@ function R(e){
     case 'video': return `<div class="m-video"><i></i></div>`;
     case 'subs': return `<div class="m-subs${m('subs')}" data-id="subs" data-name="recuadro de subtítulos"><small>Subtítulos</small>print muestra un mensaje en la pantalla.<div class="ctl"><span>◀ Frase<br>anterior</span><span>▶ Reproducir los<br>subtítulos</span><span>Frase ▶<br>siguiente</span></div></div>`;
     case 'signs': return `<div class="m-signs${m('signs')}" data-id="signs" data-name="panel de señas"><svg viewBox="0 0 60 66" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--a-blue)"><path d="M18 40V14a4 4 0 0 1 8 0v20M26 30V8a4 4 0 0 1 8 0v24M34 32V12a4 4 0 0 1 8 0v24c0 14-8 22-17 22-7 0-11-4-14-10l-6-11a4 4 0 0 1 7-4l6 7"/></svg><b>Señas · Dactilología</b><span class="lt">PRINT</span><small>Letra actual: I</small></div>`;
-    case 'cam': return `<div class="m-cam${m('camara')}" data-id="camara" data-name="vista de la cámara">${ic('hand')}</div>`;
+    case 'cam': return `<div class="m-cam${m('camara')}" data-id="camara" data-name="vista de la cámara">${ic(e.icon || 'hand')}</div>`;
     case 'written': return `<div class="m-written${m('escrito')}" data-id="escrito">Llevas escrito<b>${esc(e.t)}</b></div>`;
     case 'console': return `<div class="m-console${m('consola')}" data-id="consola" data-name="Consola"><small>Consola</small>${esc(e.t)}</div>`;
     case 'stars': return `<div class="m-stars${m('nota')}" data-id="nota" data-name="Nota del 1 al 5">${[1,2,3,4,5].map(n=>`<span class="${n===e.on?'on':''}">${n}</span>`).join('')}</div>`;
@@ -1012,12 +1013,12 @@ const ROLES = [
       { id:'perfil', t:'Mi perfil y cerrar sesión', s:'Manual, foto, datos y salida', steps:[
         { t:'Abre las opciones de perfil', scr:misCursosEst(), hl:'avatar',
           d:`<p>Toca tu foto o tu inicial, arriba a la derecha.</p>` },
-        { t:'Abre este manual', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Teclado Braille','tb','braille'],['Manual de uso','manualapp','book'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'manualapp',
+        { t:'Abre este manual', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Lectura de labios','labios','lips'],['Teclado Braille','tb','braille'],['Manual de uso','manualapp','book'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'manualapp',
           d:`<p>Toca ${u('Manual de uso')}. El manual se abre en otra pestaña, directamente en las guías de tu rol.</p>`,
           tip:'Antes de iniciar sesión también lo tienes: debajo de REGISTRARSE está «¿Cómo se usa Code4All? Ver el manual».' },
-        { t:'Sube tu foto', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Teclado Braille','tb','braille'],['Manual de uso','manualapp','book'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'miperfil',
+        { t:'Sube tu foto', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Lectura de labios','labios','lips'],['Teclado Braille','tb','braille'],['Manual de uso','manualapp','book'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'miperfil',
           d:`<p>Toca ${u('Mi perfil')}. Verás tu nombre, tu rol y tu correo.</p><p>Toca ${u('Subir foto')} y elige una imagen de menos de 5 MB. Al terminar aparece «Foto actualizada correctamente».</p>` },
-        { t:'Cierra sesión', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Teclado Braille','tb','braille'],['Manual de uso','manualapp','book'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'salirapp',
+        { t:'Cierra sesión', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Lectura de labios','labios','lips'],['Teclado Braille','tb','braille'],['Manual de uso','manualapp','book'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'salirapp',
           d:`<p>En el mismo menú toca ${u('Cerrar sesión')}. Vuelves a la pantalla de inicio de sesión.</p>`,
           tip:'Si la app dice «Tu sesión caducó. Vuelve a iniciar sesión», entra otra vez con tu correo: tu avance no se pierde.' }
       ]}
@@ -1113,6 +1114,20 @@ const ROLES = [
         { t:'Deletrea frente a la cámara', scr:{els:[bar('Lee mi mano',{back:1}), A, p('Pon la mano frente a la cámara y forma una letra. Es dactilología, no Lengua de Señas Colombiana. No se guarda ninguna imagen.'), {k:'cam'}, btn('Encender la cámara','red',{full:1, id:'encender'}), {k:'written', t:'HOL'}, row([btn('Espacio','ghost'), btn('Borrar','ghost'), btn('Empezar de nuevo','text')]), btn('Guía del alfabeto (PDF)','ghost',{full:1})]}, hl:'encender',
           d:`<p>Toca ${u('Encender la cámara')} y forma una letra. Lo que la app reconoce aparece en ${u('Llevas escrito')}.</p><p>Usa ${u('Espacio')}, ${u('Borrar')} y ${u('Empezar de nuevo')} para corregir. ${u('Cambiar de cámara')} alterna entre la frontal y la trasera.</p>`,
           tip:'El navegador te pedirá permiso para usar la cámara. Las imágenes no se guardan.' }
+      ]},
+      { id:'labios', t:'Leer tus labios con la cámara', s:'«Lectura de labios» y las letras con la boca', steps:[
+        { t:'Abre «Lectura de labios»', scr:misCursosEst(true,{menu:[['Teclado con dactilología','dactil','box'],['Lectura de labios','labios','lips'],['Teclado Braille','tb','braille'],['Manual de uso','manualapp','book'],['Mi perfil','miperfil','person'],['Cerrar sesión','salirapp','logout']]}), hl:'labios',
+          d:`<p>Toca tu foto o tu inicial, arriba a la derecha, y elige ${u('Lectura de labios')}.</p>`,
+          tip:'Esta opción solo aparece en las cuentas de estudiante.' },
+        { t:'Enciende la cámara y relaja la boca', scr:{els:[bar('Lectura de labios',{back:1}), A, p('Mira de frente a la cámara, con buena luz. No se guarda ninguna imagen.'), {k:'cam', icon:'lips'}, btn('Encender la cámara','red',{full:1, id:'encenderlabios'}), btn('Las letras con la boca','ghost',{full:1})]}, hl:'encenderlabios',
+          d:`<p>Toca ${u('Encender la cámara')} y deja la boca cerrada y relajada un momento: la app se ajusta a tu cara.</p><p>Verás tus labios dibujados sobre la imagen, tu boca ampliada, una gráfica de cómo se mueve y la forma que tiene ahora mismo.</p>`,
+          tip:'El navegador te pedirá permiso para usar la cámara. Las imágenes no se guardan.' },
+        { t:'Di una palabra', scr:{els:[bar('Lectura de labios',{back:1}), A, {k:'cam', icon:'lips'}, btn('Leer una palabra','red',{full:1, id:'leerpalabra'}), {k:'written', t:'hola'}, row([btn('Borrar la última','ghost'), btn('Empezar de nuevo','text')])]}, hl:'leerpalabra',
+          d:`<p>Toca ${u('Leer una palabra')}, di despacio una palabra de la lista ${u('Palabras que sé leer')} y toca ${u('Terminar')}. Lo que la app lee aparece en ${u('Llevas escrito')}.</p><p>Si duda, te muestra las palabras que podrían ser para que elijas. Si se equivoca, toca la correcta y la reemplaza.</p>`,
+          tip:'Los labios no lo dicen todo: muchas consonantes se hacen dentro de la boca y no se ven. Por eso solo lee palabras de una lista. Sirve para practicar, no para evaluar a nadie.' },
+        { t:'Aprende las letras con la boca', scr:{els:[bar('Lectura de labios',{back:1}), A, btn('Las letras con la boca','ghost',{full:1, id:'letrasboca'}), {k:'cam', icon:'lips'}, btn('Encender la cámara','red',{full:1})]}, hl:'letrasboca',
+          d:`<p>Toca ${u('Las letras con la boca')}. Es un manual con todo el abecedario: un dibujo de la boca, cómo se hace cada letra y cuánto se ve. Funciona sin cámara. En resumen:</p><ul><li><b>A:</b> boca muy abierta.</li><li><b>E:</b> medio abierta, con las comisuras hacia los lados.</li><li><b>I:</b> casi cerrada y estirada, como al sonreír.</li><li><b>O:</b> labios redondos y boca medio abierta.</li><li><b>U:</b> labios adelantados, casi cerrados.</li><li><b>M, B, P, V:</b> los labios se juntan. Se hacen casi igual.</li><li><b>F:</b> los dientes de arriba tocan el labio de abajo.</li><li><b>S, Z, C suave, X:</b> los dientes casi se juntan.</li><li><b>T, D, N, L, R:</b> la lengua sube detrás de los dientes. Se ven poco.</li><li><b>Ñ, Y:</b> la lengua sube hacia el paladar. Se ven poco.</li><li><b>G, J, K, Q, C fuerte:</b> se hacen al fondo de la boca. Casi no se ven.</li><li><b>H, W:</b> toman la forma de la letra que las acompaña.</li></ul>`,
+          tip:'Abrir este manual apaga la cámara. Al volver, toca otra vez «Encender la cámara».' }
       ]},
       { id:'salir', t:'Salir de un curso', s:'Tu avance se conserva', steps:[
         { t:'Toca el icono de salida', scr:misCursosEst(true), hl:'salir',
